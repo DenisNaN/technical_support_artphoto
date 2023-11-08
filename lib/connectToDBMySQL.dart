@@ -11,13 +11,13 @@ class ConnectToDBMySQL {
   MySqlConnection? _connDB;
 
   Future connDatabase() async {
-    print('connectDatabase');
     _connDB ??= await _init();
   }
 
   Future<MySqlConnection> _init() async {
     MySqlConnection connDB = await MySqlConnection.connect(ConnectionSettings(
         // host: '', port: , user: '', db: '', password: '')) ;
+        print('connectDatabase');
         return connDB;
     }
 

@@ -1,13 +1,19 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:technical_support_artphoto/repair/RepairList.dart';
 import 'package:technical_support_artphoto/splashScreen.dart';
 import 'package:technical_support_artphoto/technics/TechnicsList.dart';
+import 'utils/utils.dart' as utils;
 
 void main() {
   startMeUp() async {
 
     runApp(const SplashScreenArtphoto());
+
+    Directory docsDir = await getApplicationDocumentsDirectory();
+    utils.docsDir = docsDir;
 
     // Technic.entityList = await ConnectToDBMySQL.connDB.getAllTechnics();
     // History.historyList = await ConnectToDBMySQL.connDB.getAllHistory();
