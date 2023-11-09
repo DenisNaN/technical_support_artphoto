@@ -6,3 +6,4 @@ class CategoryDropDownValueModel{
   static List<DropDownValueModel> service = [];
   static List<DropDownValueModel> statusForEquipment = [];
 }
+

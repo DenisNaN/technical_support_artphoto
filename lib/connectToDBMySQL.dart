@@ -103,13 +103,26 @@ class ConnectToDBMySQL {
     return reversedList;
   }
 
+  Future<int> getCountRecordsRepair() async{
+    int count = 0;
+    var result = await _connDB!.query('SELECT COUNT(*) FROM repairEquipment');
+    print(result);
+    return count;
+  }
+
   String getDateFormatted(String date){
     return DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(date));
   }
 
   Future insertTechnicInDB(Technic technic) async{
-    var resultEquipment = await _connDB!.query('INSERT INTO equipment (number, category, name, dateBuy, cost, comment) VALUES (?, ?, ?, ?, ?, ?)', [technic.internalID,  technic.category, technic.name, technic.dateBuyTechnic, technic.cost, technic.comment]);
-    var resultStatusEquipment = await _connDB!.query('INSERT INTO statusEquipment (idEquipment, status, dislocation) VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?)', [technic.status, technic.dislocation]);
+    var resultEquipment = await _connDB!.query(
+        'INSERT INTO equipment (number, category, name, dateBuy, cost, comment) VALUES (?, ?, ?, ?, ?, ?)',
+        [technic.internalID,  technic.category, technic.name, technic.dateBuyTechnic, technic.cost, technic.comment]);
+
+    var resultStatusEquipment = await _connDB!.query(
+        'INSERT INTO statusEquipment (idEquipment, status, dislocation) '
+            'VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?)',
+        [technic.status, technic.dislocation]);
   }
 
   Future insertRepairInDB(Repair repair) async{

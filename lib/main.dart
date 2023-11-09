@@ -9,11 +9,12 @@ import 'utils/utils.dart' as utils;
 
 void main() {
   startMeUp() async {
-
-    runApp(const SplashScreenArtphoto());
+    WidgetsFlutterBinding.ensureInitialized();
 
     Directory docsDir = await getApplicationDocumentsDirectory();
+    print(docsDir);
     utils.docsDir = docsDir;
+    runApp(const SplashScreenArtphoto());
 
     // Technic.entityList = await ConnectToDBMySQL.connDB.getAllTechnics();
     // History.historyList = await ConnectToDBMySQL.connDB.getAllHistory();

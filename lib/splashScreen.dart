@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
 import 'package:technical_support_artphoto/technics/Technic.dart';
 import 'package:technical_support_artphoto/utils/categoryDropDownValueModel.dart';
+import 'package:technical_support_artphoto/utils/downloadAllList.dart';
 import 'ConnectToDBMySQL.dart';
 import 'repair/Repair.dart';
 import 'main.dart';
@@ -30,13 +32,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: ConnectToDBMySQL.connDB.getAll(),
+        future: DownloadAllList.downloadAllList.getAllList(),
         builder: (context, snapshot) {
           // Check for errors
           if (snapshot.hasError) {
             return const dialogDontConnectDB();
           }
-
 
           if (snapshot.hasData) {
             Technic.entityList.addAll(snapshot.data?[0]);
@@ -50,16 +51,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (_) => const ArtphotoTech()));
             });
-
-            // WidgetsBinding.instance!.addPostFrameCallback((_) {
-            //   Navigator.of(context)
-            //       .pushReplacement(MaterialPageRoute(builder: (context) {
-            //     if (~snapshot condition~) {
-            //       return HomePage();
-            //     }
-            //     return FirstPage();
-            //   }));
-            // });
           }
 
           // return const Center(child: CircularProgressIndicator());

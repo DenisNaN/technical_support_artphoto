@@ -20,7 +20,7 @@ class RepairSQFlite{
     Database db = await openDatabase(path, version: 1, onOpen: (db){},
     onCreate: (Database inDB, int inVersion) async {
       await inDB.execute("CREATE TABLE IF NOT EXISTS repair ("
-          "id INTEGER PRIMARY KEY, "
+          "id INTEGER, "
           "internalID INTEGER, "
           "category TEXT, "
           "dislocationOld TEXT, "
@@ -97,8 +97,8 @@ class RepairSQFlite{
   Future create(Repair inRepair) async {
     Database db = await database;
 
-    var val = await db.rawQuery("SELECT MAX(id) + 1 AS id FROM repair");
-    int id = val.first["id"] == null ? 1 : val.first["id"] as int;
+    // var val = await db.rawQuery("SELECT MAX(id) + 1 AS id FROM repair");
+    // int id = val.first["id"] == null ? 1 : val.first["id"] as int;
 
     return await db.rawInsert(
         "INSERT INTO repair ("
@@ -123,7 +123,7 @@ class RepairSQFlite{
             "newDislocation, "
             "dateReceipt) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [id, inRepair.id,
+        [inRepair.id,
           inRepair.internalID,
           inRepair.category,
           inRepair.dislocationOld,
@@ -151,7 +151,7 @@ class RepairSQFlite{
     return repairFromMap(rec.first);
   }
 
-  Future<List> getAll() async {
+  Future<List> getAllRepair() async {
     Database db = await database;
     var recs = await db.query("repair");
     var list = recs.isNotEmpty ? recs.map((m) => repairFromMap(m)).toList() : [];
@@ -168,4 +168,36 @@ class RepairSQFlite{
     Database db = await database;
     return await db.delete("repair", where: "id = ?", whereArgs: [inID]);
   }
+
+  Future deleteTable() async{
+    Database db = await database;
+    return await db.rawQuery("DROP TABLE IF EXISTS repair");
+  }
+
+  Future createTable() async{
+    Database db = await database;
+    return await db.rawQuery("CREATE TABLE IF NOT EXISTS repair ("
+        "id INTEGER, "
+        "internalID INTEGER, "
+        "category TEXT, "
+        "dislocationOld TEXT, "
+        "status TEXT, "
+        "complaint TEXT, "
+        "dateDeparture TEXT, "
+        "serviceDislocation TEXT, "
+        "dateTransferForService TEXT, "
+        "dateDepartureFromService TEXT, "
+        "worksPerformed TEXT, "
+        "costService INTEGER, "
+        "diagnosisService TEXT, "
+        "recommendationsNotes TEXT, "
+        "dateStartTestDrive TEXT, "
+        "dateFinishTestDrive TEXT, "
+        "resultTestDrive TEXT, "
+        "newStatus TEXT, "
+        "newDislocation TEXT, "
+        "dateReceipt TEXT)");
+  }
+
+  // DROP TABLE IF EXISTS table2;
 }
