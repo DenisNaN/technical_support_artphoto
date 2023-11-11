@@ -103,13 +103,6 @@ class ConnectToDBMySQL {
     return reversedList;
   }
 
-  Future<int> getCountRecordsRepair() async{
-    int count = 0;
-    var result = await _connDB!.query('SELECT COUNT(*) FROM repairEquipment');
-    print(result);
-    return count;
-  }
-
   String getDateFormatted(String date){
     return DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(date));
   }
@@ -167,6 +160,32 @@ class ConnectToDBMySQL {
       repair.newDislocation,
       repair.dateReceipt
     ]);
+  }
+  
+  Future<List> getLastIdList() async{
+    var resultTechnics = await _connDB!.query(
+        'SELECT id FROM equipment ORDER BY id DESC LIMIT 1');
+    var resultRepair = await _connDB!.query(
+        'SELECT id FROM repairEquipment ORDER BY id DESC LIMIT 1');
+
+    var resultService = await _connDB!.query(
+        'SELECT id FROM service ORDER BY id DESC LIMIT 1');
+    var resultStatusForEquipment = await _connDB!.query(
+        'SELECT id FROM statusForEquipment ORDER BY id DESC LIMIT 1');
+    var resultNameEquipment = await _connDB!.query(
+        'SELECT id FROM nameEquipment ORDER BY id DESC LIMIT 1');
+    var resultPhotosalons = await _connDB!.query(
+        'SELECT id FROM Фотосалоны ORDER BY id DESC LIMIT 1');
+
+    List list = [];
+    list.add(resultTechnics.last.values);
+    list.add(resultRepair.last.values);
+    list.add(resultService.last.values);
+    list.add(resultStatusForEquipment.last.values);
+    list.add(resultNameEquipment.last.values);
+    list.add(resultPhotosalons.last.values);
+
+    return list;
   }
 
   Future<List> getPhotosalons() async{

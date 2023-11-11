@@ -1,4 +1,4 @@
-import 'package:technical_support_artphoto/ConnectToDBMySQL.dart';
+import 'package:technical_support_artphoto/connectToDBMySQL.dart';
 import 'package:technical_support_artphoto/utils/CategoryDropDownValueSQFlite.dart';
 import '../repair/RepairSQFlite.dart';
 
@@ -10,17 +10,21 @@ class DownloadAllList{
   Future<List> getAllList() async{
     List list = [];
 
-    RepairSQFlite.db.deleteTable();
-    RepairSQFlite.db.createTable();
+    // RepairSQFlite.db.deleteTable();
+    // RepairSQFlite.db.createTable();
+
+
 
     List listAllRepair = await RepairSQFlite.db.getAllRepair();
     print('list1 SQFlite: ${listAllRepair}');
 
+
     if(listAllRepair.isEmpty){
       await ConnectToDBMySQL.connDB.connDatabase();
       
-      int count = await ConnectToDBMySQL.connDB.getCountRecordsRepair();
-      print('count: ${count}');
+      List list = await ConnectToDBMySQL.connDB.getLastIdList();
+      // print('count: ${count}');
+      print('last id technic: ${list}');
 
       listAllRepair = await ConnectToDBMySQL.connDB.getAllRepair();
       for(var repair in listAllRepair){
