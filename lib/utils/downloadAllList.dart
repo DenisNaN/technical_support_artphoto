@@ -11,47 +11,16 @@ class DownloadAllList{
   Future<List> getAllList() async{
     List listAll = [];
     List listAllRepair = [];
-    List listAddRepairOnSQFlite = [];
     bool isInternet = await HasNetwork().isConnectInterten();
-
-    // RepairSQFlite.db.deleteTable();
-    // RepairSQFlite.db.createTable();
 
     if(isInternet){
       await ConnectToDBMySQL.connDB.connDatabase();
-      listAll.add('trueInternet');
-      listAllRepair = await RepairSQFlite.db.getAllRepair();
-
-      if(listAllRepair.isNotEmpty){
-
-        List listLastId = await ConnectToDBMySQL.connDB.getLastIdList();
-
-        int idSQFlite = listAllRepair.first.id;
-        int idMySQL = listLastId[1]['id'];
-        if(idSQFlite < idMySQL){
-          listAddRepairOnSQFlite = await ConnectToDBMySQL.connDB.getRangeGreaterOnIDRepairs(idSQFlite);
-          for(var repair in listAddRepairOnSQFlite){
-            RepairSQFlite.db.create(repair);
-          }
-          listAllRepair.addAll(listAddRepairOnSQFlite);
-        }
-      } else {
-        listAllRepair = await ConnectToDBMySQL.connDB.getAllRepair();
-        for(var repair in listAllRepair.reversed){
-          RepairSQFlite.db.create(repair);
-        }
-        listAll.addAll(listAllRepair);
-      }
+      listAllRepair = await getAllActualRepair();
     } else {
-      listAll.add('falseInternet');
-      listAllRepair = await RepairSQFlite.db.getAllRepair();
-      listAll.addAll(listAllRepair);
+      List listAllRepair = await RepairSQFlite.db.getAllRepair();
     }
 
-
-    print('list1 SQFlite: ${listAllRepair}');
-
-
+    listAll.addAll(listAllRepair);
 
     print('list1 SQFlite: ${listAllRepair}');
 
@@ -67,7 +36,41 @@ class DownloadAllList{
     // list.add(await getPhotosalons());
 
 
-
     return listAll;
+  }
+
+  Future<List> getAllActualRepair() async{
+    List allRepair = [];
+    List addRepairInSQFlite = [];
+
+    // RepairSQFlite.db.deleteTable();
+    // RepairSQFlite.db.createTable();
+
+    allRepair = await RepairSQFlite.db.getAllRepair();
+
+    if(allRepair.isNotEmpty){
+
+      List listLastId = await ConnectToDBMySQL.connDB.getLastIdList();
+
+      int idSQFlite = allRepair.last.id;
+      int idMySQL = listLastId[1]['id'];
+      if(idSQFlite < idMySQL){
+        addRepairInSQFlite = await ConnectToDBMySQL.connDB.getRangeGreaterOnIDRepairs(idSQFlite);
+        for(var repair in addRepairInSQFlite.reversed){
+          RepairSQFlite.db.create(repair);
+        }
+        allRepair.addAll(addRepairInSQFlite);
+      }
+    } else {
+      allRepair = await ConnectToDBMySQL.connDB.getAllRepair();
+      for(var repair in allRepair.reversed){
+        RepairSQFlite.db.create(repair);
+      }
+
+      List allRep = await RepairSQFlite.db.getAllRepair();
+      print(allRep);
+    }
+
+    return allRepair;
   }
 }

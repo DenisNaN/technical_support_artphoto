@@ -145,8 +145,7 @@ class ConnectToDBMySQL {
           row[16], row[17], row[18], dateReceipt);
       list.add(repair);
     }
-    var reversedList = List.from(list.reversed);
-    return reversedList;
+    return list;
   }
 
   String getDateFormatted(String date){
