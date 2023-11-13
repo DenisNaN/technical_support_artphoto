@@ -103,6 +103,52 @@ class ConnectToDBMySQL {
     return reversedList;
   }
 
+  Future<List> getRangeGreaterOnIDRepairs(int id) async{
+    var result = await _connDB!.query('SELECT '
+        'repairEquipment.id, '
+        'repairEquipment.number, '
+        'repairEquipment.category, '
+        'repairEquipment.dislocationOld, '
+        'repairEquipment.status, '
+        'repairEquipment.complaint, '
+        'repairEquipment.dateDeparture, '
+        'repairEquipment.serviceDislocation, '
+        'repairEquipment.dateTransferForService, '
+        'repairEquipment.dateDepartureFromService, '
+        'repairEquipment.worksPerformed, '
+        'repairEquipment.costService, '
+        'repairEquipment.diagnosisService, '
+        'repairEquipment.recommendationsNotes, '
+        'repairEquipment.dateStartTestDrive, '
+        'repairEquipment.dateFinishTestDrive, '
+        'repairEquipment.resultTestDrive, '
+        'repairEquipment.newStatus, '
+        'repairEquipment.newDislocation, '
+        'repairEquipment.dateReceipt '
+        'FROM repairEquipment WHERE id > ?', [id]);
+
+    var list = [];
+    for (var row in result) {
+      // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
+      // dateTransferForService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
+      // recommendationsNotes-row[13], dateStartTestDrive-row[14], dateFinishTestDrive-row[15], resultTestDrive-row[16],
+      // newStatus-row[17],  newDislocation-row[18], dateReceipt-row[19]
+      String dateDeparture = getDateFormatted(row[6].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[6].toString());
+      String dateTransferForService = getDateFormatted(row[8].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[8].toString());
+      String dateDepartureFromService = getDateFormatted(row[9].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[9].toString());
+      String dateStartTestDrive = getDateFormatted(row[14].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[14].toString());
+      String dateFinishTestDrive = getDateFormatted(row[15].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[15].toString());
+      String dateReceipt = getDateFormatted(row[19].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[19].toString());
+
+      Repair repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferForService,
+          dateDepartureFromService, row[10],  row[11],  row[12], row[13], dateStartTestDrive, dateFinishTestDrive,
+          row[16], row[17], row[18], dateReceipt);
+      list.add(repair);
+    }
+    var reversedList = List.from(list.reversed);
+    return reversedList;
+  }
+
   String getDateFormatted(String date){
     return DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(date));
   }
@@ -167,7 +213,6 @@ class ConnectToDBMySQL {
         'SELECT id FROM equipment ORDER BY id DESC LIMIT 1');
     var resultRepair = await _connDB!.query(
         'SELECT id FROM repairEquipment ORDER BY id DESC LIMIT 1');
-
     var resultService = await _connDB!.query(
         'SELECT id FROM service ORDER BY id DESC LIMIT 1');
     var resultStatusForEquipment = await _connDB!.query(
@@ -178,12 +223,12 @@ class ConnectToDBMySQL {
         'SELECT id FROM Фотосалоны ORDER BY id DESC LIMIT 1');
 
     List list = [];
-    list.add(resultTechnics.last.values);
-    list.add(resultRepair.last.values);
-    list.add(resultService.last.values);
-    list.add(resultStatusForEquipment.last.values);
-    list.add(resultNameEquipment.last.values);
-    list.add(resultPhotosalons.last.values);
+    list.add(resultTechnics.last);
+    list.add(resultRepair.last);
+    list.add(resultService.last);
+    list.add(resultStatusForEquipment.last);
+    list.add(resultNameEquipment.last);
+    list.add(resultPhotosalons.last);
 
     return list;
   }

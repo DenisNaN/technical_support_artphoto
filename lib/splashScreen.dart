@@ -33,6 +33,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: DownloadAllList.downloadAllList.getAllList(),
+        // future: ConnectToDBMySQL.connDB.getAll(),
         builder: (context, snapshot) {
           // Check for errors
           if (snapshot.hasError) {
