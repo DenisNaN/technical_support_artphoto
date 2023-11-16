@@ -97,9 +97,6 @@ class RepairSQFlite{
   Future create(Repair inRepair) async {
     Database db = await database;
 
-    // var val = await db.rawQuery("SELECT MAX(id) + 1 AS id FROM repair");
-    // int id = val.first["id"] == null ? 1 : val.first["id"] as int;
-
     return await db.rawInsert(
         "INSERT INTO repair ("
             "id, "
@@ -155,7 +152,8 @@ class RepairSQFlite{
     Database db = await database;
     var recs = await db.query("repair");
     var list = recs.isNotEmpty ? recs.map((m) => repairFromMap(m)).toList() : [];
-    return list;
+    var reversedList = List.from(list.reversed);
+    return reversedList;
   }
 
   Future update(Repair inRepair) async {
@@ -198,6 +196,4 @@ class RepairSQFlite{
         "newDislocation TEXT, "
         "dateReceipt TEXT)");
   }
-
-  // DROP TABLE IF EXISTS table2;
 }

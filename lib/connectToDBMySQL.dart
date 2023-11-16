@@ -103,6 +103,29 @@ class ConnectToDBMySQL {
     return reversedList;
   }
 
+  Future<List> getRangeGreaterOnIDTechnics(int id) async{
+    var result = await _connDB!.query('SELECT '
+        'equipment.id, '
+        'equipment.number, '
+        'equipment.name, '
+        'equipment.category, '
+        'equipment.cost, '
+        'equipment.dateBuy, '
+        'statusEquipment.status, '
+        'statusEquipment.dislocation, '
+        'equipment.comment '
+        'FROM equipment JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id WHERE equipment.id > ?', [id]);
+
+    var list = [];
+    for (var row in result) {
+      // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4], dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8]
+      Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4], getDateFormatted(row[5].toString()), row[6], row[7], row[8]);
+      list.add(technic);
+    }
+    var reversedList = List.from(list.reversed);
+    return reversedList;
+  }
+
   Future<List> getRangeGreaterOnIDRepairs(int id) async{
     var result = await _connDB!.query('SELECT '
         'repairEquipment.id, '
@@ -220,6 +243,31 @@ class ConnectToDBMySQL {
         'SELECT id FROM nameEquipment ORDER BY id DESC LIMIT 1');
     var resultPhotosalons = await _connDB!.query(
         'SELECT id FROM Фотосалоны ORDER BY id DESC LIMIT 1');
+
+    List list = [];
+    list.add(resultTechnics.last);
+    list.add(resultRepair.last);
+    list.add(resultService.last);
+    list.add(resultStatusForEquipment.last);
+    list.add(resultNameEquipment.last);
+    list.add(resultPhotosalons.last);
+
+    return list;
+  }
+
+  Future<List> getCountList() async{
+    var resultTechnics = await _connDB!.query(
+        'SELECT COUNT(*) AS countEquipment FROM equipment');
+    var resultRepair = await _connDB!.query(
+        'SELECT COUNT(*) AS countRepair FROM repairEquipment');
+    var resultService = await _connDB!.query(
+        'SELECT COUNT(*) AS countService FROM service');
+    var resultStatusForEquipment = await _connDB!.query(
+        'SELECT COUNT(*) AS countStatus FROM statusForEquipment');
+    var resultNameEquipment = await _connDB!.query(
+        'SELECT COUNT(*) AS countName FROM nameEquipment');
+    var resultPhotosalons = await _connDB!.query(
+        'SELECT COUNT(*) AS countPhotosalons FROM Фотосалоны');
 
     List list = [];
     list.add(resultTechnics.last);

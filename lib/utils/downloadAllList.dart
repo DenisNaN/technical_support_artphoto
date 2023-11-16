@@ -1,4 +1,5 @@
 import 'package:technical_support_artphoto/connectToDBMySQL.dart';
+import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 import 'package:technical_support_artphoto/utils/CategoryDropDownValueSQFlite.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 import '../repair/RepairSQFlite.dart';
@@ -10,17 +11,21 @@ class DownloadAllList{
 
   Future<List> getAllList() async{
     List listAll = [];
-    List listAllRepair = [];
-    bool isInternet = await HasNetwork().isConnectInterten();
+    List listLastId = [];
+    List listCount = [];
 
-    if(isInternet){
+    bool isConnectInternet = await HasNetwork().isConnectInterten();
+    if(isConnectInternet) {
       await ConnectToDBMySQL.connDB.connDatabase();
-      listAllRepair = await getAllActualRepair();
-    } else {
-      List listAllRepair = await RepairSQFlite.db.getAllRepair();
+      listLastId = await ConnectToDBMySQL.connDB.getLastIdList();
+      listCount = await ConnectToDBMySQL.connDB.getCountList();
     }
 
-    listAll.addAll(listAllRepair);
+    List listAllTechnics = await getAllActualTechnics(isConnectInternet, listLastId[0]['id'], listCount[0]['countEquipment']);
+    List listAllRepair = await getAllActualRepair(isConnectInternet, listLastId[1]['id'], listCount[1]['countRepair']);
+
+    listAll.add(listAllTechnics);
+    listAll.add(listAllRepair);
 
     print('list1 SQFlite: ${listAllRepair}');
 
@@ -39,36 +44,89 @@ class DownloadAllList{
     return listAll;
   }
 
-  Future<List> getAllActualRepair() async{
+  Future<List> getAllActualTechnics(bool isConnectInternet, int lastId, int countEntities) async{
+    List allTechnics = [];
+    List addTechnicInSQFlite = [];
+
+    allTechnics = await TechnicSQFlite.db.getAllTechnics();
+
+    if(!isConnectInternet) return allTechnics;
+
+    if(allTechnics.isNotEmpty){
+
+      int lastIdSQFlite = allTechnics.first.id;
+      int lastIdMySQL = lastId;
+      if(lastIdSQFlite < lastIdMySQL){
+        var reversedAllTechnic = List.from(allTechnics.reversed);
+        addTechnicInSQFlite = await ConnectToDBMySQL.connDB.getRangeGreaterOnIDTechnics(lastIdSQFlite);
+
+        for(var technic in addTechnicInSQFlite.reversed){
+          TechnicSQFlite.db.create(technic);
+        }
+        reversedAllTechnic.addAll(addTechnicInSQFlite.reversed);
+
+        allTechnics.clear();
+        allTechnics.addAll(reversedAllTechnic.reversed);
+      }
+    } else {
+      allTechnics = await ConnectToDBMySQL.connDB.getAllTechnics();
+      for(var technic in allTechnics.reversed){
+        TechnicSQFlite.db.create(technic);
+      }
+    }
+
+    if(countEntities != allTechnics.length){
+      TechnicSQFlite.db.deleteTable();
+      TechnicSQFlite.db.createTable();
+
+      allTechnics = await ConnectToDBMySQL.connDB.getAllTechnics();
+      for(var technic in allTechnics.reversed){
+        TechnicSQFlite.db.create(technic);
+      }
+    }
+
+    return allTechnics;
+  }
+
+  Future<List> getAllActualRepair(bool isConnectInternet, int lastId, int countEntities) async{
     List allRepair = [];
     List addRepairInSQFlite = [];
 
-    // RepairSQFlite.db.deleteTable();
-    // RepairSQFlite.db.createTable();
-
     allRepair = await RepairSQFlite.db.getAllRepair();
+
+    if(!isConnectInternet) return allRepair;
 
     if(allRepair.isNotEmpty){
 
-      List listLastId = await ConnectToDBMySQL.connDB.getLastIdList();
+      int lastIdSQFlite = allRepair.first.id;
+      int lastIdMySQL = lastId;
+      if(lastIdSQFlite < lastIdMySQL){
+        var reversedAllRepair = List.from(allRepair.reversed);
+        addRepairInSQFlite = await ConnectToDBMySQL.connDB.getRangeGreaterOnIDRepairs(lastIdSQFlite);
 
-      int idSQFlite = allRepair.last.id;
-      int idMySQL = listLastId[1]['id'];
-      if(idSQFlite < idMySQL){
-        addRepairInSQFlite = await ConnectToDBMySQL.connDB.getRangeGreaterOnIDRepairs(idSQFlite);
-        for(var repair in addRepairInSQFlite.reversed){
+        for(var repair in addRepairInSQFlite){
           RepairSQFlite.db.create(repair);
         }
-        allRepair.addAll(addRepairInSQFlite);
+        reversedAllRepair.addAll(addRepairInSQFlite);
+
+        allRepair.clear();
+        allRepair.addAll(reversedAllRepair.reversed);
       }
     } else {
       allRepair = await ConnectToDBMySQL.connDB.getAllRepair();
       for(var repair in allRepair.reversed){
         RepairSQFlite.db.create(repair);
       }
+    }
 
-      List allRep = await RepairSQFlite.db.getAllRepair();
-      print(allRep);
+    if(countEntities != allRepair.length){
+      RepairSQFlite.db.deleteTable();
+      RepairSQFlite.db.createTable();
+
+      allRepair = await ConnectToDBMySQL.connDB.getAllRepair();
+      for(var repair in allRepair.reversed){
+        RepairSQFlite.db.create(repair);
+      }
     }
 
     return allRepair;
