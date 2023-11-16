@@ -260,22 +260,22 @@ class ConnectToDBMySQL {
         'SELECT COUNT(*) AS countEquipment FROM equipment');
     var resultRepair = await _connDB!.query(
         'SELECT COUNT(*) AS countRepair FROM repairEquipment');
-    var resultService = await _connDB!.query(
-        'SELECT COUNT(*) AS countService FROM service');
-    var resultStatusForEquipment = await _connDB!.query(
-        'SELECT COUNT(*) AS countStatus FROM statusForEquipment');
     var resultNameEquipment = await _connDB!.query(
         'SELECT COUNT(*) AS countName FROM nameEquipment');
     var resultPhotosalons = await _connDB!.query(
         'SELECT COUNT(*) AS countPhotosalons FROM Фотосалоны');
+    var resultService = await _connDB!.query(
+        'SELECT COUNT(*) AS countService FROM service');
+    var resultStatusForEquipment = await _connDB!.query(
+        'SELECT COUNT(*) AS countStatus FROM statusForEquipment');
 
     List list = [];
     list.add(resultTechnics.last);
     list.add(resultRepair.last);
-    list.add(resultService.last);
-    list.add(resultStatusForEquipment.last);
     list.add(resultNameEquipment.last);
     list.add(resultPhotosalons.last);
+    list.add(resultService.last);
+    list.add(resultStatusForEquipment.last);
 
     return list;
   }

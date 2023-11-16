@@ -119,14 +119,14 @@ class TechnicSQFlite{
   Future createTable() async{
     Database db = await database;
     return await db.rawQuery("CREATE TABLE IF NOT EXISTS technic ("
-        "id, "
-        "internalID, "
-        "name, "
-        "category, "
-        "cost, "
-        "dateBuyTechnic, "
-        "status, "
-        "dislocation, "
-        "comment)");
+        "id INTEGER, "
+        "internalID INTEGER, "
+        "name TEXT, "
+        "category TEXT, "
+        "cost INTEGER, "
+        "dateBuyTechnic TEXT, "
+        "status TEXT, "
+        "dislocation TEXT, "
+        "comment TEXT)");
   }
 }
