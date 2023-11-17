@@ -164,9 +164,11 @@ class DownloadAllList{
           break;
       }
 
+      int id = 0;
       for(var category in actualCategory.reversed){
         DropDownValueModel dropDownValueName = category;
-        CategorySQFlite.db.create(nameTable, nameCategory, dropDownValueName.name);
+        ++id;
+        CategorySQFlite.db.create(nameTable, nameCategory, id, dropDownValueName.name);
       }
     }
 

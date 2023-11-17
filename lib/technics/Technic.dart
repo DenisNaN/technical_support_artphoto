@@ -1,6 +1,6 @@
 
 class Technic{
-  static List entityList = [];
+  static List technicList = [];
 
   int? id;
   int? internalID;

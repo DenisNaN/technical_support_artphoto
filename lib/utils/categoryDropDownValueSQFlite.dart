@@ -29,27 +29,26 @@ class CategorySQFlite{
     String path = join(utils.docsDir!.path, 'category.db');
     Database db = await openDatabase(path);
     db.rawQuery("CREATE TABLE IF NOT EXISTS nameEquipment ("
-        "id INTEGER PRIMARY KEY, "
+        "id INTEGER, "
         "name TEXT)");
     db.rawQuery("CREATE TABLE IF NOT EXISTS photosalons ("
-        "id INTEGER PRIMARY KEY, "
+        "id INTEGER, "
         "Фотосалон TEXT)");
     db.rawQuery("CREATE TABLE IF NOT EXISTS service ("
-        "id INTEGER PRIMARY KEY, "
+        "id INTEGER, "
         "repairmen TEXT)");
     db.rawQuery("CREATE TABLE IF NOT EXISTS statusForEquipment ("
-        "id INTEGER PRIMARY KEY, "
+        "id INTEGER, "
         "status TEXT)");
     return db;
   }
 
-  Future create(String nameTable, String category, String value) async {
+  Future create(String nameTable, String category, int id, String value) async {
     Database db = await database;
-    var val = await db.rawQuery(
-        'SELECT MAX(id) + 1 AS id FROM $nameTable');
-    var id = val.first['id'];
-    id ??= 1;
-    print('id: $id');
+    // var val = await db.rawQuery(
+    //     'SELECT MAX(id) + 1 AS id FROM $nameTable');
+    // var id = val.first['id'];
+    // id ??= 1;
     return await db.rawInsert(
         'INSERT INTO $nameTable ('
             'id, '
@@ -77,7 +76,7 @@ class CategorySQFlite{
   Future createTable(String nameTable, String nameCategory) async{
     Database db = await database;
     return await db.rawQuery('CREATE TABLE IF NOT EXISTS $nameTable ('
-        'id INTEGER PRIMARY KEY, '
+        'id INTEGER, '
         '$nameCategory TEXT)');
   }
 }

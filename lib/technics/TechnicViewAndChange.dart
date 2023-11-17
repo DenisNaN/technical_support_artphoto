@@ -93,7 +93,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                             ),
                           );
                         }else{
-                          Technic technicLast = Technic.entityList.first;
+                          Technic technicLast = Technic.technicList.first;
                           Technic technic = Technic(
                               technicLast.id! + 1,
                               int.parse(_innerNumberTechnic.text),

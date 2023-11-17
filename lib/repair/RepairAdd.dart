@@ -54,7 +54,7 @@ class _RepairAddState extends State<RepairAdd> {
     _focusInnerNumberTechnic.addListener(() {
       if (!_focusInnerNumberTechnic.hasFocus) {
         technicFind =
-            Technic.entityList.firstWhere((item) => item.internalID
+            Technic.technicList.firstWhere((item) => item.internalID
                 .toString() == _innerNumberTechnic.text,
                 orElse: () =>
                     Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation', 'comment'));
