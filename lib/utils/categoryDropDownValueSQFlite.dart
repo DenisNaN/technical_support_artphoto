@@ -14,17 +14,6 @@ class CategorySQFlite{
     return _db;
   }
 
-  // Future<Database> init() async{
-  //   String path = join(utils.docsDir!.path, 'nameEquipment.db');
-  //   Database db = await openDatabase(path, version: 1, onOpen: (db){},
-  //       onCreate: (Database inDB, int inVersion) async {
-  //         await inDB.execute("CREATE TABLE IF NOT EXISTS nameEquipment ("
-  //             "id INTEGER, "
-  //             "name TEXT)");
-  //       });
-  //   return db;
-  // }
-
   Future<Database> init() async{
     String path = join(utils.docsDir!.path, 'category.db');
     Database db = await openDatabase(path);
@@ -45,10 +34,6 @@ class CategorySQFlite{
 
   Future create(String nameTable, String category, int id, String value) async {
     Database db = await database;
-    // var val = await db.rawQuery(
-    //     'SELECT MAX(id) + 1 AS id FROM $nameTable');
-    // var id = val.first['id'];
-    // id ??= 1;
     return await db.rawInsert(
         'INSERT INTO $nameTable ('
             'id, '
@@ -59,11 +44,11 @@ class CategorySQFlite{
 
   Future<List> getCategory(String nameTable) async {
     Database db = await database;
-    var recs = await db.query(nameTable);
+    List<Map> recs = await db.query(nameTable);
 
     List<DropDownValueModel> list = [];
-    for(var row in recs){
-      list.add(DropDownValueModel(name: row[1].toString(), value: row[1].toString()));
+    for(int i = 0; i < recs.length; i++){
+      list.add(DropDownValueModel(name: recs[i].values.toString(), value: recs[i].values.toString()));
     }
     return list;
   }

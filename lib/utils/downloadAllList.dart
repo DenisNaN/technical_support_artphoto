@@ -40,8 +40,6 @@ class DownloadAllList{
     listAll.add(listAllService);
     listAll.add(listAllStatusForEquipment);
 
-    print('list1 SQFlite: ${listAllRepair}');
-
     return listAll;
   }
 
