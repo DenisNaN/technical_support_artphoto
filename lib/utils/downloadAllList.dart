@@ -15,6 +15,11 @@ class DownloadAllList{
     List listLastId = [];
     List listCount = [];
 
+    // rebootAllListCategorySQFlite('nameEquipment', 'name');
+    // rebootAllListCategorySQFlite('photosalons', 'Фотосалон');
+    // rebootAllListCategorySQFlite('service', 'repairmen');
+    // rebootAllListCategorySQFlite('statusForEquipment', 'status');
+
     bool isConnectInternet = await HasNetwork().isConnectInterten();
     if(isConnectInternet) {
       await ConnectToDBMySQL.connDB.connDatabase();
@@ -172,4 +177,17 @@ class DownloadAllList{
 
     return actualCategory;
   }
+
+  Future rebootAllBasicListSQFlite() async{
+    TechnicSQFlite.db.deleteTable();
+    TechnicSQFlite.db.createTable();
+    RepairSQFlite.db.deleteTable();
+    RepairSQFlite.db.createTable();
+  }
+
+  Future rebootAllListCategorySQFlite(String nameTable, String nameCategory) async{
+    CategorySQFlite.db.deleteTable(nameTable);
+    CategorySQFlite.db.createTable(nameTable, nameCategory);
+  }
+
 }

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 
 import '../ConnectToDBMySQL.dart';
+import '../utils/categoryDropDownValueModel.dart';
 import 'Technic.dart';
 
 class TechnicAdd extends StatefulWidget {
@@ -133,16 +134,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                   clearOption: true,
                   textFieldDecoration: const InputDecoration(hintText: "Наименование техники"),
                   dropDownItemCount: 8,
-                  dropDownList: const [
-                    DropDownValueModel(name: 'Принтер', value: "Принтер"),
-                    DropDownValueModel(name: 'Копир', value: "Копир"),
-                    DropDownValueModel(name: 'Большой Копир', value: "Большой Копир"),
-                    DropDownValueModel(name: 'Фотоаппарат', value: "Фотоаппарат"),
-                    DropDownValueModel(name: 'Сканер', value: "Сканер"),
-                    DropDownValueModel(name: 'Вспышка', value: "Вспышка"),
-                    DropDownValueModel(name: 'Ламинатор', value: "Ламинатор"),
-                    DropDownValueModel(name: 'Телевизор', value: "Телевизор"),
-                  ],
+                  dropDownList: CategoryDropDownValueModel.nameEquipment,
                 ),
               ),
               ListTile(
@@ -195,14 +187,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                   clearOption: true,
                   textFieldDecoration: const InputDecoration(hintText: "Статус техники"),
                   dropDownItemCount: 4,
-                  dropDownList: const [
-                    DropDownValueModel(name: 'Активна', value: "Активна"),
-                    DropDownValueModel(name: 'Неисправна', value: "Неисправна"),
-                    DropDownValueModel(name: 'Тест-драйв', value: "Тест-драйв"),
-                    DropDownValueModel(name: 'На хранении', value: "На хранении"),
-                    DropDownValueModel(name: 'Донор', value: "Донор"),
-                    DropDownValueModel(name: 'Списана', value: "Списана"),
-                  ],
+                  dropDownList: CategoryDropDownValueModel.statusForEquipment,
                 ),
               ),
               ListTile(
@@ -212,16 +197,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                   clearOption: true,
                   textFieldDecoration: const InputDecoration(hintText: "Дислокация техники"),
                   dropDownItemCount: 4,
-                  dropDownList: const [
-                    DropDownValueModel(name: 'Кузьминки', value: "Кузьминки"),
-                    DropDownValueModel(name: 'Текстильщики', value: "Текстильщики"),
-                    DropDownValueModel(name: 'Жулебино', value: "Жулебино"),
-                    DropDownValueModel(name: 'Рязанка', value: "Рязанка"),
-                    DropDownValueModel(name: 'Ключевая', value: "Ключевая"),
-                    DropDownValueModel(name: 'Паромная', value: "Паромная"),
-                    DropDownValueModel(name: 'Склад', value: "Склад"),
-                    DropDownValueModel(name: 'Офис', value: "Офис"),
-                  ],
+                  dropDownList: CategoryDropDownValueModel.photosalons,
                 ),
               ),
               ListTile(

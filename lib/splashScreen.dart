@@ -43,10 +43,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           if (snapshot.hasData) {
             Technic.technicList.addAll(snapshot.data?[0]);
             Repair.repairList.addAll(snapshot.data?[1]);
-            CategoryDropDownValueModel.nameEquipment.addAll(snapshot.data?[4]);
-            CategoryDropDownValueModel.photosalons.addAll(snapshot.data?[5]);
-            CategoryDropDownValueModel.service.addAll(snapshot.data?[2]);
-            CategoryDropDownValueModel.statusForEquipment.addAll(snapshot.data?[3]);
+            CategoryDropDownValueModel.nameEquipment.addAll(snapshot.data?[2]);
+            CategoryDropDownValueModel.photosalons.addAll(snapshot.data?[3]);
+            CategoryDropDownValueModel.service.addAll(snapshot.data?[4]);
+            CategoryDropDownValueModel.statusForEquipment.addAll(snapshot.data?[5]);
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.of(context).pushReplacement(MaterialPageRoute(

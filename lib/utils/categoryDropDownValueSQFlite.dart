@@ -47,8 +47,8 @@ class CategorySQFlite{
     List<Map> recs = await db.query(nameTable);
 
     List<DropDownValueModel> list = [];
-    for(int i = 0; i < recs.length; i++){
-      list.add(DropDownValueModel(name: recs[i].values.toString(), value: recs[i].values.toString()));
+    for(int i = recs.length; i < 0; i--){
+      list.add(DropDownValueModel(name: recs[i].values.last, value: recs[i].values.last));
     }
     return list;
   }
