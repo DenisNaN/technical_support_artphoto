@@ -15,13 +15,6 @@ void main() {
     print(docsDir);
     utils.docsDir = docsDir;
     runApp(const SplashScreenArtphoto());
-
-    // Technic.entityList = await ConnectToDBMySQL.connDB.getAllTechnics();
-    // History.historyList = await ConnectToDBMySQL.connDB.getAllHistory();
-    // CategoryDropDownValueModel.photosalons = await ConnectToDBMySQL.connDB.getPhotosalons() as List<DropDownValueModel>;
-    // CategoryDropDownValueModel.nameEquipment = await ConnectToDBMySQL.connDB.getNameEquipment() as List<DropDownValueModel>;
-    // CategoryDropDownValueModel.service = await ConnectToDBMySQL.connDB.getService() as List<DropDownValueModel>;
-    // CategoryDropDownValueModel.statusForEquipment = await ConnectToDBMySQL.connDB.getStatusForEquipment() as List<DropDownValueModel>;
   }
   startMeUp();
 }
@@ -52,42 +45,13 @@ class ArtphotoTech extends StatelessWidget {
             // title: const Center(child: Text('Artphoto')),
               bottom: const TabBar(tabs: [
                 Tab(icon: Icon(Icons.add_a_photo_outlined), text: "Техника"),
-                Tab(icon: Icon(Icons.add_chart), text: "История"),
-                Tab(icon: Icon(Icons.accessible), text: "Неисправности"),
-                Tab(icon: Icon(Icons.assignment_turned_in), text: "Tasks")
+                Tab(icon: Icon(Icons.add_chart), text: "Ремонт"),
+                Tab(icon: Icon(Icons.accessible), text: "История"),
+                Tab(icon: Icon(Icons.assignment_turned_in), text: "Неисп-ти")
               ])),
           body: const TabBarView(
               children: [TechnicsList(),RepairList(),TechnicsList(),TechnicsList()]),
           // children: [Appointments(), Contacts(), Notes(), Tasks()]),
-        )
-    );
-  }
-}
-
-class notConnection extends StatelessWidget {
-  const notConnection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Scaffold(
-          body: Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Colors.blue, Colors.purple],
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft
-                )
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset('assets/logo_icon.png'),
-                Text("Не удалось подключиться к базе данных. Обратитесь к Денису")
-              ],
-            ),
-          ),
         )
     );
   }

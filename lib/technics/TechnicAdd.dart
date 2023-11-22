@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
+import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 
 import '../ConnectToDBMySQL.dart';
 import '../utils/categoryDropDownValueModel.dart';
@@ -215,8 +216,10 @@ class _TechnicAddState extends State<TechnicAdd> {
 }
 
 class SaveEntity{
-  void _save(Technic technic){
+  void _save(Technic technic) async{
+    await ConnectToDBMySQL.connDB.connDatabase();
     ConnectToDBMySQL.connDB.insertTechnicInDB(technic);
+    TechnicSQFlite.db.create(technic);
   }
 }
 

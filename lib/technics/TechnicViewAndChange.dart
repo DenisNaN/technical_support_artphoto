@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
+import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 import '../ConnectToDBMySQL.dart';
 import 'Technic.dart';
 
@@ -35,8 +36,11 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   @override
   void initState() {
     _innerNumberTechnic.text = '${widget.technic.internalID}';
+    _categoryTechnic.dropDownValue = DropDownValueModel(name: widget.technic.category, value: widget.technic.category);
     _nameTechnic.text = widget.technic.name;
     _costTechnic.text = '${widget.technic.cost}';
+    _statusTechnic.dropDownValue = DropDownValueModel(name: widget.technic.status, value: widget.technic.status);
+    _dislocationTechnic.dropDownValue = DropDownValueModel(name: widget.technic.dislocation, value: widget.technic.dislocation);
     _dateBuyTechnic = widget.technic.dateBuyTechnic;
     _comment.text = widget.technic.comment;
   }
@@ -73,7 +77,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                       child: const Text("Отмена")),
                   const Spacer(),
                   TextButton(
-                      onPressed: () {
+                      onPressed: HasNetwork.isConnecting ? () {
                         if(_innerNumberTechnic.text == "" ||
                             _categoryTechnic.dropDownValue?.name == null ||
                             _nameTechnic.text == "" ||
@@ -122,8 +126,10 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                             ),
                           );
                         }
-                      },
-                      child: const Text("Сохранить"))
+                      } : null,
+                      child: HasNetwork.isConnecting ? const Text("Сохранить") :
+                        const Text("Сохранить", style: TextStyle(color:  Colors.grey),
+                      ))
                 ],
               ),
             )
@@ -314,7 +320,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
 class SaveEntity{
   void _save(Technic technic){
-    ConnectToDBMySQL.connDB.insertTechnicInDB(technic);
+    // ConnectToDBMySQL.connDB.insertTechnicInDB(technic);
   }
 }
 

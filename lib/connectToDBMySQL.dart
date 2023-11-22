@@ -21,19 +21,6 @@ class ConnectToDBMySQL {
         return connDB;
     }
 
-  Future<List> getAll() async{
-    List list = [];
-    await ConnectToDBMySQL.connDB.connDatabase();
-    list.add(await getAllTechnics());
-    list.add(await getAllRepair());
-    list.add(await getService());
-    list.add(await getStatusForEquipment());
-    list.add(await getNameEquipment());
-    list.add(await getPhotosalons());
-
-    return list;
-  }
-
   Future<List> getAllTechnics() async{
     var result = await _connDB!.query('SELECT '
         'equipment.id, '

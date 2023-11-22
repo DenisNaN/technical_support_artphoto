@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'Technic.dart';
 import 'TechnicAdd.dart';
 import 'TechnicViewAndChange.dart';
+import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 
 class TechnicsList extends StatefulWidget {
   const TechnicsList({super.key});
@@ -16,13 +17,15 @@ class _TechnicsListState extends State<TechnicsList> {
   Widget build(BuildContext context) {
     return Scaffold (
         floatingActionButton: FloatingActionButton(
-            child: const Icon(Icons.add, color: Colors.white),
-            onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicAdd())).then((value) {
+            backgroundColor: HasNetwork.isConnecting ? Colors.blue : Colors.grey,
+            onPressed: HasNetwork.isConnecting ? () {Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicAdd())).then((value) {
               setState(() {
                 if(value != null) Technic.technicList.insert(0, value);
               });
             });
-            }),
+            } : null,
+            child: const Icon(Icons.add, color: Colors.white)
+            ),
         body: ListView.builder(
           // separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: Technic.technicList.length,

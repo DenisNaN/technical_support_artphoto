@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import '../utils/hasNetwork.dart';
 import 'Repair.dart';
 import 'package:flutter/material.dart';
 import 'RepairAdd.dart';
@@ -16,14 +17,15 @@ class _RepairListState extends State<RepairList> {
   Widget build(BuildContext context) {
     return Scaffold (
         floatingActionButton: FloatingActionButton(
-            child: const Icon(Icons.add, color: Colors.white),
-            onPressed: () {
+            backgroundColor: HasNetwork.isConnecting ? Colors.blue : Colors.grey,
+            onPressed: HasNetwork.isConnecting ? () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const RepairAdd())).then((value) {
                 setState(() {
                   if(value != null) Repair.repairList.insert(0, value);
                 });
               });
-            }),
+            } : null,
+            child: const Icon(Icons.add, color: Colors.white)),
         body: ListView.separated(
           padding: const EdgeInsets.symmetric(vertical: 8),
           separatorBuilder: (BuildContext context, int index) => const Divider(),

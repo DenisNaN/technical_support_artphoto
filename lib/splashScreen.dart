@@ -82,9 +82,24 @@ class dialogDontConnectDB extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text("Не удалось подключиться к базе данных. Обратитесь к Денису"),
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                colors: [Colors.grey, Colors.white],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft
+            )
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/logo_icon.png'),
+            const Text("Не удалось подключиться к базе данных. Обратитесь к Денису",
+            textAlign: TextAlign.center,)
+          ],
+        ),
       ),
     );
   }

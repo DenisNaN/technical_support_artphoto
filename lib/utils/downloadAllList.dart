@@ -11,6 +11,13 @@ class DownloadAllList{
   static final DownloadAllList downloadAllList = DownloadAllList._();
 
   Future<List> getAllList() async{
+    List listAllTechnics;
+    List listAllRepair;
+    List listAllNameEquipment;
+    List listAllPhotosalons;
+    List listAllService;
+    List listAllStatusForEquipment;
+
     List listAll = [];
     List listLastId = [];
     List listCount = [];
@@ -20,23 +27,35 @@ class DownloadAllList{
     // rebootAllListCategorySQFlite('service', 'repairmen');
     // rebootAllListCategorySQFlite('statusForEquipment', 'status');
 
-    bool isConnectInternet = await HasNetwork().isConnectInterten();
-    if(isConnectInternet) {
+    await HasNetwork().checkConnectingToInterten();
+
+    if(HasNetwork.isConnecting) {
       await ConnectToDBMySQL.connDB.connDatabase();
       listLastId = await ConnectToDBMySQL.connDB.getLastIdList();
       listCount = await ConnectToDBMySQL.connDB.getCountList();
-    }
 
-    List listAllTechnics = await getAllActualTechnics(isConnectInternet, listLastId[0]['id'], listCount[0]['countEquipment']);
-    List listAllRepair = await getAllActualRepair(isConnectInternet, listLastId[1]['id'], listCount[1]['countRepair']);
-    List listAllNameEquipment = await getActualCategory(
-        isConnectInternet, listCount[2]['countName'], 'nameEquipment', 'name');
-    List listAllPhotosalons = await getActualCategory(
-        isConnectInternet, listCount[3]['countPhotosalons'], 'photosalons', 'Фотосалон');
-    List listAllService = await getActualCategory(
-        isConnectInternet, listCount[4]['countService'], 'service', 'repairmen');
-    List listAllStatusForEquipment = await getActualCategory(
-        isConnectInternet, listCount[5]['countStatus'], 'statusForEquipment', 'status');
+      listAllTechnics = await getAllActualTechnics(HasNetwork.isConnecting, listLastId[0]['id'], listCount[0]['countEquipment']);
+      listAllRepair = await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']);
+      listAllNameEquipment = await getActualCategory(
+          HasNetwork.isConnecting, 'nameEquipment', 'name', listCount[2]['countName']);
+      listAllPhotosalons = await getActualCategory(
+          HasNetwork.isConnecting, 'photosalons', 'Фотосалон', listCount[3]['countPhotosalons']);
+      listAllService = await getActualCategory(
+          HasNetwork.isConnecting, 'service', 'repairmen', listCount[4]['countService']);
+      listAllStatusForEquipment = await getActualCategory(
+          HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[5]['countStatus']);
+    } else{
+      listAllTechnics = await getAllActualTechnics(HasNetwork.isConnecting);
+      listAllRepair = await getAllActualRepair(HasNetwork.isConnecting);
+      listAllNameEquipment = await getActualCategory(
+          HasNetwork.isConnecting, 'nameEquipment', 'name');
+      listAllPhotosalons = await getActualCategory(
+          HasNetwork.isConnecting, 'photosalons', 'Фотосалон');
+      listAllService = await getActualCategory(
+          HasNetwork.isConnecting, 'service', 'repairmen');
+      listAllStatusForEquipment = await getActualCategory(
+          HasNetwork.isConnecting, 'statusForEquipment', 'status');
+    }
 
     listAll.add(listAllTechnics);
     listAll.add(listAllRepair);
@@ -48,7 +67,7 @@ class DownloadAllList{
     return listAll;
   }
 
-  Future<List> getAllActualTechnics(bool isConnectInternet, int lastId, int countEntities) async{
+  Future<List> getAllActualTechnics(bool isConnectInternet, [int lastId = 0, int countEntities = 0]) async{
     List allTechnics = [];
     List addTechnicInSQFlite = [];
 
@@ -92,7 +111,7 @@ class DownloadAllList{
     return allTechnics;
   }
 
-  Future<List> getAllActualRepair(bool isConnectInternet, int lastId, int countEntities) async{
+  Future<List> getAllActualRepair(bool isConnectInternet, [int lastId = 0, int countEntities = 0]) async{
     List allRepair = [];
     List addRepairInSQFlite = [];
 
@@ -138,9 +157,9 @@ class DownloadAllList{
 
   Future<List> getActualCategory(
       bool isConnectInternet,
-      int countEntities,
       String nameTable,
-      String nameCategory
+      String nameCategory,
+      [int countEntities = 0]
       ) async{
     List actualCategory = [];
 
