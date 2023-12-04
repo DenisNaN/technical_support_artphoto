@@ -3,6 +3,7 @@ import 'package:technical_support_artphoto/connectToDBMySQL.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 import 'package:technical_support_artphoto/utils/categoryDropDownValueSQFlite.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
+import 'package:technical_support_artphoto/utils/utils.dart';
 import '../repair/RepairSQFlite.dart';
 
 class DownloadAllList{
@@ -33,6 +34,7 @@ class DownloadAllList{
       await ConnectToDBMySQL.connDB.connDatabase();
       listLastId = await ConnectToDBMySQL.connDB.getLastIdList();
       listCount = await ConnectToDBMySQL.connDB.getCountList();
+      LoginPassword.loginPassword.addAll(await ConnectToDBMySQL.connDB.getLoginPassword());
 
       listAllTechnics = await getAllActualTechnics(HasNetwork.isConnecting, listLastId[0]['id'], listCount[0]['countEquipment']);
       listAllRepair = await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']);

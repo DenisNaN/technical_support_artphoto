@@ -267,6 +267,17 @@ class ConnectToDBMySQL {
     return list;
   }
 
+  Future<Map<String, String>> getLoginPassword() async{
+    var result = await _connDB!.query(
+        'SELECT * FROM loginPassword');
+
+    Map<String, String> map = {};
+    for (var row in result) {
+      map[row[2]] = row[1];
+    }
+    return map;
+  }
+
   Future<List> getPhotosalons() async{
     var result = await _connDB!.query('SELECT '
         'Фотосалоны.id, '
