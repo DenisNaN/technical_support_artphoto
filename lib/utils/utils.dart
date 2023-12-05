@@ -4,4 +4,5 @@ Directory? docsDir;
 
 class LoginPassword{
   static Map<String, String> loginPassword = {};
+  static String login = '';
 }

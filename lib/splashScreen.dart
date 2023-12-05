@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
+import 'package:technical_support_artphoto/main.dart';
 import 'package:technical_support_artphoto/technics/Technic.dart';
+import 'package:technical_support_artphoto/utils/authorization.dart';
 import 'package:technical_support_artphoto/utils/categoryDropDownValueModel.dart';
 import 'package:technical_support_artphoto/utils/downloadAllList.dart';
-import 'ConnectToDBMySQL.dart';
+import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 import 'repair/Repair.dart';
-import 'main.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -33,7 +33,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: DownloadAllList.downloadAllList.getAllList(),
-        // future: ConnectToDBMySQL.connDB.getAll(),
         builder: (context, snapshot) {
           // Check for errors
           if (snapshot.hasError) {
@@ -50,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (_) => const ArtphotoTech()));
+                  builder: (_) => HasNetwork.isConnecting ? const Login() : const ArtphotoTech()));
             });
           }
 
