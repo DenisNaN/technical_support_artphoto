@@ -163,6 +163,7 @@ class ConnectToDBMySQL {
   }
 
   Future insertTechnicInDB(Technic technic) async{
+    await ConnectToDBMySQL.connDB.connDatabase();
     var resultEquipment = await _connDB!.query(
         'INSERT INTO equipment (number, category, name, dateBuy, cost, comment) VALUES (?, ?, ?, ?, ?, ?)',
         [technic.internalID,  technic.category, technic.name, technic.dateBuyTechnic, technic.cost, technic.comment]);
@@ -174,6 +175,7 @@ class ConnectToDBMySQL {
   }
 
   Future insertRepairInDB(Repair repair) async{
+    await ConnectToDBMySQL.connDB.connDatabase();
     var resultHistory = await _connDB!.query('INSERT INTO repairEquipment ('
         'number, '
         'category, '

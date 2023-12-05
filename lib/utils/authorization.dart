@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:technical_support_artphoto/utils/utils.dart';
+
+import '../main.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -8,8 +11,9 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  Map userData = {};
   final _formkey = GlobalKey<FormState>();
+  final myController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,6 +46,13 @@ class _LoginState extends State<Login> {
                           Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: TextFormField(
+                              controller: myController,
+                              validator: (value) {
+                                if (!LoginPassword.loginPassword.containsKey(value)) {
+                                  return 'Пользователь не найден';
+                                }
+                                return null;
+                              },
                               keyboardType: TextInputType.number,
                               decoration: const InputDecoration(
                                 hintText: 'Введите пароль',
@@ -66,7 +77,10 @@ class _LoginState extends State<Login> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   if (_formkey.currentState!.validate()) {
-                                    print('form submiitted');
+                                    print(myController.text);
+                                    LoginPassword.login = LoginPassword.loginPassword[myController.text]!;
+                                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                                        builder: (_) => const ArtphotoTech()));
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(

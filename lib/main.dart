@@ -6,6 +6,7 @@ import 'package:technical_support_artphoto/repair/RepairList.dart';
 import 'package:technical_support_artphoto/splashScreen.dart';
 import 'package:technical_support_artphoto/technics/TechnicsList.dart';
 import 'utils/utils.dart' as utils;
+import 'package:technical_support_artphoto/utils/utils.dart';
 
 void main() {
   startMeUp() async {
@@ -42,7 +43,7 @@ class ArtphotoTech extends StatelessWidget {
         length: 4,
         child: Scaffold(
           appBar: AppBar(
-            // title: const Center(child: Text('Artphoto')),
+            title: Center(child: Text(LoginPassword.login)),
               bottom: const TabBar(tabs: [
                 Tab(icon: Icon(Icons.add_a_photo_outlined), text: "Техника"),
                 Tab(icon: Icon(Icons.add_chart), text: "Ремонт"),

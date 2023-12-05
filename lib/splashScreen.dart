@@ -50,6 +50,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (_) => HasNetwork.isConnecting ? const Login() : const ArtphotoTech()));
+                  // builder: (_) => const ArtphotoTech()));
             });
           }
 
