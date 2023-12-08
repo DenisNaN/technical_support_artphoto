@@ -183,10 +183,12 @@ class _RepairAddState extends State<RepairAdd> {
           keyboardType: TextInputType.number,
         ) :
         Text('БН'),
-        trailing: Row(mainAxisSize: MainAxisSize.min,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text('Без номера '),
-            Switch(value: _isBN,
+            Switch(
+                value: _isBN,
                 onChanged: (value){
                   setState(() {
                     _isBN = value;

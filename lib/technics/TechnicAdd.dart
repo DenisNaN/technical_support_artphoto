@@ -25,6 +25,12 @@ class _TechnicAddState extends State<TechnicAdd> {
   String _dateBuyTechnic = "";
   String _dateForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
   final _comment = TextEditingController();
+  String _dateStartTestDrive = "Нет даты";
+  String _dateStartTestDriveForSQL = "";
+  String _dateFinishTestDrive = "Нет даты";
+  String _dateFinishTestDriveForSQL = "";
+  final _resultTestDrive = TextEditingController();
+  bool _checkTestDrive = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -37,6 +43,7 @@ class _TechnicAddState extends State<TechnicAdd> {
     _statusTechnic.dispose();
     _dislocationTechnic.dispose();
     _comment.dispose();
+    _resultTestDrive.dispose();
     super.dispose();
   }
 
@@ -61,53 +68,67 @@ class _TechnicAddState extends State<TechnicAdd> {
                   const Spacer(),
                   TextButton(
                       onPressed: () {
-                        if(_innerNumberTechnic.text == "" ||
-                            _categoryTechnic.dropDownValue?.name == null ||
-                            _nameTechnic.text == "" ||
-                            _costTechnic.text == "" ||
-                            _statusTechnic.dropDownValue?.name == null ||
-                            _dislocationTechnic.dropDownValue?.name == null){
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.bolt, size: 40, color: Colors.white),
-                                  Text('Остались не заполненые поля'),
-                                ],
+                        // checking the unique number of the equipment
+                        if (_formKey.currentState!.validate()) {
+                          if (_innerNumberTechnic.text == "" ||
+                              _categoryTechnic.dropDownValue?.name ==
+                                  null ||
+                              _nameTechnic.text == "" ||
+                              _costTechnic.text == "" ||
+                              _statusTechnic.dropDownValue?.name ==
+                                  null ||
+                              _dislocationTechnic.dropDownValue
+                                  ?.name == null) {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  children: [
+                                    Icon(Icons.bolt, size: 40,
+                                        color: Colors.white),
+                                    Text(
+                                        'Остались не заполненые поля'),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 5),
+                                showCloseIcon: true,
                               ),
-                              duration: Duration(seconds: 5),
-                              showCloseIcon: true,
-                            ),
-                          );
-                        }else{
-                          Technic technicLast = Technic.technicList.first;
-                          Technic technic = Technic(
-                              technicLast.id! + 1,
-                              int.parse(_innerNumberTechnic.text),
-                              _nameTechnic.text,
-                              _categoryTechnic.dropDownValue!.name,
-                              int.parse(_costTechnic.text.replaceAll(",", "")),
-                              _dateForSQL,
-                              _statusTechnic.dropDownValue!.name,
-                              _dislocationTechnic.dropDownValue!.name,
-                              _comment.text);
+                            );
+                          } else {
+                            Technic technicLast = Technic.technicList
+                                .first;
+                            Technic technic = Technic(
+                                technicLast.id! + 1,
+                                int.parse(_innerNumberTechnic.text),
+                                _nameTechnic.text,
+                                _categoryTechnic.dropDownValue!.name,
+                                int.parse(_costTechnic.text
+                                    .replaceAll(",", "")),
+                                _dateForSQL,
+                                _statusTechnic.dropDownValue!.name,
+                                _dislocationTechnic.dropDownValue!
+                                    .name,
+                                _comment.text);
 
-                          SaveEntity()._save(technic);
+                            SaveEntity()._save(technic);
 
-                          Navigator.pop(context, technic);
+                            Navigator.pop(context, technic);
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.add_task, size: 40, color: Colors.white),
-                                  Text(' Техника добавлена'),
-                                ],
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  children: [
+                                    Icon(Icons.add_task, size: 40,
+                                        color: Colors.white),
+                                    Text(' Техника добавлена'),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 5),
+                                showCloseIcon: true,
                               ),
-                              duration: Duration(seconds: 5),
-                              showCloseIcon: true,
-                            ),
-                          );
+                            );
+                          }
                         }
                       },
                       child: const Text("Сохранить"))
@@ -124,6 +145,14 @@ class _TechnicAddState extends State<TechnicAdd> {
                 title: TextFormField(
                   decoration: const InputDecoration(hintText: "Номер техники"),
                   controller: _innerNumberTechnic,
+                  validator: (value) {
+                    List listInternalID = [];
+                    Technic.technicList.forEach((element) {listInternalID.add(element.internalID.toString());});
+                    if (listInternalID.contains(value)) {
+                      return 'Техника с таким номером уже есть';
+                    }
+                    return null;
+                  },
                   inputFormatters: [numberFormatter],
                   keyboardType: TextInputType.number,
                 ),
@@ -208,9 +237,100 @@ class _TechnicAddState extends State<TechnicAdd> {
                   controller: _comment,
                 ),
               ),
+              ListTile(
+                title: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _checkTestDrive ? Text('Выключить тест-драйв ') : Text('Включить тест-драйв '),
+                      Switch(
+                          value: _checkTestDrive,
+                          onChanged: (value){
+                            setState(() {
+                              _checkTestDrive = value;
+                            });
+                          }
+                      ),
+                    ]
+                ),
+              ),
+              ListTile(title:
+                  _checkTestDrive ? _buildTestDriveListTile() : Text('')
+              )
             ],
           ),
         )
+    );
+  }
+
+  ListTile _buildTestDriveListTile(){
+    return _checkTestDrive ? ListTile(
+      // leading: const Icon(Icons.create),
+      title: Column(children: [
+      ListTile(
+        contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+        leading: const Icon(Icons.today),
+        title: const Text("Дата начала тест-драйва"),
+        subtitle: Text(_dateStartTestDrive == "Нет даты" ? "Выберите дату" : _dateStartTestDrive),
+        trailing: IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2099),
+                  locale: const Locale("ru", "RU")
+              ).then((date) {
+                setState(() {
+                  if(date != null) {
+                    _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
+                    _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                  }
+                });
+              });
+            },
+            color: Colors.blue
+            ),
+          ),
+        ListTile(
+          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+          leading: const Icon(Icons.today),
+          title: const Text("Дата конца тест-драйва"),
+          subtitle: Text(_dateFinishTestDrive == "Нет даты" ? "Выберите дату" : _dateFinishTestDrive),
+          trailing: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
+                      _dateFinishTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+          leading: const Icon(Icons.create),
+          title: TextFormField(
+            decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
+            controller: _resultTestDrive,
+          ),
+        )
+      ],
+      ),
+    ) : ListTile(
+      // leading: const Icon(Icons.print),
+      title: Text('Последний тест-драйв: не проводился'),
     );
   }
 }
