@@ -11,6 +11,10 @@ class Technic{
   String status = "";
   String dislocation = "";
   String comment = "";
+  String dateStartTestDrive = '';
+  String dateFinishTestDrive = '';
+  String resultTestDrive = '';
+  bool checkboxTestDrive = false;
 
   Technic(this.id, this.internalID, this.name, this.category,
       this.cost, this.dateBuyTechnic, this.status, this.dislocation, this.comment);

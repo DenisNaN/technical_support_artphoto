@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
-
 import '../ConnectToDBMySQL.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import 'Technic.dart';
@@ -30,7 +29,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   String _dateFinishTestDrive = "Нет даты";
   String _dateFinishTestDriveForSQL = "";
   final _resultTestDrive = TextEditingController();
-  bool _checkTestDrive = false;
+  bool _switchTestDrive = false;
   bool _checkboxTestDrive = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -242,12 +241,12 @@ class _TechnicAddState extends State<TechnicAdd> {
                 title: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _checkTestDrive ? Text('Выключить тест-драйв ') : Text('Включить тест-драйв '),
+                      _switchTestDrive ? Text('Выключить тест-драйв ') : Text('Включить тест-драйв '),
                       Switch(
-                          value: _checkTestDrive,
+                          value: _switchTestDrive,
                           onChanged: (value){
                             setState(() {
-                              _checkTestDrive = value;
+                              _switchTestDrive = value;
                             });
                           }
                       ),
@@ -255,7 +254,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                 ),
               ),
               ListTile(title:
-                  _checkTestDrive ? _buildTestDriveListTile() : Text('Тест-драйв не проводился')
+              _switchTestDrive ? _buildTestDriveListTile() : Text('Тест-драйв не проводился')
               )
             ],
           ),
