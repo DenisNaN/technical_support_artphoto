@@ -57,4 +57,3 @@ class ArtphotoTech extends StatelessWidget {
     );
   }
 }
-

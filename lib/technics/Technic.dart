@@ -20,6 +20,3 @@ class Technic{
     return "{ id=$id, internalID=$internalID, name=$name, category=$category, coast=$cost, dateCoast=$dateBuyTechnic, status=$status, dislocation=$dislocation, comment=$comment }";
   }
 }
-
-
-

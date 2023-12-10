@@ -1,25 +1,23 @@
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:technical_support_artphoto/connectToDBMySQL.dart';
+import 'package:technical_support_artphoto/repair/Repair.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
+import 'package:technical_support_artphoto/technics/TechnicsList.dart';
 import 'package:technical_support_artphoto/utils/categoryDropDownValueSQFlite.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 import '../repair/RepairSQFlite.dart';
+import '../technics/Technic.dart';
+import '../repair/Repair.dart';
+import 'categoryDropDownValueModel.dart';
 
 class DownloadAllList{
   DownloadAllList._();
 
   static final DownloadAllList downloadAllList = DownloadAllList._();
 
-  Future<List> getAllList() async{
-    List listAllTechnics;
-    List listAllRepair;
-    List listAllNameEquipment;
-    List listAllPhotosalons;
-    List listAllService;
-    List listAllStatusForEquipment;
-
-    List listAll = [];
+  Future<bool>  getAllList() async{
+    bool result = true;
     List listLastId = [];
     List listCount = [];
 
@@ -36,37 +34,39 @@ class DownloadAllList{
       listCount = await ConnectToDBMySQL.connDB.getCountList();
       LoginPassword.loginPassword.addAll(await ConnectToDBMySQL.connDB.getLoginPassword());
 
-      listAllTechnics = await getAllActualTechnics(HasNetwork.isConnecting, listLastId[0]['id'], listCount[0]['countEquipment']);
-      listAllRepair = await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']);
-      listAllNameEquipment = await getActualCategory(
-          HasNetwork.isConnecting, 'nameEquipment', 'name', listCount[2]['countName']);
-      listAllPhotosalons = await getActualCategory(
-          HasNetwork.isConnecting, 'photosalons', 'Фотосалон', listCount[3]['countPhotosalons']);
-      listAllService = await getActualCategory(
-          HasNetwork.isConnecting, 'service', 'repairmen', listCount[4]['countService']);
-      listAllStatusForEquipment = await getActualCategory(
-          HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[5]['countStatus']);
+      getAllHasNetwork(listLastId, listCount);
     } else{
-      listAllTechnics = await getAllActualTechnics(HasNetwork.isConnecting);
-      listAllRepair = await getAllActualRepair(HasNetwork.isConnecting);
-      listAllNameEquipment = await getActualCategory(
-          HasNetwork.isConnecting, 'nameEquipment', 'name');
-      listAllPhotosalons = await getActualCategory(
-          HasNetwork.isConnecting, 'photosalons', 'Фотосалон');
-      listAllService = await getActualCategory(
-          HasNetwork.isConnecting, 'service', 'repairmen');
-      listAllStatusForEquipment = await getActualCategory(
-          HasNetwork.isConnecting, 'statusForEquipment', 'status');
+      getAllHasnotNetwork();
     }
+    return result;
+  }
 
-    listAll.add(listAllTechnics);
-    listAll.add(listAllRepair);
-    listAll.add(listAllNameEquipment);
-    listAll.add(listAllPhotosalons);
-    listAll.add(listAllService);
-    listAll.add(listAllStatusForEquipment);
+  Future getAllHasNetwork (List listLastId, List listCount) async{
+    Technic.technicList.addAll(
+        await getAllActualTechnics(HasNetwork.isConnecting, listLastId[0]['id'], listCount[0]['countEquipment']));
+    Repair.repairList.addAll(
+        await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']));
+    CategoryDropDownValueModel.nameEquipment.addAll((await getActualCategory(
+        HasNetwork.isConnecting, 'nameEquipment', 'name', listCount[2]['countName'])) as Iterable<DropDownValueModel>);
+    CategoryDropDownValueModel.photosalons.addAll((await getActualCategory(
+        HasNetwork.isConnecting, 'photosalons', 'Фотосалон', listCount[3]['countPhotosalons'])) as Iterable<DropDownValueModel>);
+    CategoryDropDownValueModel.service.addAll((await getActualCategory(
+        HasNetwork.isConnecting, 'service', 'repairmen', listCount[4]['countService'])) as Iterable<DropDownValueModel>);
+    CategoryDropDownValueModel.statusForEquipment.addAll((await getActualCategory(
+        HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[5]['countStatus'])) as Iterable<DropDownValueModel>);
+  }
 
-    return listAll;
+  Future getAllHasnotNetwork() async{
+    Technic.technicList.addAll(await getAllActualTechnics(HasNetwork.isConnecting));
+    Repair.repairList.addAll(await getAllActualRepair(HasNetwork.isConnecting));
+    CategoryDropDownValueModel.nameEquipment.addAll((await getActualCategory(
+        HasNetwork.isConnecting, 'nameEquipment', 'name')) as Iterable<DropDownValueModel>);
+    CategoryDropDownValueModel.photosalons.addAll((await getActualCategory(
+        HasNetwork.isConnecting, 'photosalons', 'Фотосалон')) as Iterable<DropDownValueModel>);
+    CategoryDropDownValueModel.service.addAll((await getActualCategory(
+        HasNetwork.isConnecting, 'service', 'repairmen')) as Iterable<DropDownValueModel>);
+    CategoryDropDownValueModel.statusForEquipment.addAll((await getActualCategory(
+        HasNetwork.isConnecting, 'statusForEquipment', 'status')) as Iterable<DropDownValueModel>);
   }
 
   Future<List> getAllActualTechnics(bool isConnectInternet, [int lastId = 0, int countEntities = 0]) async{

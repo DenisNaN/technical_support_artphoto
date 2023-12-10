@@ -31,6 +31,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   String _dateFinishTestDriveForSQL = "";
   final _resultTestDrive = TextEditingController();
   bool _checkTestDrive = false;
+  bool _checkboxTestDrive = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -254,7 +255,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                 ),
               ),
               ListTile(title:
-                  _checkTestDrive ? _buildTestDriveListTile() : Text('')
+                  _checkTestDrive ? _buildTestDriveListTile() : Text('Тест-драйв не проводился')
               )
             ],
           ),
@@ -263,14 +264,14 @@ class _TechnicAddState extends State<TechnicAdd> {
   }
 
   ListTile _buildTestDriveListTile(){
-    return _checkTestDrive ? ListTile(
+    return ListTile(
       // leading: const Icon(Icons.create),
       title: Column(children: [
       ListTile(
         contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
         leading: const Icon(Icons.today),
         title: const Text("Дата начала тест-драйва"),
-        subtitle: Text(_dateStartTestDrive == "Нет даты" ? "Выберите дату" : _dateStartTestDrive),
+        subtitle: Text(_dateStartTestDrive == "Нет даты" ? DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now()) : _dateStartTestDrive),
         trailing: IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
@@ -325,12 +326,18 @@ class _TechnicAddState extends State<TechnicAdd> {
             decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
             controller: _resultTestDrive,
           ),
+        ),
+        CheckboxListTile(
+          title: Text('Тест-драйв выполнен'),
+          value: _checkboxTestDrive,
+          onChanged: (bool? value) {
+            setState(() {
+              _checkboxTestDrive = value!;
+            });
+          }
         )
       ],
       ),
-    ) : ListTile(
-      // leading: const Icon(Icons.print),
-      title: Text('Последний тест-драйв: не проводился'),
     );
   }
 }
