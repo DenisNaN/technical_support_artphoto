@@ -151,7 +151,8 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
               ) :
               ListTile(
                 leading: const Icon(Icons.fiber_new),
-                title: Text(widget.technic.internalID == null ? '' : '${widget.technic.internalID}'),
+                title: Text(widget.technic.internalID == null ? 'БН' : '${widget.technic.internalID}'),
+                subtitle: const Text('Номер техники'),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
                   onPressed: (){
@@ -186,6 +187,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
               ListTile(
                 leading: const Icon(Icons.print),
                 title: Text(widget.technic.category),
+                subtitle: const Text('Категория'),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
                   onPressed: (){
@@ -207,6 +209,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
               ListTile(
                 leading: const Icon(Icons.create),
                 title: Text(widget.technic.name),
+                subtitle: const Text('Наименование'),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
                   onPressed: (){
@@ -231,7 +234,8 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
               ) :
               ListTile(
                 leading: const Icon(Icons.shopify),
-                title: Text('${widget.technic.cost}'),
+                title: Text('${widget.technic.cost} руб.'),
+                subtitle: const Text('Стоимость'),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
                   onPressed: (){
@@ -244,8 +248,8 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.today),
-                title: const Text("Дата покупки техники"),
-                subtitle: Text(_dateBuyTechnic == "" ? DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now()) : _dateBuyTechnic),
+                title: Text(_dateBuyTechnic == "" ? DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now()) : _dateBuyTechnic),
+                subtitle: const Text("Дата покупки техники"),
                 trailing: IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: () {

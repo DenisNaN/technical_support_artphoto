@@ -25,8 +25,8 @@ class _TechnicAddState extends State<TechnicAdd> {
   String _dateBuyTechnic = "";
   String _dateForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
   final _comment = TextEditingController();
-  String _dateStartTestDrive = "Нет даты";
-  String _dateStartTestDriveForSQL = "";
+  String _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now());
+  String _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
   String _dateFinishTestDrive = "Нет даты";
   String _dateFinishTestDriveForSQL = "";
   final _resultTestDrive = TextEditingController();
@@ -271,7 +271,7 @@ class _TechnicAddState extends State<TechnicAdd> {
         contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
         leading: const Icon(Icons.today),
         title: const Text("Дата начала тест-драйва"),
-        subtitle: Text(_dateStartTestDrive == "Нет даты" ? DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now()) : _dateStartTestDrive),
+        subtitle: Text(_dateStartTestDrive),
         trailing: IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
@@ -328,7 +328,9 @@ class _TechnicAddState extends State<TechnicAdd> {
           ),
         ),
         CheckboxListTile(
+          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
           title: Text('Тест-драйв выполнен'),
+          secondary: Icon(Icons.check),
           value: _checkboxTestDrive,
           onChanged: (bool? value) {
             setState(() {
