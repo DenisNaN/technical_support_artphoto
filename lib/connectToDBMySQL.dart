@@ -23,21 +23,29 @@ class ConnectToDBMySQL {
 
   Future<List> getAllTechnics() async{
     var result = await _connDB!.query('SELECT '
-        'equipment.id, '
-        'equipment.number, '
+        'equipment.id, equipment.number, '
         'equipment.name, '
         'equipment.category, '
         'equipment.cost, '
         'equipment.dateBuy, '
         'statusEquipment.status, '
         'statusEquipment.dislocation, '
-        'equipment.comment '
-        'FROM equipment JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id');
+        'equipment.comment, '
+        'testDrive.dateStart, '
+        'testDrive.dateFinish, '
+        'testDrive.result, '
+        'testDrive.checkEquipment'
+        'FROM equipment '
+        // 'JOIN statusEquipment ON (SELECT idEquipment FROM statusEquipment ORDER BY id DESC LIMIT 1) = equipment.id');
+        'JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id'
+        'JOIN testDrive ON testDrive.idEquipment = equipment.id');
 
     var list = [];
     for (var row in result) {
       // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4], dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8]
-      Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4], getDateFormatted(row[5].toString()), row[6], row[7], row[8]);
+      Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
+          getDateFormatted(row[5].toString()), row[6], row[7], row[8],
+          row[9], row[10], row[11], row[12]);
       list.add(technic);
     }
     var reversedList = List.from(list.reversed);
@@ -106,7 +114,9 @@ class ConnectToDBMySQL {
     var list = [];
     for (var row in result) {
       // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4], dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8]
-      Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4], getDateFormatted(row[5].toString()), row[6], row[7], row[8]);
+      Technic technic = Technic(row[0], row[1],  row[2],  row[3],
+          row[4], getDateFormatted(row[5].toString()), row[6], row[7],
+          row[8], row[9], row[10], row[11], row[12]);
       list.add(technic);
     }
     var reversedList = List.from(list.reversed);
@@ -168,10 +178,15 @@ class ConnectToDBMySQL {
         'INSERT INTO equipment (number, category, name, dateBuy, cost, comment) VALUES (?, ?, ?, ?, ?, ?)',
         [technic.internalID,  technic.category, technic.name, technic.dateBuyTechnic, technic.cost, technic.comment]);
 
-    var resultStatusEquipment = await _connDB!.query(
-        'INSERT INTO statusEquipment (idEquipment, status, dislocation) '
-            'VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?)',
-        [technic.status, technic.dislocation]);
+    var statusEquipment = await _connDB!.query(
+        'INSERT INTO statusEquipment (idEquipment, status, dislocation, date) '
+            'VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ?)',
+        [technic.status, technic.dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now())]);
+
+    var testDrive = await _connDB!.query(
+      'INSERT INTO testDrive (idEquipment, category, dateStart, dateFinish, result, '
+          'checkEquipment) VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ? , ?, ?)',
+      [technic.category, technic.dateStartTestDrive, technic.dateFinishTestDrive, technic.resultTestDrive, technic.checkboxTestDrive]);
   }
 
   Future insertRepairInDB(Repair repair) async{

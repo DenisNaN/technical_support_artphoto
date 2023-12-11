@@ -25,7 +25,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   String _dateForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
   final _comment = TextEditingController();
   String _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now());
-  String _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
+  String _dateStartTestDriveForSQL = '';
   String _dateFinishTestDrive = "Нет даты";
   String _dateFinishTestDriveForSQL = "";
   final _resultTestDrive = TextEditingController();
@@ -102,13 +102,16 @@ class _TechnicAddState extends State<TechnicAdd> {
                                 int.parse(_innerNumberTechnic.text),
                                 _nameTechnic.text,
                                 _categoryTechnic.dropDownValue!.name,
-                                int.parse(_costTechnic.text
-                                    .replaceAll(",", "")),
+                                int.parse(_costTechnic.text.replaceAll(",", "")),
                                 _dateForSQL,
                                 _statusTechnic.dropDownValue!.name,
-                                _dislocationTechnic.dropDownValue!
-                                    .name,
-                                _comment.text);
+                                _dislocationTechnic.dropDownValue!.name,
+                                _comment.text,
+                                _dateStartTestDriveForSQL,
+                                _dateFinishTestDriveForSQL,
+                                _resultTestDrive.text,
+                                _checkboxTestDrive
+                            );
 
                             SaveEntity()._save(technic);
 
@@ -247,6 +250,8 @@ class _TechnicAddState extends State<TechnicAdd> {
                           onChanged: (value){
                             setState(() {
                               _switchTestDrive = value;
+                              _switchTestDrive ? _dateStartTestDriveForSQL = '' :
+                              _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
                             });
                           }
                       ),

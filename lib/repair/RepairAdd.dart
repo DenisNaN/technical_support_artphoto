@@ -47,7 +47,8 @@ class _RepairAddState extends State<RepairAdd> {
   bool _isBN = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation', 'comment');
+  Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
+      'dislocation', 'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false);
 
   @override
   void initState() {
@@ -57,7 +58,8 @@ class _RepairAddState extends State<RepairAdd> {
             Technic.technicList.firstWhere((item) => item.internalID
                 .toString() == _innerNumberTechnic.text,
                 orElse: () =>
-                    Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation', 'comment'));
+                    Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
+                        'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false));
         _category = technicFind.name;
         _dislocationOld = technicFind.dislocation;
         if (technicFind.id == -1) {

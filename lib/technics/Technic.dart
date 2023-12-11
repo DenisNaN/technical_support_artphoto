@@ -17,7 +17,9 @@ class Technic{
   bool checkboxTestDrive = false;
 
   Technic(this.id, this.internalID, this.name, this.category,
-      this.cost, this.dateBuyTechnic, this.status, this.dislocation, this.comment);
+      this.cost, this.dateBuyTechnic, this.status, this.dislocation,
+      this.comment, this.dateStartTestDrive, this.dateFinishTestDrive,
+      this.resultTestDrive, this.checkboxTestDrive);
 
   @override
   String toString() {

@@ -24,6 +24,10 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   String _dateBuyTechnic = "";
   String _dateForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
   final _comment = TextEditingController();
+  String _dateStartTestDrive = '';
+  String _dateFinishTestDrive = '';
+  final _resultTestDrive = TextEditingController();
+  bool _checkTestDrive = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -99,15 +103,20 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                         }else{
                           Technic technicLast = Technic.technicList.first;
                           Technic technic = Technic(
-                              technicLast.id! + 1,
-                              int.parse(_innerNumberTechnic.text),
-                              _nameTechnic.text,
-                              _categoryTechnic.dropDownValue!.name,
-                              int.parse(_costTechnic.text.replaceAll(",", "")),
-                              _dateForSQL,
-                              _statusTechnic.dropDownValue!.name,
-                              _dislocationTechnic.dropDownValue!.name,
-                              _comment.text);
+                            technicLast.id! + 1,
+                            int.parse(_innerNumberTechnic.text),
+                            _nameTechnic.text,
+                            _categoryTechnic.dropDownValue!.name,
+                            int.parse(_costTechnic.text.replaceAll(",", "")),
+                            _dateForSQL,
+                            _statusTechnic.dropDownValue!.name,
+                            _dislocationTechnic.dropDownValue!.name,
+                            _comment.text,
+                            _dateStartTestDrive,
+                            _dateFinishTestDrive,
+                            _resultTestDrive.text,
+                            _checkTestDrive
+                          );
 
                           SaveEntity()._save(technic);
 
