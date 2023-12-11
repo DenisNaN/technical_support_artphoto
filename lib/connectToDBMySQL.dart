@@ -23,7 +23,8 @@ class ConnectToDBMySQL {
 
   Future<List> getAllTechnics() async{
     var result = await _connDB!.query('SELECT '
-        'equipment.id, equipment.number, '
+        'equipment.id, '
+        'equipment.number, '
         'equipment.name, '
         'equipment.category, '
         'equipment.cost, '
@@ -34,18 +35,27 @@ class ConnectToDBMySQL {
         'testDrive.dateStart, '
         'testDrive.dateFinish, '
         'testDrive.result, '
-        'testDrive.checkEquipment'
+        'testDrive.checkEquipment '
         'FROM equipment '
-        // 'JOIN statusEquipment ON (SELECT idEquipment FROM statusEquipment ORDER BY id DESC LIMIT 1) = equipment.id');
-        'JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id'
-        'JOIN testDrive ON testDrive.idEquipment = equipment.id');
+        'LEFT JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id '
+        'LEFT JOIN testDrive ON testDrive.idEquipment = equipment.id');
+
+    // 'JOIN statusEquipment ON (SELECT idEquipment FROM statusEquipment ORDER BY id DESC LIMIT 1) = equipment.id');
 
     var list = [];
     for (var row in result) {
       // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4], dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8]
+
+      String dateStartTestDrive = 'Нет даты';
+      if(row[9] != null && row[9].toString() != "30 ноября 0001") dateStartTestDrive = getDateFormatted(row[9].toString());
+      String dateFinishTestDrive = 'Нет даты';
+      if(row[10] != null && row[9].toString() != "30 ноября 0001") dateStartTestDrive = getDateFormatted(row[10].toString());
+      bool checkTestDrive = false;
+      if(row[12] != null && row[12] == 1) checkTestDrive = true;
+
       Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
           getDateFormatted(row[5].toString()), row[6], row[7], row[8],
-          row[9], row[10], row[11], row[12]);
+          dateStartTestDrive, dateFinishTestDrive, row[11] ?? '', checkTestDrive);
       list.add(technic);
     }
     var reversedList = List.from(list.reversed);
@@ -109,7 +119,14 @@ class ConnectToDBMySQL {
         'statusEquipment.status, '
         'statusEquipment.dislocation, '
         'equipment.comment '
-        'FROM equipment JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id WHERE equipment.id > ?', [id]);
+        'testDrive.dateStart, '
+        'testDrive.dateFinish, '
+        'testDrive.result, '
+        'testDrive.checkEquipment '
+        'FROM equipment '
+        'LEFT JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id '
+        'LEFT JOIN testDrive ON testDrive.idEquipment = equipment.id '
+        'WHERE equipment.id > ?', [id]);
 
     var list = [];
     for (var row in result) {

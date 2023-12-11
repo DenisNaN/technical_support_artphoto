@@ -84,14 +84,14 @@ class TechnicSQFlite{
     );
 
     var resultStatus = await db.rawInsert(
-        'INSERT INTO statusEquipment (id, internalID, status, dislocation, '
+        'INSERT INTO statusEquipment (id, idEquipment, status, dislocation, '
             'date) VALUES (?, ?, ?, ?, ?)',
       [inTechnic.id, inTechnic.internalID, inTechnic.status, inTechnic.dislocation,
         DateFormat('yyyy.MM.dd').format(DateTime.now())]
     );
 
     var resultTestDrive = await db.rawInsert(
-        'INSERT INTO testDrive (id, internalID, category, dateStart, dateFinsh, '
+        'INSERT INTO testDrive (id, idEquipment, category, dateStart, dateFinish, '
             'result, checkEquipment) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [inTechnic.id, inTechnic.internalID, inTechnic.category, inTechnic.dateStartTestDrive,
       inTechnic.dateFinishTestDrive, inTechnic.resultTestDrive, inTechnic.checkboxTestDrive]
@@ -109,13 +109,13 @@ class TechnicSQFlite{
   Future<List> getAllTechnics() async {
     Database db = await database;
     // var recs = await db.query("technic");
-    var recs = await db.query('SELECT '
+    var recs = await db.rawQuery('SELECT '
         'equipment.id, '
         'equipment.internalID, '
         'equipment.name, '
         'equipment.category, '
         'equipment.cost, '
-        'equipment.dateBuy, '
+        'equipment.dateBuyTechnic, '
         'statusEquipment.status, '
         'statusEquipment.dislocation, '
         'equipment.comment, '
