@@ -250,8 +250,12 @@ class _TechnicAddState extends State<TechnicAdd> {
                           onChanged: (value){
                             setState(() {
                               _switchTestDrive = value;
-                              _switchTestDrive ? _dateStartTestDriveForSQL = '' :
+                              !_switchTestDrive ? _dateStartTestDriveForSQL = '' :
                               _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
+                              if(_switchTestDrive && !_checkboxTestDrive && _dateFinishTestDriveForSQL == ''){
+                                DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDriveForSQL).add(const Duration(days: 14));
+                                _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
+                              }
                             });
                           }
                       ),

@@ -2,13 +2,11 @@ import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:technical_support_artphoto/connectToDBMySQL.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
-import 'package:technical_support_artphoto/technics/TechnicsList.dart';
 import 'package:technical_support_artphoto/utils/categoryDropDownValueSQFlite.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 import '../repair/RepairSQFlite.dart';
 import '../technics/Technic.dart';
-import '../repair/Repair.dart';
 import 'categoryDropDownValueModel.dart';
 
 class DownloadAllList{
@@ -21,7 +19,7 @@ class DownloadAllList{
     List listLastId = [];
     List listCount = [];
 
-    rebootAllBasicListSQFlite();
+    // rebootAllBasicListSQFlite();
     // rebootAllListCategorySQFlite('nameEquipment', 'name');
     // rebootAllListCategorySQFlite('photosalons', 'Фотосалон');
     // rebootAllListCategorySQFlite('service', 'repairmen');
@@ -79,9 +77,9 @@ class DownloadAllList{
     if(!isConnectInternet) return allTechnics;
 
     if(allTechnics.isNotEmpty){
-
       int lastIdSQFlite = allTechnics.first.id;
       int lastIdMySQL = lastId;
+
       if(lastIdSQFlite < lastIdMySQL){
         var reversedAllTechnic = List.from(allTechnics.reversed);
         addTechnicInSQFlite = await ConnectToDBMySQL.connDB.getRangeGreaterOnIDTechnics(lastIdSQFlite);

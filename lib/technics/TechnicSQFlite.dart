@@ -4,6 +4,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:intl/intl.dart';
 
+import '../utils/utils.dart';
+
 class TechnicSQFlite{
   TechnicSQFlite._();
 
@@ -22,15 +24,15 @@ class TechnicSQFlite{
 
           await inDB.execute("CREATE TABLE IF NOT EXISTS Equipment ("
               "id INTEGER, internalID INTEGER, category TEXT, name TEXT, "
-              "dateBuyTechnic TEXT, cost INTEGER, comment TEXT)");
+              "dateBuyTechnic TEXT, cost INTEGER, comment TEXT, user TEXT)");
 
           await inDB.execute('CREATE TABLE IF NOT EXISTS statusEquipment ('
-              'id INTEGER, idEquipment INTEGER, status TEXT, dislocation TEXT, date TEXT)');
+              'id INTEGER, idEquipment INTEGER, status TEXT, dislocation TEXT, date TEXT, user TEXT)');
           
           await inDB.execute('CREATE TABLE IF NOT EXISTS testDrive ('
               'id INTEGER, idEquipment INTEGER, category TEXT, '
               'dateStart TEXT, dateFinish TEXT, result TEXT, '
-              'checkEquipment INTEGER');
+              'checkEquipment INTEGER, user TEXT');
         });
     return db;
   }
@@ -77,24 +79,25 @@ class TechnicSQFlite{
 
     var resultEquipment = await db.rawInsert(
         "INSERT INTO Equipment (id, internalID, category, name, dateBuyTechnic, "
-            "cost, comment) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "cost, comment, user) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         [inTechnic.id, inTechnic.internalID, inTechnic.category, inTechnic.name,
-          inTechnic.dateBuyTechnic, inTechnic.cost, inTechnic.comment]
+          inTechnic.dateBuyTechnic, inTechnic.cost, inTechnic.comment, utils.LoginPassword.login]
     );
 
     var resultStatus = await db.rawInsert(
         'INSERT INTO statusEquipment (id, idEquipment, status, dislocation, '
-            'date) VALUES (?, ?, ?, ?, ?)',
+            'date, user) VALUES (?, ?, ?, ?, ?, ?)',
       [inTechnic.id, inTechnic.internalID, inTechnic.status, inTechnic.dislocation,
-        DateFormat('yyyy.MM.dd').format(DateTime.now())]
+        DateFormat('yyyy.MM.dd').format(DateTime.now()), utils.LoginPassword.login]
     );
 
     var resultTestDrive = await db.rawInsert(
         'INSERT INTO testDrive (id, idEquipment, category, dateStart, dateFinish, '
-            'result, checkEquipment) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            'result, checkEquipment, user) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [inTechnic.id, inTechnic.internalID, inTechnic.category, inTechnic.dateStartTestDrive,
-      inTechnic.dateFinishTestDrive, inTechnic.resultTestDrive, inTechnic.checkboxTestDrive]
+      inTechnic.dateFinishTestDrive, inTechnic.resultTestDrive, inTechnic.checkboxTestDrive,
+      utils.LoginPassword.login]
     );
   }
 
@@ -154,12 +157,12 @@ class TechnicSQFlite{
     Database db = await database;
     await db.rawQuery("CREATE TABLE IF NOT EXISTS Equipment ("
         "id INTEGER, internalID INTEGER, category TEXT, name TEXT, "
-        "dateBuyTechnic TEXT, cost INTEGER, comment TEXT)");
+        "dateBuyTechnic TEXT, cost INTEGER, comment TEXT, user TEXT)");
     await db.rawQuery('CREATE TABLE IF NOT EXISTS statusEquipment ('
-        'id INTEGER, idEquipment INTEGER, status TEXT, dislocation TEXT, date TEXT)');
+        'id INTEGER, idEquipment INTEGER, status TEXT, dislocation TEXT, date TEXT, user TEXT)');
     await db.rawQuery('CREATE TABLE IF NOT EXISTS testDrive ('
         'id INTEGER, idEquipment INTEGER, category TEXT, '
         'dateStart TEXT, dateFinish TEXT, result TEXT, '
-        'checkEquipment INTEGER)');
+        'checkEquipment INTEGER, user TEXT)');
   }
 }

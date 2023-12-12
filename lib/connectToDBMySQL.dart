@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
 import 'package:technical_support_artphoto/technics/Technic.dart';
+import 'package:technical_support_artphoto/utils/utils.dart';
 
 class ConnectToDBMySQL {
   ConnectToDBMySQL._();
@@ -44,7 +45,10 @@ class ConnectToDBMySQL {
 
     var list = [];
     for (var row in result) {
-      // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4], dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8]
+      // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4],
+      // dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8]
+      // dateStart-row[9], dateFinish-row[10], resultTestDrive-row[11],
+      // checkTestDrive-row[12]
 
       String dateStartTestDrive = 'Нет даты';
       if(row[9] != null && row[9].toString() != "30 ноября 0001") dateStartTestDrive = getDateFormatted(row[9].toString());
@@ -192,18 +196,21 @@ class ConnectToDBMySQL {
   Future insertTechnicInDB(Technic technic) async{
     await ConnectToDBMySQL.connDB.connDatabase();
     var resultEquipment = await _connDB!.query(
-        'INSERT INTO equipment (number, category, name, dateBuy, cost, comment) VALUES (?, ?, ?, ?, ?, ?)',
-        [technic.internalID,  technic.category, technic.name, technic.dateBuyTechnic, technic.cost, technic.comment]);
+        'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [technic.internalID,  technic.category, technic.name, technic.dateBuyTechnic, technic.cost, technic.comment,
+        LoginPassword.login]);
 
     var statusEquipment = await _connDB!.query(
-        'INSERT INTO statusEquipment (idEquipment, status, dislocation, date) '
-            'VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ?)',
-        [technic.status, technic.dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now())]);
+        'INSERT INTO statusEquipment (idEquipment, status, dislocation, date, user) '
+            'VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ?, ?)',
+        [technic.status, technic.dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now()),
+        LoginPassword.login]);
 
     var testDrive = await _connDB!.query(
       'INSERT INTO testDrive (idEquipment, category, dateStart, dateFinish, result, '
-          'checkEquipment) VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ? , ?, ?)',
-      [technic.category, technic.dateStartTestDrive, technic.dateFinishTestDrive, technic.resultTestDrive, technic.checkboxTestDrive]);
+          'checkEquipment, user) VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ? , ?, ?, ?)',
+      [technic.category, technic.dateStartTestDrive, technic.dateFinishTestDrive, technic.resultTestDrive, technic.checkboxTestDrive,
+      LoginPassword.login]);
   }
 
   Future insertRepairInDB(Repair repair) async{
