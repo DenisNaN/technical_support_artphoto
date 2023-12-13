@@ -85,7 +85,7 @@ class DownloadAllList{
         addTechnicInSQFlite = await ConnectToDBMySQL.connDB.getRangeGreaterOnIDTechnics(lastIdSQFlite);
 
         for(var technic in addTechnicInSQFlite.reversed){
-          TechnicSQFlite.db.create(technic);
+          TechnicSQFlite.db.insertEquipment(technic);
         }
         reversedAllTechnic.addAll(addTechnicInSQFlite.reversed);
 
@@ -95,17 +95,17 @@ class DownloadAllList{
     } else {
       allTechnics = await ConnectToDBMySQL.connDB.getAllTechnics();
       for(var technic in allTechnics.reversed){
-        TechnicSQFlite.db.create(technic);
+        TechnicSQFlite.db.insertEquipment(technic);
       }
     }
 
     if(countEntities != allTechnics.length){
-      TechnicSQFlite.db.deleteTable();
-      TechnicSQFlite.db.createTable();
+      TechnicSQFlite.db.deleteTables();
+      TechnicSQFlite.db.createTables();
 
       allTechnics = await ConnectToDBMySQL.connDB.getAllTechnics();
       for(var technic in allTechnics.reversed){
-        TechnicSQFlite.db.create(technic);
+        TechnicSQFlite.db.insertEquipment(technic);
       }
     }
 
@@ -199,8 +199,8 @@ class DownloadAllList{
   }
 
   Future rebootAllBasicListSQFlite() async{
-    TechnicSQFlite.db.deleteTable();
-    TechnicSQFlite.db.createTable();
+    TechnicSQFlite.db.deleteTables();
+    TechnicSQFlite.db.createTables();
     RepairSQFlite.db.deleteTable();
     RepairSQFlite.db.createTable();
   }

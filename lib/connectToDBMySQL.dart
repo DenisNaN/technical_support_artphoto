@@ -39,7 +39,8 @@ class ConnectToDBMySQL {
         'testDrive.checkEquipment '
         'FROM equipment '
         'LEFT JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id '
-        'LEFT JOIN testDrive ON testDrive.idEquipment = equipment.id');
+        'LEFT JOIN testDrive ON testDrive.idEquipment = equipment.id '
+        'ORDER BY equipment.id');
 
     // 'JOIN statusEquipment ON (SELECT idEquipment FROM statusEquipment ORDER BY id DESC LIMIT 1) = equipment.id');
 
@@ -58,7 +59,50 @@ class ConnectToDBMySQL {
       if(row[12] != null && row[12] == 1) checkTestDrive = true;
 
       Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
-          getDateFormatted(row[5].toString()), row[6], row[7], row[8],
+          getDateFormatted(row[5].toString()), row[6] ?? '', row[7] ?? '', row[8],
+          dateStartTestDrive, dateFinishTestDrive, row[11] ?? '', checkTestDrive);
+      list.add(technic);
+    }
+    var reversedList = List.from(list.reversed);
+    return reversedList;
+  }
+
+  Future<List> getRangeGreaterOnIDTechnics(int id) async{
+    var result = await _connDB!.query('SELECT '
+        'equipment.id, '
+        'equipment.number, '
+        'equipment.name, '
+        'equipment.category, '
+        'equipment.cost, '
+        'equipment.dateBuy, '
+        'statusEquipment.status, '
+        'statusEquipment.dislocation, '
+        'equipment.comment, '
+        'testDrive.dateStart, '
+        'testDrive.dateFinish, '
+        'testDrive.result, '
+        'testDrive.checkEquipment '
+        'FROM equipment '
+        'LEFT JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id '
+        'LEFT JOIN testDrive ON testDrive.idEquipment = equipment.id '
+        'WHERE equipment.id > ?', [id]);
+
+    var list = [];
+    for (var row in result) {
+      // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4],
+      // dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8]
+      // dateStart-row[9], dateFinish-row[10], resultTestDrive-row[11],
+      // checkTestDrive-row[12]
+
+      String dateStartTestDrive = 'Нет даты';
+      if(row[9] != null && row[9].toString() != "30 ноября 0001") dateStartTestDrive = getDateFormatted(row[9].toString());
+      String dateFinishTestDrive = 'Нет даты';
+      if(row[10] != null && row[9].toString() != "30 ноября 0001") dateStartTestDrive = getDateFormatted(row[10].toString());
+      bool checkTestDrive = false;
+      if(row[12] != null && row[12] == 1) checkTestDrive = true;
+
+      Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
+          getDateFormatted(row[5].toString()), row[6] ?? '', row[7] ?? '', row[8],
           dateStartTestDrive, dateFinishTestDrive, row[11] ?? '', checkTestDrive);
       list.add(technic);
     }
@@ -107,38 +151,6 @@ class ConnectToDBMySQL {
           dateDepartureFromService, row[10],  row[11],  row[12], row[13], dateStartTestDrive, dateFinishTestDrive,
           row[16], row[17], row[18], dateReceipt);
       list.add(repair);
-    }
-    var reversedList = List.from(list.reversed);
-    return reversedList;
-  }
-
-  Future<List> getRangeGreaterOnIDTechnics(int id) async{
-    var result = await _connDB!.query('SELECT '
-        'equipment.id, '
-        'equipment.number, '
-        'equipment.name, '
-        'equipment.category, '
-        'equipment.cost, '
-        'equipment.dateBuy, '
-        'statusEquipment.status, '
-        'statusEquipment.dislocation, '
-        'equipment.comment '
-        'testDrive.dateStart, '
-        'testDrive.dateFinish, '
-        'testDrive.result, '
-        'testDrive.checkEquipment '
-        'FROM equipment '
-        'LEFT JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id '
-        'LEFT JOIN testDrive ON testDrive.idEquipment = equipment.id '
-        'WHERE equipment.id > ?', [id]);
-
-    var list = [];
-    for (var row in result) {
-      // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4], dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8]
-      Technic technic = Technic(row[0], row[1],  row[2],  row[3],
-          row[4], getDateFormatted(row[5].toString()), row[6], row[7],
-          row[8], row[9], row[10], row[11], row[12]);
-      list.add(technic);
     }
     var reversedList = List.from(list.reversed);
     return reversedList;

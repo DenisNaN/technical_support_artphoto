@@ -57,12 +57,10 @@ class _RepairListState extends State<RepairList> {
 
   Text _buildTextWithoutTestDrive(BuildContext context, int index){
     return Text(
-        'Статус: ${Repair.repairList[index].newStatus == "" ? Repair.repairList[index].status : Repair.repairList[index].newStatus}.\n'
+            'Статус: ${Repair.repairList[index].newStatus == "" ? Repair.repairList[index].status : Repair.repairList[index].newStatus}.\n'
             'Дислокация: ${Repair.repairList[index].newDislocation == "" ? Repair.repairList[index].serviceDislocation : Repair.repairList[index].newDislocation}. '
-            '${Repair.repairList[index].dateReceipt == "Нет даты" ?
-        (Repair.repairList[index].dateTransferForService == "Нет даты" ? Repair.repairList[index].dateDeparture :
-        Repair.repairList[index].dateTransferForService)
-            : Repair.repairList[index].dateReceipt}.'
+            '${Repair.repairList[index].dateReceipt == "Нет даты" ? (Repair.repairList[index].dateTransferForService == "Нет даты" ? Repair.repairList[index].dateDeparture :
+            Repair.repairList[index].dateTransferForService) : Repair.repairList[index].dateReceipt}.'
     );
   }
 

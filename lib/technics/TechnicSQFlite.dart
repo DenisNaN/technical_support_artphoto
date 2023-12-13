@@ -21,18 +21,12 @@ class TechnicSQFlite{
     String path = join(utils.docsDir!.path, 'technic.db');
     Database db = await openDatabase(path, version: 1, onOpen: (db){},
         onCreate: (Database inDB, int inVersion) async {
-
-          await inDB.execute("CREATE TABLE IF NOT EXISTS Equipment ("
-              "id INTEGER, internalID INTEGER, category TEXT, name TEXT, "
-              "dateBuyTechnic TEXT, cost INTEGER, comment TEXT, user TEXT)");
-
-          await inDB.execute('CREATE TABLE IF NOT EXISTS statusEquipment ('
-              'id INTEGER, idEquipment INTEGER, status TEXT, dislocation TEXT, date TEXT, user TEXT)');
-          
-          await inDB.execute('CREATE TABLE IF NOT EXISTS testDrive ('
-              'id INTEGER, idEquipment INTEGER, category TEXT, '
-              'dateStart TEXT, dateFinish TEXT, result TEXT, '
-              'checkEquipment INTEGER, user TEXT');
+          createTables();
+          await inDB.execute("CREATE TABLE IF NOT EXISTS equipment ("
+              "id INTEGER, internalID INTEGER, name TEXT, category TEXT,"
+              "cost INTEGER, dateBuyTechnic TEXT, status TEXT, dislocation TEXT, "
+              "comment TEXT, dateStartTestDrive TEXT, dateFinishTestDrive TEXT, resultTestDrive TEXT,"
+              "checkEquipment TEXT, user TEXT)");
         });
     return db;
   }
@@ -51,7 +45,7 @@ class TechnicSQFlite{
         inMap['dateStartTestDrive'],
         inMap['dateFinishTestDrive'],
         inMap['resultTestDrive'],
-        inMap['checkboxTestDrive'],
+        inMap['checkboxTestDrive'] == '0' ? false : true
     );
     return technic;
   }
@@ -74,30 +68,30 @@ class TechnicSQFlite{
     return map;
   }
 
-  Future create(Technic inTechnic) async {
+  Future insertEquipment(Technic inTechnic) async {
     Database db = await database;
 
-    var resultEquipment = await db.rawInsert(
-        "INSERT INTO Equipment (id, internalID, category, name, dateBuyTechnic, "
-            "cost, comment, user) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [inTechnic.id, inTechnic.internalID, inTechnic.category, inTechnic.name,
-          inTechnic.dateBuyTechnic, inTechnic.cost, inTechnic.comment, utils.LoginPassword.login]
-    );
-
-    var resultStatus = await db.rawInsert(
-        'INSERT INTO statusEquipment (id, idEquipment, status, dislocation, '
-            'date, user) VALUES (?, ?, ?, ?, ?, ?)',
-      [inTechnic.id, inTechnic.internalID, inTechnic.status, inTechnic.dislocation,
-        DateFormat('yyyy.MM.dd').format(DateTime.now()), utils.LoginPassword.login]
-    );
-
-    var resultTestDrive = await db.rawInsert(
-        'INSERT INTO testDrive (id, idEquipment, category, dateStart, dateFinish, '
-            'result, checkEquipment, user) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [inTechnic.id, inTechnic.internalID, inTechnic.category, inTechnic.dateStartTestDrive,
-      inTechnic.dateFinishTestDrive, inTechnic.resultTestDrive, inTechnic.checkboxTestDrive,
-      utils.LoginPassword.login]
+    await db.execute(
+        "INSERT INTO equipment (id, internalID, name, category, cost, "
+            "dateBuyTechnic, status, dislocation, comment, dateStartTestDrive, "
+            "dateFinishTestDrive, resultTestDrive, checkEquipment, user) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+          inTechnic.id,
+          inTechnic.internalID,
+          inTechnic.name,
+          inTechnic.category,
+          inTechnic.cost,
+          inTechnic.dateBuyTechnic,
+          inTechnic.status,
+          inTechnic.dislocation,
+          inTechnic.comment,
+          inTechnic.dateStartTestDrive,
+          inTechnic.dateFinishTestDrive,
+          inTechnic.resultTestDrive,
+          inTechnic.checkboxTestDrive,
+          utils.LoginPassword.login
+        ]
     );
   }
 
@@ -107,62 +101,43 @@ class TechnicSQFlite{
   //   return technicFromMap(rec.first);
   // }
 
-  // "id INTEGER, internalID INTEGER, category TEXT, name TEXT, "
-  // "dateBuyTechnic TEXT, cost INTEGER, comment TEXT)");
   Future<List> getAllTechnics() async {
     Database db = await database;
-    // var recs = await db.query("technic");
-    var recs = await db.rawQuery('SELECT '
-        'equipment.id, '
-        'equipment.internalID, '
-        'equipment.name, '
-        'equipment.category, '
-        'equipment.cost, '
-        'equipment.dateBuyTechnic, '
-        'statusEquipment.status, '
-        'statusEquipment.dislocation, '
-        'equipment.comment, '
-        'testDrive.dateStart, '
-        'testDrive.dateFinish, '
-        'testDrive.result, '
-        'testDrive.checkEquipment '
-        'FROM equipment '
-    // 'JOIN statusEquipment ON (SELECT idEquipment FROM statusEquipment ORDER BY id DESC LIMIT 1) = equipment.id');
-        'JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id '
-        'JOIN testDrive ON testDrive.idEquipment = equipment.id');
+    var recs = await db.query("equipment");
     var list = recs.isNotEmpty ? recs.map((m) => technicFromMap(m)).toList() : [];
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
 
-  Future update(Technic inTechnic) async {
-    Database db = await database;
-    return await db.update("Equipment", technicToMap(inTechnic),
-        where: "id = ?", whereArgs: [inTechnic.id]);
-  }
+  // Future update(Technic inTechnic) async {
+  //   Database db = await database;
+  //   return await db.update("equipment", technicToMap(inTechnic),
+  //       where: "id = ?", whereArgs: [inTechnic.id]);
+  // }
 
   // Future delete(int inID) async {
   //   Database db = await database;
   //   return await db.delete("technic", where: "id = ?", whereArgs: [inID]);
   // }
 
-  Future deleteTable() async{
+  Future deleteTables() async{
     Database db = await database;
-    await db.rawQuery("DROP TABLE IF EXISTS Equipment");
-    await db.rawQuery("DROP TABLE IF EXISTS statusEquipment");
-    await db.rawQuery("DROP TABLE IF EXISTS testDrive");
+    await db.rawQuery("DROP TABLE IF EXISTS equipment");
   }
 
-  Future createTable() async{
+  Future createTables() async{
     Database db = await database;
-    await db.rawQuery("CREATE TABLE IF NOT EXISTS Equipment ("
-        "id INTEGER, internalID INTEGER, category TEXT, name TEXT, "
-        "dateBuyTechnic TEXT, cost INTEGER, comment TEXT, user TEXT)");
-    await db.rawQuery('CREATE TABLE IF NOT EXISTS statusEquipment ('
-        'id INTEGER, idEquipment INTEGER, status TEXT, dislocation TEXT, date TEXT, user TEXT)');
-    await db.rawQuery('CREATE TABLE IF NOT EXISTS testDrive ('
-        'id INTEGER, idEquipment INTEGER, category TEXT, '
-        'dateStart TEXT, dateFinish TEXT, result TEXT, '
-        'checkEquipment INTEGER, user TEXT)');
+    await db.rawQuery("CREATE TABLE IF NOT EXISTS equipment ("
+        "id INTEGER, internalID INTEGER, name TEXT, category TEXT,"
+        "cost INTEGER, dateBuyTechnic TEXT, status TEXT, dislocation TEXT, "
+        "comment TEXT, dateStartTestDrive TEXT, dateFinishTestDrive TEXT, resultTestDrive TEXT,"
+        "checkEquipment TEXT, user TEXT)");
+  }
+
+  Future getEquipment() async{
+    Database db = await database;
+    var recs = await db.rawQuery('SELECT * FROM equipment');
+    recs.isNotEmpty ? recs.map((m) => print(m)) : [];
+    print('-----------------');
   }
 }

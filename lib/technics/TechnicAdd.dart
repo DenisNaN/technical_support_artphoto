@@ -356,7 +356,7 @@ class SaveEntity{
   void _save(Technic technic) async{
     await ConnectToDBMySQL.connDB.connDatabase();
     ConnectToDBMySQL.connDB.insertTechnicInDB(technic);
-    TechnicSQFlite.db.create(technic);
+    TechnicSQFlite.db.insertEquipment(technic);
   }
 }
 
