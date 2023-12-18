@@ -27,18 +27,21 @@ class _TechnicsListState extends State<TechnicsList> {
             } : null,
             child: const Icon(Icons.add, color: Colors.white)
             ),
-        body: ListView.builder(
-          // separatorBuilder: (BuildContext context, int index) => const Divider(),
+        body: ListView.separated(
+          separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: Technic.technicList.length,
           itemBuilder: (context, index) {
-            // return Text(Technic.entityList[index].toString());
+            String dateStart = '';
+            if(Technic.technicList[index].dateStartTestDrive != ''){
+              dateStart = Technic.technicList[index].dateStartTestDrive;
+            }
             return ListTile(
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index])));
               },
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               title: Text('№ ${Technic.technicList[index].internalID}  ${Technic.technicList[index].name}  ${Technic.technicList[index].category}'),
-              subtitle: Technic.technicList[index].dateStartTestDrive != 'Нет даты' ? _buildTextWithTestDrive(context, index) : _buildTextWithoutTestDrive(context, index),
+              subtitle: dateStart != '' ? _buildTextWithTestDrive(context, index) : _buildTextWithoutTestDrive(context, index),
             );
           },
         )
@@ -53,17 +56,21 @@ class _TechnicsListState extends State<TechnicsList> {
   }
 
   Text _buildTextWithTestDrive(BuildContext context, int index){
-    DateTime finishDate;
+    DateTime dateStart = DateTime.parse(Technic.technicList[index].dateStartTestDrive.replaceAll('.', '-'));
+    DateTime dateFinish;
     DateTime dateNow;
+    String formatedStartDate = DateFormat("d MMMM yyyy", "ru_RU").format(dateStart);
+    String formatedFinishDate = '';
     Duration duration = Duration(days: 0);
-    bool isFinishDay = false;
+    bool isHaveFinishDate = false;
     bool isEndTD = Technic.technicList[index].checkboxTestDrive;
 
-    if(Technic.technicList[index].dateFinishTestDrive != 'Нет даты'){
-      finishDate = DateFormat("d MMMM yyyy", "ru_RU").parse(Technic.technicList[index].dateFinishTestDrive);
+    if(Technic.technicList[index].dateFinishTestDrive != ''){
+      dateFinish = DateTime.parse(Technic.technicList[index].dateFinishTestDrive.replaceAll('.', '-'));
+      formatedFinishDate = DateFormat("d MMMM yyyy", "ru_RU").format(dateFinish);
       dateNow = DateTime.now();
-      duration = finishDate.difference(dateNow);
-      isFinishDay = true;
+      duration = dateFinish.difference(dateNow);
+      isHaveFinishDate = true;
     }
 
     return Text.rich(
@@ -71,25 +78,28 @@ class _TechnicsListState extends State<TechnicsList> {
             children:[
               TextSpan(text:
                   '${Technic.technicList[index].dislocation}.  Статус: ${Technic.technicList[index].status}\n'),
-              isFinishDay ?
+              isHaveFinishDate ?
               TextSpan(children: [
                 TextSpan(text:
-                  'Начало тест-драйва: ${Technic.technicList[index].dateStartTestDrive}.\n'
-                  'Конец тест-драйва: ${Technic.technicList[index].dateFinishTestDrive}.\n',
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+                  'Начало тест-драйва: $formatedStartDate.\n'
+                  'Конец тест-драйва: $formatedFinishDate.\n'),
                 duration.inDays > 0 ?
                     TextSpan(
                     text: 'Осталось дней до конца тест-драйва: ${duration.inDays}',
                     style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)
                 ) : TextSpan(
-                    text: Technic.technicList[index].checkboxTestDrive ? 'Период тест-драйва завершен' : 'Тест-драйв завершен',
+                    text: !Technic.technicList[index].checkboxTestDrive ?
+                    'Период тест-драйва завершен' :
+                    'Тест-драйв завершен',
                     style: TextStyle(fontWeight: FontWeight.bold, color: Technic.technicList[index].checkboxTestDrive ? Colors.green : Colors.blue)
                 )
                   ]
               ) :
               TextSpan(children:[
-                TextSpan(text: 'Дата тест-драйва: ${Technic.technicList[index].dateStartTestDrive}.'),
-                TextSpan(text: Technic.technicList[index].checkboxTestDrive ? 'Тест-драйв завершен' : 'Тест-драйв не завершен')
+                TextSpan(text: 'Дата тест-драйва: $formatedStartDate.\n'),
+                TextSpan(text: Technic.technicList[index].checkboxTestDrive ? 'Тест-драйв завершен' : 'Тест-драйв не завершен',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Technic.technicList[index].checkboxTestDrive ? Colors.green : Colors.blue)
+                )
               ]
               ),
             ]

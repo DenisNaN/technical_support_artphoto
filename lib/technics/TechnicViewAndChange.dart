@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
-import '../ConnectToDBMySQL.dart';
+import '../utils/categoryDropDownValueModel.dart';
 import 'Technic.dart';
 
 class TechnicViewAndChange extends StatefulWidget {
@@ -15,23 +15,26 @@ class TechnicViewAndChange extends StatefulWidget {
 }
 
 class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
-  final _innerNumberTechnic = TextEditingController();
   final _categoryTechnic = SingleValueDropDownController();
   final _nameTechnic = TextEditingController();
   final _costTechnic = TextEditingController();
   final _statusTechnic = SingleValueDropDownController();
   final _dislocationTechnic = SingleValueDropDownController();
-  String _dateBuyTechnic = "";
-  String _dateForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
+  late DateTime dateBuy;
+  String _dateBuyTechnic = '';
+  String _dateBuyForSQL = '';
   final _comment = TextEditingController();
   String _dateStartTestDrive = '';
+  String _dateStartTestDriveForSQL = '';
   String _dateFinishTestDrive = '';
+  String _dateFinishTestDriveForSQL = '';
   final _resultTestDrive = TextEditingController();
-  bool _checkTestDrive = false;
+  bool _checkboxTestDrive = false;
+  bool _switchTestDrive = false;
+  late bool _isCategoryPhotocamera;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  bool isEditNumber = false;
   bool isEditCategory = false;
   bool isEditName = false;
   bool isEditCost = false;
@@ -39,19 +42,26 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
   @override
   void initState() {
-    _innerNumberTechnic.text = '${widget.technic.internalID}';
     _categoryTechnic.dropDownValue = DropDownValueModel(name: widget.technic.category, value: widget.technic.category);
     _nameTechnic.text = widget.technic.name;
     _costTechnic.text = '${widget.technic.cost}';
     _statusTechnic.dropDownValue = DropDownValueModel(name: widget.technic.status, value: widget.technic.status);
     _dislocationTechnic.dropDownValue = DropDownValueModel(name: widget.technic.dislocation, value: widget.technic.dislocation);
-    _dateBuyTechnic = widget.technic.dateBuyTechnic;
+
+    dateBuy = DateTime.parse(widget.technic.dateBuyTechnic.replaceAll('.', '-'));
+    _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(dateBuy);
     _comment.text = widget.technic.comment;
+    if(widget.technic.dateStartTestDrive != ''){
+      _switchTestDrive = true;
+      _dateStartTestDrive = widget.technic.dateStartTestDrive;
+      _checkboxTestDrive = widget.technic.checkboxTestDrive;
+    }
+    widget.technic.dateFinishTestDrive != '' ? _dateFinishTestDrive = widget.technic.dateFinishTestDrive : _dateFinishTestDrive = '';
+    widget.technic.category == 'Фотоаппарат' ? _isCategoryPhotocamera = true : _isCategoryPhotocamera = false;
   }
 
   @override
   void dispose() {
-    _innerNumberTechnic.dispose();
     _categoryTechnic.dispose();
     _nameTechnic.dispose();
     _costTechnic.dispose();
@@ -82,8 +92,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   const Spacer(),
                   TextButton(
                       onPressed: HasNetwork.isConnecting ? () {
-                        if(_innerNumberTechnic.text == "" ||
-                            _categoryTechnic.dropDownValue?.name == null ||
+                        if(_categoryTechnic.dropDownValue?.name == null ||
                             _nameTechnic.text == "" ||
                             _costTechnic.text == "" ||
                             _statusTechnic.dropDownValue?.name == null ||
@@ -101,24 +110,31 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                             ),
                           );
                         }else{
+                          // !_switchTestDrive ? _dateStartTestDriveForSQL = '' :
+                          // _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
+                          // if(_switchTestDrive && !_checkboxTestDrive && _dateFinishTestDriveForSQL == '' && !_isCategoryPhotocamera){
+                          //   DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDriveForSQL).add(const Duration(days: 14));
+                          //   _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
+                          // }
+
                           Technic technicLast = Technic.technicList.first;
                           Technic technic = Technic(
                             technicLast.id! + 1,
-                            int.parse(_innerNumberTechnic.text),
+                            widget.technic.internalID,
                             _nameTechnic.text,
                             _categoryTechnic.dropDownValue!.name,
                             int.parse(_costTechnic.text.replaceAll(",", "")),
-                            _dateForSQL,
+                              _dateBuyForSQL,
                             _statusTechnic.dropDownValue!.name,
                             _dislocationTechnic.dropDownValue!.name,
                             _comment.text,
                             _dateStartTestDrive,
                             _dateFinishTestDrive,
                             _resultTestDrive.text,
-                            _checkTestDrive
+                              _checkboxTestDrive
                           );
 
-                          SaveEntity()._save(technic);
+                          _save(technic);
 
                           Navigator.pop(context, technic);
 
@@ -147,50 +163,21 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
           key: _formKey,
           child: ListView(
             children: [
-
-              isEditNumber ?
-              ListTile(
-                leading: const Icon(Icons.fiber_new),
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: "Номер техники"),
-                  controller: _innerNumberTechnic,
-                  inputFormatters: [numberFormatter],
-                  keyboardType: TextInputType.number,
-                ),
-              ) :
               ListTile(
                 leading: const Icon(Icons.fiber_new),
                 title: Text(widget.technic.internalID == null ? 'БН' : '${widget.technic.internalID}'),
                 subtitle: const Text('Номер техники'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
-                  onPressed: (){
-                    setState(() {
-                      isEditNumber = !isEditNumber;
-                    });
-                  },
-                ),
               ),
 
               isEditCategory ?
               ListTile(
                 leading: const Icon(Icons.print),
                 title: DropDownTextField(
-                  // controller: _categoryTechnic,
                   initialValue: widget.technic.category,
                   clearOption: true,
                   textFieldDecoration: const InputDecoration(hintText: "Выберите категорию"),
                   dropDownItemCount: 8,
-                  dropDownList: const [
-                    DropDownValueModel(name: 'Принтер', value: "Принтер"),
-                    DropDownValueModel(name: 'Копир', value: "Копир"),
-                    DropDownValueModel(name: 'Большой Копир', value: "Большой Копир"),
-                    DropDownValueModel(name: 'Фотоаппарат', value: "Фотоаппарат"),
-                    DropDownValueModel(name: 'Сканер', value: "Сканер"),
-                    DropDownValueModel(name: 'Вспышка', value: "Вспышка"),
-                    DropDownValueModel(name: 'Ламинатор', value: "Ламинатор"),
-                    DropDownValueModel(name: 'Телевизор', value: "Телевизор"),
-                  ],
+                  dropDownList: CategoryDropDownValueModel.nameEquipment,
                 ),
               ) :
               ListTile(
@@ -264,14 +251,14 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                     onPressed: () {
                       showDatePicker(
                           context: context,
-                          initialDate: DateTime.now(),
+                          initialDate: dateBuy,
                           firstDate: DateTime(2000),
                           lastDate: DateTime(2099),
                           locale: const Locale("ru", "RU")
                       ).then((date) {
                         setState(() {
                           if(date != null) {
-                            _dateForSQL = DateFormat('yyyy.MM.dd').format(date);
+                            _dateBuyForSQL = DateFormat('yyyy.MM.dd').format(date);
                             _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(date);
                           }
                         });
@@ -287,15 +274,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   clearOption: true,
                   textFieldDecoration: const InputDecoration(hintText: "Статус техники"),
                   dropDownItemCount: 4,
-                  dropDownList: const [
-                    DropDownValueModel(name: 'Активна', value: "Активна"),
-                    DropDownValueModel(name: 'Неисправна', value: "Неисправна"),
-                    DropDownValueModel(name: 'В ремонте', value: "В ремонте"),
-                    DropDownValueModel(name: 'Тест-драйв', value: "Тест-драйв"),
-                    DropDownValueModel(name: 'На хранении', value: "На хранении"),
-                    DropDownValueModel(name: 'Донор', value: "Донор"),
-                    DropDownValueModel(name: 'Списана', value: "Списана"),
-                  ],
+                  dropDownList: CategoryDropDownValueModel.statusForEquipment,
                 ),
               ),
               ListTile(
@@ -305,16 +284,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   clearOption: true,
                   textFieldDecoration: const InputDecoration(hintText: "Дислокация техники"),
                   dropDownItemCount: 4,
-                  dropDownList: const [
-                    DropDownValueModel(name: 'Кузьминки', value: "Кузьминки"),
-                    DropDownValueModel(name: 'Текстильщики', value: "Текстильщики"),
-                    DropDownValueModel(name: 'Жулебино', value: "Жулебино"),
-                    DropDownValueModel(name: 'Рязанка', value: "Рязанка"),
-                    DropDownValueModel(name: 'Ключевая', value: "Ключевая"),
-                    DropDownValueModel(name: 'Паромная', value: "Паромная"),
-                    DropDownValueModel(name: 'Склад', value: "Склад"),
-                    DropDownValueModel(name: 'Офис', value: "Офис"),
-                  ],
+                  dropDownList: CategoryDropDownValueModel.photosalons,
                 ),
               ),
               ListTile(
@@ -324,18 +294,171 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   controller: _comment,
                 ),
               ),
+              ListTile(
+                title: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _switchTestDrive ? Text('Выключить тест-драйв ') : Text('Включить тест-драйв '),
+                      Switch(
+                          value: _switchTestDrive,
+                          onChanged: (value){
+                            setState(() {
+                              _switchTestDrive = value;
+                            });
+                          }
+                      ),
+                    ]
+                ),
+              ),
+              ListTile(title:
+              _switchTestDrive ? !_isCategoryPhotocamera ? _buildTestDriveListTile() : _buildTestDriveListTilePhotocamera() : Text('Тест-драйв не проводился')
+              )
             ],
           ),
         )
     );
   }
-}
 
-class SaveEntity{
+  ListTile _buildTestDriveListTile(){
+    return ListTile(
+      // leading: const Icon(Icons.create),
+      title: Column(children: [
+        ListTile(
+          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+          leading: const Icon(Icons.today),
+          title: const Text("Дата начала тест-драйва"),
+          subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateStartTestDrive.replaceAll('.', '-')))),
+          trailing: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.parse(widget.technic.dateStartTestDrive.replaceAll('.', '-')),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
+                      _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+          leading: const Icon(Icons.today),
+          title: const Text("Дата конца тест-драйва"),
+          subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateFinishTestDrive.replaceAll('.', '-')))),
+          trailing: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.parse(widget.technic.dateFinishTestDrive.replaceAll('.', '-')),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
+                      _dateFinishTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+          leading: const Icon(Icons.create),
+          title: TextFormField(
+            decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
+            controller: _resultTestDrive,
+          ),
+        ),
+        CheckboxListTile(
+            contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+            title: Text('Тест-драйв выполнен'),
+            secondary: Icon(Icons.check),
+            value: _checkboxTestDrive,
+            onChanged: (bool? value) {
+              setState(() {
+                _checkboxTestDrive = value!;
+              });
+            }
+        )
+      ],
+      ),
+    );
+  }
+
+  ListTile _buildTestDriveListTilePhotocamera(){
+    return ListTile(
+      // leading: const Icon(Icons.create),
+      title: Column(children: [
+        ListTile(
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+          leading: const Icon(Icons.today),
+          title: const Text("Дата проверки"),
+          subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateStartTestDrive.replaceAll('.', '-')))),
+          trailing: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.parse(widget.technic.dateStartTestDrive.replaceAll('.', '-')),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
+                      _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+        ),
+        ListTile(
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+          leading: const Icon(Icons.create),
+          title: TextFormField(
+            decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
+            controller: _resultTestDrive,
+          ),
+        ),
+        CheckboxListTile(
+            contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+            title: const Text('Проверка выполнена'),
+            secondary: const Icon(Icons.check),
+            value: _checkboxTestDrive,
+            onChanged: (bool? value) {
+              setState(() {
+                _checkboxTestDrive = value!;
+              });
+            }
+        )
+      ],
+      ),
+    );
+  }
+
   void _save(Technic technic){
     // ConnectToDBMySQL.connDB.insertTechnicInDB(technic);
+
   }
 }
+
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {
 

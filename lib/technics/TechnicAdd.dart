@@ -31,6 +31,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   final _resultTestDrive = TextEditingController();
   bool _switchTestDrive = false;
   bool _checkboxTestDrive = false;
+  bool _isCategoryPhotocamera = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -168,6 +169,11 @@ class _TechnicAddState extends State<TechnicAdd> {
                   textFieldDecoration: const InputDecoration(hintText: "Наименование техники"),
                   dropDownItemCount: 8,
                   dropDownList: CategoryDropDownValueModel.nameEquipment,
+                  onChanged: (value){
+                    setState(() {
+                      value.name == 'Фотоаппарат' ? _isCategoryPhotocamera = true : _isCategoryPhotocamera = false;
+                    });
+                  },
                 ),
               ),
               ListTile(
@@ -252,7 +258,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                               _switchTestDrive = value;
                               !_switchTestDrive ? _dateStartTestDriveForSQL = '' :
                               _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
-                              if(_switchTestDrive && !_checkboxTestDrive && _dateFinishTestDriveForSQL == ''){
+                              if(_switchTestDrive && !_checkboxTestDrive && _dateFinishTestDriveForSQL == '' && !_isCategoryPhotocamera){
                                 DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDriveForSQL).add(const Duration(days: 14));
                                 _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
                               }
@@ -263,7 +269,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                 ),
               ),
               ListTile(title:
-              _switchTestDrive ? _buildTestDriveListTile() : Text('Тест-драйв не проводился')
+              _switchTestDrive ? !_isCategoryPhotocamera ? _buildTestDriveListTile() : _buildTestDriveListTilePhotocamera() : Text('Тест-драйв не проводился')
               )
             ],
           ),
@@ -345,6 +351,60 @@ class _TechnicAddState extends State<TechnicAdd> {
               _checkboxTestDrive = value!;
             });
           }
+        )
+      ],
+      ),
+    );
+  }
+
+  ListTile _buildTestDriveListTilePhotocamera(){
+    return ListTile(
+      // leading: const Icon(Icons.create),
+      title: Column(children: [
+        ListTile(
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+          leading: const Icon(Icons.today),
+          title: const Text("Дата проверки"),
+          subtitle: Text(_dateStartTestDrive),
+          trailing: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
+                      _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+        ),
+        ListTile(
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+          leading: const Icon(Icons.create),
+          title: TextFormField(
+            decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
+            controller: _resultTestDrive,
+          ),
+        ),
+        CheckboxListTile(
+            contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+            title: const Text('Проверка выполнена'),
+            secondary: const Icon(Icons.check),
+            value: _checkboxTestDrive,
+            onChanged: (bool? value) {
+              setState(() {
+                _checkboxTestDrive = value!;
+              });
+            }
         )
       ],
       ),
