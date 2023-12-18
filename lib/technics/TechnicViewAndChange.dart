@@ -119,18 +119,18 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
                           Technic technicLast = Technic.technicList.first;
                           Technic technic = Technic(
-                            technicLast.id! + 1,
-                            widget.technic.internalID,
-                            _nameTechnic.text,
-                            _categoryTechnic.dropDownValue!.name,
-                            int.parse(_costTechnic.text.replaceAll(",", "")),
+                              technicLast.id! + 1,
+                              widget.technic.internalID,
+                              _nameTechnic.text,
+                              _categoryTechnic.dropDownValue!.name,
+                              int.parse(_costTechnic.text.replaceAll(",", "")),
                               _dateBuyForSQL,
-                            _statusTechnic.dropDownValue!.name,
-                            _dislocationTechnic.dropDownValue!.name,
-                            _comment.text,
-                            _dateStartTestDrive,
-                            _dateFinishTestDrive,
-                            _resultTestDrive.text,
+                              _statusTechnic.dropDownValue!.name,
+                              _dislocationTechnic.dropDownValue!.name,
+                              _comment.text,
+                              _dateStartTestDriveForSQL,
+                              _dateFinishTestDriveForSQL,
+                              _resultTestDrive.text,
                               _checkboxTestDrive
                           );
 
@@ -304,6 +304,23 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                           onChanged: (value){
                             setState(() {
                               _switchTestDrive = value;
+
+                              if(!_switchTestDrive){
+                                _dateStartTestDrive = '';
+                                _dateFinishTestDrive = '';
+                                _dateStartTestDriveForSQL = '';
+                                _dateFinishTestDriveForSQL = '';
+                                _resultTestDrive.text = '';
+                                _checkboxTestDrive = false;
+                              }else{
+                                _dateStartTestDrive = DateFormat('yyyy.MM.dd').format(DateTime.now());
+                                _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
+                              }
+
+                              if(_switchTestDrive && !_checkboxTestDrive && _dateFinishTestDriveForSQL == '' && !_isCategoryPhotocamera){
+                                DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDrive).add(const Duration(days: 14));
+                                _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
+                              }
                             });
                           }
                       ),

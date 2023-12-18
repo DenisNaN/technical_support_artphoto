@@ -26,12 +26,15 @@ class TechnicSQFlite{
               "id INTEGER, internalID INTEGER, name TEXT, category TEXT,"
               "cost INTEGER, dateBuyTechnic TEXT, status TEXT, dislocation TEXT, "
               "comment TEXT, dateStartTestDrive TEXT, dateFinishTestDrive TEXT, resultTestDrive TEXT,"
-              "checkEquipment TEXT, user TEXT)");
+              "checkboxTestDrive TEXT, user TEXT)");
         });
     return db;
   }
 
   Technic technicFromMap(Map inMap){
+    bool _checkboxTestDrive = false;
+    inMap['checkboxTestDrive'] == '0' ? _checkboxTestDrive = false : _checkboxTestDrive = true;
+
     Technic technic = Technic(
         inMap['id'],
         inMap['internalID'],
@@ -45,7 +48,7 @@ class TechnicSQFlite{
         inMap['dateStartTestDrive'],
         inMap['dateFinishTestDrive'],
         inMap['resultTestDrive'],
-        inMap['checkboxTestDrive'] == '0' ? false : true
+        _checkboxTestDrive
     );
     return technic;
   }
@@ -74,7 +77,7 @@ class TechnicSQFlite{
     await db.execute(
         "INSERT INTO equipment (id, internalID, name, category, cost, "
             "dateBuyTechnic, status, dislocation, comment, dateStartTestDrive, "
-            "dateFinishTestDrive, resultTestDrive, checkEquipment, user) "
+            "dateFinishTestDrive, resultTestDrive, checkboxTestDrive, user) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           inTechnic.id,
@@ -131,7 +134,7 @@ class TechnicSQFlite{
         "id INTEGER, internalID INTEGER, name TEXT, category TEXT,"
         "cost INTEGER, dateBuyTechnic TEXT, status TEXT, dislocation TEXT, "
         "comment TEXT, dateStartTestDrive TEXT, dateFinishTestDrive TEXT, resultTestDrive TEXT,"
-        "checkEquipment TEXT, user TEXT)");
+        "checkboxTestDrive TEXT, user TEXT)");
   }
 
   Future getEquipment() async{
