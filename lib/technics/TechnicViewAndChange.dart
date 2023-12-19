@@ -17,7 +17,7 @@ class TechnicViewAndChange extends StatefulWidget {
 }
 
 class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
-  final _categoryTechnic = SingleValueDropDownController();
+  late final _categoryTechnic;
   final _nameTechnic = TextEditingController();
   final _costTechnic = TextEditingController();
   late final _statusTechnic;
@@ -47,9 +47,9 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
   @override
   void initState() {
-    _categoryTechnic.dropDownValue = DropDownValueModel(name: widget.technic.category, value: widget.technic.category);
     _nameTechnic.text = widget.technic.name;
     _costTechnic.text = '${widget.technic.cost}';
+    _categoryTechnic = SingleValueDropDownController(data: DropDownValueModel(name: widget.technic.category, value: widget.technic.category));
     _statusTechnic = SingleValueDropDownController(data: DropDownValueModel(name: widget.technic.status, value: widget.technic.status));
     _dislocationTechnic = SingleValueDropDownController(data: DropDownValueModel(name: widget.technic.dislocation, value: widget.technic.dislocation));
 
@@ -123,9 +123,8 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                             ),
                           );
                         }else{
-                          Technic technicLast = Technic.technicList.first;
                           Technic technic = Technic(
-                              technicLast.id! + 1,
+                              widget.technic.id,
                               widget.technic.internalID,
                               _nameTechnic.text,
                               _categoryTechnic.dropDownValue!.name,
@@ -149,7 +148,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                               content: Row(
                                 children: [
                                   Icon(Icons.add_task, size: 40, color: Colors.white),
-                                  Text(' Техника добавлена'),
+                                  Text(' Изменения внесены'),
                                 ],
                               ),
                               duration: Duration(seconds: 5),
@@ -180,7 +179,6 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                 leading: const Icon(Icons.print),
                 title: DropDownTextField(
                   controller: _categoryTechnic,
-                  initialValue: widget.technic.category,
                   clearOption: true,
                   textFieldDecoration: const InputDecoration(hintText: "Выберите категорию"),
                   dropDownItemCount: 8,

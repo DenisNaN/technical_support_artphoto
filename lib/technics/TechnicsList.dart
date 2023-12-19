@@ -37,7 +37,12 @@ class _TechnicsListState extends State<TechnicsList> {
             }
             return ListTile(
               onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index])));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index]))).then(
+                  (value){
+                    setState(() {
+                      if(value != null) Technic.technicList[index] = value;
+                    });
+                  });
               },
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               title: Text('№ ${Technic.technicList[index].internalID}  ${Technic.technicList[index].name}  ${Technic.technicList[index].category}'),

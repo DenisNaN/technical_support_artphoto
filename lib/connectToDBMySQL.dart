@@ -38,7 +38,11 @@ class ConnectToDBMySQL {
         'testDrive.result, '
         'testDrive.checkEquipment '
         'FROM equipment '
-        'LEFT JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id '
+        // 'LEFT JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id '
+        'LEFT JOIN (SELECT * FROM statusEquipment '
+        'WHERE statusEquipment.idEquipment = equipment.id ORDER BY statusEquipment.date DESC) '
+        'statusOrderBy '
+        'ON statusOrderBy.idEquipment = equipment.id '
         'LEFT JOIN testDrive ON testDrive.idEquipment = equipment.id '
         'ORDER BY equipment.id');
 
@@ -249,7 +253,7 @@ class ConnectToDBMySQL {
   Future updateTechnicInDB(Technic technic) async{
     await ConnectToDBMySQL.connDB.connDatabase();
     await _connDB!.query(
-        'UPDATE equipment SET category=?, name=?, dateBuy=?, cost=?, comment=? WHERE id=?',
+        'UPDATE equipment SET category = ?, name = ?, dateBuy = ?, cost = ?, comment = ? WHERE id = ?',
         [
           technic.category,
           technic.name,

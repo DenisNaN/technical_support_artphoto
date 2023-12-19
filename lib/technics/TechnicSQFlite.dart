@@ -54,6 +54,9 @@ class TechnicSQFlite{
   }
 
   Map<String, dynamic> technicToMap(Technic inTechnic){
+    String _checkboxTestDrive = '';
+    inTechnic.checkboxTestDrive ? _checkboxTestDrive = '1' : _checkboxTestDrive = '0';
+
     Map<String, dynamic> map = Map<String, dynamic>();
     map['id'] = inTechnic.id;
     map['internalID'] = inTechnic.internalID;
@@ -67,7 +70,7 @@ class TechnicSQFlite{
     map['dateStartTestDrive'] = inTechnic.dateStartTestDrive;
     map['dateFinishTestDrive'] = inTechnic.dateFinishTestDrive;
     map['resultTestDrive'] = inTechnic.resultTestDrive;
-    map['checkboxTestDrive'] = inTechnic.checkboxTestDrive;
+    map['checkboxTestDrive'] = _checkboxTestDrive;
     return map;
   }
 
