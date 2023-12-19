@@ -21,13 +21,13 @@ class _TechnicAddState extends State<TechnicAdd> {
   final _costTechnic = TextEditingController();
   final _statusTechnic = SingleValueDropDownController();
   final _dislocationTechnic = SingleValueDropDownController();
-  String _dateBuyTechnic = "";
+  String _dateBuyTechnic = '';
   String _dateForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
   final _comment = TextEditingController();
-  String _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now());
+  String _dateStartTestDrive = DateFormat('d MMMM yyyy', 'ru_RU').format(DateTime.now());
   String _dateStartTestDriveForSQL = '';
-  String _dateFinishTestDrive = "Нет даты";
-  String _dateFinishTestDriveForSQL = "";
+  String _dateFinishTestDrive = '';
+  String _dateFinishTestDriveForSQL = '';
   final _resultTestDrive = TextEditingController();
   bool _switchTestDrive = false;
   bool _checkboxTestDrive = false;
@@ -256,8 +256,14 @@ class _TechnicAddState extends State<TechnicAdd> {
                           onChanged: (value){
                             setState(() {
                               _switchTestDrive = value;
-                              !_switchTestDrive ? _dateStartTestDriveForSQL = '' :
-                              _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
+                              if(!_switchTestDrive){
+                                _dateStartTestDriveForSQL = '';
+                                _dateFinishTestDriveForSQL = '';
+                                _resultTestDrive.text = '';
+                                _checkboxTestDrive = false;
+                              } else{
+                                _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
+                              }
                               if(_switchTestDrive && !_checkboxTestDrive && _dateFinishTestDriveForSQL == '' && !_isCategoryPhotocamera){
                                 DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDriveForSQL).add(const Duration(days: 14));
                                 _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
@@ -311,7 +317,7 @@ class _TechnicAddState extends State<TechnicAdd> {
           contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
           leading: const Icon(Icons.today),
           title: const Text("Дата конца тест-драйва"),
-          subtitle: Text(_dateFinishTestDrive == "Нет даты" ? "Выберите дату" : _dateFinishTestDrive),
+          subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateFinishTestDriveForSQL.replaceAll('.', '-')))),
           trailing: IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () {

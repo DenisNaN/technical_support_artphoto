@@ -112,11 +112,11 @@ class TechnicSQFlite{
     return reversedList;
   }
 
-  // Future update(Technic inTechnic) async {
-  //   Database db = await database;
-  //   return await db.update("equipment", technicToMap(inTechnic),
-  //       where: "id = ?", whereArgs: [inTechnic.id]);
-  // }
+  Future updateTechnic(Technic inTechnic) async {
+    Database db = await database;
+    return await db.update("equipment", technicToMap(inTechnic),
+        where: "id = ?", whereArgs: [inTechnic.id]);
+  }
 
   // Future delete(int inID) async {
   //   Database db = await database;

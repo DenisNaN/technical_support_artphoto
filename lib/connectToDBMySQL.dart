@@ -94,10 +94,10 @@ class ConnectToDBMySQL {
       // dateStart-row[9], dateFinish-row[10], resultTestDrive-row[11],
       // checkTestDrive-row[12]
 
-      String dateStartTestDrive = 'Нет даты';
-      if(row[9] != null && row[9].toString() != "30 ноября 0001") dateStartTestDrive = getDateFormatted(row[9].toString());
-      String dateFinishTestDrive = 'Нет даты';
-      if(row[10] != null && row[9].toString() != "30 ноября 0001") dateStartTestDrive = getDateFormatted(row[10].toString());
+      String dateStartTestDrive = '';
+      if(row[9] != null && row[9].toString() != "-0001-11-30 00:00:00.000Z") dateStartTestDrive = getDateFormatted(row[9].toString());
+      String dateFinishTestDrive = '';
+      if(row[10] != null && row[10].toString() != "-0001-11-30 00:00:00.000Z") dateFinishTestDrive = getDateFormatted(row[10].toString());
       bool checkTestDrive = false;
       if(row[12] != null && row[12] == 1) checkTestDrive = true;
 
@@ -202,7 +202,6 @@ class ConnectToDBMySQL {
   }
 
   String getDateFormatted(String date){
-    // return DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(date));
     return DateFormat('yyyy.MM.dd').format(DateTime.parse(date));
   }
 
@@ -213,25 +212,52 @@ class ConnectToDBMySQL {
         [technic.internalID,  technic.category, technic.name, technic.dateBuyTechnic, technic.cost, technic.comment,
         LoginPassword.login]);
 
-    await _connDB!.query(
-        'INSERT INTO statusEquipment (idEquipment, status, dislocation, date, user) '
-            'VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ?, ?)',
-        [technic.status, technic.dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now()),
-        LoginPassword.login]);
+   insertStatusInDB(technic);
 
     if(technic.dateStartTestDrive != '') {
-      await _connDB!.query(
-          'INSERT INTO testDrive (idEquipment, category, dateStart, dateFinish, result, '
-              'checkEquipment, user) VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ? , ?, ?, ?)',
-          [
-            technic.category,
-            technic.dateStartTestDrive,
-            technic.dateFinishTestDrive,
-            technic.resultTestDrive,
-            technic.checkboxTestDrive,
-            LoginPassword.login
-          ]);
+      insertTestDriveInDB(technic);
     }
+  }
+
+  Future insertStatusInDB(Technic technic) async{
+    await ConnectToDBMySQL.connDB.connDatabase();
+    await _connDB!.query(
+        'INSERT INTO statusEquipment (idEquipment, status, dislocation, date, user) '
+            'VALUES (?, ?, ?, ?, ?)',
+            // 'VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ?, ?)',
+        [technic.id, technic.status, technic.dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now()),
+          LoginPassword.login]);
+  }
+
+  Future insertTestDriveInDB(Technic technic) async{
+    await ConnectToDBMySQL.connDB.connDatabase();
+    await _connDB!.query(
+        'INSERT INTO testDrive (idEquipment, category, dateStart, dateFinish, result, '
+            'checkEquipment, user) VALUES (?, ?, ?, ? , ?, ?, ?)',
+            // 'checkEquipment, user) VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ? , ?, ?, ?)',
+        [
+          technic.id,
+          technic.category,
+          technic.dateStartTestDrive,
+          technic.dateFinishTestDrive,
+          technic.resultTestDrive,
+          technic.checkboxTestDrive,
+          LoginPassword.login
+        ]);
+  }
+
+  Future updateTechnicInDB(Technic technic) async{
+    await ConnectToDBMySQL.connDB.connDatabase();
+    await _connDB!.query(
+        'UPDATE equipment SET category=?, name=?, dateBuy=?, cost=?, comment=? WHERE id=?',
+        [
+          technic.category,
+          technic.name,
+          technic.dateBuyTechnic,
+          technic.cost,
+          technic.comment,
+          technic.id
+        ]);
   }
 
   Future insertRepairInDB(Repair repair) async{
