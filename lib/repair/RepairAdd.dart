@@ -35,11 +35,6 @@ class _RepairAddState extends State<RepairAdd> {
   final _costService = TextEditingController();
   final _diagnosisService = TextEditingController();
   final _recommendationsNotes = TextEditingController();
-  String _dateStartTestDrive = "Нет даты";
-  String _dateStartTestDriveForSQL = "";
-  String _dateFinishTestDrive = "Нет даты";
-  String _dateFinishTestDriveForSQL = "";
-  final _resultTestDrive = TextEditingController();
   final _newStatus = SingleValueDropDownController();
   final _newDislocation = SingleValueDropDownController();
   String _dateReceipt = "Нет даты";
@@ -95,7 +90,6 @@ class _RepairAddState extends State<RepairAdd> {
     _costService.dispose();
     _diagnosisService.dispose();
     _recommendationsNotes.dispose();
-    _resultTestDrive.dispose();
     _newStatus.dispose();
     _newDislocation.dispose();
     super.dispose();
@@ -158,9 +152,6 @@ class _RepairAddState extends State<RepairAdd> {
               _buildCostServiceListTile(),
               _buildDiagnosisServiceListTile(),
               _buildRecommendationsNotesListTile(),
-              _buildDateStartTestDriveListTile(),
-              _buildDateFinishTestDriveListTile(),
-              _buildResultTestDriveListTile(),
               _buildNewStatusListTile(),
               _buildNewDislocationListTile(),
               _buildDateReceiptListTile(),
@@ -177,7 +168,7 @@ class _RepairAddState extends State<RepairAdd> {
 
     return ListTile(
         leading: const Icon(Icons.fiber_new),
-        title: _isBN == false ? TextFormField(
+        title: !_isBN ? TextFormField(
           decoration: const InputDecoration(hintText: "Номер техники"),
           focusNode: _focusInnerNumberTechnic,
           controller: _innerNumberTechnic,
@@ -257,7 +248,7 @@ class _RepairAddState extends State<RepairAdd> {
     return ListTile(
       leading: const Icon(Icons.today),
       title: Text("Забрали с точки. Дата"),
-      subtitle: Text(_dateDeparture == "Нет даты" ? "Выберите дату" : _dateDeparture),
+      subtitle: Text(_dateDeparture == "" ? "Выберите дату" : _dateDeparture),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -298,7 +289,7 @@ class _RepairAddState extends State<RepairAdd> {
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Дата сдачи в ремонт"),
-      subtitle: Text(_dateTransferForService == "Нет даты" ? "Выберите дату" : _dateTransferForService),
+      subtitle: Text(_dateTransferForService == "" ? "Выберите дату" : _dateTransferForService),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -326,7 +317,7 @@ class _RepairAddState extends State<RepairAdd> {
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Забрали из ремонта. Дата"),
-      subtitle: Text(_dateDepartureFromService == "Нет даты" ? "Выберите дату" : _dateDepartureFromService),
+      subtitle: Text(_dateDepartureFromService == "" ? "Выберите дату" : _dateDepartureFromService),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -394,72 +385,6 @@ class _RepairAddState extends State<RepairAdd> {
     );
   }
 
-  ListTile _buildDateStartTestDriveListTile(){
-    return ListTile(
-      leading: const Icon(Icons.today),
-      title: const Text("Дата начала тест-драйва"),
-      subtitle: Text(_dateStartTestDrive == "Нет даты" ? "Выберите дату" : _dateStartTestDrive),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                }
-              });
-            });
-          },
-          color: Colors.blue
-      ),
-    );
-  }
-
-  ListTile _buildDateFinishTestDriveListTile(){
-    return  ListTile(
-      leading: const Icon(Icons.today),
-      title: const Text("Дата конца тест-драйва"),
-      subtitle: Text(_dateFinishTestDrive == "Нет даты" ? "Выберите дату" : _dateFinishTestDrive),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateFinishTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                }
-              });
-            });
-          },
-          color: Colors.blue
-      ),
-    );
-  }
-
-  ListTile _buildResultTestDriveListTile(){
-    return ListTile(
-      leading: const Icon(Icons.create),
-      title: TextFormField(
-        decoration: const InputDecoration(hintText: "Результат проверки-тестирования (для копиров)"),
-        controller: _resultTestDrive,
-      ),
-    );
-  }
-
   ListTile _buildNewStatusListTile(){
     return ListTile(
       leading: const Icon(Icons.copyright),
@@ -490,7 +415,7 @@ class _RepairAddState extends State<RepairAdd> {
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Дата поступления"),
-      subtitle: Text(_dateReceipt == "Нет даты" ? "Выберите дату" : _dateReceipt),
+      subtitle: Text(_dateReceipt == "" ? "Выберите дату" : _dateReceipt),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -538,13 +463,6 @@ class _RepairAddState extends State<RepairAdd> {
     _newStatus.dropDownValue?.name != null ? _newStatusStr = _newStatus.dropDownValue!.name : _newStatusStr = "";
     _newDislocation.dropDownValue?.name != null ? _newDislocationStr = _newDislocation.dropDownValue!.name : _newDislocationStr = "";
 
-    // Если введене только дата начала тест-драйва, дата конца устанавливается через 2 недели
-    if(_dateStartTestDrive != "Нет даты" && _dateFinishTestDrive == "Нет даты"){
-      DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDriveForSQL).add(const Duration(days: 14));
-      _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
-      _dateFinishTestDrive = DateFormat('d MMMM yyyy', 'ru_RU').format(finishTestDrive);
-    }
-
     Repair repairLast = Repair.repairList.first;
     Repair repair = Repair(
         repairLast.id! + 1,
@@ -561,9 +479,6 @@ class _RepairAddState extends State<RepairAdd> {
         _costServ,
         _diagnosisService.text,
         _recommendationsNotes.text,
-        _dateStartTestDriveForSQL,
-        _dateFinishTestDriveForSQL,
-        _resultTestDrive.text,
         _newStatusStr,
         _newDislocationStr,
         _dateReceiptForSQL
@@ -574,8 +489,6 @@ class _RepairAddState extends State<RepairAdd> {
     repair.dateDeparture = _dateDeparture;
     repair.dateTransferForService = _dateTransferForService;
     repair.dateDepartureFromService = _dateDepartureFromService;
-    repair.dateStartTestDrive = _dateStartTestDrive;
-    repair.dateFinishTestDrive = _dateFinishTestDrive;
     repair.dateReceipt = _dateReceipt;
 
     Navigator.pop(context, repair);
@@ -585,7 +498,7 @@ class _RepairAddState extends State<RepairAdd> {
         content: Row(
           children: [
             Icon(Icons.add_task, size: 40, color: Colors.white),
-            Text(' Техника добавлена'),
+            Text(' Техника в ремонт добавлена'),
           ],
         ),
         duration: Duration(seconds: 5),

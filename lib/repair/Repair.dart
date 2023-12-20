@@ -16,9 +16,6 @@ class Repair{
   int? costService;
   String diagnosisService = "";
   String recommendationsNotes = "";
-  String dateStartTestDrive = "";
-  String dateFinishTestDrive = "";
-  String resultTestDrive = "";
   String newStatus = "";
   String newDislocation = "";
   String dateReceipt = "";
@@ -38,9 +35,6 @@ class Repair{
       this.costService,
       this.diagnosisService,
       this.recommendationsNotes,
-      this.dateStartTestDrive,
-      this.dateFinishTestDrive,
-      this.resultTestDrive,
       this.newStatus,
       this.newDislocation,
       this.dateReceipt);

@@ -88,7 +88,7 @@ class _TechnicsListState extends State<TechnicsList> {
                 TextSpan(text:
                   'Начало тест-драйва: $formatedStartDate.\n'
                   'Конец тест-драйва: $formatedFinishDate.\n'),
-                duration.inDays > 0 ?
+                duration.inDays > 0 && !Technic.technicList[index].checkboxTestDrive ?
                     TextSpan(
                     text: 'Осталось дней до конца тест-драйва: ${duration.inDays}',
                     style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)

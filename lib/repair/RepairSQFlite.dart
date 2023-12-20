@@ -34,9 +34,6 @@ class RepairSQFlite{
           "costService INTEGER, "
           "diagnosisService TEXT, "
           "recommendationsNotes TEXT, "
-          "dateStartTestDrive TEXT, "
-          "dateFinishTestDrive TEXT, "
-          "resultTestDrive TEXT, "
           "newStatus TEXT, "
           "newDislocation TEXT, "
           "dateReceipt TEXT)");
@@ -60,9 +57,6 @@ class RepairSQFlite{
       inMap['costService'],
       inMap['diagnosisService'],
       inMap['recommendationsNotes'],
-      inMap['dateStartTestDrive'],
-      inMap['dateFinishTestDrive'],
-      inMap['resultTestDrive'],
       inMap['newStatus'],
       inMap['newDislocation'],
       inMap['dateReceipt']);
@@ -85,9 +79,6 @@ class RepairSQFlite{
     map['costService'] = inRepair.costService;
     map['diagnosisService'] = inRepair.diagnosisService;
     map['recommendationsNotes'] = inRepair.recommendationsNotes;
-    map['dateStartTestDrive'] = inRepair.dateStartTestDrive;
-    map['dateFinishTestDrive'] = inRepair.dateFinishTestDrive;
-    map['resultTestDrive'] = inRepair.resultTestDrive;
     map['newStatus'] = inRepair.newStatus;
     map['newDislocation'] = inRepair.newDislocation;
     map['dateReceipt'] = inRepair.dateReceipt;
@@ -113,13 +104,10 @@ class RepairSQFlite{
             "costService, "
             "diagnosisService, "
             "recommendationsNotes, "
-            "dateStartTestDrive, "
-            "dateFinishTestDrive, "
-            "resultTestDrive, "
             "newStatus, "
             "newDislocation, "
             "dateReceipt) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [inRepair.id,
           inRepair.internalID,
           inRepair.category,
@@ -134,9 +122,6 @@ class RepairSQFlite{
           inRepair.costService,
           inRepair.diagnosisService,
           inRepair.recommendationsNotes,
-          inRepair.dateStartTestDrive,
-          inRepair.dateFinishTestDrive,
-          inRepair.resultTestDrive,
           inRepair.newStatus,
           inRepair.newDislocation,
           inRepair.dateReceipt]);
@@ -162,10 +147,10 @@ class RepairSQFlite{
         where: "id = ?", whereArgs: [inRepair.id]);
   }
 
-  Future delete(int inID) async {
-    Database db = await database;
-    return await db.delete("repair", where: "id = ?", whereArgs: [inID]);
-  }
+  // Future delete(int inID) async {
+  //   Database db = await database;
+  //   return await db.delete("repair", where: "id = ?", whereArgs: [inID]);
+  // }
 
   Future deleteTable() async{
     Database db = await database;
@@ -189,9 +174,6 @@ class RepairSQFlite{
         "costService INTEGER, "
         "diagnosisService TEXT, "
         "recommendationsNotes TEXT, "
-        "dateStartTestDrive TEXT, "
-        "dateFinishTestDrive TEXT, "
-        "resultTestDrive TEXT, "
         "newStatus TEXT, "
         "newDislocation TEXT, "
         "dateReceipt TEXT)");

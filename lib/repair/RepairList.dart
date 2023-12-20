@@ -37,8 +37,7 @@ class _RepairListState extends State<RepairList> {
                 },
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 title: Repair.repairList[index].internalID == -1 ? _buildTextWithoutBN(context, index) : _buildTextWithBN(context, index),
-                subtitle: Repair.repairList[index].dateStartTestDrive == "Нет даты" || Repair.repairList[index].dateFinishTestDrive == "Нет даты"
-                    ? _buildTextWithoutTestDrive(context, index) : _buildTextWithTestDrive(context, index)
+                subtitle: _buildTextWithoutTestDrive(context, index)
             );
           },
         )
@@ -58,39 +57,19 @@ class _RepairListState extends State<RepairList> {
   Text _buildTextWithoutTestDrive(BuildContext context, int index){
     return Text(
             'Статус: ${Repair.repairList[index].newStatus == "" ? Repair.repairList[index].status : Repair.repairList[index].newStatus}.\n'
-            'Дислокация: ${Repair.repairList[index].newDislocation == "" ? Repair.repairList[index].serviceDislocation : Repair.repairList[index].newDislocation}. '
-            '${Repair.repairList[index].dateReceipt == "Нет даты" ? (Repair.repairList[index].dateTransferForService == "Нет даты" ? Repair.repairList[index].dateDeparture :
-            Repair.repairList[index].dateTransferForService) : Repair.repairList[index].dateReceipt}.'
+            'Дислокация: ${Repair.repairList[index].newDislocation == "" ?
+            Repair.repairList[index].serviceDislocation :
+            Repair.repairList[index].newDislocation}. '
+            '${Repair.repairList[index].dateReceipt == "" ? (Repair.repairList[index].dateTransferForService == "" ?
+            getDateFormat(Repair.repairList[index].dateDeparture) :
+            getDateFormat(Repair.repairList[index].dateTransferForService)) :
+            getDateFormat(Repair.repairList[index].dateReceipt)}'
     );
   }
 
-  Text _buildTextWithTestDrive(BuildContext context, int index){
-    DateTime finishDate = DateFormat("d MMMM yyyy", "ru_RU").parse(Repair.repairList[index].dateFinishTestDrive);
-    DateTime dateNow = DateTime.now();
-    Duration duration = finishDate.difference(dateNow);
-
-    return Text.rich(
-        TextSpan(
-            children:[
-              TextSpan(text: 'Статус: ${Repair.repairList[index].newStatus == "" ? Repair.repairList[index].status : Repair.repairList[index].newStatus}.\n'
-                  'Дислокация: ${Repair.repairList[index].newDislocation == "" ? Repair.repairList[index].serviceDislocation : Repair.repairList[index].newDislocation}. '
-                  '${Repair.repairList[index].dateReceipt == "Нет даты" ? Repair.repairList[index].dateTransferForService : Repair.repairList[index].dateReceipt}.\n'),
-              TextSpan(text: 'Начало тест-драйва: ${Repair.repairList[index].dateStartTestDrive}.\n'
-                  'Конец тест-драйва: ${Repair.repairList[index].dateFinishTestDrive}.\n',
-                  style: const TextStyle(fontWeight: FontWeight.bold)
-              ),
-              duration.inDays > 0 ? TextSpan(
-                  text: 'Осталось дней до конца тест-драйва: ${duration.inDays}',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)
-              ) : const TextSpan(
-                  text: 'Тест-драйв окончен',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)
-              )
-            ]
-        )
-    );
+  String getDateFormat(String date) {
+    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
-
 }
 
 

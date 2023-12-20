@@ -38,7 +38,7 @@ class ConnectToDBMySQL {
         't.result, '
         't.checkEquipment '
         'FROM equipment '
-        'LEFT JOIN (SELECT MAX(id), idEquipment, status, dislocation FROM statusEquipment GROUP BY idEquipment) s ON s.idEquipment = equipment.id '
+        'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
         'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
         'ORDER BY equipment.id');
 
@@ -81,8 +81,8 @@ class ConnectToDBMySQL {
         'testDrive.result, '
         'testDrive.checkEquipment '
         'FROM equipment '
-        'LEFT JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id '
-        'LEFT JOIN testDrive ON testDrive.idEquipment = equipment.id '
+        'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
+        'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
         'WHERE equipment.id > ?', [id]);
 
     var list = [];
@@ -124,9 +124,6 @@ class ConnectToDBMySQL {
         'repairEquipment.costService, '
         'repairEquipment.diagnosisService, '
         'repairEquipment.recommendationsNotes, '
-        'repairEquipment.dateStartTestDrive, '
-        'repairEquipment.dateFinishTestDrive, '
-        'repairEquipment.resultTestDrive, '
         'repairEquipment.newStatus, '
         'repairEquipment.newDislocation, '
         'repairEquipment.dateReceipt '
@@ -136,18 +133,14 @@ class ConnectToDBMySQL {
     for (var row in result) {
       // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
       // dateTransferForService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
-      // recommendationsNotes-row[13], dateStartTestDrive-row[14], dateFinishTestDrive-row[15], resultTestDrive-row[16],
-      // newStatus-row[17],  newDislocation-row[18], dateReceipt-row[19]
-      String dateDeparture = getDateFormatted(row[6].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[6].toString());
-      String dateTransferForService = getDateFormatted(row[8].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[8].toString());
-      String dateDepartureFromService = getDateFormatted(row[9].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[9].toString());
-      String dateStartTestDrive = getDateFormatted(row[14].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[14].toString());
-      String dateFinishTestDrive = getDateFormatted(row[15].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[15].toString());
-      String dateReceipt = getDateFormatted(row[19].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[19].toString());
+      // recommendationsNotes-row[13], newStatus-row[14],  newDislocation-row[15], dateReceipt-row[16]
+      String dateDeparture = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
+      String dateTransferForService = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
+      String dateDepartureFromService = row[9].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[9].toString());
+      String dateReceipt = row[16].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[16].toString());
 
       Repair repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferForService,
-          dateDepartureFromService, row[10],  row[11],  row[12], row[13], dateStartTestDrive, dateFinishTestDrive,
-          row[16], row[17], row[18], dateReceipt);
+          dateDepartureFromService, row[10],  row[11],  row[12], row[13], row[14], row[15], dateReceipt);
       list.add(repair);
     }
     var reversedList = List.from(list.reversed);
@@ -170,9 +163,6 @@ class ConnectToDBMySQL {
         'repairEquipment.costService, '
         'repairEquipment.diagnosisService, '
         'repairEquipment.recommendationsNotes, '
-        'repairEquipment.dateStartTestDrive, '
-        'repairEquipment.dateFinishTestDrive, '
-        'repairEquipment.resultTestDrive, '
         'repairEquipment.newStatus, '
         'repairEquipment.newDislocation, '
         'repairEquipment.dateReceipt '
@@ -182,18 +172,14 @@ class ConnectToDBMySQL {
     for (var row in result) {
       // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
       // dateTransferForService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
-      // recommendationsNotes-row[13], dateStartTestDrive-row[14], dateFinishTestDrive-row[15], resultTestDrive-row[16],
-      // newStatus-row[17],  newDislocation-row[18], dateReceipt-row[19]
-      String dateDeparture = getDateFormatted(row[6].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[6].toString());
-      String dateTransferForService = getDateFormatted(row[8].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[8].toString());
-      String dateDepartureFromService = getDateFormatted(row[9].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[9].toString());
-      String dateStartTestDrive = getDateFormatted(row[14].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[14].toString());
-      String dateFinishTestDrive = getDateFormatted(row[15].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[15].toString());
-      String dateReceipt = getDateFormatted(row[19].toString()) == "30 ноября 0001" ? "Нет даты" : getDateFormatted(row[19].toString());
+      // recommendationsNotes-row[13], newStatus-row[14],  newDislocation-row[15], dateReceipt-row[16]
+      String dateDeparture = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
+      String dateTransferForService = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
+      String dateDepartureFromService = row[9].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[9].toString());
+      String dateReceipt = row[16].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[19].toString());
 
       Repair repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferForService,
-          dateDepartureFromService, row[10],  row[11],  row[12], row[13], dateStartTestDrive, dateFinishTestDrive,
-          row[16], row[17], row[18], dateReceipt);
+          dateDepartureFromService, row[10],  row[11],  row[12], row[13], row[14], row[15], dateReceipt);
       list.add(repair);
     }
     return list;
@@ -280,7 +266,7 @@ class ConnectToDBMySQL {
         'newStatus, '
         'newDislocation, '
         'dateReceipt '
-        ') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+        ') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
       repair.internalID,
       repair.category,
       repair.dislocationOld,
@@ -294,9 +280,6 @@ class ConnectToDBMySQL {
       repair.costService,
       repair.diagnosisService,
       repair.recommendationsNotes,
-      repair.dateStartTestDrive,
-      repair.dateFinishTestDrive,
-      repair.resultTestDrive,
       repair.newStatus,
       repair.newDislocation,
       repair.dateReceipt
