@@ -30,23 +30,17 @@ class ConnectToDBMySQL {
         'equipment.category, '
         'equipment.cost, '
         'equipment.dateBuy, '
-        'statusEquipment.status, '
-        'statusEquipment.dislocation, '
+        's.status, '
+        's.dislocation, '
         'equipment.comment, '
-        'testDrive.dateStart, '
-        'testDrive.dateFinish, '
-        'testDrive.result, '
-        'testDrive.checkEquipment '
+        't.dateStart, '
+        't.dateFinish, '
+        't.result, '
+        't.checkEquipment '
         'FROM equipment '
-        // 'LEFT JOIN statusEquipment ON statusEquipment.idEquipment = equipment.id '
-        'LEFT JOIN (SELECT * FROM statusEquipment '
-        'WHERE statusEquipment.idEquipment = equipment.id ORDER BY statusEquipment.date DESC) '
-        'statusOrderBy '
-        'ON statusOrderBy.idEquipment = equipment.id '
-        'LEFT JOIN testDrive ON testDrive.idEquipment = equipment.id '
+        'LEFT JOIN (SELECT MAX(id), idEquipment, status, dislocation FROM statusEquipment GROUP BY idEquipment) s ON s.idEquipment = equipment.id '
+        'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
         'ORDER BY equipment.id');
-
-    // 'JOIN statusEquipment ON (SELECT idEquipment FROM statusEquipment ORDER BY id DESC LIMIT 1) = equipment.id');
 
     var list = [];
     for (var row in result) {

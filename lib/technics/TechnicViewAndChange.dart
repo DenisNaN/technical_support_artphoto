@@ -44,6 +44,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   bool _isEditComment = false;
   bool _isEditStatusDislocation = false;
   bool _isEditTestDrive = false;
+  bool _isEditSwitch = false;
 
   @override
   void initState() {
@@ -328,6 +329,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                           onChanged: (value){
                             setState(() {
                               _switchTestDrive = value;
+                              _isEditSwitch = true;
 
                               if(!_switchTestDrive){
                                 _dateStartTestDriveForSQL = '';
@@ -512,11 +514,11 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     if(_isEditStatusDislocation){
       ConnectToDBMySQL.connDB.insertStatusInDB(technic);
     }
-    if(_isEditTestDrive){
+    if(_isEditTestDrive || _isEditSwitch){
       ConnectToDBMySQL.connDB.insertTestDriveInDB(technic);
     }
 
-    if(_isEditCategory || _isEditName || _isEditCost || _isEditDateBuy || _isEditComment || _isEditStatusDislocation || _isEditTestDrive) {
+    if(_isEditCategory || _isEditName || _isEditCost || _isEditDateBuy || _isEditComment || _isEditStatusDislocation || _isEditTestDrive || _isEditSwitch) {
       TechnicSQFlite.db.updateTechnic(technic);
     }
   }
