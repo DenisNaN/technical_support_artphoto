@@ -24,12 +24,12 @@ class _RepairAddState extends State<RepairAdd> {
   final _dislocationOldController = SingleValueDropDownController();
   final _status = SingleValueDropDownController();
   final _complaint = TextEditingController();
-  String _dateDeparture = "Нет даты";
+  String _dateDeparture = "";
   String _dateDepartureForSQL = "";
   final _serviceDislocation = SingleValueDropDownController();
-  String _dateTransferForService = "Нет даты";
+  String _dateTransferForService = "";
   String _dateTransferForServiceForSQL = "";
-  String _dateDepartureFromService = "Нет даты";
+  String _dateDepartureFromService = "";
   String _dateDepartureFromServiceForSQL = "";
   final _worksPerformed = TextEditingController();
   final _costService = TextEditingController();
@@ -37,7 +37,7 @@ class _RepairAddState extends State<RepairAdd> {
   final _recommendationsNotes = TextEditingController();
   final _newStatus = SingleValueDropDownController();
   final _newDislocation = SingleValueDropDownController();
-  String _dateReceipt = "Нет даты";
+  String _dateReceipt = "";
   String _dateReceiptForSQL = "";
   bool _isBN = false;
 
@@ -447,7 +447,7 @@ class _RepairAddState extends State<RepairAdd> {
         (!_isBN ? _dislocationOld != "" : _dislocationOldController.dropDownValue?.name != null) &&
         _status.dropDownValue?.name != null &&
         _complaint.text != "" &&
-        _dateDeparture != "Нет даты" &&
+        _dateDeparture != "" &&
         _serviceDislocation.dropDownValue?.name != null) {
       validate = true;
     }
@@ -486,10 +486,10 @@ class _RepairAddState extends State<RepairAdd> {
 
     ConnectToDBMySQL.connDB.insertRepairInDB(repair);
 
-    repair.dateDeparture = _dateDeparture;
-    repair.dateTransferForService = _dateTransferForService;
-    repair.dateDepartureFromService = _dateDepartureFromService;
-    repair.dateReceipt = _dateReceipt;
+    // repair.dateDeparture = _dateDeparture;
+    // repair.dateTransferForService = _dateTransferForService;
+    // repair.dateDepartureFromService = _dateDepartureFromService;
+    // repair.dateReceipt = _dateReceipt;
 
     Navigator.pop(context, repair);
 
