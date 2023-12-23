@@ -1,6 +1,7 @@
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path/path.dart';
 import '../ConnectToDBMySQL.dart';
 import '../technics/Technic.dart';
 import '../technics/TechnicViewAndChange.dart';
@@ -21,8 +22,6 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String _innerNumberTechnic = '';
-  final String _innerNumberTechnicBN = 'БН';
-  // final _focusInnerNumberTechnic = FocusNode();
   String _nameTechnic = '';
   String _dislocationOld = '';
   String _status = '';
@@ -129,7 +128,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                           );
                         }else{
                           int _costServ;
-                          _costService.text != "" ? _costServ = int.parse(_costService.text.replaceAll(",", "")) : _costServ = 0;
+                          _costService.text != "" ? _costServ = int.parse(_costService.text.replaceAll(",", "")) : _costServ = -1;
 
                           Repair repair = Repair(
                               widget.repair.id,
@@ -182,20 +181,33 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
             children: [
               ListTile(
                 leading: const Icon(Icons.fiber_new),
-                title: widget.repair.internalID != 'БН' ?
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[indexTechnic]))).then(
-                              (value){
-                            setState(() {
-                              if(value != null) Technic.technicList[indexTechnic] = value;
-                            });
-                          });
-                    },
-                    child: Text('№ техники - $_innerNumberTechnic',
-                    ))
+                title: widget.repair.internalID != -1 ?
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.only(left: 0.0),
+                          alignment: Alignment.centerLeft,
+                          textStyle: const TextStyle(fontSize: 20)
+                        ),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[indexTechnic]))).then(
+                                  (value){
+                                setState(() {
+                                  if(value != null) Technic.technicList[indexTechnic] = value;
+                                });
+                              });
+                        },
+                        child: Text('№ - $_innerNumberTechnic'
+                        )
+                      )
+                    // )
                     : const Text('БН'),
                 ),
+
+              ListTile(
+                leading: const Icon(Icons.create),
+                title: Text(_nameTechnic),
+                subtitle: const Text('Наименование техники'),
+              ),
 
               _isEditStatusOld ?
               ListTile(
@@ -246,7 +258,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.today),
-                title: Text(_dateDeparture),
+                title: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateDeparture.replaceAll('.', '-')))),
                 subtitle: const Text("Забрали с точки. Дата"),
                 trailing: IconButton(
                     icon: const Icon(Icons.edit),
@@ -289,7 +301,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.today),
-                title: Text(_dateTransferForService == '' ? 'Выберите дату' : _dateTransferForService),
+                title: Text(_dateTransferForService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateTransferForService.replaceAll('.', '-')))),
                 subtitle: const Text("Дата сдачи в ремонт"),
                 trailing: IconButton(
                     icon: const Icon(Icons.edit),
@@ -316,7 +328,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.today),
-                title: Text(_dateDepartureFromService == '' ? 'Выберите дату' : _dateDepartureFromService),
+                title: Text(_dateDepartureFromService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateDepartureFromService.replaceAll('.', '-')))),
                 subtitle: const Text("Забрали из ремонта. Дата"),
                 trailing: IconButton(
                     icon: const Icon(Icons.edit),
@@ -430,7 +442,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.today),
-                title: Text(_dateReceipt == '' ? 'Выберите дату' : _dateReceipt),
+                title: Text(_dateReceipt == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateReceipt.replaceAll('.', '-')))),
                 subtitle: const Text("Дата поступления"),
                 trailing: IconButton(
                     icon: const Icon(Icons.edit),
