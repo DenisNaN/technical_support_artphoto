@@ -1,7 +1,6 @@
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:path/path.dart';
 import '../ConnectToDBMySQL.dart';
 import '../technics/Technic.dart';
 import '../technics/TechnicViewAndChange.dart';
@@ -24,17 +23,13 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   String _innerNumberTechnic = '';
   String _nameTechnic = '';
   String _dislocationOld = '';
-  String _status = '';
-  late final _statusController;
+  String _statusOld = '';
   String _complaint = '';
   final _complaintController = TextEditingController();
   String _dateDeparture = '';
-  String _dateDepartureForSQL = '';
   late final _serviceDislocation;
   String _dateTransferForService = '';
-  String _dateTransferForServiceForSQL = '';
   String _dateDepartureFromService = '';
-  String _dateDepartureFromServiceForSQL = '';
   final _worksPerformed = TextEditingController();
   final _costService = TextEditingController();
   final _diagnosisService = TextEditingController();
@@ -42,9 +37,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   late final _newStatus;
   late final _newDislocation;
   String _dateReceipt = '';
-  String _dateReceiptForSQL = '';
 
-  bool _isEditStatusOld = false;
   bool _isEditComplaint = false;
   bool _isEdit = false;
   int indexTechnic = 0;
@@ -60,13 +53,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
     _innerNumberTechnic = '${widget.repair.internalID}';
     _nameTechnic = widget.repair.category;
+    _statusOld = widget.repair.status;
     _dislocationOld = widget.repair.dislocationOld;
-    _status = widget.repair.status;
-    _statusController = SingleValueDropDownController(data: DropDownValueModel(name: widget.repair.status, value: widget.repair.status));
     _complaint = widget.repair.complaint;
     _complaintController.text = widget.repair.complaint;
     _dateDeparture = widget.repair.dateDeparture;
-    _dateDepartureForSQL = widget.repair.dateDeparture;
     _serviceDislocation = SingleValueDropDownController(data: DropDownValueModel(name: widget.repair.serviceDislocation, value: widget.repair.serviceDislocation));
     _dateTransferForService = widget.repair.dateTransferForService;
     _dateDepartureFromService = widget.repair.dateDepartureFromService;
@@ -77,12 +68,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     _newStatus = SingleValueDropDownController(data: DropDownValueModel(name: widget.repair.newStatus, value: widget.repair.newStatus));
     _newDislocation = SingleValueDropDownController(data: DropDownValueModel(name: widget.repair.newDislocation, value: widget.repair.newDislocation));
     _dateReceipt = widget.repair.dateReceipt;
-    _dateReceiptForSQL = widget.repair.dateReceipt;
   }
 
   @override
   void dispose() {
-    _statusController.dispose();
+    _complaintController.dispose();
     _serviceDislocation.dispose();
     _worksPerformed.dispose();
     _costService.dispose();
@@ -110,9 +100,8 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                   const Spacer(),
                   TextButton(
                       onPressed: HasNetwork.isConnecting ? () {
-                        if(_statusController.dropDownValue?.name == null ||
-                            _complaint == "" ||
-                            _dateDepartureForSQL == "" ||
+                        if(_complaint == "" ||
+                            _dateDeparture == "" ||
                             _serviceDislocation.dropDownValue?.name == null){
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -135,19 +124,19 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                               widget.repair.internalID,
                               _nameTechnic,
                               _dislocationOld,
-                              _statusController.dropDownValue!.name,
-                              _complaint,
-                              _dateDepartureForSQL,
+                              _statusOld,
+                              _complaintController.text,
+                              _dateDeparture,
                               _serviceDislocation.dropDownValue!.name,
-                              _dateTransferForServiceForSQL,
-                              _dateDepartureFromServiceForSQL,
+                              _dateTransferForService,
+                              _dateDepartureFromService,
                               _worksPerformed.text,
                               _costServ,
                               _diagnosisService.text,
                               _recommendationsNotes.text,
                               _newStatus.dropDownValue!.name,
                               _newDislocation.dropDownValue!.name,
-                              _dateReceiptForSQL
+                              _dateReceipt
                           );
 
                           _save(repair);
@@ -205,53 +194,31 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.create),
-                title: Text(_nameTechnic),
-                subtitle: const Text('Наименование техники'),
-              ),
-
-              _isEditStatusOld ?
-              ListTile(
-                leading: const Icon(Icons.print),
-                title: DropDownTextField(
-                  controller: _statusController,
-                  clearOption: true,
-                  textFieldDecoration: const InputDecoration(hintText: "Выберите статус"),
-                  dropDownItemCount: 4,
-                  dropDownList: CategoryDropDownValueModel.statusForEquipment,
-                ),
-              ) :
-              ListTile(
-                leading: const Icon(Icons.print),
-                title: Text(_status),
-                subtitle: const Text('Статус техники'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
-                  onPressed: (){
-                    setState(() {
-                      _isEditStatusOld = true;
-                    });
-                  },
-                ),
+                title: Text('Наименование: $_nameTechnic\n'
+                            'Статус: $_statusOld'),
+                subtitle: Text('Откуда забрали: $_dislocationOld'),
               ),
 
               _isEditComplaint ?
               ListTile(
                 leading: const Icon(Icons.create),
                 title: TextFormField(
-                  decoration: const InputDecoration(hintText: "Наименование техники"),
+                  decoration: const InputDecoration(hintText: "Жалоба"),
                   controller: _complaintController,
                 ),
               ) :
               ListTile(
                 leading: const Icon(Icons.create),
-                title: Text(_complaint),
+                title: Text(_complaintController.text),
                 subtitle: const Text('Жалоба'),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
                   onPressed: (){
-                    setState(() {
-                      _isEditComplaint = true;
-                    });
+                      setState(() {
+                        _isEditComplaint = !_isEditComplaint;
+                        _isEdit = true;
+                      }
+                    );
                   },
                 ),
               ),
@@ -272,8 +239,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                       ).then((date) {
                         setState(() {
                           if(date != null) {
-                            _dateDepartureForSQL = DateFormat('yyyy.MM.dd').format(date);
-                            _dateDeparture = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                            _dateDeparture = DateFormat('yyyy.MM.dd').format(date);
                             _isEdit = true;
                           }
                         });
@@ -315,8 +281,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                       ).then((date) {
                         setState(() {
                           if(date != null) {
-                            _dateTransferForServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
-                            _dateTransferForService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                            _dateTransferForService = DateFormat('yyyy.MM.dd').format(date);
                             _isEdit = true;
                           }
                         });
@@ -342,8 +307,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                       ).then((date) {
                         setState(() {
                           if(date != null) {
-                            _dateDepartureFromServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
-                            _dateDepartureFromService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                            _dateDepartureFromService = DateFormat('yyyy.MM.dd').format(date);
                             _isEdit = true;
                           }
                         });
@@ -456,8 +420,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                       ).then((date) {
                         setState(() {
                           if(date != null) {
-                            _dateReceiptForSQL = DateFormat('yyyy.MM.dd').format(date);
-                            _dateReceipt = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                            _dateReceipt = DateFormat('yyyy.MM.dd').format(date);
                             _isEdit = true;
                           }
                         });
@@ -475,9 +438,9 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
   void _save (Repair repair) async{
     await ConnectToDBMySQL.connDB.connDatabase();
-    // if(_isEditCategory || _isEditName || _isEditCost || _isEditDateBuy || _isEditComment) {
-    //   ConnectToDBMySQL.connDB.updateTechnicInDB(technic);
-    // }
+    if(_isEdit) {
+      // ConnectToDBMySQL.connDB.updateTechnicInDB(repair);
+    }
     // if(_isEditStatusDislocation){
     //   ConnectToDBMySQL.connDB.insertStatusInDB(technic);
     // }

@@ -285,6 +285,26 @@ class ConnectToDBMySQL {
       repair.dateReceipt
     ]);
   }
+
+  Future updateRepairInDB(Repair repair) async{
+    await ConnectToDBMySQL.connDB.connDatabase();
+    // await _connDB!.query(
+    //     'UPDATE repairEquipment SET '
+    //         'category = ?, '
+    //         'name = ?, '
+    //         'dateBuy = ?, '
+    //         'cost = ?, '
+    //         'comment = ? '
+    //         'WHERE id = ?',
+    //     [
+    //       technic.category,
+    //       technic.name,
+    //       technic.dateBuyTechnic,
+    //       technic.cost,
+    //       technic.comment,
+    //       technic.id
+    //     ]);
+  }
   
   Future<List> getLastIdList() async{
     var resultTechnics = await _connDB!.query(
