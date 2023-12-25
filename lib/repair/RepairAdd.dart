@@ -15,18 +15,17 @@ class RepairAdd extends StatefulWidget {
 }
 
 class _RepairAddState extends State<RepairAdd> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   final _innerNumberTechnic = TextEditingController();
   final String _innerNumberTechnicBN = "БН";
   final _focusInnerNumberTechnic = FocusNode();
   String _category = "";
   final _categoryController = TextEditingController();
   String _dislocationOld = "";
-  final _dislocationOldController = SingleValueDropDownController();
-  final _status = SingleValueDropDownController();
   final _complaint = TextEditingController();
   String _dateDeparture = "";
   String _dateDepartureForSQL = "";
-  final _serviceDislocation = SingleValueDropDownController();
   String _dateTransferForService = "";
   String _dateTransferForServiceForSQL = "";
   String _dateDepartureFromService = "";
@@ -35,13 +34,15 @@ class _RepairAddState extends State<RepairAdd> {
   final _costService = TextEditingController();
   final _diagnosisService = TextEditingController();
   final _recommendationsNotes = TextEditingController();
-  final _newStatus = SingleValueDropDownController();
-  final _newDislocation = SingleValueDropDownController();
   String _dateReceipt = "";
   String _dateReceiptForSQL = "";
   bool _isBN = false;
+  String? _selectedDropdownDislocationOld;
+  String? _selectedDropdownStatusOld;
+  String? _selectedDropdownService;
+  String? _selectedDropdownStatusNew;
+  String? _selectedDropdownDislocationNew;
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
       'dislocation', 'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false);
 
@@ -83,15 +84,11 @@ class _RepairAddState extends State<RepairAdd> {
   @override
   void dispose() {
     _innerNumberTechnic.dispose();
-    _status.dispose();
     _complaint.dispose();
-    _serviceDislocation.dispose();
     _worksPerformed.dispose();
     _costService.dispose();
     _diagnosisService.dispose();
     _recommendationsNotes.dispose();
-    _newStatus.dispose();
-    _newDislocation.dispose();
     super.dispose();
   }
 
@@ -208,12 +205,29 @@ class _RepairAddState extends State<RepairAdd> {
   ListTile _buildDislocationOldListTile(){
     return _isBN ? ListTile(
       leading: const Icon(Icons.copyright),
-      title: DropDownTextField(
-        controller: _dislocationOldController,
-        clearOption: true,
-        textFieldDecoration: const InputDecoration(hintText: "Последний фотосалон"),
-        dropDownItemCount: 4,
-        dropDownList: CategoryDropDownValueModel.photosalons,
+      title: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(10.0),
+        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+        isExpanded: true,
+        hint: Text('Последний фотосалон'),
+        icon: _selectedDropdownDislocationOld != null ? IconButton(
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: (){
+              setState(() {
+                _selectedDropdownDislocationOld = null;
+              });}) : null,
+        value: _selectedDropdownDislocationOld,
+        items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? value){
+          setState(() {
+            _selectedDropdownDislocationOld = value!;
+          });
+        },
       ),
     ) : ListTile(
       leading: const Icon(Icons.print),
@@ -224,12 +238,29 @@ class _RepairAddState extends State<RepairAdd> {
   ListTile _buildStatusListTile(){
     return ListTile(
       leading: const Icon(Icons.copyright),
-      title: DropDownTextField(
-        controller: _status,
-        clearOption: true,
-        textFieldDecoration: const InputDecoration(hintText: "Статус техники"),
-        dropDownItemCount: 4,
-        dropDownList: CategoryDropDownValueModel.statusForEquipment,
+      title: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(10.0),
+        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+        isExpanded: true,
+        hint: Text('Статус техники'),
+        icon: _selectedDropdownStatusOld != null ? IconButton(
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: (){
+              setState(() {
+                _selectedDropdownStatusOld = null;
+              });}) : null,
+        value: _selectedDropdownStatusOld,
+        items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? value){
+          setState(() {
+            _selectedDropdownStatusOld = value!;
+          });
+        },
       ),
     );
   }
@@ -275,12 +306,29 @@ class _RepairAddState extends State<RepairAdd> {
   ListTile _buildServiceDislocationListTile(){
     return ListTile(
       leading: const Icon(Icons.copyright),
-      title: DropDownTextField(
-        controller: _serviceDislocation,
-        clearOption: true,
-        textFieldDecoration: const InputDecoration(hintText: "Местонахождение техники"),
-        dropDownItemCount: 4,
-        dropDownList: CategoryDropDownValueModel.service,
+      title: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(10.0),
+        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+        isExpanded: true,
+        hint: Text('Местонахождение техники'),
+        icon: _selectedDropdownService != null ? IconButton(
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: (){
+              setState(() {
+                _selectedDropdownService = null;
+              });}) : null,
+        value: _selectedDropdownService,
+        items: CategoryDropDownValueModel.service.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? value){
+          setState(() {
+            _selectedDropdownService = value!;
+          });
+        },
       ),
     );
   }
@@ -388,12 +436,29 @@ class _RepairAddState extends State<RepairAdd> {
   ListTile _buildNewStatusListTile(){
     return ListTile(
       leading: const Icon(Icons.copyright),
-      title: DropDownTextField(
-        controller: _newStatus,
-        clearOption: true,
-        textFieldDecoration: const InputDecoration(hintText: "Новый статус"),
-        dropDownItemCount: 4,
-        dropDownList: CategoryDropDownValueModel.statusForEquipment,
+      title: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(10.0),
+        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+        isExpanded: true,
+        hint: Text('Новый статус'),
+        icon: _selectedDropdownStatusNew != null ? IconButton(
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: (){
+              setState(() {
+                _selectedDropdownStatusNew = null;
+              });}) : null,
+        value: _selectedDropdownStatusNew,
+        items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? value){
+          setState(() {
+            _selectedDropdownStatusNew = value!;
+          });
+        },
       ),
     );
   }
@@ -401,12 +466,29 @@ class _RepairAddState extends State<RepairAdd> {
   ListTile _buildNewDislocationListTile(){
     return ListTile(
       leading: const Icon(Icons.copyright),
-      title: DropDownTextField(
-        controller: _newDislocation,
-        clearOption: true,
-        textFieldDecoration: const InputDecoration(hintText: "Куда уехал"),
-        dropDownItemCount: 4,
-        dropDownList: CategoryDropDownValueModel.photosalons,
+      title: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(10.0),
+        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+        isExpanded: true,
+        hint: Text('Куда уехал'),
+        icon: _selectedDropdownDislocationNew != null ? IconButton(
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: (){
+              setState(() {
+                _selectedDropdownDislocationNew = null;
+              });}) : null,
+        value: _selectedDropdownDislocationNew,
+        items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? value){
+          setState(() {
+            _selectedDropdownDislocationNew = value!;
+          });
+        },
       ),
     );
   }
@@ -444,11 +526,11 @@ class _RepairAddState extends State<RepairAdd> {
     bool validate = false;
     if((!_isBN ? _innerNumberTechnic.text != "" : _innerNumberTechnicBN == "БН") &&
         (!_isBN ? _category != "" : _categoryController.text != "") &&
-        (!_isBN ? _dislocationOld != "" : _dislocationOldController.dropDownValue?.name != null) &&
-        _status.dropDownValue?.name != null &&
+        (!_isBN ? _selectedDropdownDislocationOld != "" : _selectedDropdownDislocationOld != null) &&
+        _selectedDropdownStatusOld != null &&
         _complaint.text != "" &&
         _dateDeparture != "" &&
-        _serviceDislocation.dropDownValue?.name != null) {
+        _selectedDropdownService != null) {
       validate = true;
     }
     return validate;
@@ -460,19 +542,19 @@ class _RepairAddState extends State<RepairAdd> {
     String _newStatusStr;
     String _newDislocationStr;
     _costService.text != "" ? _costServ = int.parse(_costService.text.replaceAll(",", "")) : _costServ = 0;
-    _newStatus.dropDownValue?.name != null ? _newStatusStr = _newStatus.dropDownValue!.name : _newStatusStr = "";
-    _newDislocation.dropDownValue?.name != null ? _newDislocationStr = _newDislocation.dropDownValue!.name : _newDislocationStr = "";
+    _selectedDropdownStatusNew != null ? _newStatusStr = _selectedDropdownStatusNew! : _newStatusStr = "";
+    _selectedDropdownDislocationNew != null ? _newDislocationStr = _selectedDropdownDislocationNew! : _newDislocationStr = "";
 
     Repair repairLast = Repair.repairList.first;
     Repair repair = Repair(
         repairLast.id! + 1,
         int.parse(_innerNumberTechnic.text),
         _isBN ? _categoryController.text : _category,
-        _isBN ? _dislocationOldController.dropDownValue!.name : _dislocationOld,
-        _status.dropDownValue!.name,
+        _isBN ? _selectedDropdownDislocationOld! : _dislocationOld,
+        _selectedDropdownStatusOld!,
         _complaint.text,
         _dateDepartureForSQL,
-        _serviceDislocation.dropDownValue!.name,
+        _selectedDropdownService!,
         _dateTransferForServiceForSQL,
         _dateDepartureFromServiceForSQL,
         _worksPerformed.text,
@@ -485,11 +567,6 @@ class _RepairAddState extends State<RepairAdd> {
     );
 
     ConnectToDBMySQL.connDB.insertRepairInDB(repair);
-
-    // repair.dateDeparture = _dateDeparture;
-    // repair.dateTransferForService = _dateTransferForService;
-    // repair.dateDepartureFromService = _dateDepartureFromService;
-    // repair.dateReceipt = _dateReceipt;
 
     Navigator.pop(context, repair);
 

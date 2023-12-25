@@ -1,4 +1,3 @@
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../ConnectToDBMySQL.dart';
@@ -24,7 +23,6 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   String _nameTechnic = '';
   String _dislocationOld = '';
   String _statusOld = '';
-  String _complaint = '';
   final _complaintController = TextEditingController();
   String _dateDeparture = '';
   late final _serviceDislocation;
@@ -37,6 +35,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   late final _newStatus;
   late final _newDislocation;
   String _dateReceipt = '';
+  String? _selectedDropdownDislocationOld;
+  String? _selectedDropdownStatusOld;
+  String? _selectedDropdownService;
+  String? _selectedDropdownStatusNew;
+  String? _selectedDropdownDislocationNew;
 
   bool _isEditComplaint = false;
   bool _isEdit = false;
@@ -50,24 +53,23 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
         break;
       }
     }
-
     _innerNumberTechnic = '${widget.repair.internalID}';
     _nameTechnic = widget.repair.category;
-    _statusOld = widget.repair.status;
-    _dislocationOld = widget.repair.dislocationOld;
-    _complaint = widget.repair.complaint;
+    _selectedDropdownStatusOld = widget.repair.status;
+    _selectedDropdownDislocationOld = widget.repair.dislocationOld;
     _complaintController.text = widget.repair.complaint;
     _dateDeparture = widget.repair.dateDeparture;
-    _serviceDislocation = SingleValueDropDownController(data: DropDownValueModel(name: widget.repair.serviceDislocation, value: widget.repair.serviceDislocation));
+    _selectedDropdownService = widget.repair.serviceDislocation;
     _dateTransferForService = widget.repair.dateTransferForService;
     _dateDepartureFromService = widget.repair.dateDepartureFromService;
     _worksPerformed.text = widget.repair.worksPerformed;
     _costService.text = '${widget.repair.costService}';
     _diagnosisService.text = widget.repair.diagnosisService;
     _recommendationsNotes.text = widget.repair.recommendationsNotes;
-    _newStatus = SingleValueDropDownController(data: DropDownValueModel(name: widget.repair.newStatus, value: widget.repair.newStatus));
-    _newDislocation = SingleValueDropDownController(data: DropDownValueModel(name: widget.repair.newDislocation, value: widget.repair.newDislocation));
+    _selectedDropdownStatusNew = widget.repair.newStatus;
+    _selectedDropdownDislocationNew = widget.repair.newDislocation;
     _dateReceipt = widget.repair.dateReceipt;
+    super.initState();
   }
 
   @override
@@ -100,7 +102,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                   const Spacer(),
                   TextButton(
                       onPressed: HasNetwork.isConnecting ? () {
-                        if(_complaint == "" ||
+                        if(_complaintController.text == "" ||
                             _dateDeparture == "" ||
                             _serviceDislocation.dropDownValue?.name == null){
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -116,26 +118,26 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                             ),
                           );
                         }else{
-                          int _costServ;
-                          _costService.text != "" ? _costServ = int.parse(_costService.text.replaceAll(",", "")) : _costServ = -1;
+                          int costServ = -1;
+                          _costService.text != "" ? costServ = int.parse(_costService.text.replaceAll(",", "")) : costServ = -1;
 
                           Repair repair = Repair(
                               widget.repair.id,
                               widget.repair.internalID,
                               _nameTechnic,
-                              _dislocationOld,
-                              _statusOld,
+                              _selectedDropdownDislocationOld!,
+                              _selectedDropdownStatusOld!,
                               _complaintController.text,
                               _dateDeparture,
-                              _serviceDislocation.dropDownValue!.name,
+                              _selectedDropdownService!,
                               _dateTransferForService,
                               _dateDepartureFromService,
                               _worksPerformed.text,
-                              _costServ,
+                              costServ,
                               _diagnosisService.text,
                               _recommendationsNotes.text,
-                              _newStatus.dropDownValue!.name,
-                              _newDislocation.dropDownValue!.name,
+                              _selectedDropdownStatusNew!,
+                              _selectedDropdownDislocationNew!,
                               _dateReceipt
                           );
 
@@ -195,8 +197,8 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
               ListTile(
                 leading: const Icon(Icons.create),
                 title: Text('Наименование: $_nameTechnic\n'
-                            'Статус: $_statusOld'),
-                subtitle: Text('Откуда забрали: $_dislocationOld'),
+                            'Статус: $_selectedDropdownStatusOld'),
+                subtitle: Text('Откуда забрали: $_selectedDropdownDislocationOld'),
               ),
 
               _isEditComplaint ?
@@ -251,18 +253,30 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.copyright),
-                title: DropDownTextField(
-                  controller: _serviceDislocation,
-                  clearOption: true,
-                  textFieldDecoration: const InputDecoration(hintText: "Местонахождение техники"),
-                  dropDownItemCount: 4,
-                  dropDownList: CategoryDropDownValueModel.service,
-                  onChanged: (value){
-                    setState(() {
-                      if(_serviceDislocation.dropDownValue!.name != widget.repair.serviceDislocation) _isEdit = true;
-                    });
-                  },
-                ),
+                  title: DropdownButton<String>(
+                    borderRadius: BorderRadius.circular(10.0),
+                    padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                    isExpanded: true,
+                    hint: Text('Местонахождение техники'),
+                    icon: _selectedDropdownService != null ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      onPressed: (){
+                        setState(() {
+                          _selectedDropdownService = null;
+                        });}) : null,
+                    value: _selectedDropdownService,
+                    items: CategoryDropDownValueModel.service.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? value){
+                      setState(() {
+                        _selectedDropdownService = value!;
+                      });
+                    },
+                  )
               ),
 
               ListTile(
@@ -374,15 +388,27 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.copyright),
-                title: DropDownTextField(
-                  controller: _newStatus,
-                  clearOption: true,
-                  textFieldDecoration: const InputDecoration(hintText: "Новый статус"),
-                  dropDownItemCount: 4,
-                  dropDownList: CategoryDropDownValueModel.statusForEquipment,
-                  onChanged: (value){
+                title: DropdownButton<String>(
+                  borderRadius: BorderRadius.circular(10.0),
+                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  isExpanded: true,
+                  hint: Text('Новый статус'),
+                  icon: _selectedDropdownService != null ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      onPressed: (){
+                        setState(() {
+                          _selectedDropdownService = null;
+                        });}) : null,
+                  value: _selectedDropdownService,
+                  items: CategoryDropDownValueModel.service.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? value){
                     setState(() {
-                      if(_newStatus.dropDownValue!.name != widget.repair.newStatus) _isEdit = true;
+                      _selectedDropdownService = value!;
                     });
                   },
                 ),
@@ -390,15 +416,27 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.copyright),
-                title: DropDownTextField(
-                  controller: _newDislocation,
-                  clearOption: true,
-                  textFieldDecoration: const InputDecoration(hintText: "Куда уехал"),
-                  dropDownItemCount: 4,
-                  dropDownList: CategoryDropDownValueModel.statusForEquipment,
-                  onChanged: (value){
+                title: DropdownButton<String>(
+                  borderRadius: BorderRadius.circular(10.0),
+                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  isExpanded: true,
+                  hint: Text('Куда уехал'),
+                  icon: _selectedDropdownDislocationNew != null ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      onPressed: (){
+                        setState(() {
+                          _selectedDropdownDislocationNew = null;
+                        });}) : null,
+                  value: _selectedDropdownDislocationNew,
+                  items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? value){
                     setState(() {
-                      if(_newDislocation.dropDownValue!.name != widget.repair.newDislocation) _isEdit = true;
+                      _selectedDropdownDislocationNew = value!;
                     });
                   },
                 ),

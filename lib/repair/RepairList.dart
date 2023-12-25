@@ -33,13 +33,17 @@ class _RepairListState extends State<RepairList> {
           itemCount: Repair.repairList.length,
           itemBuilder: (context, index) {
             return ListTile(
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => RepairViewAndChange(repair: Repair.repairList[index]))).then(
-                          (value){
-                        setState(() {
-                          if(value != null) Repair.repairList[index] = value;
-                        });
+                onTap: () {
+                  if (mounted) {
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => RepairViewAndChange(repair: Repair.repairList[index])))
+                        .then((value) {
+                      setState(() {
+                        if (value != null)
+                          Repair.repairList[index] = value;
                       });
+                    });
+                  }
                 },
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 title: Repair.repairList[index].internalID == -1 ? _buildTextWithoutBN(context, index) : _buildTextWithBN(context, index),

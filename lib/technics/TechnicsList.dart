@@ -37,8 +37,7 @@ class _TechnicsListState extends State<TechnicsList> {
             }
             return ListTile(
               onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index]))).then(
-                  (value){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index]))).then((value){
                     setState(() {
                       if(value != null) Technic.technicList[index] = value;
                     });

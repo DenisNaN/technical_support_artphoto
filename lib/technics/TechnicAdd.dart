@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 import '../ConnectToDBMySQL.dart';
 import '../utils/categoryDropDownValueModel.dart';
@@ -16,11 +15,8 @@ class TechnicAdd extends StatefulWidget {
 
 class _TechnicAddState extends State<TechnicAdd> {
   final _innerNumberTechnic = TextEditingController();
-  final _categoryTechnic = SingleValueDropDownController();
   final _nameTechnic = TextEditingController();
   final _costTechnic = TextEditingController();
-  final _statusTechnic = SingleValueDropDownController();
-  final _dislocationTechnic = SingleValueDropDownController();
   String _dateBuyTechnic = '';
   String _dateForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
   final _comment = TextEditingController();
@@ -29,6 +25,9 @@ class _TechnicAddState extends State<TechnicAdd> {
   String _dateFinishTestDrive = '';
   String _dateFinishTestDriveForSQL = '';
   final _resultTestDrive = TextEditingController();
+  String? _selectedDropdownNameTechnic;
+  String? _selectedDropdownDislocation;
+  String? _selectedDropdownStatus;
   bool _switchTestDrive = false;
   bool _checkboxTestDrive = false;
   bool _isCategoryPhotocamera = false;
@@ -38,11 +37,8 @@ class _TechnicAddState extends State<TechnicAdd> {
   @override
   void dispose() {
     _innerNumberTechnic.dispose();
-    _categoryTechnic.dispose();
     _nameTechnic.dispose();
     _costTechnic.dispose();
-    _statusTechnic.dispose();
-    _dislocationTechnic.dispose();
     _comment.dispose();
     _resultTestDrive.dispose();
     super.dispose();
@@ -72,14 +68,11 @@ class _TechnicAddState extends State<TechnicAdd> {
                         // checking the unique number of the equipment
                         if (_formKey.currentState!.validate()) {
                           if (_innerNumberTechnic.text == "" ||
-                              _categoryTechnic.dropDownValue?.name ==
-                                  null ||
+                              _selectedDropdownNameTechnic == null ||
                               _nameTechnic.text == "" ||
                               _costTechnic.text == "" ||
-                              _statusTechnic.dropDownValue?.name ==
-                                  null ||
-                              _dislocationTechnic.dropDownValue
-                                  ?.name == null) {
+                              _selectedDropdownStatus == null ||
+                              _selectedDropdownDislocation == null) {
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(
                               const SnackBar(
@@ -102,11 +95,11 @@ class _TechnicAddState extends State<TechnicAdd> {
                                 technicLast.id! + 1,
                                 int.parse(_innerNumberTechnic.text),
                                 _nameTechnic.text,
-                                _categoryTechnic.dropDownValue!.name,
+                                _selectedDropdownNameTechnic!,
                                 int.parse(_costTechnic.text.replaceAll(",", "")),
                                 _dateForSQL,
-                                _statusTechnic.dropDownValue!.name,
-                                _dislocationTechnic.dropDownValue!.name,
+                                _selectedDropdownStatus!,
+                                _selectedDropdownDislocation!,
                                 _comment.text,
                                 _dateStartTestDriveForSQL,
                                 _dateFinishTestDriveForSQL,
@@ -163,15 +156,27 @@ class _TechnicAddState extends State<TechnicAdd> {
               ),
               ListTile(
                 leading: const Icon(Icons.print),
-                title: DropDownTextField(
-                  controller: _categoryTechnic,
-                  clearOption: true,
-                  textFieldDecoration: const InputDecoration(hintText: "Наименование техники"),
-                  dropDownItemCount: 8,
-                  dropDownList: CategoryDropDownValueModel.nameEquipment,
-                  onChanged: (value){
+                title: DropdownButton<String>(
+                  borderRadius: BorderRadius.circular(10.0),
+                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  isExpanded: true,
+                  hint: Text('Наименование техники'),
+                  icon: _selectedDropdownNameTechnic != null ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      onPressed: (){
+                        setState(() {
+                          _selectedDropdownNameTechnic = null;
+                        });}) : null,
+                  value: _selectedDropdownNameTechnic,
+                  items: CategoryDropDownValueModel.nameEquipment.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? value){
                     setState(() {
-                      value.name == 'Фотоаппарат' ? _isCategoryPhotocamera = true : _isCategoryPhotocamera = false;
+                      _selectedDropdownNameTechnic = value!;
                     });
                   },
                 ),
@@ -221,22 +226,56 @@ class _TechnicAddState extends State<TechnicAdd> {
               ),
               ListTile(
                 leading: const Icon(Icons.copyright),
-                title: DropDownTextField(
-                  controller: _statusTechnic,
-                  clearOption: true,
-                  textFieldDecoration: const InputDecoration(hintText: "Статус техники"),
-                  dropDownItemCount: 4,
-                  dropDownList: CategoryDropDownValueModel.statusForEquipment,
+                title: DropdownButton<String>(
+                  borderRadius: BorderRadius.circular(10.0),
+                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  isExpanded: true,
+                  hint: Text('Статус техники'),
+                  icon: _selectedDropdownStatus != null ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      onPressed: (){
+                        setState(() {
+                          _selectedDropdownStatus = null;
+                        });}) : null,
+                  value: _selectedDropdownStatus,
+                  items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? value){
+                    setState(() {
+                      _selectedDropdownStatus = value!;
+                    });
+                  },
                 ),
               ),
               ListTile(
                 leading: const Icon(Icons.airport_shuttle),
-                title: DropDownTextField(
-                  controller: _dislocationTechnic,
-                  clearOption: true,
-                  textFieldDecoration: const InputDecoration(hintText: "Дислокация техники"),
-                  dropDownItemCount: 4,
-                  dropDownList: CategoryDropDownValueModel.photosalons,
+                title: DropdownButton<String>(
+                  borderRadius: BorderRadius.circular(10.0),
+                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  isExpanded: true,
+                  hint: Text('Дислокация техники'),
+                  icon: _selectedDropdownDislocation != null ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      onPressed: (){
+                        setState(() {
+                          _selectedDropdownDislocation = null;
+                        });}) : null,
+                  value: _selectedDropdownDislocation,
+                  items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? value){
+                    setState(() {
+                      _selectedDropdownDislocation = value!;
+                    });
+                  },
                 ),
               ),
               ListTile(

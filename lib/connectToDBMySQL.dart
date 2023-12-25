@@ -1,4 +1,3 @@
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:intl/intl.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
@@ -373,10 +372,10 @@ class ConnectToDBMySQL {
         'Фотосалоны.Фотосалон '
         'FROM Фотосалоны');
 
-    List<DropDownValueModel> list = [];
+    List<String> list = [];
 
     for (var row in result) {
-      list.add(DropDownValueModel(name: row[1].toString(), value: row[1].toString()));
+      list.add(row[1].toString());
     }
     return list;
   }
@@ -387,9 +386,9 @@ class ConnectToDBMySQL {
         'statusForEquipment.status '
         'FROM statusForEquipment');
 
-    List<DropDownValueModel> list = [];
+    List<String> list = [];
     for (var row in result) {
-      list.add(DropDownValueModel(name: row[1].toString(), value: row[1].toString()));
+      list.add(row[1].toString());
     }
     return list;
   }
@@ -400,9 +399,9 @@ class ConnectToDBMySQL {
         'service.repairmen '
         'FROM service');
 
-    List<DropDownValueModel> list = [];
+    List<String> list = [];
     for (var row in result) {
-      list.add(DropDownValueModel(name: row[1].toString(), value: row[1].toString()));
+      list.add(row[1].toString());
     }
     return list;
   }
@@ -413,9 +412,9 @@ class ConnectToDBMySQL {
         'nameEquipment.name '
         'FROM nameEquipment');
 
-    List<DropDownValueModel> list = [];
+    List<String> list = [];
     for (var row in result) {
-      list.add(DropDownValueModel(name: row[1].toString(), value: row[1].toString()));
+      list.add(row[1].toString());
     }
     return list;
   }

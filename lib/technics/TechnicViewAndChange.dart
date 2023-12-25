@@ -17,11 +17,8 @@ class TechnicViewAndChange extends StatefulWidget {
 }
 
 class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
-  late final _categoryTechnic;
   final _nameTechnic = TextEditingController();
   final _costTechnic = TextEditingController();
-  late final _statusTechnic;
-  late final _dislocationTechnic;
   late DateTime _dateBuy;
   String _dateBuyTechnic = '';
   String _dateBuyForSQL = '';
@@ -31,6 +28,9 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   String _dateFinishTestDrive = '';
   String _dateFinishTestDriveForSQL = '';
   final _resultTestDrive = TextEditingController();
+  String? _selectedDropdownNameTechnic;
+  String? _selectedDropdownDislocation;
+  String? _selectedDropdownStatus;
   bool _checkboxTestDrive = false;
   bool _switchTestDrive = false;
   late bool _isCategoryPhotocamera;
@@ -48,11 +48,12 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
   @override
   void initState() {
+    super.initState();
     _nameTechnic.text = widget.technic.name;
     _costTechnic.text = '${widget.technic.cost}';
-    _categoryTechnic = SingleValueDropDownController(data: DropDownValueModel(name: widget.technic.category, value: widget.technic.category));
-    _statusTechnic = SingleValueDropDownController(data: DropDownValueModel(name: widget.technic.status, value: widget.technic.status));
-    _dislocationTechnic = SingleValueDropDownController(data: DropDownValueModel(name: widget.technic.dislocation, value: widget.technic.dislocation));
+    _selectedDropdownNameTechnic = widget.technic.category;
+    _selectedDropdownStatus = widget.technic.status;
+    _selectedDropdownDislocation = widget.technic.dislocation;
 
     _dateBuy = DateTime.parse(widget.technic.dateBuyTechnic.replaceAll('.', '-'));
     _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(_dateBuy);
@@ -76,21 +77,14 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
   @override
   void dispose() {
-    _categoryTechnic.dispose();
     _nameTechnic.dispose();
     _costTechnic.dispose();
-    _statusTechnic.dispose();
-    _dislocationTechnic.dispose();
     _comment.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final numberFormatter = FilteringTextInputFormatter.allow(
-      RegExp(r'[0-9]'),
-    );
-
     return Scaffold(
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
@@ -106,11 +100,11 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   const Spacer(),
                   TextButton(
                       onPressed: HasNetwork.isConnecting ? () {
-                        if(_categoryTechnic.dropDownValue?.name == null ||
+                        if(_selectedDropdownNameTechnic == null ||
                             _nameTechnic.text == "" ||
                             _costTechnic.text == "" ||
-                            _statusTechnic.dropDownValue?.name == null ||
-                            _dislocationTechnic.dropDownValue?.name == null){
+                            _selectedDropdownStatus == null ||
+                            _selectedDropdownDislocation == null){
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Row(
@@ -128,11 +122,11 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                               widget.technic.id,
                               widget.technic.internalID,
                               _nameTechnic.text,
-                              _categoryTechnic.dropDownValue!.name,
+                              _selectedDropdownNameTechnic!,
                               int.parse(_costTechnic.text.replaceAll(",", "")),
                               _dateBuyForSQL,
-                              _statusTechnic.dropDownValue!.name,
-                              _dislocationTechnic.dropDownValue!.name,
+                              _selectedDropdownStatus!,
+                              _selectedDropdownDislocation!,
                               _comment.text,
                               _dateStartTestDriveForSQL,
                               _dateFinishTestDriveForSQL,
@@ -178,12 +172,29 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
               _isEditCategory ?
               ListTile(
                 leading: const Icon(Icons.print),
-                title: DropDownTextField(
-                  controller: _categoryTechnic,
-                  clearOption: true,
-                  textFieldDecoration: const InputDecoration(hintText: "Выберите категорию"),
-                  dropDownItemCount: 8,
-                  dropDownList: CategoryDropDownValueModel.nameEquipment,
+                title: DropdownButton<String>(
+                  borderRadius: BorderRadius.circular(10.0),
+                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  isExpanded: true,
+                  hint: Text('Выберите категорию'),
+                  icon: _selectedDropdownNameTechnic != null ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      onPressed: (){
+                        setState(() {
+                          _selectedDropdownNameTechnic = null;
+                        });}) : null,
+                  value: _selectedDropdownNameTechnic,
+                  items: CategoryDropDownValueModel.nameEquipment.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? value){
+                    setState(() {
+                      _selectedDropdownNameTechnic = value!;
+                    });
+                  },
                 ),
               ) :
               ListTile(
@@ -276,32 +287,54 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
               ),
               ListTile(
                 leading: const Icon(Icons.copyright),
-                title: DropDownTextField(
-                  controller: _statusTechnic,
-                  // initialValue: widget.technic.status,
-                  clearOption: true,
-                  textFieldDecoration: const InputDecoration(hintText: "Статус техники"),
-                  dropDownItemCount: 4,
-                  dropDownList: CategoryDropDownValueModel.statusForEquipment,
-                  onChanged: (value){
+                title: DropdownButton<String>(
+                  borderRadius: BorderRadius.circular(10.0),
+                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  isExpanded: true,
+                  hint: Text('Статус техники'),
+                  icon: _selectedDropdownStatus != null ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      onPressed: (){
+                        setState(() {
+                          _selectedDropdownStatus = null;
+                        });}) : null,
+                  value: _selectedDropdownStatus,
+                  items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? value){
                     setState(() {
-                      if(_statusTechnic.dropDownValue!.name != widget.technic.status) _isEditStatusDislocation = true;
+                      _selectedDropdownStatus = value!;
                     });
                   },
                 ),
               ),
               ListTile(
                 leading: const Icon(Icons.airport_shuttle),
-                title: DropDownTextField(
-                  controller: _dislocationTechnic,
-                  // initialValue: widget.technic.dislocation,
-                  clearOption: true,
-                  textFieldDecoration: const InputDecoration(hintText: "Дислокация техники"),
-                  dropDownItemCount: 4,
-                  dropDownList: CategoryDropDownValueModel.photosalons,
-                  onChanged: (value){
+                title: DropdownButton<String>(
+                  borderRadius: BorderRadius.circular(10.0),
+                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  isExpanded: true,
+                  hint: Text('Дислокация техники'),
+                  icon: _selectedDropdownDislocation != null ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      onPressed: (){
+                        setState(() {
+                          _selectedDropdownDislocation = null;
+                        });}) : null,
+                  value: _selectedDropdownDislocation,
+                  items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? value){
                     setState(() {
-                      if(_dislocationTechnic.dropDownValue!.name != widget.technic.dislocation) _isEditStatusDislocation = true;
+                      _selectedDropdownDislocation = value!;
                     });
                   },
                 ),
