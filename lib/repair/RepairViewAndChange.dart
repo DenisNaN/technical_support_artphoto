@@ -21,19 +21,14 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
   String _innerNumberTechnic = '';
   String _nameTechnic = '';
-  String _dislocationOld = '';
-  String _statusOld = '';
   final _complaintController = TextEditingController();
   String _dateDeparture = '';
-  late final _serviceDislocation;
   String _dateTransferForService = '';
   String _dateDepartureFromService = '';
   final _worksPerformed = TextEditingController();
   final _costService = TextEditingController();
   final _diagnosisService = TextEditingController();
   final _recommendationsNotes = TextEditingController();
-  late final _newStatus;
-  late final _newDislocation;
   String _dateReceipt = '';
   String? _selectedDropdownDislocationOld;
   String? _selectedDropdownStatusOld;
@@ -75,13 +70,10 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   @override
   void dispose() {
     _complaintController.dispose();
-    _serviceDislocation.dispose();
     _worksPerformed.dispose();
     _costService.dispose();
     _diagnosisService.dispose();
     _recommendationsNotes.dispose();
-    _newStatus.dispose();
-    _newDislocation.dispose();
     super.dispose();
   }
 
@@ -104,7 +96,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                       onPressed: HasNetwork.isConnecting ? () {
                         if(_complaintController.text == "" ||
                             _dateDeparture == "" ||
-                            _serviceDislocation.dropDownValue?.name == null){
+                            _selectedDropdownService == null){
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Row(
