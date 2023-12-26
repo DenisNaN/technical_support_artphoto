@@ -287,22 +287,36 @@ class ConnectToDBMySQL {
 
   Future updateRepairInDB(Repair repair) async{
     await ConnectToDBMySQL.connDB.connDatabase();
-    // await _connDB!.query(
-    //     'UPDATE repairEquipment SET '
-    //         'category = ?, '
-    //         'name = ?, '
-    //         'dateBuy = ?, '
-    //         'cost = ?, '
-    //         'comment = ? '
-    //         'WHERE id = ?',
-    //     [
-    //       technic.category,
-    //       technic.name,
-    //       technic.dateBuyTechnic,
-    //       technic.cost,
-    //       technic.comment,
-    //       technic.id
-    //     ]);
+    await _connDB!.query(
+        'UPDATE repairEquipment SET '
+            'complaint = ?, '
+            'dateDeparture = ?, '
+            'serviceDislocation = ?, '
+            'dateTransferForService = ?, '
+            'dateDepartureFromService = ? '
+            'worksPerformed = ? '
+            'costService = ? '
+            'diagnosisService = ? '
+            'recommendationsNotes = ? '
+            'newStatus = ? '
+            'newDislocation = ? '
+            'dateReceipt = ? '
+            'WHERE id = ?',
+        [
+          repair.complaint,
+          repair.dateDeparture,
+          repair.serviceDislocation,
+          repair.dateTransferForService,
+          repair.dateDepartureFromService,
+          repair.worksPerformed,
+          repair.costService,
+          repair.diagnosisService,
+          repair.recommendationsNotes,
+          repair.newStatus,
+          repair.newDislocation,
+          repair.dateReceipt,
+          repair.id
+        ]);
   }
   
   Future<List> getLastIdList() async{

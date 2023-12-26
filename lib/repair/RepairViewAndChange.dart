@@ -58,11 +58,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     _dateTransferForService = widget.repair.dateTransferForService;
     _dateDepartureFromService = widget.repair.dateDepartureFromService;
     _worksPerformed.text = widget.repair.worksPerformed;
-    _costService.text = '${widget.repair.costService}';
+    _costService.text = widget.repair.costService == 0 ? '' : '${widget.repair.costService}';
     _diagnosisService.text = widget.repair.diagnosisService;
     _recommendationsNotes.text = widget.repair.recommendationsNotes;
-    _selectedDropdownStatusNew = widget.repair.newStatus;
-    _selectedDropdownDislocationNew = widget.repair.newDislocation;
+    _selectedDropdownStatusNew = widget.repair.newStatus == '' ? null : widget.repair.newStatus;
+    _selectedDropdownDislocationNew = widget.repair.newDislocation == '' ? null : widget.repair.newDislocation;
     _dateReceipt = widget.repair.dateReceipt;
     super.initState();
   }
@@ -209,7 +209,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                   icon: const Icon(Icons.edit, color: Colors.blue),
                   onPressed: (){
                       setState(() {
-                        _isEditComplaint = !_isEditComplaint;
+                        _isEditComplaint = true;
                         _isEdit = true;
                       }
                     );
@@ -266,6 +266,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                     onChanged: (String? value){
                       setState(() {
                         _selectedDropdownService = value!;
+                        _isEdit = true;
                       });
                     },
                   )
@@ -328,10 +329,9 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                 title: TextFormField(
                   decoration: const InputDecoration(hintText: "Произведенные работы"),
                   controller: _worksPerformed,
-                  // initialValue: _worksPerformed.text,
                   onChanged: (value){
                     setState(() {
-                      if(_worksPerformed.text != widget.repair.worksPerformed) _isEdit = true;
+                      if(value != widget.repair.worksPerformed) _isEdit = true;
                     });
                   },
                 ),
@@ -344,7 +344,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                         hintText: "Стоимость ремонта",
                         prefix: Text('₽ ')),
                     controller: _costService,
-                    // initialValue: _costService.text,
+                    onChanged: (value){
+                      setState(() {
+                        if(value != '${widget.repair.costService}') _isEdit = true;
+                      });
+                    },
                     inputFormatters: [IntegerCurrencyInputFormatter()],
                     keyboardType: TextInputType.number,
                   )
@@ -385,14 +389,14 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                   padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                   isExpanded: true,
                   hint: Text('Новый статус'),
-                  icon: _selectedDropdownService != null ? IconButton(
+                  icon: _selectedDropdownStatusNew != null ? IconButton(
                       icon: const Icon(Icons.clear, color: Colors.grey),
                       onPressed: (){
                         setState(() {
-                          _selectedDropdownService = null;
+                          _selectedDropdownStatusNew = null;
                         });}) : null,
-                  value: _selectedDropdownService,
-                  items: CategoryDropDownValueModel.service.map<DropdownMenuItem<String>>((String value) {
+                  value: _selectedDropdownStatusNew,
+                  items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -400,7 +404,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                   }).toList(),
                   onChanged: (String? value){
                     setState(() {
-                      _selectedDropdownService = value!;
+                      _selectedDropdownStatusNew = value!;
                     });
                   },
                 ),
@@ -469,7 +473,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   void _save (Repair repair) async{
     await ConnectToDBMySQL.connDB.connDatabase();
     if(_isEdit) {
-      // ConnectToDBMySQL.connDB.updateTechnicInDB(repair);
+      ConnectToDBMySQL.connDB.updateRepairInDB(repair);
     }
     // if(_isEditStatusDislocation){
     //   ConnectToDBMySQL.connDB.insertStatusInDB(technic);

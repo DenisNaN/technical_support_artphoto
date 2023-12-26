@@ -43,6 +43,7 @@ class _RepairAddState extends State<RepairAdd> {
   String? _selectedDropdownStatusNew;
   String? _selectedDropdownDislocationNew;
 
+
   Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
       'dislocation', 'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false);
 

@@ -50,6 +50,7 @@ class _TechnicAddState extends State<TechnicAdd> {
       RegExp(r'[0-9]'),
     );
 
+
     return Scaffold(
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,

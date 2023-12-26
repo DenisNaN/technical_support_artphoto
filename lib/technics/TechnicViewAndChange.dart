@@ -193,6 +193,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   onChanged: (String? value){
                     setState(() {
                       _selectedDropdownNameTechnic = value!;
+                      _isEditCategory = !_isEditCategory;
                     });
                   },
                 ),

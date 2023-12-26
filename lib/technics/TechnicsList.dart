@@ -59,6 +59,7 @@ class _TechnicsListState extends State<TechnicsList> {
     );
   }
 
+
   Text _buildTextWithTestDrive(BuildContext context, int index){
     DateTime dateStart = DateTime.parse(Technic.technicList[index].dateStartTestDrive.replaceAll('.', '-'));
     DateTime dateFinish;
