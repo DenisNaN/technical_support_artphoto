@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
 import '../ConnectToDBMySQL.dart';
 import '../technics/Technic.dart';
 import '../technics/TechnicViewAndChange.dart';
@@ -38,6 +39,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
   bool _isEditComplaint = false;
   bool _isEdit = false;
+  bool _isEditNewStatusDislocation = false;
   int indexTechnic = 0;
 
   @override
@@ -405,6 +407,9 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                   onChanged: (String? value){
                     setState(() {
                       _selectedDropdownStatusNew = value!;
+                      if(_selectedDropdownStatusNew != widget.repair.newStatus) {
+                        _isEditNewStatusDislocation = true;
+                      }
                     });
                   },
                 ),
@@ -433,6 +438,9 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                   onChanged: (String? value){
                     setState(() {
                       _selectedDropdownDislocationNew = value!;
+                      if(_selectedDropdownDislocationNew != widget.repair.newDislocation) {
+                        _isEditNewStatusDislocation = true;
+                      }
                     });
                   },
                 ),
@@ -471,20 +479,19 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   }
 
   void _save (Repair repair) async{
+    _selectedDropdownStatusNew = _selectedDropdownStatusNew ?? '';
+    _selectedDropdownDislocationNew = _selectedDropdownDislocationNew ?? '';
+
     await ConnectToDBMySQL.connDB.connDatabase();
     if(_isEdit) {
       ConnectToDBMySQL.connDB.updateRepairInDB(repair);
+      RepairSQFlite.db.update(repair);
+
+      if(widget.repair.internalID != -1 && _isEditNewStatusDislocation){
+        ConnectToDBMySQL.connDB.insertStatusInDB(
+            Technic.technicList[indexTechnic].id!, _selectedDropdownStatusNew!, _selectedDropdownDislocationNew!);
+      }
     }
-    // if(_isEditStatusDislocation){
-    //   ConnectToDBMySQL.connDB.insertStatusInDB(technic);
-    // }
-    // if(_isEditTestDrive || _isEditSwitch){
-    //   ConnectToDBMySQL.connDB.insertTestDriveInDB(technic);
-    // }
-    //
-    // if(_isEditCategory || _isEditName || _isEditCost || _isEditDateBuy || _isEditComment || _isEditStatusDislocation || _isEditTestDrive || _isEditSwitch) {
-    //   TechnicSQFlite.db.updateTechnic(technic);
-    // }
   }
 }
 

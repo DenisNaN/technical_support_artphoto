@@ -195,21 +195,11 @@ class ConnectToDBMySQL {
         [technic.internalID,  technic.category, technic.name, technic.dateBuyTechnic, technic.cost, technic.comment,
         LoginPassword.login]);
 
-   insertStatusInDB(technic);
+   insertStatusInDB(technic.id!, technic.status, technic.dislocation);
 
     if(technic.dateStartTestDrive != '') {
       insertTestDriveInDB(technic);
     }
-  }
-
-  Future insertStatusInDB(Technic technic) async{
-    await ConnectToDBMySQL.connDB.connDatabase();
-    await _connDB!.query(
-        'INSERT INTO statusEquipment (idEquipment, status, dislocation, date, user) '
-            'VALUES (?, ?, ?, ?, ?)',
-            // 'VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ?, ?)',
-        [technic.id, technic.status, technic.dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now()),
-          LoginPassword.login]);
   }
 
   Future insertTestDriveInDB(Technic technic) async{
@@ -217,7 +207,6 @@ class ConnectToDBMySQL {
     await _connDB!.query(
         'INSERT INTO testDrive (idEquipment, category, dateStart, dateFinish, result, '
             'checkEquipment, user) VALUES (?, ?, ?, ? , ?, ?, ?)',
-            // 'checkEquipment, user) VALUES ((SELECT id FROM equipment ORDER BY id DESC LIMIT 1), ?, ?, ? , ?, ?, ?)',
         [
           technic.id,
           technic.category,
@@ -227,6 +216,15 @@ class ConnectToDBMySQL {
           technic.checkboxTestDrive,
           LoginPassword.login
         ]);
+  }
+
+  Future insertStatusInDB(int id, String status, String dislocation) async{
+    await ConnectToDBMySQL.connDB.connDatabase();
+    await _connDB!.query(
+        'INSERT INTO statusEquipment (idEquipment, status, dislocation, date, user) '
+            'VALUES (?, ?, ?, ?, ?)',
+        [id, status, dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now()),
+          LoginPassword.login]);
   }
 
   Future updateTechnicInDB(Technic technic) async{

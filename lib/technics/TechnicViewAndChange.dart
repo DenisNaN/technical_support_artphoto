@@ -546,7 +546,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
       ConnectToDBMySQL.connDB.updateTechnicInDB(technic);
     }
     if(_isEditStatusDislocation){
-      ConnectToDBMySQL.connDB.insertStatusInDB(technic);
+      ConnectToDBMySQL.connDB.insertStatusInDB(technic.id!, technic.status, technic.dislocation);
     }
     if(_isEditTestDrive || _isEditSwitch){
       ConnectToDBMySQL.connDB.insertTestDriveInDB(technic);
