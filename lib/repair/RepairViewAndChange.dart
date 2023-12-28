@@ -112,45 +112,10 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                             ),
                           );
                         }else{
-                          int costServ = -1;
-                          _costService.text != "" ? costServ = int.parse(_costService.text.replaceAll(",", "")) : costServ = -1;
-
-                          Repair repair = Repair(
-                              widget.repair.id,
-                              widget.repair.internalID,
-                              _nameTechnic,
-                              _selectedDropdownDislocationOld!,
-                              _selectedDropdownStatusOld!,
-                              _complaintController.text,
-                              _dateDeparture,
-                              _selectedDropdownService!,
-                              _dateTransferForService,
-                              _dateDepartureFromService,
-                              _worksPerformed.text,
-                              costServ,
-                              _diagnosisService.text,
-                              _recommendationsNotes.text,
-                              _selectedDropdownStatusNew!,
-                              _selectedDropdownDislocationNew!,
-                              _dateReceipt
-                          );
-
-                          _save(repair);
-
-                          Navigator.pop(context, repair);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.add_task, size: 40, color: Colors.white),
-                                  Text(' Изменения внесены'),
-                                ],
-                              ),
-                              duration: Duration(seconds: 5),
-                              showCloseIcon: true,
-                            ),
-                          );
+                          if(isValidationNewStatusDislocation()){
+                            Future<Repair> repair = _save();
+                            Navigator.pop(context, repair);
+                          }
                         }
                       } : null,
                       child: HasNetwork.isConnecting ? const Text("Сохранить") :
@@ -408,6 +373,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                     setState(() {
                       _selectedDropdownStatusNew = value!;
                       if(_selectedDropdownStatusNew != widget.repair.newStatus) {
+                        _isEdit = true;
                         _isEditNewStatusDislocation = true;
                       }
                     });
@@ -439,6 +405,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                     setState(() {
                       _selectedDropdownDislocationNew = value!;
                       if(_selectedDropdownDislocationNew != widget.repair.newDislocation) {
+                        _isEdit = true;
                         _isEditNewStatusDislocation = true;
                       }
                     });
@@ -478,9 +445,31 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     );
   }
 
-  void _save (Repair repair) async{
+  Future<Repair> _save() async{
+    int costServ = -1;
+    _costService.text != "" ? costServ = int.parse(_costService.text.replaceAll(",", "")) : costServ = -1;
     _selectedDropdownStatusNew = _selectedDropdownStatusNew ?? '';
     _selectedDropdownDislocationNew = _selectedDropdownDislocationNew ?? '';
+
+    Repair repair = Repair(
+        widget.repair.id,
+        widget.repair.internalID,
+        _nameTechnic,
+        _selectedDropdownDislocationOld!,
+        _selectedDropdownStatusOld!,
+        _complaintController.text,
+        _dateDeparture,
+        _selectedDropdownService!,
+        _dateTransferForService,
+        _dateDepartureFromService,
+        _worksPerformed.text,
+        costServ,
+        _diagnosisService.text,
+        _recommendationsNotes.text,
+        _selectedDropdownStatusNew!,
+        _selectedDropdownDislocationNew!,
+        _dateReceipt
+    );
 
     await ConnectToDBMySQL.connDB.connDatabase();
     if(_isEdit) {
@@ -491,7 +480,57 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
         ConnectToDBMySQL.connDB.insertStatusInDB(
             Technic.technicList[indexTechnic].id!, _selectedDropdownStatusNew!, _selectedDropdownDislocationNew!);
       }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.add_task, size: 40, color: Colors.white),
+              Text(' Изменения внесены'),
+            ],
+          ),
+          duration: Duration(seconds: 5),
+          showCloseIcon: true,
+        ),
+      );
     }
+    return repair;
+  }
+
+  bool isValidationNewStatusDislocation(){
+    bool result = true;
+
+    if(_selectedDropdownStatusNew != null && _selectedDropdownDislocationNew == null){
+      result = false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.add_task, size: 40, color: Colors.white),
+              Text(' Заполните поле "Куда уехал"'),
+            ],
+          ),
+          duration: Duration(seconds: 5),
+          showCloseIcon: true,
+        ),
+      );
+    }
+    if(_selectedDropdownStatusNew == null && _selectedDropdownDislocationNew != null){
+      result = false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.add_task, size: 40, color: Colors.white),
+              Text(' Заполните поле "Новый статус"'),
+            ],
+          ),
+          duration: Duration(seconds: 5),
+          showCloseIcon: true,
+        ),
+      );
+    }
+    return result;
   }
 }
 
