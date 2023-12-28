@@ -40,6 +40,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   bool _isEditComplaint = false;
   bool _isEdit = false;
   bool _isEditNewStatusDislocation = false;
+  bool _isAllFieldsfilled = false;
   int indexTechnic = 0;
 
   @override
@@ -477,6 +478,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
       RepairSQFlite.db.update(repair);
 
       if(widget.repair.internalID != -1 && _isEditNewStatusDislocation){
+        repair.dateReceipt = DateFormat('yyyy.MM.dd').format(DateTime.now());
         ConnectToDBMySQL.connDB.insertStatusInDB(
             Technic.technicList[indexTechnic].id!, _selectedDropdownStatusNew!, _selectedDropdownDislocationNew!);
       }
@@ -532,6 +534,17 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     }
     return result;
   }
+
+  bool isAllFieldsFilled(Repair repair){
+    bool result = false;
+
+    if(
+    repair.complaint == ''
+    )
+
+    return result;
+  }
+
 }
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {

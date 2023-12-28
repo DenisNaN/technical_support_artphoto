@@ -13,6 +13,7 @@ class RepairList extends StatefulWidget {
 }
 
 class _RepairListState extends State<RepairList> {
+  bool isDoneRepair = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +34,7 @@ class _RepairListState extends State<RepairList> {
           itemCount: Repair.repairList.length,
           itemBuilder: (context, index) {
             return ListTile(
+              tileColor: ,
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(
                       builder: (context) => RepairViewAndChange(repair: Repair.repairList[index])))
