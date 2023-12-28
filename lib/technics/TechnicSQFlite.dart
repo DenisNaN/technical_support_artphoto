@@ -121,6 +121,17 @@ class TechnicSQFlite{
         where: "id = ?", whereArgs: [inTechnic.id]);
   }
 
+  Future updateStatusDislocationTechnic(String status, String dislocation, int id) async {
+    Database db = await database;
+    return await db.execute(
+        'UPDATE equipment SET '
+        'status = ?, '
+        'dislocation = ? '
+        'WHERE id = ?',
+      [status, dislocation, id]
+    );
+  }
+
   // Future delete(int inID) async {
   //   Database db = await database;
   //   return await db.delete("technic", where: "id = ?", whereArgs: [inID]);

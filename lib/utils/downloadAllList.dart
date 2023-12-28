@@ -19,7 +19,7 @@ class DownloadAllList{
     List listLastId = [];
     List listCount = [];
 
-    rebootAllBasicListSQFlite();
+    // rebootAllBasicListSQFlite();
     // rebootAllListCategorySQFlite('nameEquipment', 'name');
     // rebootAllListCategorySQFlite('photosalons', 'Фотосалон');
     // rebootAllListCategorySQFlite('service', 'repairmen');

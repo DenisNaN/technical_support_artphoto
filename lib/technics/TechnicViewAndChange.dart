@@ -135,7 +135,6 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                           );
 
                           _save(technic);
-
                           Navigator.pop(context, technic);
 
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -174,9 +173,8 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                 leading: const Icon(Icons.print),
                 title: DropdownButton<String>(
                   borderRadius: BorderRadius.circular(10.0),
-                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                   isExpanded: true,
-                  hint: Text('Выберите категорию'),
+                  hint: const Text('Выберите категорию'),
                   icon: _selectedDropdownNameTechnic != null ? IconButton(
                       icon: const Icon(Icons.clear, color: Colors.grey),
                       onPressed: (){
@@ -193,7 +191,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   onChanged: (String? value){
                     setState(() {
                       _selectedDropdownNameTechnic = value!;
-                      _isEditCategory = !_isEditCategory;
+                      _isEditCategory = true;
                     });
                   },
                 ),
@@ -290,9 +288,8 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                 leading: const Icon(Icons.copyright),
                 title: DropdownButton<String>(
                   borderRadius: BorderRadius.circular(10.0),
-                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                   isExpanded: true,
-                  hint: Text('Статус техники'),
+                  hint: const Text('Статус техники'),
                   icon: _selectedDropdownStatus != null ? IconButton(
                       icon: const Icon(Icons.clear, color: Colors.grey),
                       onPressed: (){
@@ -309,6 +306,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   onChanged: (String? value){
                     setState(() {
                       _selectedDropdownStatus = value!;
+                      _isEditStatusDislocation = true;
                     });
                   },
                 ),
@@ -317,9 +315,8 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                 leading: const Icon(Icons.airport_shuttle),
                 title: DropdownButton<String>(
                   borderRadius: BorderRadius.circular(10.0),
-                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                   isExpanded: true,
-                  hint: Text('Дислокация техники'),
+                  hint: const Text('Дислокация техники'),
                   icon: _selectedDropdownDislocation != null ? IconButton(
                       icon: const Icon(Icons.clear, color: Colors.grey),
                       onPressed: (){
@@ -336,6 +333,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   onChanged: (String? value){
                     setState(() {
                       _selectedDropdownDislocation = value!;
+                      _isEditStatusDislocation = true;
                     });
                   },
                 ),
@@ -357,7 +355,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                 title: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _switchTestDrive ? Text('Выключить тест-драйв ') : Text('Включить тест-драйв '),
+                      _switchTestDrive ? const Text('Выключить тест-драйв ') : const Text('Включить тест-драйв '),
                       Switch(
                           value: _switchTestDrive,
                           onChanged: (value){
@@ -385,7 +383,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                 ),
               ),
               ListTile(title:
-              _switchTestDrive ? !_isCategoryPhotocamera ? _buildTestDriveListTile() : _buildTestDriveListTilePhotocamera() : Text('Тест-драйв не проводился')
+              _switchTestDrive ? !_isCategoryPhotocamera ? _buildTestDriveListTile() : _buildTestDriveListTilePhotocamera() : const Text('Тест-драйв не проводился')
               )
             ],
           ),
@@ -398,7 +396,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
       // leading: const Icon(Icons.create),
       title: Column(children: [
         ListTile(
-          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
           leading: const Icon(Icons.today),
           title: const Text("Дата начала тест-драйва"),
           subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateStartTestDriveForSQL.replaceAll('.', '-')))),
@@ -425,7 +423,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
           ),
         ),
         ListTile(
-          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
           leading: const Icon(Icons.today),
           title: const Text("Дата конца тест-драйва"),
           subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateFinishTestDriveForSQL.replaceAll('.', '-')))),
@@ -452,7 +450,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
           ),
         ),
         ListTile(
-          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
           leading: const Icon(Icons.create),
           title: TextFormField(
             decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 import '../ConnectToDBMySQL.dart';
 import '../technics/Technic.dart';
 import '../utils/categoryDropDownValueModel.dart';
@@ -42,7 +41,6 @@ class _RepairAddState extends State<RepairAdd> {
   String? _selectedDropdownService;
   String? _selectedDropdownStatusNew;
   String? _selectedDropdownDislocationNew;
-
 
   Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
       'dislocation', 'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false);
@@ -173,11 +171,11 @@ class _RepairAddState extends State<RepairAdd> {
           inputFormatters: [numberFormatter],
           keyboardType: TextInputType.number,
         ) :
-        Text('БН'),
+        const Text('БН'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Без номера '),
+            const Text('Без номера '),
             Switch(
                 value: _isBN,
                 onChanged: (value){
@@ -208,9 +206,8 @@ class _RepairAddState extends State<RepairAdd> {
       leading: const Icon(Icons.copyright),
       title: DropdownButton<String>(
         borderRadius: BorderRadius.circular(10.0),
-        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
         isExpanded: true,
-        hint: Text('Последний фотосалон'),
+        hint: const Text('Последний фотосалон'),
         icon: _selectedDropdownDislocationOld != null ? IconButton(
             icon: const Icon(Icons.clear, color: Colors.grey),
             onPressed: (){
@@ -241,9 +238,8 @@ class _RepairAddState extends State<RepairAdd> {
       leading: const Icon(Icons.copyright),
       title: DropdownButton<String>(
         borderRadius: BorderRadius.circular(10.0),
-        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
         isExpanded: true,
-        hint: Text('Статус техники'),
+        hint: const Text('Статус техники'),
         icon: _selectedDropdownStatusOld != null ? IconButton(
             icon: const Icon(Icons.clear, color: Colors.grey),
             onPressed: (){
@@ -279,7 +275,7 @@ class _RepairAddState extends State<RepairAdd> {
   ListTile _buildDateDepartureListTile(){
     return ListTile(
       leading: const Icon(Icons.today),
-      title: Text("Забрали с точки. Дата"),
+      title: const Text("Забрали с точки. Дата"),
       subtitle: Text(_dateDeparture == "" ? "Выберите дату" : _dateDeparture),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
@@ -309,9 +305,8 @@ class _RepairAddState extends State<RepairAdd> {
       leading: const Icon(Icons.copyright),
       title: DropdownButton<String>(
         borderRadius: BorderRadius.circular(10.0),
-        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
         isExpanded: true,
-        hint: Text('Местонахождение техники'),
+        hint: const Text('Местонахождение техники'),
         icon: _selectedDropdownService != null ? IconButton(
             icon: const Icon(Icons.clear, color: Colors.grey),
             onPressed: (){
@@ -428,7 +423,7 @@ class _RepairAddState extends State<RepairAdd> {
     return ListTile(
       leading: const Icon(Icons.create),
       title: TextFormField(
-        decoration: const InputDecoration(hintText: "Рекомендации/примечания"),
+        decoration: const InputDecoration(hintText: "Рекомендации/примечания (необязательно)"),
         controller: _recommendationsNotes,
       ),
     );
@@ -439,9 +434,8 @@ class _RepairAddState extends State<RepairAdd> {
       leading: const Icon(Icons.copyright),
       title: DropdownButton<String>(
         borderRadius: BorderRadius.circular(10.0),
-        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
         isExpanded: true,
-        hint: Text('Новый статус'),
+        hint: const Text('Новый статус'),
         icon: _selectedDropdownStatusNew != null ? IconButton(
             icon: const Icon(Icons.clear, color: Colors.grey),
             onPressed: (){
@@ -469,9 +463,8 @@ class _RepairAddState extends State<RepairAdd> {
       leading: const Icon(Icons.copyright),
       title: DropdownButton<String>(
         borderRadius: BorderRadius.circular(10.0),
-        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
         isExpanded: true,
-        hint: Text('Куда уехал'),
+        hint: const Text('Куда уехал'),
         icon: _selectedDropdownDislocationNew != null ? IconButton(
             icon: const Icon(Icons.clear, color: Colors.grey),
             onPressed: (){
@@ -522,7 +515,6 @@ class _RepairAddState extends State<RepairAdd> {
     );
   }
 
-
   bool _isValidateToSave(){
     bool validate = false;
     if((!_isBN ? _innerNumberTechnic.text != "" : _innerNumberTechnicBN == "БН") &&
@@ -538,13 +530,13 @@ class _RepairAddState extends State<RepairAdd> {
   }
 
   void _save(){
-    int _costServ;
+    int costServ;
     if(_isBN) _innerNumberTechnic.text = '-1';
-    String _newStatusStr;
-    String _newDislocationStr;
-    _costService.text != "" ? _costServ = int.parse(_costService.text.replaceAll(",", "")) : _costServ = 0;
-    _selectedDropdownStatusNew != null ? _newStatusStr = _selectedDropdownStatusNew! : _newStatusStr = "";
-    _selectedDropdownDislocationNew != null ? _newDislocationStr = _selectedDropdownDislocationNew! : _newDislocationStr = "";
+    String newStatusStr;
+    String newDislocationStr;
+    _costService.text != "" ? costServ = int.parse(_costService.text.replaceAll(",", "")) : costServ = 0;
+    _selectedDropdownStatusNew != null ? newStatusStr = _selectedDropdownStatusNew! : newStatusStr = "";
+    _selectedDropdownDislocationNew != null ? newDislocationStr = _selectedDropdownDislocationNew! : newDislocationStr = "";
 
     Repair repairLast = Repair.repairList.first;
     Repair repair = Repair(
@@ -559,11 +551,11 @@ class _RepairAddState extends State<RepairAdd> {
         _dateTransferForServiceForSQL,
         _dateDepartureFromServiceForSQL,
         _worksPerformed.text,
-        _costServ,
+        costServ,
         _diagnosisService.text,
         _recommendationsNotes.text,
-        _newStatusStr,
-        _newDislocationStr,
+        newStatusStr,
+        newDislocationStr,
         _dateReceiptForSQL
     );
 
@@ -584,7 +576,6 @@ class _RepairAddState extends State<RepairAdd> {
       ),
     );
   }
-
 }
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
+import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 import '../ConnectToDBMySQL.dart';
 import '../technics/Technic.dart';
 import '../technics/TechnicViewAndChange.dart';
@@ -40,7 +41,6 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   bool _isEditComplaint = false;
   bool _isEdit = false;
   bool _isEditNewStatusDislocation = false;
-  bool _isAllFieldsfilled = false;
   int indexTechnic = 0;
 
   @override
@@ -116,6 +116,19 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                           if(isValidationNewStatusDislocation()){
                             Future<Repair> repair = _save();
                             Navigator.pop(context, repair);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  children: [
+                                    Icon(Icons.add_task, size: 40, color: Colors.white),
+                                    Text(' Изменения внесены'),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 5),
+                                showCloseIcon: true,
+                              ),
+                            );
                           }
                         }
                       } : null,
@@ -143,7 +156,13 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                           Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[indexTechnic]))).then(
                                   (value){
                                 setState(() {
-                                  if(value != null) Technic.technicList[indexTechnic] = value;
+                                  if(value != null) {
+                                    Technic.technicList[indexTechnic] = value;
+                                    _selectedDropdownStatusNew = value.status;
+                                    _selectedDropdownDislocationNew = value.dislocation;
+                                    Future<Repair> repair = _save();
+                                    Navigator.pop(context, repair);
+                                  }
                                 });
                               });
                         },
@@ -213,11 +232,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.copyright),
+                  subtitle: _selectedDropdownService != null ? const Text('Местонахождение техники') : null,
                   title: DropdownButton<String>(
                     borderRadius: BorderRadius.circular(10.0),
-                    padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                     isExpanded: true,
-                    hint: Text('Местонахождение техники'),
+                    hint: const Text('Местонахождение техники'),
                     icon: _selectedDropdownService != null ? IconButton(
                       icon: const Icon(Icons.clear, color: Colors.grey),
                       onPressed: (){
@@ -294,6 +313,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.comment),
+                subtitle: _worksPerformed.text != '' ? const Text('Произведенные работы') : null,
                 title: TextFormField(
                   decoration: const InputDecoration(hintText: "Произведенные работы"),
                   controller: _worksPerformed,
@@ -307,9 +327,10 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                   leading: const Icon(Icons.shopify),
+                  subtitle: _costService.text != '' ? const Text('Стоимость ремонта') : null,
                   title: TextFormField(
                     decoration: const InputDecoration(
-                        hintText: "Стоимость ремонта",
+                        hintText: 'Стоимость ремонта',
                         prefix: Text('₽ ')),
                     controller: _costService,
                     onChanged: (value){
@@ -324,10 +345,10 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.comment),
+                subtitle: _diagnosisService.text != '' ? const Text('Диагноз мастерской') : null,
                 title: TextFormField(
-                  decoration: const InputDecoration(hintText: "Диагноз мастерской"),
+                  decoration: const InputDecoration(hintText: 'Диагноз мастерской'),
                   controller: _diagnosisService,
-                  // initialValue: _diagnosisService.text,
                   onChanged: (value){
                     setState(() {
                       if(_diagnosisService.text != widget.repair.diagnosisService) _isEdit = true;
@@ -338,10 +359,10 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.comment),
+                subtitle: _recommendationsNotes.text != '' ? const Text('Рекомендации/примечания') : null,
                 title: TextFormField(
-                  decoration: const InputDecoration(hintText: "Рекомендации/примечания"),
+                  decoration: const InputDecoration(hintText: 'Рекомендации/примечания (необязательно)'),
                   controller: _recommendationsNotes,
-                  // initialValue: _recommendationsNotes.text,
                   onChanged: (value){
                     setState(() {
                       if(_recommendationsNotes.text != widget.repair.recommendationsNotes) _isEdit = true;
@@ -352,11 +373,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.copyright),
+                subtitle: _selectedDropdownStatusNew != null ? const Text('Новый статус') : null,
                 title: DropdownButton<String>(
                   borderRadius: BorderRadius.circular(10.0),
-                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                   isExpanded: true,
-                  hint: Text('Новый статус'),
+                  hint: const Text('Новый статус'),
                   icon: _selectedDropdownStatusNew != null ? IconButton(
                       icon: const Icon(Icons.clear, color: Colors.grey),
                       onPressed: (){
@@ -384,11 +405,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
               ListTile(
                 leading: const Icon(Icons.copyright),
+                subtitle: _selectedDropdownDislocationNew != null ? const Text('Куда уехал') : null,
                 title: DropdownButton<String>(
                   borderRadius: BorderRadius.circular(10.0),
-                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                   isExpanded: true,
-                  hint: Text('Куда уехал'),
+                  hint: const Text('Куда уехал'),
                   icon: _selectedDropdownDislocationNew != null ? IconButton(
                       icon: const Icon(Icons.clear, color: Colors.grey),
                       onPressed: (){
@@ -439,7 +460,6 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                     color: Colors.blue
                 ),
               ),
-
             ],
           ),
         )
@@ -479,22 +499,9 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
       if(widget.repair.internalID != -1 && _isEditNewStatusDislocation){
         repair.dateReceipt = DateFormat('yyyy.MM.dd').format(DateTime.now());
-        ConnectToDBMySQL.connDB.insertStatusInDB(
-            Technic.technicList[indexTechnic].id!, _selectedDropdownStatusNew!, _selectedDropdownDislocationNew!);
+        ConnectToDBMySQL.connDB.insertStatusInDB(Technic.technicList[indexTechnic].id!, _selectedDropdownStatusNew!, _selectedDropdownDislocationNew!);
+        TechnicSQFlite.db.updateStatusDislocationTechnic(_selectedDropdownStatusNew!, _selectedDropdownDislocationNew!, Technic.technicList[indexTechnic].id);
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.add_task, size: 40, color: Colors.white),
-              Text(' Изменения внесены'),
-            ],
-          ),
-          duration: Duration(seconds: 5),
-          showCloseIcon: true,
-        ),
-      );
     }
     return repair;
   }
@@ -534,17 +541,6 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     }
     return result;
   }
-
-  bool isAllFieldsFilled(Repair repair){
-    bool result = false;
-
-    if(
-    repair.complaint == ''
-    )
-
-    return result;
-  }
-
 }
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {

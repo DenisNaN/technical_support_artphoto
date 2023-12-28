@@ -13,7 +13,6 @@ class RepairList extends StatefulWidget {
 }
 
 class _RepairListState extends State<RepairList> {
-  bool isDoneRepair = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +32,18 @@ class _RepairListState extends State<RepairList> {
           separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: Repair.repairList.length,
           itemBuilder: (context, index) {
+            bool isDoneRepair = isAllFieldsFilled(Repair.repairList[index]);
+
             return ListTile(
-              tileColor: ,
+              tileColor: isDoneRepair ? Colors.lightGreenAccent : null,
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(
                       builder: (context) => RepairViewAndChange(repair: Repair.repairList[index])))
                       .then((value) {
                     setState(() {
-                      if (value != null) Repair.repairList[index] = value;
+                      if (value != null) {
+                        Repair.repairList[index] = value;
+                      }
                     });
                   });
                 },
@@ -53,6 +56,24 @@ class _RepairListState extends State<RepairList> {
     );
   }
 
+  bool isAllFieldsFilled(Repair repair){
+    bool result = false;
+    if(repair.complaint != '' &&
+        repair.dateDeparture != '' &&
+        repair.dateTransferForService != '' &&
+        repair.serviceDislocation != '' &&
+        repair.dateDepartureFromService != '' &&
+        repair.worksPerformed != '' &&
+        repair.costService != null &&
+        repair.diagnosisService != '' &&
+        // repair.recommendationsNotes != '' &&
+        repair.dateReceipt != '' &&
+        repair.newStatus != '' &&
+        repair.newDislocation != ''){
+      result = true;
+    }
+    return result;
+  }
 
   Text _buildTextWithBN(BuildContext context, int index){
     return Text('№ ${Repair.repairList[index].internalID}. ${Repair.repairList[index].category}.\n'
