@@ -121,7 +121,7 @@ class TechnicSQFlite{
         where: "id = ?", whereArgs: [inTechnic.id]);
   }
 
-  Future updateStatusDislocationTechnic(String status, String dislocation, int id) async {
+  Future updateStatusDislocationTechnic(int id, String status, String dislocation) async {
     Database db = await database;
     return await db.execute(
         'UPDATE equipment SET '

@@ -117,18 +117,20 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                             Future<Repair> repair = _save();
                             Navigator.pop(context, repair);
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Row(
-                                  children: [
-                                    Icon(Icons.add_task, size: 40, color: Colors.white),
-                                    Text(' Изменения внесены'),
-                                  ],
+                            if(_isEdit){
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Icon(Icons.add_task, size: 40, color: Colors.white),
+                                      Text(' Изменения внесены'),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                  showCloseIcon: true,
                                 ),
-                                duration: Duration(seconds: 5),
-                                showCloseIcon: true,
-                              ),
-                            );
+                              );
+                            }
                           }
                         }
                       } : null,
@@ -158,10 +160,6 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                                 setState(() {
                                   if(value != null) {
                                     Technic.technicList[indexTechnic] = value;
-                                    _selectedDropdownStatusNew = value.status;
-                                    _selectedDropdownDislocationNew = value.dislocation;
-                                    Future<Repair> repair = _save();
-                                    Navigator.pop(context, repair);
                                   }
                                 });
                               });
@@ -499,8 +497,10 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
       if(widget.repair.internalID != -1 && _isEditNewStatusDislocation){
         repair.dateReceipt = DateFormat('yyyy.MM.dd').format(DateTime.now());
-        ConnectToDBMySQL.connDB.insertStatusInDB(Technic.technicList[indexTechnic].id!, _selectedDropdownStatusNew!, _selectedDropdownDislocationNew!);
-        TechnicSQFlite.db.updateStatusDislocationTechnic(_selectedDropdownStatusNew!, _selectedDropdownDislocationNew!, Technic.technicList[indexTechnic].id);
+        ConnectToDBMySQL.connDB.insertStatusInDB(Technic.technicList[indexTechnic].id!, repair.newStatus, repair.newDislocation);
+        TechnicSQFlite.db.updateStatusDislocationTechnic(Technic.technicList[indexTechnic].id, repair.newStatus, repair.newDislocation);
+        Technic.technicList[indexTechnic].status = repair.newStatus;
+        Technic.technicList[indexTechnic].dislocation = repair.newDislocation;
       }
     }
     return repair;
