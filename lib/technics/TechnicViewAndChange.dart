@@ -63,6 +63,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
       _switchTestDrive = true;
       _dateStartTestDrive = widget.technic.dateStartTestDrive;
       _dateStartTestDriveForSQL = widget.technic.dateStartTestDrive;
+      _resultTestDrive.text = widget.technic.resultTestDrive;
       _checkboxTestDrive = widget.technic.checkboxTestDrive;
     }
     if(widget.technic.dateFinishTestDrive != ''){
@@ -192,6 +193,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                     setState(() {
                       _selectedDropdownNameTechnic = value!;
                       _isEditCategory = true;
+                      if(value == 'Фотоаппарат') _isCategoryPhotocamera = !_isCategoryPhotocamera;
                     });
                   },
                 ),
@@ -454,8 +456,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
           leading: const Icon(Icons.create),
           title: TextFormField(
             decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
-            // controller: _resultTestDrive,
-            initialValue: widget.technic.resultTestDrive,
+            controller: _resultTestDrive,
             onChanged: (value){
               if(value != widget.technic.resultTestDrive) _isEditTestDrive = true;
             },
@@ -515,7 +516,6 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
           title: TextFormField(
             decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
             controller: _resultTestDrive,
-            initialValue: widget.technic.resultTestDrive,
             onChanged: (value){
               if(value != widget.technic.resultTestDrive) _isEditTestDrive = true;
             },
