@@ -1,7 +1,8 @@
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:technical_support_artphoto/connectToDBMySQL.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
+import 'package:technical_support_artphoto/trouble/Trouble.dart';
+import 'package:technical_support_artphoto/trouble/TroubleSQFlite.dart';
 import 'package:technical_support_artphoto/utils/categoryDropDownValueSQFlite.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
@@ -19,7 +20,7 @@ class DownloadAllList{
     List listLastId = [];
     List listCount = [];
 
-    // rebootAllBasicListSQFlite();
+    rebootAllBasicListSQFlite();
     // rebootAllListCategorySQFlite('nameEquipment', 'name');
     // rebootAllListCategorySQFlite('photosalons', 'Фотосалон');
     // rebootAllListCategorySQFlite('service', 'repairmen');
@@ -45,19 +46,22 @@ class DownloadAllList{
         await getAllActualTechnics(HasNetwork.isConnecting, listLastId[0]['id'], listCount[0]['countEquipment']));
     Repair.repairList.addAll(
         await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']));
+    Trouble.troubleList.addAll(
+        await getAllActualTrouble(HasNetwork.isConnecting, listLastId[2]['id'], listCount[2]['countTrouble']));
     CategoryDropDownValueModel.nameEquipment.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'nameEquipment', 'name', listCount[2]['countName'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'nameEquipment', 'name', listCount[3]['countName'])) as Iterable<String>);
     CategoryDropDownValueModel.photosalons.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'photosalons', 'Фотосалон', listCount[3]['countPhotosalons'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'photosalons', 'Фотосалон', listCount[4]['countPhotosalons'])) as Iterable<String>);
     CategoryDropDownValueModel.service.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'service', 'repairmen', listCount[4]['countService'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'service', 'repairmen', listCount[5]['countService'])) as Iterable<String>);
     CategoryDropDownValueModel.statusForEquipment.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[5]['countStatus'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[6]['countStatus'])) as Iterable<String>);
   }
 
   Future getAllHasnotNetwork() async{
     Technic.technicList.addAll(await getAllActualTechnics(HasNetwork.isConnecting));
     Repair.repairList.addAll(await getAllActualRepair(HasNetwork.isConnecting));
+    Trouble.troubleList.addAll(await getAllActualTrouble(HasNetwork.isConnecting));
     CategoryDropDownValueModel.nameEquipment.addAll((await getActualCategory(
         HasNetwork.isConnecting, 'nameEquipment', 'name')) as Iterable<String>);
     CategoryDropDownValueModel.photosalons.addAll((await getActualCategory(
@@ -156,6 +160,49 @@ class DownloadAllList{
     return allRepair;
   }
 
+  Future<List> getAllActualTrouble(bool isConnectInternet, [int lastId = 0, int countEntities = 0]) async{
+    List allTrouble = [];
+    List addTroubleInSQFlite = [];
+
+    allTrouble = await TroubleSQFlite.db.getAllTrouble();
+
+    if(!isConnectInternet) return allTrouble;
+
+    if(allTrouble.isNotEmpty){
+
+      int lastIdSQFlite = allTrouble.first.id;
+      int lastIdMySQL = lastId;
+      if(lastIdSQFlite < lastIdMySQL){
+        var reversedAllTrouble = List.from(allTrouble.reversed);
+        addTroubleInSQFlite = await ConnectToDBMySQL.connDB.getRangeGreaterOnIDTrouble(lastIdSQFlite);
+
+        for(var trouble in addTroubleInSQFlite){
+          TroubleSQFlite.db.insertTrouble(trouble);
+        }
+        reversedAllTrouble.addAll(addTroubleInSQFlite);
+
+        allTrouble.clear();
+        allTrouble.addAll(reversedAllTrouble.reversed);
+      }
+    } else {
+      allTrouble = await ConnectToDBMySQL.connDB.getAllTrouble();
+      for(var trouble in allTrouble.reversed){
+        TroubleSQFlite.db.insertTrouble(trouble);
+      }
+    }
+
+    if(countEntities != allTrouble.length){
+      TroubleSQFlite.db.deleteTables();
+      TroubleSQFlite.db.createTables();
+
+      allTrouble = await ConnectToDBMySQL.connDB.getAllTrouble();
+      for(var trouble in allTrouble.reversed){
+        TroubleSQFlite.db.insertTrouble(trouble);
+      }
+    }
+    return allTrouble;
+  }
+
   Future<List> getActualCategory(
       bool isConnectInternet,
       String nameTable,
@@ -201,6 +248,8 @@ class DownloadAllList{
     TechnicSQFlite.db.createTables();
     RepairSQFlite.db.deleteTable();
     RepairSQFlite.db.createTable();
+    TroubleSQFlite.db.deleteTables();
+    TroubleSQFlite.db.createTables();
   }
 
   Future rebootAllListCategorySQFlite(String nameTable, String nameCategory) async{

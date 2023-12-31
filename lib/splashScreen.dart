@@ -3,10 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:technical_support_artphoto/main.dart';
 import 'package:technical_support_artphoto/technics/Technic.dart';
 import 'package:technical_support_artphoto/utils/authorization.dart';
-import 'package:technical_support_artphoto/utils/categoryDropDownValueModel.dart';
 import 'package:technical_support_artphoto/utils/downloadAllList.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
-import 'repair/Repair.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

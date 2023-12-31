@@ -18,26 +18,26 @@ class RepairSQFlite{
   Future<Database> init() async{
     String path = join(utils.docsDir!.path, 'repair.db');
     Database db = await openDatabase(path, version: 1, onOpen: (db){},
-    onCreate: (Database inDB, int inVersion) async {
-      await inDB.execute("CREATE TABLE IF NOT EXISTS repair ("
-          "id INTEGER, "
-          "internalID INTEGER, "
-          "category TEXT, "
-          "dislocationOld TEXT, "
-          "status TEXT, "
-          "complaint TEXT, "
-          "dateDeparture TEXT, "
-          "serviceDislocation TEXT, "
-          "dateTransferForService TEXT, "
-          "dateDepartureFromService TEXT, "
-          "worksPerformed TEXT, "
-          "costService INTEGER, "
-          "diagnosisService TEXT, "
-          "recommendationsNotes TEXT, "
-          "newStatus TEXT, "
-          "newDislocation TEXT, "
-          "dateReceipt TEXT)");
-    });
+      onCreate: (Database inDB, int inVersion) async {
+        await inDB.execute("CREATE TABLE IF NOT EXISTS repair ("
+            "id INTEGER, "
+            "internalID INTEGER, "
+            "category TEXT, "
+            "dislocationOld TEXT, "
+            "status TEXT, "
+            "complaint TEXT, "
+            "dateDeparture TEXT, "
+            "serviceDislocation TEXT, "
+            "dateTransferForService TEXT, "
+            "dateDepartureFromService TEXT, "
+            "worksPerformed TEXT, "
+            "costService INTEGER, "
+            "diagnosisService TEXT, "
+            "recommendationsNotes TEXT, "
+            "newStatus TEXT, "
+            "newDislocation TEXT, "
+            "dateReceipt TEXT)");
+      });
     return db;
   }
 

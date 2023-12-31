@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:technical_support_artphoto/repair/RepairList.dart';
 import 'package:technical_support_artphoto/splashScreen.dart';
 import 'package:technical_support_artphoto/technics/TechnicsList.dart';
+import 'package:technical_support_artphoto/trouble/ToubleList.dart';
 import 'utils/utils.dart' as utils;
 import 'package:technical_support_artphoto/utils/utils.dart';
 
@@ -47,11 +48,11 @@ class ArtphotoTech extends StatelessWidget {
               bottom: const TabBar(tabs: [
                 Tab(icon: Icon(Icons.add_a_photo_outlined), text: "Техника"),
                 Tab(icon: Icon(Icons.add_chart), text: "Ремонт"),
-                Tab(icon: Icon(Icons.accessible), text: "История"),
-                Tab(icon: Icon(Icons.assignment_turned_in), text: "Неисп-ти")
+                Tab(icon: Icon(Icons.assignment_turned_in), text: "Неисп-ти"),
+                Tab(icon: Icon(Icons.accessible), text: "История")
               ])),
           body: const TabBarView(
-              children: [TechnicsList(),RepairList(),TechnicsList(),TechnicsList()]),
+              children: [TechnicsList(),RepairList(),TroubleList(),TechnicsList()]),
           // children: [Appointments(), Contacts(), Notes(), Tasks()]),
         )
     );

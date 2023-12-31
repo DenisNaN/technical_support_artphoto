@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
 import 'package:technical_support_artphoto/technics/Technic.dart';
+import 'package:technical_support_artphoto/trouble/Trouble.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 
 class ConnectToDBMySQL {
@@ -184,6 +185,53 @@ class ConnectToDBMySQL {
     return list;
   }
 
+  Future<List> getAllTrouble() async{
+    var result = await _connDB!.query('SELECT '
+        'id, photosalon, dateTrouble, employee, internalID, trouble, '
+        'dateCheckFixTroubleEmployee, employeeCheckFixTrouble, '
+        'dateCheckFixTroubleEngineer, engineerCheckFixTrouble, photoTrouble '
+        'FROM Неисправности');
+
+    var list = [];
+    for (var row in result) {
+      // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
+      // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
+      // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
+      String dateTrouble = row[2].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[2].toString());
+      String dateCheckFixTroubleEmployee = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
+      String dateCheckFixTroubleEngineer = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
+
+      Trouble trouble = Trouble(row[0], row[1],  dateTrouble,  row[3], row[4], row[5], dateCheckFixTroubleEmployee,
+          row[7], dateCheckFixTroubleEngineer, row[9], row[10]);
+      list.add(trouble);
+    }
+    var reversedList = List.from(list.reversed);
+    return reversedList;
+  }
+
+  Future<List> getRangeGreaterOnIDTrouble(int id) async{
+    var result = await _connDB!.query('SELECT '
+        'id, photosalon, dateTrouble, employee, internalID, trouble, '
+        'dateCheckFixTroubleEmployee, employeeCheckFixTrouble, '
+        'dateCheckFixTroubleEngineer, engineerCheckFixTrouble, photoTrouble '
+        'FROM Неисправности WHERE id > ?', [id]);
+
+    var list = [];
+    for (var row in result) {
+      // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
+      // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
+      // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
+      String dateTrouble = row[2].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[2].toString());
+      String dateCheckFixTroubleEmployee = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
+      String dateCheckFixTroubleEngineer = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
+
+      Trouble trouble = Trouble(row[0], row[1],  dateTrouble,  row[3], row[4], row[5], dateCheckFixTroubleEmployee,
+          row[7], dateCheckFixTroubleEngineer, row[9], row[10]);
+      list.add(trouble);
+    }
+    return list;
+  }
+
   String getDateFormatted(String date){
     return DateFormat('yyyy.MM.dd').format(DateTime.parse(date));
   }
@@ -316,12 +364,65 @@ class ConnectToDBMySQL {
           repair.id
         ]);
   }
+
+  Future insertTroubleInDB(Trouble trouble) async{
+    await ConnectToDBMySQL.connDB.connDatabase();
+    await _connDB!.query('INSERT INTO Неисправности ('
+        'id, photosalon, dateTrouble, employee, internalID, trouble, '
+        'dateCheckFixTroubleEmployee, employeeCheckFixTrouble, '
+        'dateCheckFixTroubleEngineer, engineerCheckFixTrouble, photoTrouble '
+        ') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+      trouble.id,
+      trouble.photosalon,
+      trouble.dateTrouble,
+      trouble.employee,
+      trouble.internalID,
+      trouble.trouble,
+      trouble.dateCheckFixTroubleEmployee,
+      trouble.employeeCheckFixTrouble,
+      trouble.dateCheckFixTroubleEngineer,
+      trouble.engineerCheckFixTrouble,
+      trouble.photoTrouble
+    ]);
+  }
+
+  Future updateTroubleInDB(Trouble trouble) async{
+    await ConnectToDBMySQL.connDB.connDatabase();
+    await _connDB!.query(
+        'UPDATE Неисправности SET '
+            'photosalon = ?, '
+            'dateTrouble = ?, '
+            'employee = ?, '
+            'internalID = ?, '
+            'trouble = ?, '
+            'dateCheckFixTroubleEmployee = ?, '
+            'employeeCheckFixTrouble = ?, '
+            'dateCheckFixTroubleEngineer = ?, '
+            'engineerCheckFixTrouble = ?, '
+            'photoTrouble = ? '
+            'WHERE id = ?',
+        [
+          trouble.photosalon,
+          trouble.dateTrouble,
+          trouble.employee,
+          trouble.internalID,
+          trouble.trouble,
+          trouble.dateCheckFixTroubleEmployee,
+          trouble.employeeCheckFixTrouble,
+          trouble.dateCheckFixTroubleEngineer,
+          trouble.engineerCheckFixTrouble,
+          trouble.photoTrouble,
+          trouble.id
+        ]);
+  }
   
   Future<List> getLastIdList() async{
     var resultTechnics = await _connDB!.query(
         'SELECT id FROM equipment ORDER BY id DESC LIMIT 1');
     var resultRepair = await _connDB!.query(
         'SELECT id FROM repairEquipment ORDER BY id DESC LIMIT 1');
+    var resultTrouble = await _connDB!.query(
+        'SELECT id FROM Неисправности ORDER BY id DESC LIMIT 1');
     var resultService = await _connDB!.query(
         'SELECT id FROM service ORDER BY id DESC LIMIT 1');
     var resultStatusForEquipment = await _connDB!.query(
@@ -334,6 +435,7 @@ class ConnectToDBMySQL {
     List list = [];
     list.add(resultTechnics.last);
     list.add(resultRepair.last);
+    list.add(resultTrouble.last);
     list.add(resultService.last);
     list.add(resultStatusForEquipment.last);
     list.add(resultNameEquipment.last);
@@ -347,6 +449,8 @@ class ConnectToDBMySQL {
         'SELECT COUNT(*) AS countEquipment FROM equipment');
     var resultRepair = await _connDB!.query(
         'SELECT COUNT(*) AS countRepair FROM repairEquipment');
+    var resultTrouble = await _connDB!.query(
+        'SELECT COUNT(*) AS countTrouble FROM Неисправности');
     var resultNameEquipment = await _connDB!.query(
         'SELECT COUNT(*) AS countName FROM nameEquipment');
     var resultPhotosalons = await _connDB!.query(
@@ -359,6 +463,7 @@ class ConnectToDBMySQL {
     List list = [];
     list.add(resultTechnics.last);
     list.add(resultRepair.last);
+    list.add(resultTrouble.last);
     list.add(resultNameEquipment.last);
     list.add(resultPhotosalons.last);
     list.add(resultService.last);

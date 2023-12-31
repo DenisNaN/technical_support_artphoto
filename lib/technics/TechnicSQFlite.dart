@@ -2,9 +2,6 @@ import 'package:technical_support_artphoto/technics/Technic.dart';
 import 'package:technical_support_artphoto/utils/utils.dart' as utils;
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:intl/intl.dart';
-
-import '../utils/utils.dart';
 
 class TechnicSQFlite{
   TechnicSQFlite._();
@@ -21,7 +18,6 @@ class TechnicSQFlite{
     String path = join(utils.docsDir!.path, 'technic.db');
     Database db = await openDatabase(path, version: 1, onOpen: (db){},
         onCreate: (Database inDB, int inVersion) async {
-          createTables();
           await inDB.execute("CREATE TABLE IF NOT EXISTS equipment ("
               "id INTEGER, internalID INTEGER, name TEXT, category TEXT,"
               "cost INTEGER, dateBuyTechnic TEXT, status TEXT, dislocation TEXT, "
@@ -155,6 +151,5 @@ class TechnicSQFlite{
     Database db = await database;
     var recs = await db.rawQuery('SELECT * FROM equipment');
     recs.isNotEmpty ? recs.map((m) => print(m)) : [];
-    print('-----------------');
   }
 }
