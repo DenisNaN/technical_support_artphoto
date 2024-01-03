@@ -1,7 +1,6 @@
 import 'package:technical_support_artphoto/utils/utils.dart' as utils;
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-
 import 'Trouble.dart';
 
 class TroubleSQFlite{
@@ -68,10 +67,10 @@ class TroubleSQFlite{
     Database db = await database;
 
     await db.execute(
-        "INSERT INTO equipment (id, photosalon, dateTrouble, employee, internalID, "
+        "INSERT INTO trouble (id, photosalon, dateTrouble, employee, internalID, "
             "trouble, dateCheckFixTroubleEmployee, employeeCheckFixTrouble, "
             "dateCheckFixTroubleEngineer, engineerCheckFixTrouble, photoTrouble) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           inTrouble.id,
           inTrouble.photosalon,

@@ -159,9 +159,9 @@ class _TechnicAddState extends State<TechnicAdd> {
                 leading: const Icon(Icons.print),
                 title: DropdownButton<String>(
                   borderRadius: BorderRadius.circular(10.0),
-                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
                   isExpanded: true,
-                  hint: Text('Наименование техники'),
+                  hint: const Text('Наименование техники'),
                   icon: _selectedDropdownNameTechnic != null ? IconButton(
                       icon: const Icon(Icons.clear, color: Colors.grey),
                       onPressed: (){
@@ -178,6 +178,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                   onChanged: (String? value){
                     setState(() {
                       _selectedDropdownNameTechnic = value!;
+                      value == 'Фотоаппарат' ? _isCategoryPhotocamera = true : _isCategoryPhotocamera = false;
                     });
                   },
                 ),

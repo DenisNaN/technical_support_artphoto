@@ -37,7 +37,7 @@ class _TroubleListState extends State<TroubleList> {
               // },
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               title: Text('№ ${Trouble.troubleList[index].internalID}  ${Trouble.troubleList[index].photosalon}  ${Trouble.troubleList[index].dateTrouble}'),
-              subtitle: Trouble.troubleList[index].trouble,
+              subtitle: Text('Проблема: ${Trouble.troubleList[index].trouble}'),
             );
           },
         )

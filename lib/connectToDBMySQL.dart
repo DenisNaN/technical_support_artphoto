@@ -187,9 +187,9 @@ class ConnectToDBMySQL {
 
   Future<List> getAllTrouble() async{
     var result = await _connDB!.query('SELECT '
-        'id, photosalon, dateTrouble, employee, internalID, trouble, '
-        'dateCheckFixTroubleEmployee, employeeCheckFixTrouble, '
-        'dateCheckFixTroubleEngineer, engineerCheckFixTrouble, photoTrouble '
+        'id, Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, '
+        'ДатаУстрСотр, СотрПодтверУстр, '
+        'ДатаУстрИнженер, ИнженерПодтверУстр, Фотография '
         'FROM Неисправности');
 
     var list = [];
@@ -201,8 +201,8 @@ class ConnectToDBMySQL {
       String dateCheckFixTroubleEmployee = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
       String dateCheckFixTroubleEngineer = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
 
-      Trouble trouble = Trouble(row[0], row[1],  dateTrouble,  row[3], row[4], row[5], dateCheckFixTroubleEmployee,
-          row[7], dateCheckFixTroubleEngineer, row[9], row[10]);
+      Trouble trouble = Trouble(row[0], row[1].toString(),  dateTrouble,  row[3].toString(), row[4], row[5].toString(), dateCheckFixTroubleEmployee,
+          row[7].toString(), dateCheckFixTroubleEngineer, row[9].toString(), row[10].toString());
       list.add(trouble);
     }
     var reversedList = List.from(list.reversed);
@@ -211,9 +211,9 @@ class ConnectToDBMySQL {
 
   Future<List> getRangeGreaterOnIDTrouble(int id) async{
     var result = await _connDB!.query('SELECT '
-        'id, photosalon, dateTrouble, employee, internalID, trouble, '
-        'dateCheckFixTroubleEmployee, employeeCheckFixTrouble, '
-        'dateCheckFixTroubleEngineer, engineerCheckFixTrouble, photoTrouble '
+        'id, Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, '
+        'ДатаУстрСотр, СотрПодтверУстр, '
+        'ДатаУстрИнженер, ИнженерПодтверУстр, Фотография '
         'FROM Неисправности WHERE id > ?', [id]);
 
     var list = [];
@@ -368,10 +368,10 @@ class ConnectToDBMySQL {
   Future insertTroubleInDB(Trouble trouble) async{
     await ConnectToDBMySQL.connDB.connDatabase();
     await _connDB!.query('INSERT INTO Неисправности ('
-        'id, photosalon, dateTrouble, employee, internalID, trouble, '
-        'dateCheckFixTroubleEmployee, employeeCheckFixTrouble, '
-        'dateCheckFixTroubleEngineer, engineerCheckFixTrouble, photoTrouble '
-        ') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+        'id, Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, '
+        'ДатаУстрСотр, СотрПодтверУстр, '
+        'ДатаУстрИнженер, ИнженерПодтверУстр, Фотография) '
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
       trouble.id,
       trouble.photosalon,
       trouble.dateTrouble,
@@ -390,16 +390,16 @@ class ConnectToDBMySQL {
     await ConnectToDBMySQL.connDB.connDatabase();
     await _connDB!.query(
         'UPDATE Неисправности SET '
-            'photosalon = ?, '
-            'dateTrouble = ?, '
-            'employee = ?, '
-            'internalID = ?, '
-            'trouble = ?, '
-            'dateCheckFixTroubleEmployee = ?, '
-            'employeeCheckFixTrouble = ?, '
-            'dateCheckFixTroubleEngineer = ?, '
-            'engineerCheckFixTrouble = ?, '
-            'photoTrouble = ? '
+            'Фотосалон = ?, '
+            'ДатаНеисправности = ?, '
+            'Сотрудник = ?, '
+            'НомерТехники = ?, '
+            'Неисправность = ?, '
+            'ДатаУстрСотр = ?, '
+            'СотрПодтверУстр = ?, '
+            'ДатаУстрИнженер = ?, '
+            'ИнженерПодтверУстр = ?, '
+            'Фотография = ? '
             'WHERE id = ?',
         [
           trouble.photosalon,
