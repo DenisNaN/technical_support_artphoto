@@ -178,7 +178,17 @@ class _TechnicAddState extends State<TechnicAdd> {
                   onChanged: (String? value){
                     setState(() {
                       _selectedDropdownNameTechnic = value!;
-                      value == 'Фотоаппарат' ? _isCategoryPhotocamera = true : _isCategoryPhotocamera = false;
+                      if(value == 'Фотоаппарат') {
+                        _isCategoryPhotocamera = true;
+                        _dateFinishTestDriveForSQL = '';
+                      }
+                      else {
+                        _isCategoryPhotocamera = false;
+                        if(_dateFinishTestDriveForSQL == '' && _dateStartTestDriveForSQL != ''){
+                          DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDriveForSQL).add(const Duration(days: 14));
+                          _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
+                        }
+                      }
                     });
                   },
                 ),
@@ -316,7 +326,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                 ),
               ),
               ListTile(title:
-              _switchTestDrive ? !_isCategoryPhotocamera ? _buildTestDriveListTile() : _buildTestDriveListTilePhotocamera() : Text('Тест-драйв не проводился')
+              _switchTestDrive ? _buildTestDriveListTile() : const Text('Тест-драйв не проводился')
               )
             ],
           ),
@@ -354,8 +364,8 @@ class _TechnicAddState extends State<TechnicAdd> {
             color: Colors.blue
             ),
           ),
-        ListTile(
-          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+        !_isCategoryPhotocamera ? ListTile(
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
           leading: const Icon(Icons.today),
           title: const Text("Дата конца тест-драйва"),
           subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateFinishTestDriveForSQL.replaceAll('.', '-')))),
@@ -379,9 +389,9 @@ class _TechnicAddState extends State<TechnicAdd> {
               },
               color: Colors.blue
           ),
-        ),
+        ) : const SizedBox.shrink(),
         ListTile(
-          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
           leading: const Icon(Icons.create),
           title: TextFormField(
             decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
@@ -389,69 +399,15 @@ class _TechnicAddState extends State<TechnicAdd> {
           ),
         ),
         CheckboxListTile(
-          contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
-          title: Text('Тест-драйв выполнен'),
-          secondary: Icon(Icons.check),
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+          title: const Text('Тест-драйв выполнен'),
+          secondary: const Icon(Icons.check),
           value: _checkboxTestDrive,
           onChanged: (bool? value) {
             setState(() {
               _checkboxTestDrive = value!;
             });
           }
-        )
-      ],
-      ),
-    );
-  }
-
-  ListTile _buildTestDriveListTilePhotocamera(){
-    return ListTile(
-      // leading: const Icon(Icons.create),
-      title: Column(children: [
-        ListTile(
-          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-          leading: const Icon(Icons.today),
-          title: const Text("Дата проверки"),
-          subtitle: Text(_dateStartTestDrive),
-          trailing: IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2099),
-                    locale: const Locale("ru", "RU")
-                ).then((date) {
-                  setState(() {
-                    if(date != null) {
-                      _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
-                      _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                    }
-                  });
-                });
-              },
-              color: Colors.blue
-          ),
-        ),
-        ListTile(
-          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-          leading: const Icon(Icons.create),
-          title: TextFormField(
-            decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
-            controller: _resultTestDrive,
-          ),
-        ),
-        CheckboxListTile(
-            contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-            title: const Text('Проверка выполнена'),
-            secondary: const Icon(Icons.check),
-            value: _checkboxTestDrive,
-            onChanged: (bool? value) {
-              setState(() {
-                _checkboxTestDrive = value!;
-              });
-            }
         )
       ],
       ),

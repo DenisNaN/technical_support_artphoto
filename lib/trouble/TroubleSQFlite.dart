@@ -18,7 +18,6 @@ class TroubleSQFlite{
     String path = join(utils.docsDir!.path, 'trouble.db');
     Database db = await openDatabase(path, version: 1, onOpen: (db){},
         onCreate: (Database inDB, int inVersion) async {
-          // createTables();
           await inDB.execute("CREATE TABLE IF NOT EXISTS trouble ("
               "id INTEGER, photosalon TEXT, dateTrouble TEXT, employee TEXT, "
               "internalID INTEGER, trouble TEXT, dateCheckFixTroubleEmployee TEXT,"

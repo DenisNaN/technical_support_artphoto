@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'Trouble.dart';
+import 'package:intl/intl.dart';
 
 class TroubleList extends StatefulWidget {
   const TroubleList({super.key});
@@ -36,8 +37,9 @@ class _TroubleListState extends State<TroubleList> {
               //   });
               // },
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-              title: Text('№ ${Trouble.troubleList[index].internalID}  ${Trouble.troubleList[index].photosalon}  ${Trouble.troubleList[index].dateTrouble}'),
-              subtitle: Text('Проблема: ${Trouble.troubleList[index].trouble}'),
+              title: Text('№ ${Trouble.troubleList[index].internalID}  ${Trouble.troubleList[index].photosalon} '),
+              subtitle: Text('Проблема: ${Trouble.troubleList[index].trouble}\n'
+                  '${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(Trouble.troubleList[index].dateTrouble.replaceAll('.', '-')))}'),
             );
           },
         )

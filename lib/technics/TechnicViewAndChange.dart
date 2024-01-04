@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 import '../ConnectToDBMySQL.dart';
@@ -193,7 +192,17 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                     setState(() {
                       _selectedDropdownNameTechnic = value!;
                       _isEditCategory = true;
-                      if(value == 'Фотоаппарат') _isCategoryPhotocamera = !_isCategoryPhotocamera;
+                      if(value == 'Фотоаппарат') {
+                        _isCategoryPhotocamera = true;
+                        _dateFinishTestDriveForSQL = '';
+                      }
+                      else {
+                        _isCategoryPhotocamera = false;
+                        if(_dateFinishTestDriveForSQL == '' && _dateStartTestDriveForSQL != ''){
+                          DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDriveForSQL).add(const Duration(days: 14));
+                          _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
+                        }
+                      }
                     });
                   },
                 ),
@@ -364,7 +373,6 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                             setState(() {
                               _switchTestDrive = value;
                               _isEditSwitch = true;
-
                               if(!_switchTestDrive){
                                 _dateStartTestDriveForSQL = '';
                                 _dateFinishTestDriveForSQL = '';
@@ -385,7 +393,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                 ),
               ),
               ListTile(title:
-              _switchTestDrive ? !_isCategoryPhotocamera ? _buildTestDriveListTile() : _buildTestDriveListTilePhotocamera() : const Text('Тест-драйв не проводился')
+              _switchTestDrive ? _buildTestDriveListTile() : const Text('Тест-драйв не проводился')
               )
             ],
           ),
@@ -395,7 +403,6 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
   ListTile _buildTestDriveListTile(){
     return ListTile(
-      // leading: const Icon(Icons.create),
       title: Column(children: [
         ListTile(
           contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
@@ -424,7 +431,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
               color: Colors.blue
           ),
         ),
-        ListTile(
+        !_isCategoryPhotocamera ? ListTile(
           contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
           leading: const Icon(Icons.today),
           title: const Text("Дата конца тест-драйва"),
@@ -450,7 +457,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
               },
               color: Colors.blue
           ),
-        ),
+        ) : const SizedBox.shrink(),
         ListTile(
           contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
           leading: const Icon(Icons.create),
@@ -465,65 +472,6 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
         CheckboxListTile(
             contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
             title: const Text('Тест-драйв выполнен'),
-            secondary: const Icon(Icons.check),
-            value: _checkboxTestDrive,
-            onChanged: (bool? value) {
-              setState(() {
-                _checkboxTestDrive = value!;
-                _isEditTestDrive = true;
-              });
-            }
-        )
-      ],
-      ),
-    );
-  }
-
-  ListTile _buildTestDriveListTilePhotocamera(){
-    return ListTile(
-      // leading: const Icon(Icons.create),
-      title: Column(children: [
-        ListTile(
-          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-          leading: const Icon(Icons.today),
-          title: const Text("Дата проверки"),
-          subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateStartTestDrive.replaceAll('.', '-')))),
-          trailing: IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                showDatePicker(
-                    context: context,
-                    initialDate: DateTime.parse(widget.technic.dateStartTestDrive.replaceAll('.', '-')),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2099),
-                    locale: const Locale("ru", "RU")
-                ).then((date) {
-                  setState(() {
-                    if(date != null) {
-                      _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
-                      _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                      if(_dateStartTestDriveForSQL != widget.technic.dateStartTestDrive) _isEditTestDrive = true;
-                    }
-                  });
-                });
-              },
-              color: Colors.blue
-          ),
-        ),
-        ListTile(
-          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-          leading: const Icon(Icons.create),
-          title: TextFormField(
-            decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
-            controller: _resultTestDrive,
-            onChanged: (value){
-              if(value != widget.technic.resultTestDrive) _isEditTestDrive = true;
-            },
-          ),
-        ),
-        CheckboxListTile(
-            contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-            title: const Text('Проверка выполнена'),
             secondary: const Icon(Icons.check),
             value: _checkboxTestDrive,
             onChanged: (bool? value) {
