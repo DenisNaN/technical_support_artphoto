@@ -135,6 +135,7 @@ class _RepairAddState extends State<RepairAdd> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(0, 22, 0, 0),
             child: Column(children:[
+              SizedBox(key: _formKey, height: 20),
               _buildInnerNumberTechnicListTile(),
               _buildCategoryListTile(),
               _buildDislocationOldListTile(),
