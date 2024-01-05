@@ -38,11 +38,34 @@ class _TroubleListState extends State<TroubleList> {
               // },
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               title: Text('№ ${Trouble.troubleList[index].internalID}  ${Trouble.troubleList[index].photosalon} '),
-              subtitle: Text('Проблема: ${Trouble.troubleList[index].trouble}\n'
-                  '${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(Trouble.troubleList[index].dateTrouble.replaceAll('.', '-')))}'),
+              subtitle: _buildTitleListTile(context, index),
             );
           },
         )
+    );
+  }
+
+  Row _buildTitleListTile(BuildContext context, int index){
+    bool checkboxValueEngineer;
+    bool checkboxValueEmployee;
+    Trouble.troubleList[index].dateCheckFixTroubleEngineer != '' ? checkboxValueEngineer = true :
+      checkboxValueEngineer = false;
+    Trouble.troubleList[index].dateCheckFixTroubleEmployee != '' ? checkboxValueEmployee = true :
+    checkboxValueEmployee = false;
+
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Expanded(child:
+          Text('Проблема: ${Trouble.troubleList[index].trouble}\n'
+            '${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(Trouble.troubleList[index].dateTrouble.replaceAll('.', '-')))}')
+        ),
+        Column(
+            children: [
+              Row(children: [Checkbox(value: checkboxValueEngineer, onChanged: (value){}), const Text('И')]),
+              Row(children: [Checkbox(value: checkboxValueEmployee, onChanged: (value){}), const Text('Ф')])
+        ],)
+      ],
     );
   }
 
