@@ -28,6 +28,7 @@ class _TroubleListState extends State<TroubleList> {
           separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: Trouble.troubleList.length,
           itemBuilder: (context, index) {
+            bool isDoneTrouble = isAllFieldsFilled(Trouble.troubleList[index]);
             return ListTile(
               // onTap: (){
               //   Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index]))).then((value){
@@ -36,9 +37,9 @@ class _TroubleListState extends State<TroubleList> {
               //     });
               //   });
               // },
+              tileColor: isDoneTrouble ? Colors.lightGreenAccent : null,
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-              title: Text('№ ${Trouble.troubleList[index].internalID}  ${Trouble.troubleList[index].photosalon} '),
-              subtitle: _buildTitleListTile(context, index),
+              title: _buildTitleListTile(context, index)
             );
           },
         )
@@ -54,14 +55,19 @@ class _TroubleListState extends State<TroubleList> {
     checkboxValueEmployee = false;
 
     return Row(
-      mainAxisSize: MainAxisSize.max,
       children: [
         Expanded(child:
-          Text('Проблема: ${Trouble.troubleList[index].trouble}\n'
-            '${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(Trouble.troubleList[index].dateTrouble.replaceAll('.', '-')))}')
-        ),
+          Text.rich(
+              TextSpan(children: [
+                TextSpan(
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    text: '№ ${Trouble.troubleList[index].internalID}  ${Trouble.troubleList[index].photosalon} ${Trouble.troubleList[index].employee}\n'),
+                TextSpan(text: 'Проблема: ${Trouble.troubleList[index].trouble}\n'
+                    '${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(Trouble.troubleList[index].dateTrouble.replaceAll('.', '-')))}')
+              ],
+          ))),
         Column(
-            children: [
+          children: [
               Row(children: [Checkbox(value: checkboxValueEngineer, onChanged: (value){}), const Text('И')]),
               Row(children: [Checkbox(value: checkboxValueEmployee, onChanged: (value){}), const Text('Ф')])
         ],)
@@ -69,62 +75,12 @@ class _TroubleListState extends State<TroubleList> {
     );
   }
 
-  // Text _buildTextWithoutTestDrive(BuildContext context, int index){
-  //   return Text(
-  //       '${Technic.technicList[index].dislocation}.  Статус: ${Technic.technicList[index].status}\n'
-  //           'Тест-драйв не проводился'
-  //   );
-  // }
-  //
-  // Text _buildTextWithTestDrive(BuildContext context, int index){
-  //   DateTime dateStart = DateTime.parse(Technic.technicList[index].dateStartTestDrive.replaceAll('.', '-'));
-  //   DateTime dateFinish;
-  //   DateTime dateNow;
-  //   String formatedStartDate = DateFormat("d MMMM yyyy", "ru_RU").format(dateStart);
-  //   String formatedFinishDate = '';
-  //   Duration duration = Duration(days: 0);
-  //   bool isHaveFinishDate = false;
-  //   bool isEndTD = Technic.technicList[index].checkboxTestDrive;
-  //
-  //   if(Technic.technicList[index].dateFinishTestDrive != ''){
-  //     dateFinish = DateTime.parse(Technic.technicList[index].dateFinishTestDrive.replaceAll('.', '-'));
-  //     formatedFinishDate = DateFormat("d MMMM yyyy", "ru_RU").format(dateFinish);
-  //     dateNow = DateTime.now();
-  //     duration = dateFinish.difference(dateNow);
-  //     isHaveFinishDate = true;
-  //   }
-  //
-  //   return Text.rich(
-  //       TextSpan(
-  //           children:[
-  //             TextSpan(text:
-  //             '${Technic.technicList[index].dislocation}.  Статус: ${Technic.technicList[index].status}\n'),
-  //             isHaveFinishDate ?
-  //             TextSpan(children: [
-  //               TextSpan(text:
-  //               'Начало тест-драйва: $formatedStartDate.\n'
-  //                   'Конец тест-драйва: $formatedFinishDate.\n'),
-  //               duration.inDays > 0 && !Technic.technicList[index].checkboxTestDrive ?
-  //               TextSpan(
-  //                   text: 'Осталось дней до конца тест-драйва: ${duration.inDays}',
-  //                   style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)
-  //               ) : TextSpan(
-  //                   text: !Technic.technicList[index].checkboxTestDrive ?
-  //                   'Период тест-драйва завершен' :
-  //                   'Тест-драйв завершен',
-  //                   style: TextStyle(fontWeight: FontWeight.bold, color: Technic.technicList[index].checkboxTestDrive ? Colors.green : Colors.blue)
-  //               )
-  //             ]
-  //             ) :
-  //             TextSpan(children:[
-  //               TextSpan(text: 'Дата тест-драйва: $formatedStartDate.\n'),
-  //               TextSpan(text: Technic.technicList[index].checkboxTestDrive ? 'Тест-драйв завершен' : 'Тест-драйв не завершен',
-  //                   style: TextStyle(fontWeight: FontWeight.bold, color: Technic.technicList[index].checkboxTestDrive ? Colors.green : Colors.blue)
-  //               )
-  //             ]
-  //             ),
-  //           ]
-  //       )
-  //   );
-  // }
+  bool isAllFieldsFilled(Trouble trouble){
+    bool result = false;
+    if(trouble.dateCheckFixTroubleEmployee != '' &&
+        trouble.dateCheckFixTroubleEngineer != ''){
+      result = true;
+    }
+    return result;
+  }
 }
