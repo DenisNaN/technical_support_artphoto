@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
 import '../ConnectToDBMySQL.dart';
 import '../technics/Technic.dart';
 import '../utils/categoryDropDownValueModel.dart';
@@ -561,6 +562,7 @@ class _RepairAddState extends State<RepairAdd> {
     );
 
     ConnectToDBMySQL.connDB.insertRepairInDB(repair);
+    RepairSQFlite.db.create(repair);
 
     Navigator.pop(context, repair);
 

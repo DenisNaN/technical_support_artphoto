@@ -1,10 +1,15 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:technical_support_artphoto/trouble/TroubleSQFlite.dart';
 import '../ConnectToDBMySQL.dart';
 import '../technics/Technic.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import '../utils/utils.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:photo_view/photo_view.dart';
+import 'Trouble.dart';
 
 class TroubleAdd extends StatefulWidget {
   const TroubleAdd({super.key});
@@ -25,12 +30,9 @@ class _TroubleAddState extends State<TroubleAdd> {
   String _category = "";
   final _categoryController = TextEditingController();
   final _trouble = TextEditingController();
-  String dateCheckFixTroubleEmployee = '';
-  String employeeCheckFixTrouble = '';
-  String dateCheckFixTroubleEngineer = '';
-  String engineerCheckFixTrouble = '';
-  String photoTrouble = '';
   bool _isBN = false;
+  File? imageFile;
+  String _photoTrouble = '';
 
   Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
       'dislocation', 'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false);
@@ -80,6 +82,7 @@ class _TroubleAddState extends State<TroubleAdd> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
@@ -95,21 +98,23 @@ class _TroubleAddState extends State<TroubleAdd> {
                   const Spacer(),
                   TextButton(
                       onPressed: () {
-                        if(_isValidateToSave() == false){
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.bolt, size: 40, color: Colors.white),
-                                  Text('Остались не заполненые поля'),
-                                ],
+                        if (_formKey.currentState!.validate()) {
+                          if(_isValidateToSave() == false){
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  children: [
+                                    Icon(Icons.bolt, size: 40, color: Colors.white),
+                                    Text('Остались не заполненые поля'),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 5),
+                                showCloseIcon: true,
                               ),
-                              duration: Duration(seconds: 5),
-                              showCloseIcon: true,
-                            ),
-                          );
-                        }else{
-                          _save();
+                            );
+                          }else{
+                            _save();
+                          }
                         }
                       },
                       child: const Text("Сохранить"))
@@ -122,23 +127,15 @@ class _TroubleAddState extends State<TroubleAdd> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(0, 22, 0, 0),
             child: Column(children:[
-              SizedBox(key: _formKey, height: 20),
+              const SizedBox(height: 10),
               _buildInnerNumberTechnicListTile(),
               _buildCategoryListTile(),
-              _buildDislocationOldListTile(),
-              _buildStatusListTile(),
+              _buildDislocationListTile(),
+              _buildDateTroubleListTile(),
+              _buildEmployeeListTile(),
               _buildComplaintListTile(),
-              _buildDateDepartureListTile(),
-              _buildServiceDislocationListTile(),
-              _buildDateTransferForServiceListTile(),
-              _buildDateDepartureFromServiceListTile(),
-              _buildWorksPerformedListTile(),
-              _buildCostServiceListTile(),
-              _buildDiagnosisServiceListTile(),
-              _buildRecommendationsNotesListTile(),
-              _buildNewStatusListTile(),
-              _buildNewDislocationListTile(),
-              _buildDateReceiptListTile(),
+              const SizedBox(height: 10),
+              _buildPhotoTroubleListTile(),
             ]),
           ),
         )
@@ -189,7 +186,7 @@ class _TroubleAddState extends State<TroubleAdd> {
     );
   }
 
-  ListTile _buildDislocationOldListTile(){
+  ListTile _buildDislocationListTile(){
     return _isBN ? ListTile(
       leading: const Icon(Icons.copyright),
       title: DropdownButton<String>(
@@ -221,7 +218,7 @@ class _TroubleAddState extends State<TroubleAdd> {
     );
   }
 
-  ListTile _buildDateDepartureListTile(){
+  ListTile _buildDateTroubleListTile(){
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Дата проблемы"),
@@ -249,7 +246,7 @@ class _TroubleAddState extends State<TroubleAdd> {
     );
   }
 
-  ListTile _buildServiceDislocationListTile(){
+  ListTile _buildEmployeeListTile(){
     Iterable<String> employee = LoginPassword.loginPassword.values;
     return ListTile(
       leading: const Icon(Icons.copyright),
@@ -289,88 +286,110 @@ class _TroubleAddState extends State<TroubleAdd> {
     );
   }
 
-  ListTile _buildDateReceiptListTile(){
+  ListTile _buildPhotoTroubleListTile(){
     return ListTile(
-      leading: const Icon(Icons.today),
-      title: const Text("Дата поступления"),
-      subtitle: Text(_dateReceipt == "" ? "Выберите дату" : _dateReceipt),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateReceiptForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateReceipt = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                }
-              });
+      leading: const Icon(Icons.photo_camera),
+      title: imageFile == null ? Text("Фотография") :
+        TextButton(
+          onPressed: (){
+            setState(() {
+              imageFile = null;
             });
           },
-          color: Colors.blue
-      ),
+          child: const Text('Удалить фотографию')),
+      subtitle: Container(
+          child: imageFile == null
+              ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      _getFromGallery();
+                    },
+                    child: const Text("Выбрать в галереи"),
+                  ),
+                  Container(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      _getFromCamera();
+                    },
+                    child: const Text("Сфотографировать"),
+                  )
+                ],
+              ):
+          SizedBox(
+              height: 500,
+              child: PhotoView(
+                backgroundDecoration: const BoxDecoration(color: Colors.white70),
+                  imageProvider: FileImage(imageFile!.absolute, scale: 0.5)
+              )
+      ))
     );
+  }
+
+  /// Get from gallery
+  _getFromGallery() async {
+    XFile? pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1800,
+      maxHeight: 1800,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
+  /// Get from Camera
+  _getFromCamera() async {
+    XFile? pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+      maxWidth: 1800,
+      maxHeight: 1800,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        imageFile = File(pickedFile.path);
+      });
+    }
   }
 
   bool _isValidateToSave(){
     bool validate = false;
-    if((!_isBN ? _innerNumberTechnic.text != "" : _innerNumberTechnicBN == "БН") &&
+    if(_photosalon != '' && _dateTrouble != '' && _employee != '' &&
+        (!_isBN ? _innerNumberTechnic.text != "" : _innerNumberTechnic.text == '-1') &&
         (!_isBN ? _category != "" : _categoryController.text != "") &&
-        (!_isBN ? _selectedDropdownDislocationOld != "" : _selectedDropdownDislocationOld != null) &&
-        _selectedDropdownStatusOld != null &&
-        _complaint.text != "" &&
-        _dateDeparture != "" &&
-        _selectedDropdownService != null) {
+        _trouble.text != '') {
       validate = true;
     }
     return validate;
   }
 
   void _save(){
-    int costServ;
-    if(_isBN) _innerNumberTechnic.text = '-1';
-    String newStatusStr;
-    String newDislocationStr;
-    _costService.text != "" ? costServ = int.parse(_costService.text.replaceAll(",", "")) : costServ = 0;
-    _selectedDropdownStatusNew != null ? newStatusStr = _selectedDropdownStatusNew! : newStatusStr = "";
-    _selectedDropdownDislocationNew != null ? newDislocationStr = _selectedDropdownDislocationNew! : newDislocationStr = "";
-
-    Repair repairLast = Repair.repairList.first;
-    Repair repair = Repair(
-        repairLast.id! + 1,
-        int.parse(_innerNumberTechnic.text),
-        _isBN ? _categoryController.text : _category,
-        _isBN ? _selectedDropdownDislocationOld! : _dislocationOld,
-        _selectedDropdownStatusOld!,
-        _complaint.text,
-        _dateDepartureForSQL,
-        _selectedDropdownService!,
-        _dateTransferForServiceForSQL,
-        _dateDepartureFromServiceForSQL,
-        _worksPerformed.text,
-        costServ,
-        _diagnosisService.text,
-        _recommendationsNotes.text,
-        newStatusStr,
-        newDislocationStr,
-        _dateReceiptForSQL
+    Trouble troubleLast = Trouble.troubleList.first;
+    Trouble trouble = Trouble(
+      troubleLast.id! + 1,
+      _photosalon!,
+      _dateTroubleForSQL,
+      _employee!,
+      int.parse(_innerNumberTechnic.text),
+      _trouble.text, '', '', '', '',
+        _photoTrouble
     );
 
-    ConnectToDBMySQL.connDB.insertRepairInDB(repair);
+    ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
+    TroubleSQFlite.db.insertTrouble(trouble);
 
-    Navigator.pop(context, repair);
+    Navigator.pop(context, trouble);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Row(
           children: [
             Icon(Icons.add_task, size: 40, color: Colors.white),
-            Text(' Техника в ремонт добавлена'),
+            Text(' Неисправность добавлена'),
           ],
         ),
         duration: Duration(seconds: 5),

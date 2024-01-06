@@ -1,4 +1,3 @@
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 
 class CategoryDropDownValueModel{
   static List<String> nameEquipment = [];

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:technical_support_artphoto/trouble/TroubleAdd.dart';
+import '../utils/hasNetwork.dart';
 import 'Trouble.dart';
 import 'package:intl/intl.dart';
 
@@ -14,16 +16,16 @@ class _TroubleListState extends State<TroubleList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold (
-        // floatingActionButton: FloatingActionButton(
-        //     backgroundColor: HasNetwork.isConnecting ? Colors.blue : Colors.grey,
-        //     onPressed: HasNetwork.isConnecting ? () {Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicAdd())).then((value) {
-        //       setState(() {
-        //         if(value != null) Technic.technicList.insert(0, value);
-        //       });
-        //     });
-        //     } : null,
-        //     child: const Icon(Icons.add, color: Colors.white)
-        // ),
+        floatingActionButton: FloatingActionButton(
+            backgroundColor: HasNetwork.isConnecting ? Colors.blue : Colors.grey,
+            onPressed: HasNetwork.isConnecting ? () {Navigator.push(context, MaterialPageRoute(builder: (context) => const TroubleAdd())).then((value) {
+              setState(() {
+                if(value != null) Trouble.troubleList.insert(0, value);
+              });
+            });
+            } : null,
+            child: const Icon(Icons.add, color: Colors.white)
+        ),
         body: ListView.separated(
           separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: Trouble.troubleList.length,
