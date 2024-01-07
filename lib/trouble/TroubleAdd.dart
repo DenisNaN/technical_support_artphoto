@@ -1,4 +1,7 @@
+import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -286,10 +289,15 @@ class _TroubleAddState extends State<TroubleAdd> {
     );
   }
 
-  ListTile _buildPhotoTroubleListTile(){
+  ListTile _buildPhotoTroubleListTile() {
+    // if(imageFile != null) {
+    //   double height = 0.0;
+    //   _calculateImageHeight().then((value) => print(value));
+    // }
+
     return ListTile(
       leading: const Icon(Icons.photo_camera),
-      title: imageFile == null ? Text("Фотография") :
+      title: imageFile == null ? const Text("Фотография") :
         TextButton(
           onPressed: (){
             setState(() {
@@ -318,18 +326,47 @@ class _TroubleAddState extends State<TroubleAdd> {
                   )
                 ],
               ):
-          SizedBox(
-              height: 500,
-              child: PhotoView(
-                backgroundDecoration: const BoxDecoration(color: Colors.white70),
-                  imageProvider: FileImage(imageFile!.absolute, scale: 0.5)
-              )
-      ))
+              // SizedBox(
+              // height: 500,
+              // child: PhotoView(
+              //     backgroundDecoration: const BoxDecoration(color: Colors.white70),
+              //     imageProvider: FileImage(imageFile!)
+              //     )
+              // )
+
+              FutureBuilder<double>(
+                future: _calculateImageHeight(),
+                builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
+                  if (snapshot.hasData) {
+                    double? height = snapshot.data;
+                    return SizedBox(
+                        height: height,
+                        child: PhotoView(
+                            backgroundDecoration: const BoxDecoration(color: Colors.white70),
+                            imageProvider: FileImage(imageFile!)
+                        )
+                    );
+                  } else {
+                    return const Text('Loading...');
+                  }
+                },
+              ),
+      ),
     );
   }
 
   /// Get from gallery
   _getFromGallery() async {
+    // FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
+    //
+    // if (result != null) {
+    //   setState(() {
+    //     imageFile = File(result.files.single.path!);
+    //   });
+    // } else {
+    //   // User canceled the picker
+    // }
+
     XFile? pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       maxWidth: 1800,
@@ -346,8 +383,8 @@ class _TroubleAddState extends State<TroubleAdd> {
   _getFromCamera() async {
     XFile? pickedFile = await ImagePicker().pickImage(
       source: ImageSource.camera,
-      maxWidth: 1800,
-      maxHeight: 1800,
+      // maxWidth: 1800,
+      // maxHeight: 1800,
     );
     if (pickedFile != null) {
       setState(() {
@@ -355,6 +392,46 @@ class _TroubleAddState extends State<TroubleAdd> {
       });
     }
   }
+
+  Future<double> _calculateImageHeight() {
+    // ByteData data = Image.file(imageFile!).toByteData(format: ImageByteFormat.png);
+    //
+    // final Uint8List bytes = data.buffer.asUint8List();
+    // final decodedImage = decodeImageFromList(bytes);
+    // print(decodedImage.width);
+    // print(decodedImage.height);
+
+    Completer<double> completer = Completer();
+    Image image = Image.file(imageFile!);
+    image.image.resolve(const ImageConfiguration()).addListener(
+      ImageStreamListener(
+            (ImageInfo image, bool synchronousCall) {
+          var myImage = image.image;
+          double height = myImage.height.toDouble();
+          print('myImage.height ${myImage.height.toDouble()}');
+          print('myImage.width ${myImage.width.toDouble()}');
+
+          completer.complete(height);
+        },
+      ),
+    );
+    return completer.future;
+  }
+
+  // Future<Size> _calculateImageDimension() {
+  //   Completer<Size> completer = Completer();
+  //   Image image = Image.network("https://i.stack.imgur.com/lkd0a.png");
+  //   image.image.resolve(ImageConfiguration()).addListener(
+  //     ImageStreamListener(
+  //           (ImageInfo image, bool synchronousCall) {
+  //         var myImage = image.image;
+  //         Size size = Size(myImage.width.toDouble(), myImage.height.toDouble());
+  //         completer.complete(size);
+  //       },
+  //     ),
+  //   );
+  //   return completer.future;
+  // }
 
   bool _isValidateToSave(){
     bool validate = false;
