@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
@@ -374,11 +372,10 @@ class ConnectToDBMySQL {
   Future insertTroubleInDB(Trouble trouble) async{
     await ConnectToDBMySQL.connDB.connDatabase();
     await _connDB!.query('INSERT INTO Неисправности ('
-        'id, Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, '
+        'Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, '
         'ДатаУстрСотр, СотрПодтверУстр, '
         'ДатаУстрИнженер, ИнженерПодтверУстр, Фотография) '
-        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-      trouble.id,
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
       trouble.photosalon,
       trouble.dateTrouble,
       trouble.employee,

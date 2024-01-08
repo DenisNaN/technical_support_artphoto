@@ -393,62 +393,93 @@ class _TroubleAddState extends State<TroubleAdd> {
   }
 
   void _save() {
-    FutureBuilder(
-      future: _decoderPhotoToBlob(),
-      builder: (context, snapshot) {
-        List<Widget> children;
-        if (snapshot.hasData) {
-          _photoTrouble = snapshot.data!;
+    _photoTrouble = _decoderPhotoToBlob();
 
-          Trouble troubleLast = Trouble.troubleList.first;
-          Trouble trouble = Trouble(
-              troubleLast.id! + 1,
-              _photosalon!,
-              _dateTroubleForSQL,
-              _employee!,
-              int.parse(_innerNumberTechnic.text),
-              _trouble.text, '', '', '', '',
-              _photoTrouble
-          );
-
-          ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
-          TroubleSQFlite.db.insertTrouble(trouble);
-
-          Navigator.pop(context, trouble);
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.add_task, size: 40, color: Colors.white),
-                  Text(' Неисправность добавлена'),
-                ],
-              ),
-              duration: Duration(seconds: 5),
-              showCloseIcon: true,
-            ),
-          );
-        } else if(snapshot.hasError){
-          print(snapshot.error);
-        }else{
-          children = const <Widget>[
-            SizedBox(
-              width: 60,
-              height: 60,
-              child: CircularProgressIndicator(),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 16),
-              child: Text('Awaiting result...'),
-            ),
-          ];
-        }
-      },
+    Trouble troubleLast = Trouble.troubleList.first;
+    Trouble trouble = Trouble(
+        troubleLast.id! + 1,
+        _photosalon!,
+        _dateTroubleForSQL,
+        _employee!,
+        int.parse(_innerNumberTechnic.text),
+        _trouble.text, '', '', '', '',
+        _photoTrouble
     );
+
+    ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
+    TroubleSQFlite.db.insertTrouble(trouble);
+
+    Navigator.pop(context, trouble);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.add_task, size: 40, color: Colors.white),
+            Text(' Неисправность добавлена'),
+          ],
+        ),
+        duration: Duration(seconds: 5),
+        showCloseIcon: true,
+      ),
+    );
+
+    // FutureBuilder(
+    //   future: _decoderPhotoToBlob(),
+    //   builder: (context, snapshot) {
+    //     List<Widget> children;
+    //     if (snapshot.hasData) {
+    //       _photoTrouble = snapshot.data!;
+    //
+    //       Trouble troubleLast = Trouble.troubleList.first;
+    //       Trouble trouble = Trouble(
+    //           troubleLast.id! + 1,
+    //           _photosalon!,
+    //           _dateTroubleForSQL,
+    //           _employee!,
+    //           int.parse(_innerNumberTechnic.text),
+    //           _trouble.text, '', '', '', '',
+    //           _photoTrouble
+    //       );
+    //
+    //       ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
+    //       TroubleSQFlite.db.insertTrouble(trouble);
+    //
+    //       Navigator.pop(context, trouble);
+    //
+    //       ScaffoldMessenger.of(context).showSnackBar(
+    //         const SnackBar(
+    //           content: Row(
+    //             children: [
+    //               Icon(Icons.add_task, size: 40, color: Colors.white),
+    //               Text(' Неисправность добавлена'),
+    //             ],
+    //           ),
+    //           duration: Duration(seconds: 5),
+    //           showCloseIcon: true,
+    //         ),
+    //       );
+    //     } else if(snapshot.hasError){
+    //       print(snapshot.error);
+    //     }else{
+    //       children = const <Widget>[
+    //         SizedBox(
+    //           width: 60,
+    //           height: 60,
+    //           child: CircularProgressIndicator(),
+    //         ),
+    //         Padding(
+    //           padding: EdgeInsets.only(top: 16),
+    //           child: Text('Awaiting result...'),
+    //         ),
+    //       ];
+    //     }
+    //   },
+    // );
   }
 
-  Future<Uint8List> _decoderPhotoToBlob() async{
-    return await imageFile!.readAsBytes();
+  Uint8List _decoderPhotoToBlob() {
+    return imageFile!.readAsBytesSync();
   }
 }
 
