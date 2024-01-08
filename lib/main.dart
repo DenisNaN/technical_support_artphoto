@@ -5,7 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:technical_support_artphoto/repair/RepairList.dart';
 import 'package:technical_support_artphoto/splashScreen.dart';
 import 'package:technical_support_artphoto/technics/TechnicsList.dart';
-import 'package:technical_support_artphoto/trouble/ToubleList.dart';
+import 'package:technical_support_artphoto/trouble/TroubleList.dart';
 import 'utils/utils.dart' as utils;
 import 'package:technical_support_artphoto/utils/utils.dart';
 
@@ -26,11 +26,14 @@ class SplashScreenArtphoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-        localizationsDelegates: [
+    return MaterialApp(
+        localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate
         ],
-        home: SplashScreen()
+        theme: ThemeData(
+          useMaterial3: false,
+        ),
+        home: const SplashScreen()
     );
   }
 }

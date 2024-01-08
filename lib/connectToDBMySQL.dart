@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
@@ -201,8 +204,11 @@ class ConnectToDBMySQL {
       String dateCheckFixTroubleEmployee = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
       String dateCheckFixTroubleEngineer = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
 
+      Blob blobImage = row[10];
+      Uint8List image = Uint8List.fromList(blobImage.toBytes());
+
       Trouble trouble = Trouble(row[0], row[1].toString(),  dateTrouble,  row[3].toString(), row[4], row[5].toString(), dateCheckFixTroubleEmployee,
-          row[7].toString(), dateCheckFixTroubleEngineer, row[9].toString(), row[10].toString());
+          row[7].toString(), dateCheckFixTroubleEngineer, row[9].toString(), image);
       list.add(trouble);
     }
     var reversedList = List.from(list.reversed);
@@ -291,7 +297,7 @@ class ConnectToDBMySQL {
 
   Future insertRepairInDB(Repair repair) async{
     await ConnectToDBMySQL.connDB.connDatabase();
-    var resultHistory = await _connDB!.query('INSERT INTO repairEquipment ('
+    await _connDB!.query('INSERT INTO repairEquipment ('
         'number, '
         'category, '
         'dislocationOld, '

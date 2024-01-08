@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:technical_support_artphoto/main.dart';
-import 'package:technical_support_artphoto/technics/Technic.dart';
 import 'package:technical_support_artphoto/utils/authorization.dart';
 import 'package:technical_support_artphoto/utils/downloadAllList.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
@@ -40,7 +39,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (_) => HasNetwork.isConnecting ? const Login() : const ArtphotoTech()));
-                  // builder: (_) => const ArtphotoTech()));
             });
           }
 

@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +9,6 @@ import '../technics/Technic.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import '../utils/utils.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:photo_view/photo_view.dart';
 import 'Trouble.dart';
 
 class TroubleAdd extends StatefulWidget {
@@ -25,17 +22,18 @@ class _TroubleAddState extends State<TroubleAdd> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String? _photosalon;
-  String _dateTrouble = '';
+  String _dateTrouble = DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now());
   String _dateTroubleForSQL = '';
   String? _employee;
   final _innerNumberTechnic = TextEditingController();
   final _focusInnerNumberTechnic = FocusNode();
-  String _category = "";
   final _categoryController = TextEditingController();
   final _trouble = TextEditingController();
   bool _isBN = false;
   File? imageFile;
-  String _photoTrouble = '';
+  late Uint8List _photoTrouble;
+  late TransformationController transformationController;
+  TapDownDetails? tapDownDetails;
 
   Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
       'dislocation', 'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false);
@@ -50,11 +48,13 @@ class _TroubleAddState extends State<TroubleAdd> {
                 orElse: () =>
                     Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
                         'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false));
-        _category = technicFind.name;
+        _categoryController.text = technicFind.name;
+        _photosalon = technicFind.dislocation;
         if (technicFind.id == -1) {
           setState(() {
             _innerNumberTechnic.clear();
           });
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Row(
@@ -71,6 +71,7 @@ class _TroubleAddState extends State<TroubleAdd> {
         }
       }
     });
+    transformationController = TransformationController();
     super.initState();
   }
 
@@ -80,12 +81,12 @@ class _TroubleAddState extends State<TroubleAdd> {
     _focusInnerNumberTechnic.dispose();
     _trouble.dispose();
     _categoryController.dispose();
+    transformationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
@@ -225,7 +226,7 @@ class _TroubleAddState extends State<TroubleAdd> {
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Дата проблемы"),
-      subtitle: Text(_dateTrouble == "" ? "Выберите дату" : _dateTrouble),
+      subtitle: Text(_dateTrouble),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -290,11 +291,6 @@ class _TroubleAddState extends State<TroubleAdd> {
   }
 
   ListTile _buildPhotoTroubleListTile() {
-    // if(imageFile != null) {
-    //   double height = 0.0;
-    //   _calculateImageHeight().then((value) => print(value));
-    // }
-
     return ListTile(
       leading: const Icon(Icons.photo_camera),
       title: imageFile == null ? const Text("Фотография") :
@@ -326,51 +322,18 @@ class _TroubleAddState extends State<TroubleAdd> {
                   )
                 ],
               ):
-              // SizedBox(
-              // height: 500,
-              // child: PhotoView(
-              //     backgroundDecoration: const BoxDecoration(color: Colors.white70),
-              //     imageProvider: FileImage(imageFile!)
-              //     )
-              // )
-
-              FutureBuilder<double>(
-                future: _calculateImageHeight(),
-                builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
-                  if (snapshot.hasData) {
-                    double? height = snapshot.data;
-                    return SizedBox(
-                        height: height,
-                        child: PhotoView(
-                            backgroundDecoration: const BoxDecoration(color: Colors.white70),
-                            imageProvider: FileImage(imageFile!)
-                        )
-                    );
-                  } else {
-                    return const Text('Loading...');
-                  }
-                },
-              ),
+              _buildImage()
       ),
     );
   }
 
   /// Get from gallery
   _getFromGallery() async {
-    // FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
-    //
-    // if (result != null) {
-    //   setState(() {
-    //     imageFile = File(result.files.single.path!);
-    //   });
-    // } else {
-    //   // User canceled the picker
-    // }
-
     XFile? pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       maxWidth: 1800,
       maxHeight: 1800,
+      imageQuality: 50
     );
     if (pickedFile != null) {
       setState(() {
@@ -383,8 +346,9 @@ class _TroubleAddState extends State<TroubleAdd> {
   _getFromCamera() async {
     XFile? pickedFile = await ImagePicker().pickImage(
       source: ImageSource.camera,
-      // maxWidth: 1800,
-      // maxHeight: 1800,
+      maxWidth: 1800,
+      maxHeight: 1800,
+        imageQuality: 50
     );
     if (pickedFile != null) {
       setState(() {
@@ -393,86 +357,98 @@ class _TroubleAddState extends State<TroubleAdd> {
     }
   }
 
-  Future<double> _calculateImageHeight() {
-    // ByteData data = Image.file(imageFile!).toByteData(format: ImageByteFormat.png);
-    //
-    // final Uint8List bytes = data.buffer.asUint8List();
-    // final decodedImage = decodeImageFromList(bytes);
-    // print(decodedImage.width);
-    // print(decodedImage.height);
-
-    Completer<double> completer = Completer();
-    Image image = Image.file(imageFile!);
-    image.image.resolve(const ImageConfiguration()).addListener(
-      ImageStreamListener(
-            (ImageInfo image, bool synchronousCall) {
-          var myImage = image.image;
-          double height = myImage.height.toDouble();
-          print('myImage.height ${myImage.height.toDouble()}');
-          print('myImage.width ${myImage.width.toDouble()}');
-
-          completer.complete(height);
-        },
-      ),
-    );
-    return completer.future;
-  }
-
-  // Future<Size> _calculateImageDimension() {
-  //   Completer<Size> completer = Completer();
-  //   Image image = Image.network("https://i.stack.imgur.com/lkd0a.png");
-  //   image.image.resolve(ImageConfiguration()).addListener(
-  //     ImageStreamListener(
-  //           (ImageInfo image, bool synchronousCall) {
-  //         var myImage = image.image;
-  //         Size size = Size(myImage.width.toDouble(), myImage.height.toDouble());
-  //         completer.complete(size);
-  //       },
-  //     ),
-  //   );
-  //   return completer.future;
-  // }
+  Widget _buildImage() => GestureDetector(
+      onDoubleTap: (){
+        final position = tapDownDetails!.localPosition;
+        const double scale = 3;
+        final x = -position.dx * (scale - 1);
+        final y = -position.dy * (scale - 1);
+        final zoomed = Matrix4.identity()
+          ..translate(x, y)
+          ..scale(scale);
+        final value = transformationController.value.isIdentity() ? zoomed : Matrix4.identity();
+        transformationController.value = value;
+      },
+      onDoubleTapDown: (details) => tapDownDetails = details,
+      child: InteractiveViewer(
+        clipBehavior: Clip.none,
+        transformationController: transformationController,
+        panEnabled: true,
+        scaleEnabled: true,
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: Image.file(imageFile!)
+        )
+      )
+  );
 
   bool _isValidateToSave(){
     bool validate = false;
     if(_photosalon != '' && _dateTrouble != '' && _employee != '' &&
         (!_isBN ? _innerNumberTechnic.text != "" : _innerNumberTechnic.text == '-1') &&
-        (!_isBN ? _category != "" : _categoryController.text != "") &&
-        _trouble.text != '') {
+        _categoryController.text != "") {
       validate = true;
     }
     return validate;
   }
 
-  void _save(){
-    Trouble troubleLast = Trouble.troubleList.first;
-    Trouble trouble = Trouble(
-      troubleLast.id! + 1,
-      _photosalon!,
-      _dateTroubleForSQL,
-      _employee!,
-      int.parse(_innerNumberTechnic.text),
-      _trouble.text, '', '', '', '',
-        _photoTrouble
+  void _save() {
+    FutureBuilder(
+      future: _decoderPhotoToBlob(),
+      builder: (context, snapshot) {
+        List<Widget> children;
+        if (snapshot.hasData) {
+          _photoTrouble = snapshot.data!;
+
+          Trouble troubleLast = Trouble.troubleList.first;
+          Trouble trouble = Trouble(
+              troubleLast.id! + 1,
+              _photosalon!,
+              _dateTroubleForSQL,
+              _employee!,
+              int.parse(_innerNumberTechnic.text),
+              _trouble.text, '', '', '', '',
+              _photoTrouble
+          );
+
+          ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
+          TroubleSQFlite.db.insertTrouble(trouble);
+
+          Navigator.pop(context, trouble);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.add_task, size: 40, color: Colors.white),
+                  Text(' Неисправность добавлена'),
+                ],
+              ),
+              duration: Duration(seconds: 5),
+              showCloseIcon: true,
+            ),
+          );
+        } else if(snapshot.hasError){
+          print(snapshot.error);
+        }else{
+          children = const <Widget>[
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Text('Awaiting result...'),
+            ),
+          ];
+        }
+      },
     );
+  }
 
-    ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
-    TroubleSQFlite.db.insertTrouble(trouble);
-
-    Navigator.pop(context, trouble);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.add_task, size: 40, color: Colors.white),
-            Text(' Неисправность добавлена'),
-          ],
-        ),
-        duration: Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
+  Future<Uint8List> _decoderPhotoToBlob() async{
+    return await imageFile!.readAsBytes();
   }
 }
 

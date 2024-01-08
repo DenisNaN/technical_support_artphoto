@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 
 class Trouble{
   static List troubleList = [];
@@ -12,7 +13,7 @@ class Trouble{
   String employeeCheckFixTrouble = '';
   String dateCheckFixTroubleEngineer = '';
   String engineerCheckFixTrouble = '';
-  String photoTrouble = '';
+  Uint8List photoTrouble;
 
   Trouble(
       this.id,

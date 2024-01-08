@@ -20,7 +20,7 @@ class DownloadAllList{
     List listLastId = [];
     List listCount = [];
 
-    // rebootAllBasicListSQFlite();
+    rebootAllBasicListSQFlite();
     // rebootAllListCategorySQFlite('nameEquipment', 'name');
     // rebootAllListCategorySQFlite('photosalons', 'Фотосалон');
     // rebootAllListCategorySQFlite('service', 'repairmen');
@@ -235,7 +235,6 @@ class DownloadAllList{
 
       int id = 0;
       for(var category in actualCategory.reversed){
-        // DropDownValueModel dropDownValueName = category;
         ++id;
         CategorySQFlite.db.create(nameTable, nameCategory, id, category);
       }

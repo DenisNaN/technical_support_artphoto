@@ -22,7 +22,7 @@ class TroubleSQFlite{
               "id INTEGER, photosalon TEXT, dateTrouble TEXT, employee TEXT, "
               "internalID INTEGER, trouble TEXT, dateCheckFixTroubleEmployee TEXT,"
               "employeeCheckFixTrouble TEXT, dateCheckFixTroubleEngineer TEXT, "
-              "engineerCheckFixTrouble TEXT, photoTrouble TEXT)");
+              "engineerCheckFixTrouble TEXT, photoTrouble BLOB)");
         });
     return db;
   }
@@ -122,7 +122,7 @@ class TroubleSQFlite{
         "id INTEGER, photosalon TEXT, dateTrouble TEXT, employee TEXT, "
         "internalID INTEGER, trouble TEXT, dateCheckFixTroubleEmployee TEXT,"
         "employeeCheckFixTrouble TEXT, dateCheckFixTroubleEngineer TEXT, "
-        "engineerCheckFixTrouble TEXT, photoTrouble TEXT)");
+        "engineerCheckFixTrouble TEXT, photoTrouble BLOB)");
   }
 
   Future getTrouble() async{

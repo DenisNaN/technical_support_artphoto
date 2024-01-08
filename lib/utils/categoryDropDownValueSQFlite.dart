@@ -1,4 +1,3 @@
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:technical_support_artphoto/utils/utils.dart' as utils;
@@ -46,9 +45,9 @@ class CategorySQFlite{
     Database db = await database;
     List<Map> recs = await db.query(nameTable);
 
-    List<DropDownValueModel> list = [];
+    List list = [];
     for(int i = recs.length; i < 0; i--){
-      list.add(DropDownValueModel(name: recs[i].values.last, value: recs[i].values.last));
+      list.add(recs[i].values.last);
     }
     return list;
   }
