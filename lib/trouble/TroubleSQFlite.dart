@@ -81,7 +81,7 @@ class TroubleSQFlite{
           inTrouble.employeeCheckFixTrouble,
           inTrouble.dateCheckFixTroubleEngineer,
           inTrouble.engineerCheckFixTrouble,
-          inTrouble.photoTrouble,
+          inTrouble.photoTrouble ?? '',
         ]
     );
   }

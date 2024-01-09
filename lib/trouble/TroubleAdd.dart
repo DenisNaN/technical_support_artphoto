@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,13 +17,12 @@ class TroubleAdd extends StatefulWidget {
   State<TroubleAdd> createState() => _TroubleAddState();
 }
 
-class _TroubleAddState extends State<TroubleAdd> {
+class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateMixin{
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String? _photosalon;
   String _dateTrouble = DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now());
-  String _dateTroubleForSQL = '';
-  String? _employee;
+  String _dateTroubleForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
   final _innerNumberTechnic = TextEditingController();
   final _focusInnerNumberTechnic = FocusNode();
   final _categoryController = TextEditingController();
@@ -33,6 +31,8 @@ class _TroubleAddState extends State<TroubleAdd> {
   File? imageFile;
   late Uint8List _photoTrouble;
   late TransformationController transformationController;
+  late AnimationController animationController;
+  Animation<Matrix4>? animation;
   TapDownDetails? tapDownDetails;
 
   Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
@@ -71,7 +71,14 @@ class _TroubleAddState extends State<TroubleAdd> {
         }
       }
     });
+
     transformationController = TransformationController();
+    animationController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300)
+    )..addListener(() {
+      transformationController.value = animation!.value;
+    });
     super.initState();
   }
 
@@ -82,6 +89,7 @@ class _TroubleAddState extends State<TroubleAdd> {
     _trouble.dispose();
     _categoryController.dispose();
     transformationController.dispose();
+    animationController.dispose();
     super.dispose();
   }
 
@@ -136,9 +144,7 @@ class _TroubleAddState extends State<TroubleAdd> {
               _buildCategoryListTile(),
               _buildDislocationListTile(),
               _buildDateTroubleListTile(),
-              _buildEmployeeListTile(),
               _buildComplaintListTile(),
-              const SizedBox(height: 10),
               _buildPhotoTroubleListTile(),
             ]),
           ),
@@ -170,6 +176,7 @@ class _TroubleAddState extends State<TroubleAdd> {
                 onChanged: (value){
                   setState(() {
                     _isBN = value;
+                    value ? _innerNumberTechnic.text = '0' : _innerNumberTechnic.text = '';
                   });
                 }
             ),
@@ -191,8 +198,8 @@ class _TroubleAddState extends State<TroubleAdd> {
   }
 
   ListTile _buildDislocationListTile(){
-    return _isBN ? ListTile(
-      leading: const Icon(Icons.copyright),
+    return ListTile(
+      leading: const Icon(Icons.language),
       title: DropdownButton<String>(
         borderRadius: BorderRadius.circular(10.0),
         isExpanded: true,
@@ -216,9 +223,6 @@ class _TroubleAddState extends State<TroubleAdd> {
           });
         },
       ),
-    ) : ListTile(
-      leading: const Icon(Icons.print),
-      title: technicFind.id == -1 ? const Text('Введите номер техники') : Text('Последний фотосалон: ${technicFind.dislocation}'),
     );
   }
 
@@ -250,36 +254,6 @@ class _TroubleAddState extends State<TroubleAdd> {
     );
   }
 
-  ListTile _buildEmployeeListTile(){
-    Iterable<String> employee = LoginPassword.loginPassword.values;
-    return ListTile(
-      leading: const Icon(Icons.copyright),
-      title: DropdownButton<String>(
-        borderRadius: BorderRadius.circular(10.0),
-        isExpanded: true,
-        hint: const Text('Сотрудник'),
-        icon: _employee != null ? IconButton(
-            icon: const Icon(Icons.clear, color: Colors.grey),
-            onPressed: (){
-              setState(() {
-                _employee = null;
-              });}) : null,
-        value: _employee,
-        items: employee.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-        onChanged: (String? value){
-          setState(() {
-            _employee = value!;
-          });
-        },
-      ),
-    );
-  }
-
   ListTile _buildComplaintListTile(){
     return ListTile(
       leading: const Icon(Icons.create),
@@ -292,8 +266,8 @@ class _TroubleAddState extends State<TroubleAdd> {
 
   ListTile _buildPhotoTroubleListTile() {
     return ListTile(
-      leading: const Icon(Icons.photo_camera),
-      title: imageFile == null ? const Text("Фотография") :
+      leading: const SizedBox(height: 37, child: Icon(Icons.photo_camera)),
+      title: imageFile == null ? const Text("\nФотография") :
         TextButton(
           onPressed: (){
             setState(() {
@@ -358,18 +332,28 @@ class _TroubleAddState extends State<TroubleAdd> {
   }
 
   Widget _buildImage() => GestureDetector(
+      onDoubleTapDown: (details) => tapDownDetails = details,
       onDoubleTap: (){
         final position = tapDownDetails!.localPosition;
+
         const double scale = 3;
         final x = -position.dx * (scale - 1);
         final y = -position.dy * (scale - 1);
         final zoomed = Matrix4.identity()
           ..translate(x, y)
           ..scale(scale);
-        final value = transformationController.value.isIdentity() ? zoomed : Matrix4.identity();
-        transformationController.value = value;
+
+        final end = transformationController.value.isIdentity() ? zoomed : Matrix4.identity();
+
+        animation = Matrix4Tween(
+          begin: transformationController.value,
+          end: end
+        ).animate(
+          CurveTween(curve: Curves.easeOut).animate(animationController)
+        );
+
+        animationController.forward(from: 0);
       },
-      onDoubleTapDown: (details) => tapDownDetails = details,
       child: InteractiveViewer(
         clipBehavior: Clip.none,
         transformationController: transformationController,
@@ -384,26 +368,30 @@ class _TroubleAddState extends State<TroubleAdd> {
 
   bool _isValidateToSave(){
     bool validate = false;
-    if(_photosalon != '' && _dateTrouble != '' && _employee != '' &&
-        (!_isBN ? _innerNumberTechnic.text != "" : _innerNumberTechnic.text == '-1') &&
-        _categoryController.text != "") {
+    if(_innerNumberTechnic.text != "" &&
+        _categoryController.text != "" &&
+        _photosalon != '' &&
+        _dateTrouble != '' &&
+        _trouble.text != '') {
       validate = true;
     }
     return validate;
   }
 
   void _save() {
-    _photoTrouble = _decoderPhotoToBlob();
+    if(imageFile != null) {
+      _photoTrouble = _decoderPhotoToBlob(imageFile!);
+    }
 
     Trouble troubleLast = Trouble.troubleList.first;
     Trouble trouble = Trouble(
         troubleLast.id! + 1,
         _photosalon!,
         _dateTroubleForSQL,
-        _employee!,
+        LoginPassword.login,
         int.parse(_innerNumberTechnic.text),
         _trouble.text, '', '', '', '',
-        _photoTrouble
+        imageFile != null ? _photoTrouble : null
     );
 
     ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
@@ -423,63 +411,10 @@ class _TroubleAddState extends State<TroubleAdd> {
         showCloseIcon: true,
       ),
     );
-
-    // FutureBuilder(
-    //   future: _decoderPhotoToBlob(),
-    //   builder: (context, snapshot) {
-    //     List<Widget> children;
-    //     if (snapshot.hasData) {
-    //       _photoTrouble = snapshot.data!;
-    //
-    //       Trouble troubleLast = Trouble.troubleList.first;
-    //       Trouble trouble = Trouble(
-    //           troubleLast.id! + 1,
-    //           _photosalon!,
-    //           _dateTroubleForSQL,
-    //           _employee!,
-    //           int.parse(_innerNumberTechnic.text),
-    //           _trouble.text, '', '', '', '',
-    //           _photoTrouble
-    //       );
-    //
-    //       ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
-    //       TroubleSQFlite.db.insertTrouble(trouble);
-    //
-    //       Navigator.pop(context, trouble);
-    //
-    //       ScaffoldMessenger.of(context).showSnackBar(
-    //         const SnackBar(
-    //           content: Row(
-    //             children: [
-    //               Icon(Icons.add_task, size: 40, color: Colors.white),
-    //               Text(' Неисправность добавлена'),
-    //             ],
-    //           ),
-    //           duration: Duration(seconds: 5),
-    //           showCloseIcon: true,
-    //         ),
-    //       );
-    //     } else if(snapshot.hasError){
-    //       print(snapshot.error);
-    //     }else{
-    //       children = const <Widget>[
-    //         SizedBox(
-    //           width: 60,
-    //           height: 60,
-    //           child: CircularProgressIndicator(),
-    //         ),
-    //         Padding(
-    //           padding: EdgeInsets.only(top: 16),
-    //           child: Text('Awaiting result...'),
-    //         ),
-    //       ];
-    //     }
-    //   },
-    // );
   }
 
-  Uint8List _decoderPhotoToBlob() {
-    return imageFile!.readAsBytesSync();
+  Uint8List _decoderPhotoToBlob(File image) {
+    return image.readAsBytesSync();
   }
 }
 

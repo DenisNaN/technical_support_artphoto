@@ -13,7 +13,7 @@ class Trouble{
   String employeeCheckFixTrouble = '';
   String dateCheckFixTroubleEngineer = '';
   String engineerCheckFixTrouble = '';
-  Uint8List photoTrouble;
+  Uint8List? photoTrouble;
 
   Trouble(
       this.id,
@@ -26,5 +26,5 @@ class Trouble{
       this.employeeCheckFixTrouble,
       this.dateCheckFixTroubleEngineer,
       this.engineerCheckFixTrouble,
-      this.photoTrouble);
+      [this.photoTrouble]);
 }

@@ -304,7 +304,7 @@ class _RepairAddState extends State<RepairAdd> {
 
   ListTile _buildServiceDislocationListTile(){
     return ListTile(
-      leading: const Icon(Icons.copyright),
+      leading: const Icon(Icons.language),
       title: DropdownButton<String>(
         borderRadius: BorderRadius.circular(10.0),
         isExpanded: true,
@@ -462,7 +462,7 @@ class _RepairAddState extends State<RepairAdd> {
 
   ListTile _buildNewDislocationListTile(){
     return ListTile(
-      leading: const Icon(Icons.copyright),
+      leading: const Icon(Icons.local_shipping),
       title: DropdownButton<String>(
         borderRadius: BorderRadius.circular(10.0),
         isExpanded: true,

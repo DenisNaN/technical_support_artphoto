@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
@@ -8,75 +9,76 @@ import '../technics/TechnicViewAndChange.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import '../utils/hasNetwork.dart';
 import 'package:intl/intl.dart';
-import 'Repair.dart';
+import 'Trouble.dart';
 
-class RepairViewAndChange extends StatefulWidget {
-  final Repair repair;
-  const RepairViewAndChange({super.key, required this.repair});
+class TroubleViewAndChange extends StatefulWidget {
+  final Trouble trouble;
+  const TroubleViewAndChange({super.key, required this.trouble});
 
   @override
-  State<RepairViewAndChange> createState() => _RepairViewAndChangeState();
+  State<TroubleViewAndChange> createState() => _TroubleViewAndChangeState();
 }
 
-class _RepairViewAndChangeState extends State<RepairViewAndChange> {
+class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with SingleTickerProviderStateMixin{
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String _innerNumberTechnic = '';
-  String _nameTechnic = '';
-  final _complaintController = TextEditingController();
-  String _dateDeparture = '';
-  String _dateTransferForService = '';
-  String _dateDepartureFromService = '';
-  final _worksPerformed = TextEditingController();
-  final _costService = TextEditingController();
-  final _diagnosisService = TextEditingController();
-  final _recommendationsNotes = TextEditingController();
-  String _dateReceipt = '';
-  String? _selectedDropdownDislocationOld;
-  String? _selectedDropdownStatusOld;
-  String? _selectedDropdownService;
-  String? _selectedDropdownStatusNew;
-  String? _selectedDropdownDislocationNew;
+  String? _photosalon;
+  String _dateTrouble = '';
+  String _dateTroubleForSQL = '';
+  String _categoryController = '';
+  String _trouble = '';
+  String _dateCheckFixTroubleEmployee = '';
+  String _employeeCheckFixTrouble = '';
+  String _dateCheckFixTroubleEngineer = '';
+  String _engineerCheckFixTrouble = '';
+  File? _imageFile;
+  late Uint8List _photoTrouble;
 
-  bool _isEditComplaint = false;
-  bool _isEdit = false;
-  bool _isEditNewStatusDislocation = false;
+  late TransformationController transformationController;
+  late AnimationController animationController;
+  Animation<Matrix4>? animation;
+  TapDownDetails? tapDownDetails;
+
+  // bool _isEditComplaint = false;
+  // bool _isEdit = false;
+  // bool _isEditNewStatusDislocation = false;
   int indexTechnic = 0;
 
   @override
   void initState() {
     for(int i = 0; i < Technic.technicList.length; i++){
-      if(Technic.technicList[i].internalID == widget.repair.internalID){
+      if(Technic.technicList[i].internalID == widget.trouble.internalID){
         indexTechnic = i;
         break;
       }
     }
-    _innerNumberTechnic = '${widget.repair.internalID}';
-    _nameTechnic = widget.repair.category;
-    _selectedDropdownStatusOld = widget.repair.status;
-    _selectedDropdownDislocationOld = widget.repair.dislocationOld;
-    _complaintController.text = widget.repair.complaint;
-    _dateDeparture = widget.repair.dateDeparture;
-    _selectedDropdownService = widget.repair.serviceDislocation;
-    _dateTransferForService = widget.repair.dateTransferForService;
-    _dateDepartureFromService = widget.repair.dateDepartureFromService;
-    _worksPerformed.text = widget.repair.worksPerformed;
-    _costService.text = widget.repair.costService == 0 ? '' : '${widget.repair.costService}';
-    _diagnosisService.text = widget.repair.diagnosisService;
-    _recommendationsNotes.text = widget.repair.recommendationsNotes;
-    _selectedDropdownStatusNew = widget.repair.newStatus == '' ? null : widget.repair.newStatus;
-    _selectedDropdownDislocationNew = widget.repair.newDislocation == '' ? null : widget.repair.newDislocation;
-    _dateReceipt = widget.repair.dateReceipt;
+    _innerNumberTechnic = '${widget.trouble.internalID}';
+    _photosalon = widget.trouble.photosalon;
+    _dateTrouble = widget.trouble.dateTrouble;
+    indexTechnic != 0 ? _categoryController = Technic.technicList[indexTechnic].category : _categoryController = '';
+    _trouble = widget.trouble.trouble;
+    _dateCheckFixTroubleEmployee = widget.trouble.dateCheckFixTroubleEmployee;
+    _employeeCheckFixTrouble = widget.trouble.employeeCheckFixTrouble;
+    _dateCheckFixTroubleEngineer = widget.trouble.dateCheckFixTroubleEngineer;
+    _engineerCheckFixTrouble = widget.trouble.engineerCheckFixTrouble;
+    if(widget.trouble.photoTrouble != null) _photoTrouble = widget.trouble.photoTrouble!;
+
+    transformationController = TransformationController();
+    animationController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300)
+    )..addListener(() {
+      transformationController.value = animation!.value;
+    });
+
     super.initState();
   }
 
   @override
   void dispose() {
-    _complaintController.dispose();
-    _worksPerformed.dispose();
-    _costService.dispose();
-    _diagnosisService.dispose();
-    _recommendationsNotes.dispose();
+    transformationController.dispose();
+    animationController.dispose();
     super.dispose();
   }
 
@@ -148,33 +150,33 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
               ListTile(
                 leading: const Icon(Icons.fiber_new),
                 title: widget.repair.internalID != -1 ?
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.only(left: 0.0),
-                          alignment: Alignment.centerLeft,
-                          textStyle: const TextStyle(fontSize: 20)
-                        ),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[indexTechnic]))).then(
-                                  (value){
-                                setState(() {
-                                  if(value != null) {
-                                    Technic.technicList[indexTechnic] = value;
-                                  }
-                                });
-                              });
-                        },
-                        child: Text('№ - $_innerNumberTechnic'
-                        )
-                      )
-                    // )
+                TextButton(
+                    style: TextButton.styleFrom(
+                        padding: const EdgeInsets.only(left: 0.0),
+                        alignment: Alignment.centerLeft,
+                        textStyle: const TextStyle(fontSize: 20)
+                    ),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[indexTechnic]))).then(
+                              (value){
+                            setState(() {
+                              if(value != null) {
+                                Technic.technicList[indexTechnic] = value;
+                              }
+                            });
+                          });
+                    },
+                    child: Text('№ - $_innerNumberTechnic'
+                    )
+                )
+                // )
                     : const Text('БН'),
-                ),
+              ),
 
               ListTile(
                 leading: const Icon(Icons.medical_information),
                 title: Text('Наименование: $_nameTechnic\n'
-                            'Статус: $_selectedDropdownStatusOld'),
+                    'Статус: $_selectedDropdownStatusOld'),
                 subtitle: Text('Откуда забрали: $_selectedDropdownDislocationOld'),
               ),
 
@@ -193,10 +195,10 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                 trailing: IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
                   onPressed: (){
-                      setState(() {
-                        _isEditComplaint = true;
-                        _isEdit = true;
-                      }
+                    setState(() {
+                      _isEditComplaint = true;
+                      _isEdit = true;
+                    }
                     );
                   },
                 ),
@@ -229,18 +231,18 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
               ),
 
               ListTile(
-                leading: const Icon(Icons.miscellaneous_services),
+                  leading: const Icon(Icons.miscellaneous_services),
                   subtitle: _selectedDropdownService != null ? const Text('Местонахождение техники') : null,
                   title: DropdownButton<String>(
                     borderRadius: BorderRadius.circular(10.0),
                     isExpanded: true,
                     hint: const Text('Местонахождение техники'),
                     icon: _selectedDropdownService != null ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
-                      onPressed: (){
-                        setState(() {
-                          _selectedDropdownService = null;
-                        });}) : null,
+                        icon: const Icon(Icons.clear, color: Colors.grey),
+                        onPressed: (){
+                          setState(() {
+                            _selectedDropdownService = null;
+                          });}) : null,
                     value: _selectedDropdownService,
                     items: CategoryDropDownValueModel.service.map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(

@@ -385,7 +385,7 @@ class ConnectToDBMySQL {
       trouble.employeeCheckFixTrouble,
       trouble.dateCheckFixTroubleEngineer,
       trouble.engineerCheckFixTrouble,
-      trouble.photoTrouble
+      trouble.photoTrouble ?? ''
     ]);
   }
 
@@ -414,7 +414,7 @@ class ConnectToDBMySQL {
           trouble.employeeCheckFixTrouble,
           trouble.dateCheckFixTroubleEngineer,
           trouble.engineerCheckFixTrouble,
-          trouble.photoTrouble,
+          trouble.photoTrouble ?? '',
           trouble.id
         ]);
   }
