@@ -67,7 +67,8 @@ class _TroubleListState extends State<TroubleList> {
               TextSpan(children: [
                 TextSpan(
                     style: const TextStyle(fontWeight: FontWeight.bold),
-                    text: '№ ${Trouble.troubleList[index].internalID}  '
+                    text: Trouble.troubleList[index].internalID != 0 ?
+                    '№ ${Trouble.troubleList[index].internalID}  ' : 'БН '
                         '${Trouble.troubleList[index].photosalon} '
                         '${Trouble.troubleList[index].employee}\n'),
                 TextSpan(style: const TextStyle(fontStyle: FontStyle.italic),

@@ -393,28 +393,16 @@ class ConnectToDBMySQL {
     await ConnectToDBMySQL.connDB.connDatabase();
     await _connDB!.query(
         'UPDATE Неисправности SET '
-            'Фотосалон = ?, '
-            'ДатаНеисправности = ?, '
-            'Сотрудник = ?, '
-            'НомерТехники = ?, '
-            'Неисправность = ?, '
             'ДатаУстрСотр = ?, '
             'СотрПодтверУстр = ?, '
             'ДатаУстрИнженер = ?, '
             'ИнженерПодтверУстр = ?, '
-            'Фотография = ? '
             'WHERE id = ?',
         [
-          trouble.photosalon,
-          trouble.dateTrouble,
-          trouble.employee,
-          trouble.internalID,
-          trouble.trouble,
           trouble.dateCheckFixTroubleEmployee,
           trouble.employeeCheckFixTrouble,
           trouble.dateCheckFixTroubleEngineer,
           trouble.engineerCheckFixTrouble,
-          trouble.photoTrouble ?? '',
           trouble.id
         ]);
   }

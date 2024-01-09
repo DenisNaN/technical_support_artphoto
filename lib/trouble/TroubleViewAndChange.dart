@@ -1,12 +1,12 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
+import 'package:technical_support_artphoto/trouble/TroubleSQFlite.dart';
+import 'package:technical_support_artphoto/utils/utils.dart';
 import '../ConnectToDBMySQL.dart';
 import '../technics/Technic.dart';
 import '../technics/TechnicViewAndChange.dart';
-import '../utils/categoryDropDownValueModel.dart';
 import '../utils/hasNetwork.dart';
 import 'package:intl/intl.dart';
 import 'Trouble.dart';
@@ -25,14 +25,13 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
   String _innerNumberTechnic = '';
   String? _photosalon;
   String _dateTrouble = '';
-  String _dateTroubleForSQL = '';
-  String _categoryController = '';
   String _trouble = '';
   String _dateCheckFixTroubleEmployee = '';
+  String _dateCheckFixTroubleEmployeeForSQL = '';
   String _employeeCheckFixTrouble = '';
   String _dateCheckFixTroubleEngineer = '';
+  String _dateCheckFixTroubleEngineerForSQL = '';
   String _engineerCheckFixTrouble = '';
-  File? _imageFile;
   late Uint8List _photoTrouble;
 
   late TransformationController transformationController;
@@ -41,7 +40,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
   TapDownDetails? tapDownDetails;
 
   // bool _isEditComplaint = false;
-  // bool _isEdit = false;
+  bool _isEdit = false;
   // bool _isEditNewStatusDislocation = false;
   int indexTechnic = 0;
 
@@ -56,11 +55,12 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
     _innerNumberTechnic = '${widget.trouble.internalID}';
     _photosalon = widget.trouble.photosalon;
     _dateTrouble = widget.trouble.dateTrouble;
-    indexTechnic != 0 ? _categoryController = Technic.technicList[indexTechnic].category : _categoryController = '';
     _trouble = widget.trouble.trouble;
     _dateCheckFixTroubleEmployee = widget.trouble.dateCheckFixTroubleEmployee;
+    _dateCheckFixTroubleEmployeeForSQL = widget.trouble.dateCheckFixTroubleEmployee;
     _employeeCheckFixTrouble = widget.trouble.employeeCheckFixTrouble;
     _dateCheckFixTroubleEngineer = widget.trouble.dateCheckFixTroubleEngineer;
+    _dateCheckFixTroubleEngineerForSQL = widget.trouble.dateCheckFixTroubleEngineer;
     _engineerCheckFixTrouble = widget.trouble.engineerCheckFixTrouble;
     if(widget.trouble.photoTrouble != null) _photoTrouble = widget.trouble.photoTrouble!;
 
@@ -99,41 +99,22 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                   const Spacer(),
                   TextButton(
                       onPressed: HasNetwork.isConnecting ? () {
-                        if(_complaintController.text == "" ||
-                            _dateDeparture == "" ||
-                            _selectedDropdownService == null){
+                        if(_isEdit){
+                          Future<Trouble> trouble = _save();
+                          Navigator.pop(context, trouble);
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Row(
                                 children: [
-                                  Icon(Icons.bolt, size: 40, color: Colors.white),
-                                  Text('Остались не заполненые поля'),
+                                  Icon(Icons.add_task, size: 40, color: Colors.white),
+                                  Text(' Изменения внесены'),
                                 ],
                               ),
                               duration: Duration(seconds: 5),
                               showCloseIcon: true,
                             ),
                           );
-                        }else{
-                          if(isValidationNewStatusDislocation()){
-                            Future<Repair> repair = _save();
-                            Navigator.pop(context, repair);
-
-                            if(_isEdit){
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Icon(Icons.add_task, size: 40, color: Colors.white),
-                                      Text(' Изменения внесены'),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                  showCloseIcon: true,
-                                ),
-                              );
-                            }
-                          }
                         }
                       } : null,
                       child: HasNetwork.isConnecting ? const Text("Сохранить") :
@@ -149,7 +130,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
             children: [
               ListTile(
                 leading: const Icon(Icons.fiber_new),
-                title: widget.repair.internalID != -1 ?
+                title: widget.trouble.internalID != 0 ?
                 TextButton(
                     style: TextButton.styleFrom(
                         padding: const EdgeInsets.only(left: 0.0),
@@ -166,382 +147,170 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                             });
                           });
                     },
-                    child: Text('№ - $_innerNumberTechnic'
-                    )
-                )
-                // )
-                    : const Text('БН'),
+                    child: Text('№ - $_innerNumberTechnic')
+                ) : const Text('БН'),
               ),
 
               ListTile(
                 leading: const Icon(Icons.medical_information),
-                title: Text('Наименование: $_nameTechnic\n'
-                    'Статус: $_selectedDropdownStatusOld'),
-                subtitle: Text('Откуда забрали: $_selectedDropdownDislocationOld'),
+                title: Text('Наименование: ${Technic.technicList[indexTechnic].category}\n'
+                    'Откуда забрали: $_photosalon'),
               ),
 
-              _isEditComplaint ?
+              ListTile(
+                leading: const Icon(Icons.medical_information),
+                title: Text('Дата проблемы: '
+                    '${DateFormat('d MMMM yyyy', 'ru_RU').format(DateTime.parse(_dateTrouble.replaceAll('.', '-')))}'),
+              ),
+
               ListTile(
                 leading: const Icon(Icons.create),
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: "Жалоба"),
-                  controller: _complaintController,
+                title: Text('Жалоба:\n $_trouble')
                 ),
-              ) :
-              ListTile(
-                leading: const Icon(Icons.comment),
-                title: Text(_complaintController.text),
-                subtitle: const Text('Жалоба'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
-                  onPressed: (){
-                    setState(() {
-                      _isEditComplaint = true;
-                      _isEdit = true;
-                    }
-                    );
-                  },
-                ),
-              ),
 
               ListTile(
                 leading: const Icon(Icons.today),
-                title: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateDeparture.replaceAll('.', '-')))),
-                subtitle: const Text("Забрали с точки. Дата"),
-                trailing: IconButton(
+                title: _dateCheckFixTroubleEmployee != '' ? Text('Закрытие сотрудником:\n'
+                    'Сотрудник: $_employeeCheckFixTrouble\n'
+                    'Дата: ${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateCheckFixTroubleEmployee.replaceAll('.', '-')))}') :
+                const Text('Проблема сотрудником не закрыта'),
+                trailing: LoginPassword.login == 'Денис' || LoginPassword.login == 'Владимир' ? IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: () {
                       showDatePicker(
                           context: context,
-                          initialDate: DateTime.now(),
+                          initialDate: _dateCheckFixTroubleEmployee != '' ?
+                            DateTime.parse(_dateCheckFixTroubleEmployee.replaceAll('.', '-')) : DateTime.now(),
                           firstDate: DateTime(2000),
                           lastDate: DateTime(2099),
                           locale: const Locale("ru", "RU")
                       ).then((date) {
                         setState(() {
                           if(date != null) {
-                            _dateDeparture = DateFormat('yyyy.MM.dd').format(date);
+                            _dateCheckFixTroubleEmployee = DateFormat('d MMMM yyyy', 'ru_RU').format(date);
+                            _dateCheckFixTroubleEmployeeForSQL = DateFormat('yyyy.MM.dd').format(date);
+                            _employeeCheckFixTrouble = LoginPassword.login;
                             _isEdit = true;
                           }
                         });
                       });
                     },
                     color: Colors.blue
-                ),
-              ),
-
-              ListTile(
-                  leading: const Icon(Icons.miscellaneous_services),
-                  subtitle: _selectedDropdownService != null ? const Text('Местонахождение техники') : null,
-                  title: DropdownButton<String>(
-                    borderRadius: BorderRadius.circular(10.0),
-                    isExpanded: true,
-                    hint: const Text('Местонахождение техники'),
-                    icon: _selectedDropdownService != null ? IconButton(
-                        icon: const Icon(Icons.clear, color: Colors.grey),
-                        onPressed: (){
-                          setState(() {
-                            _selectedDropdownService = null;
-                          });}) : null,
-                    value: _selectedDropdownService,
-                    items: CategoryDropDownValueModel.service.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? value){
-                      setState(() {
-                        _selectedDropdownService = value!;
-                        _isEdit = true;
-                      });
-                    },
-                  )
+                ) : null,
               ),
 
               ListTile(
                 leading: const Icon(Icons.today),
-                title: Text(_dateTransferForService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateTransferForService.replaceAll('.', '-')))),
-                subtitle: const Text("Дата сдачи в ремонт"),
-                trailing: IconButton(
+                title: Text(_dateCheckFixTroubleEngineer == '' ? 'Выберите дату' :
+                  DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateCheckFixTroubleEngineer.replaceAll('.', '-')))),
+                subtitle: const Text("Дата закрытия проблемы инженером"),
+                trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                  SizedBox(width: 30, child: IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: () {
                       showDatePicker(
                           context: context,
-                          initialDate: DateTime.now(),
+                          initialDate: _dateCheckFixTroubleEngineer != '' ?
+                            DateTime.parse(_dateCheckFixTroubleEngineer.replaceAll('.', '-')) : DateTime.now(),
                           firstDate: DateTime(2000),
                           lastDate: DateTime(2099),
                           locale: const Locale("ru", "RU")
                       ).then((date) {
                         setState(() {
                           if(date != null) {
-                            _dateTransferForService = DateFormat('yyyy.MM.dd').format(date);
+                            _dateCheckFixTroubleEngineer = DateFormat('d MMMM yyyy', 'ru_RU').format(date);
+                            _dateCheckFixTroubleEngineerForSQL = DateFormat('yyyy.MM.dd').format(date);
+                            _engineerCheckFixTrouble = LoginPassword.login;
                             _isEdit = true;
                           }
                         });
                       });
                     },
-                    color: Colors.blue
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.today),
-                title: Text(_dateDepartureFromService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateDepartureFromService.replaceAll('.', '-')))),
-                subtitle: const Text("Забрали из ремонта. Дата"),
-                trailing: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2099),
-                          locale: const Locale("ru", "RU")
-                      ).then((date) {
-                        setState(() {
-                          if(date != null) {
-                            _dateDepartureFromService = DateFormat('yyyy.MM.dd').format(date);
-                            _isEdit = true;
-                          }
-                        });
-                      });
-                    },
-                    color: Colors.blue
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.comment),
-                subtitle: _worksPerformed.text != '' ? const Text('Произведенные работы') : null,
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: "Произведенные работы"),
-                  controller: _worksPerformed,
-                  onChanged: (value){
-                    setState(() {
-                      if(value != widget.repair.worksPerformed) _isEdit = true;
-                    });
-                  },
-                ),
-              ),
-
-              ListTile(
-                  leading: const Icon(Icons.shopify),
-                  subtitle: _costService.text != '' ? const Text('Стоимость ремонта') : null,
-                  title: TextFormField(
-                    decoration: const InputDecoration(
-                        hintText: 'Стоимость ремонта',
-                        prefix: Text('₽ ')),
-                    controller: _costService,
-                    onChanged: (value){
-                      setState(() {
-                        if(value != '${widget.repair.costService}') _isEdit = true;
-                      });
-                    },
-                    inputFormatters: [IntegerCurrencyInputFormatter()],
-                    keyboardType: TextInputType.number,
-                  )
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.comment),
-                subtitle: _diagnosisService.text != '' ? const Text('Диагноз мастерской') : null,
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: 'Диагноз мастерской'),
-                  controller: _diagnosisService,
-                  onChanged: (value){
-                    setState(() {
-                      if(_diagnosisService.text != widget.repair.diagnosisService) _isEdit = true;
-                    });
-                  },
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.comment),
-                subtitle: _recommendationsNotes.text != '' ? const Text('Рекомендации/примечания') : null,
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: 'Рекомендации/примечания (необязательно)'),
-                  controller: _recommendationsNotes,
-                  onChanged: (value){
-                    setState(() {
-                      if(_recommendationsNotes.text != widget.repair.recommendationsNotes) _isEdit = true;
-                    });
-                  },
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.copyright),
-                subtitle: _selectedDropdownStatusNew != null ? const Text('Новый статус') : null,
-                title: DropdownButton<String>(
-                  borderRadius: BorderRadius.circular(10.0),
-                  isExpanded: true,
-                  hint: const Text('Новый статус'),
-                  icon: _selectedDropdownStatusNew != null ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
+                    color: Colors.blue)),
+                  IconButton(
                       onPressed: (){
                         setState(() {
-                          _selectedDropdownStatusNew = null;
-                        });}) : null,
-                  value: _selectedDropdownStatusNew,
-                  items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? value){
-                    setState(() {
-                      _selectedDropdownStatusNew = value!;
-                      if(_selectedDropdownStatusNew != widget.repair.newStatus) {
-                        _isEdit = true;
-                        _isEditNewStatusDislocation = true;
-                      }
-                    });
-                  },
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.local_shipping),
-                subtitle: _selectedDropdownDislocationNew != null ? const Text('Куда уехал') : null,
-                title: DropdownButton<String>(
-                  borderRadius: BorderRadius.circular(10.0),
-                  isExpanded: true,
-                  hint: const Text('Куда уехал'),
-                  icon: _selectedDropdownDislocationNew != null ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
-                      onPressed: (){
-                        setState(() {
-                          _selectedDropdownDislocationNew = null;
-                        });}) : null,
-                  value: _selectedDropdownDislocationNew,
-                  items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? value){
-                    setState(() {
-                      _selectedDropdownDislocationNew = value!;
-                      if(_selectedDropdownDislocationNew != widget.repair.newDislocation) {
-                        _isEdit = true;
-                        _isEditNewStatusDislocation = true;
-                      }
-                    });
-                  },
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.today),
-                title: Text(_dateReceipt == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateReceipt.replaceAll('.', '-')))),
-                subtitle: const Text("Дата поступления"),
-                trailing: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2099),
-                          locale: const Locale("ru", "RU")
-                      ).then((date) {
-                        setState(() {
-                          if(date != null) {
-                            _dateReceipt = DateFormat('yyyy.MM.dd').format(date);
-                            _isEdit = true;
-                          }
+                          _dateCheckFixTroubleEngineer = '';
+                          _dateCheckFixTroubleEngineerForSQL = '';
+                          _isEdit = true;
                         });
-                      });
-                    },
-                    color: Colors.blue
-                ),
+                      },
+                      icon: const Icon(Icons.clear))
+                ])
               ),
+              _buildPhotoTroubleListTile()
             ],
           ),
         )
     );
   }
 
-  Future<Repair> _save() async{
-    int costServ = -1;
-    _costService.text != "" ? costServ = int.parse(_costService.text.replaceAll(",", "")) : costServ = -1;
-    _selectedDropdownStatusNew = _selectedDropdownStatusNew ?? '';
-    _selectedDropdownDislocationNew = _selectedDropdownDislocationNew ?? '';
+  ListTile _buildPhotoTroubleListTile() {
+    return ListTile(
+      leading: const SizedBox(height: 37, child: Icon(Icons.photo_camera)),
+      title:  const Text("\nФотография"),
+      subtitle: Container(
+          child: _buildImage()
+      ),
+    );
+  }
 
-    Repair repair = Repair(
-        widget.repair.id,
-        widget.repair.internalID,
-        _nameTechnic,
-        _selectedDropdownDislocationOld!,
-        _selectedDropdownStatusOld!,
-        _complaintController.text,
-        _dateDeparture,
-        _selectedDropdownService!,
-        _dateTransferForService,
-        _dateDepartureFromService,
-        _worksPerformed.text,
-        costServ,
-        _diagnosisService.text,
-        _recommendationsNotes.text,
-        _selectedDropdownStatusNew!,
-        _selectedDropdownDislocationNew!,
-        _dateReceipt
+  Widget _buildImage() => GestureDetector(
+      onDoubleTapDown: (details) => tapDownDetails = details,
+      onDoubleTap: (){
+        final position = tapDownDetails!.localPosition;
+
+        const double scale = 3;
+        final x = -position.dx * (scale - 1);
+        final y = -position.dy * (scale - 1);
+        final zoomed = Matrix4.identity()
+          ..translate(x, y)
+          ..scale(scale);
+
+        final end = transformationController.value.isIdentity() ? zoomed : Matrix4.identity();
+
+        animation = Matrix4Tween(
+            begin: transformationController.value,
+            end: end
+        ).animate(
+            CurveTween(curve: Curves.easeOut).animate(animationController)
+        );
+
+        animationController.forward(from: 0);
+      },
+      child: InteractiveViewer(
+          clipBehavior: Clip.none,
+          transformationController: transformationController,
+          panEnabled: true,
+          scaleEnabled: true,
+          child: AspectRatio(
+              aspectRatio: 1,
+              child: Image.memory(_photoTrouble)
+          )
+      )
+  );
+
+  Future<Trouble> _save() async{
+
+    Trouble trouble = Trouble(
+        widget.trouble.id,
+        _photosalon!,
+        _dateTrouble,
+        widget.trouble.employee,
+        int.parse(_innerNumberTechnic),
+        _trouble,
+        _dateCheckFixTroubleEmployeeForSQL,
+        _employeeCheckFixTrouble,
+        _dateCheckFixTroubleEngineerForSQL,
+        _engineerCheckFixTrouble,
     );
 
     await ConnectToDBMySQL.connDB.connDatabase();
     if(_isEdit) {
-      ConnectToDBMySQL.connDB.updateRepairInDB(repair);
-      RepairSQFlite.db.update(repair);
-
-      if(widget.repair.internalID != -1 && _isEditNewStatusDislocation){
-        repair.dateReceipt = DateFormat('yyyy.MM.dd').format(DateTime.now());
-        ConnectToDBMySQL.connDB.insertStatusInDB(Technic.technicList[indexTechnic].id!, repair.newStatus, repair.newDislocation);
-        TechnicSQFlite.db.updateStatusDislocationTechnic(Technic.technicList[indexTechnic].id, repair.newStatus, repair.newDislocation);
-        Technic.technicList[indexTechnic].status = repair.newStatus;
-        Technic.technicList[indexTechnic].dislocation = repair.newDislocation;
-      }
+      ConnectToDBMySQL.connDB.updateTroubleInDB(trouble);
+      TroubleSQFlite.db.updateTrouble(trouble);
     }
-    return repair;
-  }
-
-  bool isValidationNewStatusDislocation(){
-    bool result = true;
-
-    if(_selectedDropdownStatusNew != null && _selectedDropdownDislocationNew == null){
-      result = false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.add_task, size: 40, color: Colors.white),
-              Text(' Заполните поле "Куда уехал"'),
-            ],
-          ),
-          duration: Duration(seconds: 5),
-          showCloseIcon: true,
-        ),
-      );
-    }
-    if(_selectedDropdownStatusNew == null && _selectedDropdownDislocationNew != null){
-      result = false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.add_task, size: 40, color: Colors.white),
-              Text(' Заполните поле "Новый статус"'),
-            ],
-          ),
-          duration: Duration(seconds: 5),
-          showCloseIcon: true,
-        ),
-      );
-    }
-    return result;
+    return trouble;
   }
 }
 
