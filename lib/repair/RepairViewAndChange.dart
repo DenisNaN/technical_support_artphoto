@@ -96,7 +96,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                       child: const Text("Отмена")),
                   const Spacer(),
                   TextButton(
-                      onPressed: HasNetwork.isConnecting ? () {
+                      onPressed: HasNetwork.isConnecting && _isEdit ? () {
                         if(_complaintController.text == "" ||
                             _dateDeparture == "" ||
                             _selectedDropdownService == null){
@@ -134,9 +134,12 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                           }
                         }
                       } : null,
-                      child: HasNetwork.isConnecting ? const Text("Сохранить") :
-                      const Text("Сохранить", style: TextStyle(color:  Colors.grey),
-                      ))
+                      child: HasNetwork.isConnecting && _isEdit ?
+                        Container(padding: const EdgeInsets.all(5.0),
+                          decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(7)),
+                          child: const Text("Сохранить", style: TextStyle(color: Colors.white))) :
+                        const SizedBox(),
+                      )
                 ],
               ),
             )
@@ -317,7 +320,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                   controller: _worksPerformed,
                   onChanged: (value){
                     setState(() {
-                      if(value != widget.repair.worksPerformed) _isEdit = true;
+                      _isEdit = true;
                     });
                   },
                 ),
@@ -333,7 +336,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                     controller: _costService,
                     onChanged: (value){
                       setState(() {
-                        if(value != '${widget.repair.costService}') _isEdit = true;
+                        _isEdit = true;
                       });
                     },
                     inputFormatters: [IntegerCurrencyInputFormatter()],
@@ -349,7 +352,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                   controller: _diagnosisService,
                   onChanged: (value){
                     setState(() {
-                      if(_diagnosisService.text != widget.repair.diagnosisService) _isEdit = true;
+                      _isEdit = true;
                     });
                   },
                 ),
@@ -363,7 +366,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                   controller: _recommendationsNotes,
                   onChanged: (value){
                     setState(() {
-                      if(_recommendationsNotes.text != widget.repair.recommendationsNotes) _isEdit = true;
+                      _isEdit = true;
                     });
                   },
                 ),
@@ -389,13 +392,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                       child: Text(value),
                     );
                   }).toList(),
-                  onChanged: (String? value){
+                  onChanged: (value){
                     setState(() {
-                      _selectedDropdownStatusNew = value!;
-                      if(_selectedDropdownStatusNew != widget.repair.newStatus) {
-                        _isEdit = true;
-                        _isEditNewStatusDislocation = true;
-                      }
+                      _selectedDropdownStatusNew = value;
+                      _isEdit = true;
+                      _isEditNewStatusDislocation = true;
                     });
                   },
                 ),
@@ -421,13 +422,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                       child: Text(value),
                     );
                   }).toList(),
-                  onChanged: (String? value){
+                  onChanged: (value){
                     setState(() {
-                      _selectedDropdownDislocationNew = value!;
-                      if(_selectedDropdownDislocationNew != widget.repair.newDislocation) {
-                        _isEdit = true;
-                        _isEditNewStatusDislocation = true;
-                      }
+                      _selectedDropdownDislocationNew = value;
+                      _isEdit = true;
+                      _isEditNewStatusDislocation = true;
                     });
                   },
                 ),

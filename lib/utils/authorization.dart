@@ -77,7 +77,9 @@ class _LoginState extends State<Login> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   if (_formkey.currentState!.validate()) {
-                                    LoginPassword.login = LoginPassword.loginPassword[myController.text]!;
+                                    var listLoginAccess = LoginPassword.loginPassword[myController.text];
+                                    LoginPassword.login = listLoginAccess![0];
+                                    LoginPassword.access = listLoginAccess[1];
                                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                                         builder: (_) => const ArtphotoTech()));
                                   }

@@ -463,13 +463,13 @@ class ConnectToDBMySQL {
     return list;
   }
 
-  Future<Map<String, String>> getLoginPassword() async{
+  Future<Map<String, List>> getLoginPassword() async{
     var result = await _connDB!.query(
         'SELECT * FROM loginPassword');
 
-    Map<String, String> map = {};
+    Map<String, List> map = {};
     for (var row in result) {
-      map[row[2]] = row[1];
+      map[row[2]] = [row[1], row[3]];
     }
     return map;
   }

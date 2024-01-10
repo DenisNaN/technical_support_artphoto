@@ -94,7 +94,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                       child: const Text("Отмена")),
                   const Spacer(),
                   TextButton(
-                      onPressed: HasNetwork.isConnecting ? () {
+                      onPressed: HasNetwork.isConnecting && _isEdit ? () {
                         if(_isEdit){
                           Future<Trouble> trouble = _save();
                           Navigator.pop(context, trouble);
@@ -113,12 +113,12 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                           );
                         }
                       } : null,
-                      child: HasNetwork.isConnecting ?
-                      !_isEdit ? const Text("Сохранить") : Container(padding: const EdgeInsets.all(5.0),
-                          decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(7)),
+                      child: HasNetwork.isConnecting && _isEdit ?
+                        Container(padding: const EdgeInsets.all(5.0),
+                          decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(7)),
                           child: const Text("Сохранить", style: TextStyle(color: Colors.white))) :
-                      const Text("Сохранить", style: TextStyle(color:  Colors.grey),
-                      ))
+                        const SizedBox(),
+                      )
                 ],
               ),
             )
@@ -174,9 +174,9 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                     'Сотрудник: $_employeeCheckFixTrouble\n'
                     'Дата: ${getFomattedDateForView(_dateCheckFixTroubleEmployee)}') :
                 const Text('Проблема сотрудником не закрыта'),
-                trailing: LoginPassword.login == 'Денис' || LoginPassword.login == 'Владимир' ?
+                trailing: LoginPassword.access == 'admin' ?
                 Row(mainAxisSize: MainAxisSize.min, children: [
-                  SizedBox(width: 30, child: IconButton(
+                  SizedBox(width: 40, child: IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: () {
                       showDatePicker(
@@ -215,7 +215,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                         'Сотрудник: $_engineerCheckFixTrouble\n'
                         'Дата: ${getFomattedDateForView(_dateCheckFixTroubleEngineer)}'),
                 trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                  SizedBox(width: 30, child: IconButton(
+                  SizedBox(width: 40, child: IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: () {
                       showDatePicker(

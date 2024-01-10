@@ -45,6 +45,8 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   bool _isEditTestDrive = false;
   bool _isEditSwitch = false;
 
+  bool _isEdit = false;
+
   @override
   void initState() {
     super.initState();
@@ -85,6 +87,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
   @override
   Widget build(BuildContext context) {
+    _isEdit = validateButtonSaveView();
     return Scaffold(
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
@@ -99,7 +102,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                       child: const Text("Отмена")),
                   const Spacer(),
                   TextButton(
-                      onPressed: HasNetwork.isConnecting ? () {
+                      onPressed: HasNetwork.isConnecting && _isEdit ? () {
                         if(_selectedDropdownNameTechnic == null ||
                             _nameTechnic.text == "" ||
                             _costTechnic.text == "" ||
@@ -151,9 +154,12 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                           );
                         }
                       } : null,
-                      child: HasNetwork.isConnecting ? const Text("Сохранить") :
-                        const Text("Сохранить", style: TextStyle(color:  Colors.grey),
-                      ))
+                      child: HasNetwork.isConnecting && _isEdit ?
+                        Container(padding: const EdgeInsets.all(5.0),
+                          decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(7)),
+                          child: const Text("Сохранить", style: TextStyle(color: Colors.white))) :
+                        const SizedBox(),
+                      )
                 ],
               ),
             )
@@ -501,6 +507,16 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     if(_isEditCategory || _isEditName || _isEditCost || _isEditDateBuy || _isEditComment || _isEditStatusDislocation || _isEditTestDrive || _isEditSwitch) {
       TechnicSQFlite.db.updateTechnic(technic);
     }
+  }
+
+  bool validateButtonSaveView(){
+    bool result = false;
+    if(_isEditCategory || _isEditName || _isEditCost || _isEditDateBuy ||
+        _isEditComment || _isEditStatusDislocation || _isEditTestDrive ||
+        _isEditSwitch){
+      result = true;
+    }
+    return result;
   }
 }
 
