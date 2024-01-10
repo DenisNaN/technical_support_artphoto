@@ -27,12 +27,10 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
   String _dateTrouble = '';
   String _trouble = '';
   String _dateCheckFixTroubleEmployee = '';
-  String _dateCheckFixTroubleEmployeeForSQL = '';
   String _employeeCheckFixTrouble = '';
   String _dateCheckFixTroubleEngineer = '';
-  String _dateCheckFixTroubleEngineerForSQL = '';
   String _engineerCheckFixTrouble = '';
-  late Uint8List _photoTrouble;
+  Uint8List _photoTrouble = Uint8List.fromList([]);
 
   late TransformationController transformationController;
   late AnimationController animationController;
@@ -57,10 +55,8 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
     _dateTrouble = widget.trouble.dateTrouble;
     _trouble = widget.trouble.trouble;
     _dateCheckFixTroubleEmployee = widget.trouble.dateCheckFixTroubleEmployee;
-    _dateCheckFixTroubleEmployeeForSQL = widget.trouble.dateCheckFixTroubleEmployee;
     _employeeCheckFixTrouble = widget.trouble.employeeCheckFixTrouble;
     _dateCheckFixTroubleEngineer = widget.trouble.dateCheckFixTroubleEngineer;
-    _dateCheckFixTroubleEngineerForSQL = widget.trouble.dateCheckFixTroubleEngineer;
     _engineerCheckFixTrouble = widget.trouble.engineerCheckFixTrouble;
     if(widget.trouble.photoTrouble != null) _photoTrouble = widget.trouble.photoTrouble!;
 
@@ -117,7 +113,10 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                           );
                         }
                       } : null,
-                      child: HasNetwork.isConnecting ? const Text("Сохранить") :
+                      child: HasNetwork.isConnecting ?
+                      !_isEdit ? const Text("Сохранить") : Container(padding: const EdgeInsets.all(5.0),
+                          decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(7)),
+                          child: const Text("Сохранить", style: TextStyle(color: Colors.white))) :
                       const Text("Сохранить", style: TextStyle(color:  Colors.grey),
                       ))
                 ],
@@ -151,17 +150,17 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                 ) : const Text('БН'),
               ),
 
-              ListTile(
+              widget.trouble.internalID != 0 ? ListTile(
                 leading: const Icon(Icons.medical_information),
                 title: Text('Наименование: ${Technic.technicList[indexTechnic].category}\n'
                     'Откуда забрали: $_photosalon'),
-              ),
+              ) : const SizedBox(),
 
-              ListTile(
-                leading: const Icon(Icons.medical_information),
-                title: Text('Дата проблемы: '
+              widget.trouble.internalID != 0 ? ListTile(
+                leading: const Icon(Icons.date_range),
+                title: Text('Дата: '
                     '${DateFormat('d MMMM yyyy', 'ru_RU').format(DateTime.parse(_dateTrouble.replaceAll('.', '-')))}'),
-              ),
+              ) : const SizedBox(),
 
               ListTile(
                 leading: const Icon(Icons.create),
@@ -170,11 +169,14 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
 
               ListTile(
                 leading: const Icon(Icons.today),
-                title: _dateCheckFixTroubleEmployee != '' ? Text('Закрытие сотрудником:\n'
+                title: _dateCheckFixTroubleEmployee != '' ? Text(
+                    'Закрытие сотрудником:\n'
                     'Сотрудник: $_employeeCheckFixTrouble\n'
-                    'Дата: ${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateCheckFixTroubleEmployee.replaceAll('.', '-')))}') :
+                    'Дата: ${getFomattedDateForView(_dateCheckFixTroubleEmployee)}') :
                 const Text('Проблема сотрудником не закрыта'),
-                trailing: LoginPassword.login == 'Денис' || LoginPassword.login == 'Владимир' ? IconButton(
+                trailing: LoginPassword.login == 'Денис' || LoginPassword.login == 'Владимир' ?
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  SizedBox(width: 30, child: IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: () {
                       showDatePicker(
@@ -187,23 +189,31 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                       ).then((date) {
                         setState(() {
                           if(date != null) {
-                            _dateCheckFixTroubleEmployee = DateFormat('d MMMM yyyy', 'ru_RU').format(date);
-                            _dateCheckFixTroubleEmployeeForSQL = DateFormat('yyyy.MM.dd').format(date);
+                            _dateCheckFixTroubleEmployee = DateFormat('yyyy.MM.dd').format(date);
                             _employeeCheckFixTrouble = LoginPassword.login;
                             _isEdit = true;
                           }
                         });
                       });
                     },
-                    color: Colors.blue
-                ) : null,
+                    color: Colors.blue)),
+                      IconButton(
+                          onPressed: (){
+                            setState(() {
+                              _dateCheckFixTroubleEmployee = '';
+                              _isEdit = true;
+                            });
+                          },
+                          icon: const Icon(Icons.clear))
+                ]) : null
               ),
 
               ListTile(
                 leading: const Icon(Icons.today),
-                title: Text(_dateCheckFixTroubleEngineer == '' ? 'Выберите дату' :
-                  DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateCheckFixTroubleEngineer.replaceAll('.', '-')))),
-                subtitle: const Text("Дата закрытия проблемы инженером"),
+                title: Text(_dateCheckFixTroubleEngineer == '' ? 'Для закрытия проблемы инженером выберите дату' :
+                        'Закрытие инженером:\n'
+                        'Сотрудник: $_engineerCheckFixTrouble\n'
+                        'Дата: ${getFomattedDateForView(_dateCheckFixTroubleEngineer)}'),
                 trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                   SizedBox(width: 30, child: IconButton(
                     icon: const Icon(Icons.edit),
@@ -218,8 +228,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                       ).then((date) {
                         setState(() {
                           if(date != null) {
-                            _dateCheckFixTroubleEngineer = DateFormat('d MMMM yyyy', 'ru_RU').format(date);
-                            _dateCheckFixTroubleEngineerForSQL = DateFormat('yyyy.MM.dd').format(date);
+                            _dateCheckFixTroubleEngineer = DateFormat('yyyy.MM.dd').format(date);
                             _engineerCheckFixTrouble = LoginPassword.login;
                             _isEdit = true;
                           }
@@ -231,14 +240,13 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                       onPressed: (){
                         setState(() {
                           _dateCheckFixTroubleEngineer = '';
-                          _dateCheckFixTroubleEngineerForSQL = '';
                           _isEdit = true;
                         });
                       },
                       icon: const Icon(Icons.clear))
                 ])
               ),
-              _buildPhotoTroubleListTile()
+              _photoTrouble.isNotEmpty ? _buildPhotoTroubleListTile() : const SizedBox()
             ],
           ),
         )
@@ -247,8 +255,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
 
   ListTile _buildPhotoTroubleListTile() {
     return ListTile(
-      leading: const SizedBox(height: 37, child: Icon(Icons.photo_camera)),
-      title:  const Text("\nФотография"),
+      title:  const Center(child: Text("\nФотография\n")),
       subtitle: Container(
           child: _buildImage()
       ),
@@ -299,9 +306,9 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
         widget.trouble.employee,
         int.parse(_innerNumberTechnic),
         _trouble,
-        _dateCheckFixTroubleEmployeeForSQL,
+        _dateCheckFixTroubleEmployee,
         _employeeCheckFixTrouble,
-        _dateCheckFixTroubleEngineerForSQL,
+        _dateCheckFixTroubleEngineer,
         _engineerCheckFixTrouble,
     );
 
@@ -311,6 +318,10 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
       TroubleSQFlite.db.updateTrouble(trouble);
     }
     return trouble;
+  }
+
+  String getFomattedDateForView(String date){
+    return DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 }
 

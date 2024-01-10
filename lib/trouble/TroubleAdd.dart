@@ -29,7 +29,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
   final _trouble = TextEditingController();
   bool _isBN = false;
   File? imageFile;
-  late Uint8List _photoTrouble;
+  Uint8List _photoTrouble = Uint8List(0);
   late TransformationController transformationController;
   late AnimationController animationController;
   Animation<Matrix4>? animation;

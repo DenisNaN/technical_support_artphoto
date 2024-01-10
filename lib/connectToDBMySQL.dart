@@ -396,7 +396,7 @@ class ConnectToDBMySQL {
             'ДатаУстрСотр = ?, '
             'СотрПодтверУстр = ?, '
             'ДатаУстрИнженер = ?, '
-            'ИнженерПодтверУстр = ?, '
+            'ИнженерПодтверУстр = ? '
             'WHERE id = ?',
         [
           trouble.dateCheckFixTroubleEmployee,

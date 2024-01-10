@@ -14,7 +14,6 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
 
     Directory docsDir = await getApplicationDocumentsDirectory();
-    print(docsDir);
     utils.docsDir = docsDir;
     runApp(const SplashScreenArtphoto());
   }

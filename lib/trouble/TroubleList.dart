@@ -52,13 +52,17 @@ class _TroubleListState extends State<TroubleList> {
   Row _buildTitleListTile(BuildContext context, int index){
     bool checkboxValueEngineer;
     bool checkboxValueEmployee;
-    bool checkboxValuePhoto;
+    bool checkboxValuePhoto = false;
+
     Trouble.troubleList[index].dateCheckFixTroubleEngineer != '' ? checkboxValueEngineer = true :
       checkboxValueEngineer = false;
     Trouble.troubleList[index].dateCheckFixTroubleEmployee != '' ? checkboxValueEmployee = true :
     checkboxValueEmployee = false;
-    Trouble.troubleList[index].photoTrouble.isNotEmpty ? checkboxValuePhoto = true :
-    checkboxValuePhoto = false;
+
+    if(Trouble.troubleList[index].photoTrouble != null){
+      Trouble.troubleList[index].photoTrouble.isNotEmpty ? checkboxValuePhoto = true :
+      checkboxValuePhoto = false;
+    }
 
     return Row(
       children: [
@@ -68,11 +72,15 @@ class _TroubleListState extends State<TroubleList> {
                 TextSpan(
                     style: const TextStyle(fontWeight: FontWeight.bold),
                     text: Trouble.troubleList[index].internalID != 0 ?
-                    '№ ${Trouble.troubleList[index].internalID}  ' : 'БН '
-                        '${Trouble.troubleList[index].photosalon} '
-                        '${Trouble.troubleList[index].employee}\n'),
-                TextSpan(style: const TextStyle(fontStyle: FontStyle.italic),
-                  text: '${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(Trouble.troubleList[index].dateTrouble.replaceAll('.', '-')))}\n'),
+                      '№ ${Trouble.troubleList[index].internalID} ' : 'БН '),
+                TextSpan(
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    text: '${Trouble.troubleList[index].photosalon} '
+                        '${Trouble.troubleList[index].employee}\n'
+                ),
+                TextSpan(
+                    style: const TextStyle(fontStyle: FontStyle.italic),
+                    text: '${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(Trouble.troubleList[index].dateTrouble.replaceAll('.', '-')))}\n'),
                 TextSpan(
                   text: 'Проблема: ${Trouble.troubleList[index].trouble}\n',
                   children: [WidgetSpan(child:
@@ -81,7 +89,7 @@ class _TroubleListState extends State<TroubleList> {
                         SizedBox(
                             width: 30,
                             height: 10,
-                            child: Checkbox(value: checkboxValuePhoto, onChanged: (value){})),
+                            child: Checkbox(value: checkboxValuePhoto, onChanged: null)),
                         ]
                       )
                     )

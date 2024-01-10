@@ -20,6 +20,11 @@ class DownloadAllList{
     List listLastId = [];
     List listCount = [];
 
+    CategoryDropDownValueModel.nameEquipment = [];
+    CategoryDropDownValueModel.photosalons = [];
+    CategoryDropDownValueModel.service = [];
+    CategoryDropDownValueModel.statusForEquipment = [];
+
     rebootAllBasicListSQFlite();
     // rebootAllListCategorySQFlite('nameEquipment', 'name');
     // rebootAllListCategorySQFlite('photosalons', 'Фотосалон');
