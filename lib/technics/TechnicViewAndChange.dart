@@ -52,9 +52,9 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     super.initState();
     _nameTechnic.text = widget.technic.name;
     _costTechnic.text = '${widget.technic.cost}';
-    _selectedDropdownNameTechnic = widget.technic.category;
-    _selectedDropdownStatus = widget.technic.status;
-    _selectedDropdownDislocation = widget.technic.dislocation;
+    _selectedDropdownNameTechnic = widget.technic.category == '' ? null : widget.technic.category;
+    _selectedDropdownStatus = widget.technic.status == '' ? null : widget.technic.status;
+    _selectedDropdownDislocation = widget.technic.dislocation == '' ? null : widget.technic.dislocation;
 
     _dateBuy = DateTime.parse(widget.technic.dateBuyTechnic.replaceAll('.', '-'));
     _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(_dateBuy);

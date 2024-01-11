@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:technical_support_artphoto/repair/RepairAdd.dart';
+import 'package:technical_support_artphoto/repair/RepairAddWithTrouble.dart';
 import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 import 'package:technical_support_artphoto/trouble/TroubleSQFlite.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 import '../ConnectToDBMySQL.dart';
+import '../repair/Repair.dart';
 import '../technics/Technic.dart';
 import '../technics/TechnicViewAndChange.dart';
 import '../utils/hasNetwork.dart';
@@ -246,7 +249,9 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                       icon: const Icon(Icons.clear))
                 ])
               ),
-              _photoTrouble.isNotEmpty ? _buildPhotoTroubleListTile() : const SizedBox()
+              _photoTrouble.isNotEmpty ? _buildPhotoTroubleListTile() : const SizedBox(),
+              const SizedBox(height: 30),
+              _buildRequestRepair()
             ],
           ),
         )
@@ -296,6 +301,24 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
           )
       )
   );
+
+  ListTile _buildRequestRepair(){
+    return ListTile(
+      title: TextButton(
+        child: Container(
+            padding: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(color: Colors.blueAccent, borderRadius: BorderRadius.circular(7)),
+            child: const Text("Сформировать заявку на ремонт", style: TextStyle(color: Colors.white, fontSize: 15))),
+        onPressed: (){
+          Navigator.push(context, MaterialPageRoute(builder: (context) => RepairAddWithTrouble(trouble: widget.trouble))).then((value){
+            setState(() {
+              if(value != null) Repair.repairList.insert(0, value);
+            });
+          });
+        },
+      ),
+    );
+  }
 
   Future<Trouble> _save() async{
 

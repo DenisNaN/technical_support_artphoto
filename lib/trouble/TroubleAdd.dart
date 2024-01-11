@@ -371,6 +371,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
     if(_innerNumberTechnic.text != "" &&
         _categoryController.text != "" &&
         _photosalon != '' &&
+        _photosalon != null &&
         _dateTrouble != '' &&
         _trouble.text != '') {
       validate = true;

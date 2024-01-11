@@ -229,8 +229,11 @@ class ConnectToDBMySQL {
       String dateCheckFixTroubleEmployee = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
       String dateCheckFixTroubleEngineer = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
 
-      Trouble trouble = Trouble(row[0], row[1],  dateTrouble,  row[3], row[4], row[5], dateCheckFixTroubleEmployee,
-          row[7], dateCheckFixTroubleEngineer, row[9], row[10]);
+      Blob blobImage = row[10];
+      Uint8List image = Uint8List.fromList(blobImage.toBytes());
+
+      Trouble trouble = Trouble(row[0], row[1].toString(),  dateTrouble,  row[3].toString(), row[4], row[5].toString(), dateCheckFixTroubleEmployee,
+          row[7].toString(), dateCheckFixTroubleEngineer, row[9].toString(), image);
       list.add(trouble);
     }
     return list;
@@ -309,9 +312,6 @@ class ConnectToDBMySQL {
         'costService, '
         'diagnosisService, '
         'recommendationsNotes, '
-        'dateStartTestDrive, '
-        'dateFinishTestDrive, '
-        'resultTestDrive, '
         'newStatus, '
         'newDislocation, '
         'dateReceipt '

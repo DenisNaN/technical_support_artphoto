@@ -4,50 +4,67 @@ import 'package:intl/intl.dart';
 import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
 import '../ConnectToDBMySQL.dart';
 import '../technics/Technic.dart';
+import '../trouble/Trouble.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import 'Repair.dart';
 
-class RepairAdd extends StatefulWidget {
-  const RepairAdd({super.key}) ;
+class RepairAddWithTrouble extends StatefulWidget {
+  final Trouble trouble;
+
+  const RepairAddWithTrouble({super.key, required this.trouble});
 
   @override
-  State<RepairAdd> createState() => _RepairAddState();
+  State<RepairAddWithTrouble> createState() => _RepairAddWithTroubleState();
 }
 
-class _RepairAddState extends State<RepairAdd> {
+class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final _innerNumberTechnic = TextEditingController();
   final String _innerNumberTechnicBN = "БН";
   final _focusInnerNumberTechnic = FocusNode();
-  String _category = "";
   final _categoryController = TextEditingController();
   String _dislocationOld = "";
   final _complaint = TextEditingController();
   String _dateDeparture = "";
-  String _dateDepartureForSQL = "";
   String _dateTransferForService = "";
-  String _dateTransferForServiceForSQL = "";
   String _dateDepartureFromService = "";
-  String _dateDepartureFromServiceForSQL = "";
   final _worksPerformed = TextEditingController();
   final _costService = TextEditingController();
   final _diagnosisService = TextEditingController();
   final _recommendationsNotes = TextEditingController();
   String _dateReceipt = "";
-  String _dateReceiptForSQL = "";
   bool _isBN = false;
   String? _selectedDropdownDislocationOld;
   String? _selectedDropdownStatusOld;
   String? _selectedDropdownService;
   String? _selectedDropdownStatusNew;
   String? _selectedDropdownDislocationNew;
+  int indexTechnic = 0;
 
   Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
       'dislocation', 'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false);
 
   @override
   void initState() {
+    for(int i = 0; i < Technic.technicList.length; i++){
+      if(Technic.technicList[i].internalID == widget.trouble.internalID){
+        indexTechnic = i;
+        break;
+      }
+    }
+
+    _innerNumberTechnic.text = widget.trouble.internalID.toString();
+    _innerNumberTechnic.text == '0' ? _isBN = true : _isBN = false;
+    _selectedDropdownStatusOld = 'Неисправна';
+    _complaint.text = widget.trouble.trouble;
+    _dateDeparture = DateFormat('yyyy.MM.dd').format(DateTime.now());
+    _selectedDropdownService = CategoryDropDownValueModel.service.first;
+
+    technickFinder();
+    _categoryController.text = !_isBN ? technicFind.category : '';
+    _dislocationOld = !_isBN ? technicFind.dislocation : '';
+
     _focusInnerNumberTechnic.addListener(() {
       if (!_focusInnerNumberTechnic.hasFocus) {
         technicFind =
@@ -56,8 +73,6 @@ class _RepairAddState extends State<RepairAdd> {
                 orElse: () =>
                     Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
                         'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false));
-        _category = technicFind.name;
-        _dislocationOld = technicFind.dislocation;
         if (technicFind.id == -1) {
           setState(() {
             _innerNumberTechnic.clear();
@@ -231,7 +246,7 @@ class _RepairAddState extends State<RepairAdd> {
       ),
     ) : ListTile(
       leading: const Icon(Icons.print),
-      title: technicFind.id == -1 ? const Text('Введите номер техники') : Text('Последний фотосалон: ${technicFind.dislocation}'),
+      title: technicFind.id == -1 ? const Text('Введите номер техники') : Text('Последний фотосалон: $_dislocationOld'),
     );
   }
 
@@ -278,7 +293,7 @@ class _RepairAddState extends State<RepairAdd> {
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Забрали с точки. Дата"),
-      subtitle: Text(_dateDeparture == "" ? "Выберите дату" : _dateDeparture),
+      subtitle: Text(_dateDeparture == "" ? "Выберите дату" : getFomattedDateForView(_dateDeparture)),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -291,8 +306,7 @@ class _RepairAddState extends State<RepairAdd> {
             ).then((date) {
               setState(() {
                 if(date != null) {
-                  _dateDepartureForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateDeparture = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                  _dateDeparture = DateFormat('yyyy.MM.dd').format(date);
                 }
               });
             });
@@ -335,7 +349,7 @@ class _RepairAddState extends State<RepairAdd> {
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Дата сдачи в ремонт"),
-      subtitle: Text(_dateTransferForService == "" ? "Выберите дату" : _dateTransferForService),
+      subtitle: Text(_dateTransferForService == "" ? "Выберите дату" : getFomattedDateForView(_dateTransferForService)),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -348,8 +362,7 @@ class _RepairAddState extends State<RepairAdd> {
             ).then((date) {
               setState(() {
                 if(date != null) {
-                  _dateTransferForServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateTransferForService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                  _dateTransferForService = DateFormat('yyyy.MM.dd').format(date);
                 }
               });
             });
@@ -363,7 +376,7 @@ class _RepairAddState extends State<RepairAdd> {
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Забрали из ремонта. Дата"),
-      subtitle: Text(_dateDepartureFromService == "" ? "Выберите дату" : _dateDepartureFromService),
+      subtitle: Text(_dateDepartureFromService == "" ? "Выберите дату" : getFomattedDateForView(_dateDepartureFromService)),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -376,8 +389,7 @@ class _RepairAddState extends State<RepairAdd> {
             ).then((date) {
               setState(() {
                 if(date != null) {
-                  _dateDepartureFromServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateDepartureFromService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                  _dateDepartureFromService = DateFormat('yyyy.MM.dd').format(date);
                 }
               });
             });
@@ -493,7 +505,7 @@ class _RepairAddState extends State<RepairAdd> {
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Дата поступления"),
-      subtitle: Text(_dateReceipt == "" ? "Выберите дату" : _dateReceipt),
+      subtitle: Text(_dateReceipt == "" ? "Выберите дату" : getFomattedDateForView(_dateReceipt)),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -506,8 +518,7 @@ class _RepairAddState extends State<RepairAdd> {
             ).then((date) {
               setState(() {
                 if(date != null) {
-                  _dateReceiptForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateReceipt = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                  _dateReceipt = DateFormat('yyyy.MM.dd').format(date);
                 }
               });
             });
@@ -520,7 +531,7 @@ class _RepairAddState extends State<RepairAdd> {
   bool _isValidateToSave(){
     bool validate = false;
     if((!_isBN ? _innerNumberTechnic.text != "" : _innerNumberTechnicBN == "БН") &&
-        (!_isBN ? _category != "" : _categoryController.text != "") &&
+        _categoryController.text != "" &&
         (!_isBN ? _selectedDropdownDislocationOld != "" : _selectedDropdownDislocationOld != null) &&
         _selectedDropdownStatusOld != null &&
         _complaint.text != "" &&
@@ -544,21 +555,21 @@ class _RepairAddState extends State<RepairAdd> {
     Repair repair = Repair(
         repairLast.id! + 1,
         int.parse(_innerNumberTechnic.text),
-        _isBN ? _categoryController.text : _category,
+        _categoryController.text,
         _isBN ? _selectedDropdownDislocationOld! : _dislocationOld,
         _selectedDropdownStatusOld!,
         _complaint.text,
-        _dateDepartureForSQL,
+        _dateDeparture,
         _selectedDropdownService!,
-        _dateTransferForServiceForSQL,
-        _dateDepartureFromServiceForSQL,
+        _dateTransferForService,
+        _dateDepartureFromService,
         _worksPerformed.text,
         costServ,
         _diagnosisService.text,
         _recommendationsNotes.text,
         newStatusStr,
         newDislocationStr,
-        _dateReceiptForSQL
+        _dateReceipt
     );
 
     ConnectToDBMySQL.connDB.insertRepairInDB(repair);
@@ -578,6 +589,26 @@ class _RepairAddState extends State<RepairAdd> {
         showCloseIcon: true,
       ),
     );
+  }
+
+  void technickFinder(){
+    technicFind =
+        Technic.technicList.firstWhere((item) => item.internalID
+            .toString() == _innerNumberTechnic.text,
+            orElse: () =>
+                Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
+                    'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false));
+    if (technicFind.id == -1) {
+      setState(() {
+        _isBN = true;
+      });
+    } else {
+      _isBN = false;
+    }
+  }
+
+  String getFomattedDateForView(String date){
+    return DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 }
 

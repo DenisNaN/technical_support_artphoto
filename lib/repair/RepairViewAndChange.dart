@@ -53,11 +53,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     }
     _innerNumberTechnic = '${widget.repair.internalID}';
     _nameTechnic = widget.repair.category;
-    _selectedDropdownStatusOld = widget.repair.status;
-    _selectedDropdownDislocationOld = widget.repair.dislocationOld;
+    _selectedDropdownStatusOld = widget.repair.status == '' ? null : widget.repair.status;
+    _selectedDropdownDislocationOld = widget.repair.dislocationOld == '' ? null : widget.repair.dislocationOld;
     _complaintController.text = widget.repair.complaint;
     _dateDeparture = widget.repair.dateDeparture;
-    _selectedDropdownService = widget.repair.serviceDislocation;
+    _selectedDropdownService = widget.repair.serviceDislocation == '' ? null : widget.repair.serviceDislocation;
     _dateTransferForService = widget.repair.dateTransferForService;
     _dateDepartureFromService = widget.repair.dateDepartureFromService;
     _worksPerformed.text = widget.repair.worksPerformed;
@@ -251,9 +251,9 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                         child: Text(value),
                       );
                     }).toList(),
-                    onChanged: (String? value){
+                    onChanged: (value){
                       setState(() {
-                        _selectedDropdownService = value!;
+                        _selectedDropdownService = value;
                         _isEdit = true;
                       });
                     },
