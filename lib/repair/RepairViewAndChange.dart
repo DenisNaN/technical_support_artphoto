@@ -146,320 +146,371 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
         ),
         body: Form(
           key: _formKey,
-          child: ListView(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.fiber_new),
-                title: widget.repair.internalID != -1 ?
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.only(left: 0.0),
-                          alignment: Alignment.centerLeft,
-                          textStyle: const TextStyle(fontSize: 20)
-                        ),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[indexTechnic]))).then(
-                                  (value){
-                                setState(() {
-                                  if(value != null) {
-                                    Technic.technicList[indexTechnic] = value;
-                                  }
-                                });
-                              });
-                        },
-                        child: Text('№ - $_innerNumberTechnic'
-                        )
-                      )
-                    // )
-                    : const Text('БН'),
-                ),
-
-              ListTile(
-                leading: const Icon(Icons.medical_information),
-                title: Text('Наименование: $_nameTechnic\n'
-                            'Статус: $_selectedDropdownStatusOld'),
-                subtitle: Text('Откуда забрали: $_selectedDropdownDislocationOld'),
-              ),
-
-              _isEditComplaint ?
-              ListTile(
-                leading: const Icon(Icons.create),
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: "Жалоба"),
-                  controller: _complaintController,
-                ),
-              ) :
-              ListTile(
-                leading: const Icon(Icons.comment),
-                title: Text(_complaintController.text),
-                subtitle: const Text('Жалоба'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
-                  onPressed: (){
-                      setState(() {
-                        _isEditComplaint = true;
-                        _isEdit = true;
-                      }
-                    );
-                  },
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.today),
-                title: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateDeparture.replaceAll('.', '-')))),
-                subtitle: const Text("Забрали с точки. Дата"),
-                trailing: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2099),
-                          locale: const Locale("ru", "RU")
-                      ).then((date) {
-                        setState(() {
-                          if(date != null) {
-                            _dateDeparture = DateFormat('yyyy.MM.dd').format(date);
-                            _isEdit = true;
-                          }
-                        });
-                      });
-                    },
-                    color: Colors.blue
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.miscellaneous_services),
-                  subtitle: _selectedDropdownService != null ? const Text('Местонахождение техники') : null,
-                  title: DropdownButton<String>(
-                    borderRadius: BorderRadius.circular(10.0),
-                    isExpanded: true,
-                    hint: const Text('Местонахождение техники'),
-                    icon: _selectedDropdownService != null ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
-                      onPressed: (){
-                        setState(() {
-                          _selectedDropdownService = null;
-                        });}) : null,
-                    value: _selectedDropdownService,
-                    items: CategoryDropDownValueModel.service.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (value){
-                      setState(() {
-                        _selectedDropdownService = value;
-                        _isEdit = true;
-                      });
-                    },
-                  )
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.today),
-                title: Text(_dateTransferForService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateTransferForService.replaceAll('.', '-')))),
-                subtitle: const Text("Дата сдачи в ремонт"),
-                trailing: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2099),
-                          locale: const Locale("ru", "RU")
-                      ).then((date) {
-                        setState(() {
-                          if(date != null) {
-                            _dateTransferForService = DateFormat('yyyy.MM.dd').format(date);
-                            _isEdit = true;
-                          }
-                        });
-                      });
-                    },
-                    color: Colors.blue
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.today),
-                title: Text(_dateDepartureFromService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateDepartureFromService.replaceAll('.', '-')))),
-                subtitle: const Text("Забрали из ремонта. Дата"),
-                trailing: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2099),
-                          locale: const Locale("ru", "RU")
-                      ).then((date) {
-                        setState(() {
-                          if(date != null) {
-                            _dateDepartureFromService = DateFormat('yyyy.MM.dd').format(date);
-                            _isEdit = true;
-                          }
-                        });
-                      });
-                    },
-                    color: Colors.blue
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.comment),
-                subtitle: _worksPerformed.text != '' ? const Text('Произведенные работы') : null,
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: "Произведенные работы"),
-                  controller: _worksPerformed,
-                  onChanged: (value){
-                    setState(() {
-                      _isEdit = true;
-                    });
-                  },
-                ),
-              ),
-
-              ListTile(
-                  leading: const Icon(Icons.shopify),
-                  subtitle: _costService.text != '' ? const Text('Стоимость ремонта') : null,
-                  title: TextFormField(
-                    decoration: const InputDecoration(
-                        hintText: 'Стоимость ремонта',
-                        prefix: Text('₽ ')),
-                    controller: _costService,
-                    onChanged: (value){
-                      setState(() {
-                        _isEdit = true;
-                      });
-                    },
-                    inputFormatters: [IntegerCurrencyInputFormatter()],
-                    keyboardType: TextInputType.number,
-                  )
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.comment),
-                subtitle: _diagnosisService.text != '' ? const Text('Диагноз мастерской') : null,
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: 'Диагноз мастерской'),
-                  controller: _diagnosisService,
-                  onChanged: (value){
-                    setState(() {
-                      _isEdit = true;
-                    });
-                  },
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.comment),
-                subtitle: _recommendationsNotes.text != '' ? const Text('Рекомендации/примечания') : null,
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: 'Рекомендации/примечания (необязательно)'),
-                  controller: _recommendationsNotes,
-                  onChanged: (value){
-                    setState(() {
-                      _isEdit = true;
-                    });
-                  },
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.copyright),
-                subtitle: _selectedDropdownStatusNew != null ? const Text('Новый статус') : null,
-                title: DropdownButton<String>(
-                  borderRadius: BorderRadius.circular(10.0),
-                  isExpanded: true,
-                  hint: const Text('Новый статус'),
-                  icon: _selectedDropdownStatusNew != null ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
-                      onPressed: (){
-                        setState(() {
-                          _selectedDropdownStatusNew = null;
-                        });}) : null,
-                  value: _selectedDropdownStatusNew,
-                  items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (value){
-                    setState(() {
-                      _selectedDropdownStatusNew = value;
-                      _isEdit = true;
-                      _isEditNewStatusDislocation = true;
-                    });
-                  },
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.local_shipping),
-                subtitle: _selectedDropdownDislocationNew != null ? const Text('Куда уехал') : null,
-                title: DropdownButton<String>(
-                  borderRadius: BorderRadius.circular(10.0),
-                  isExpanded: true,
-                  hint: const Text('Куда уехал'),
-                  icon: _selectedDropdownDislocationNew != null ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
-                      onPressed: (){
-                        setState(() {
-                          _selectedDropdownDislocationNew = null;
-                        });}) : null,
-                  value: _selectedDropdownDislocationNew,
-                  items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (value){
-                    setState(() {
-                      _selectedDropdownDislocationNew = value;
-                      _isEdit = true;
-                      _isEditNewStatusDislocation = true;
-                    });
-                  },
-                ),
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.today),
-                title: Text(_dateReceipt == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateReceipt.replaceAll('.', '-')))),
-                subtitle: const Text("Дата поступления"),
-                trailing: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2099),
-                          locale: const Locale("ru", "RU")
-                      ).then((date) {
-                        setState(() {
-                          if(date != null) {
-                            _dateReceipt = DateFormat('yyyy.MM.dd').format(date);
-                            _isEdit = true;
-                          }
-                        });
-                      });
-                    },
-                    color: Colors.blue
-                ),
-              ),
-            ],
-          ),
+          child: Column(children: [
+            const Padding(
+                padding: EdgeInsets.fromLTRB(0, 40, 0, 10),
+                child: Text('Заявка на ремонт',
+                    style: TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),
+            Expanded(child:
+              ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildInternalID(),
+                  _buildDataTechnick(),
+                  _buildComplait(),
+                  _buildDateDeparture(),
+                  _buildDislocationService(),
+                  _buildDateTransferForService(),
+                  _buildDateDepartureFromService(),
+                  _buildWorksPerformed(),
+                  _buildCostService(),
+                  _buildDiagnosisService(),
+                  _buildRecommendationsNotes(),
+                  _buildStatusNew(),
+                  _buildDislocationNew(),
+                  _buildDateReceipt()
+                ]))]
+          )
         )
+    );
+  }
+
+  ListTile _buildInternalID() {
+  return ListTile (
+    leading: const Icon(Icons.fiber_new),
+    title: widget.repair.internalID != -1 ?
+          TextButton(
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.only(left: 0.0),
+              alignment: Alignment.centerLeft,
+              textStyle: const TextStyle(fontSize: 20)
+            ),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[indexTechnic]))).then(
+                      (value){
+                    setState(() {
+                      if(value != null) {
+                        Technic.technicList[indexTechnic] = value;
+                      }
+                    });
+                  });
+            },
+            child: Text('№ - $_innerNumberTechnic'
+            )
+          )
+        // )
+        : const Text('БН'),
+    );
+  }
+
+  ListTile _buildDataTechnick() {
+    return ListTile(
+    leading: const Icon(Icons.medical_information),
+    title: Text('Наименование: $_nameTechnic\n'
+                'Статус: $_selectedDropdownStatusOld'),
+    subtitle: Text('Откуда забрали: $_selectedDropdownDislocationOld'),
+  );
+  }
+
+  ListTile _buildComplait() {
+    return _isEditComplaint ?
+    ListTile(
+      leading: const Icon(Icons.create),
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: "Жалоба"),
+        controller: _complaintController,
+      ),
+    ) :
+    ListTile(
+      leading: const Icon(Icons.comment),
+      title: Text(_complaintController.text),
+      subtitle: const Text('Жалоба'),
+      trailing: IconButton(
+        icon: const Icon(Icons.edit, color: Colors.blue),
+        onPressed: (){
+            setState(() {
+              _isEditComplaint = true;
+              _isEdit = true;
+            }
+          );
+        },
+      ),
+    );
+  }
+
+  ListTile _buildDateDeparture() {
+    return ListTile(
+      leading: const Icon(Icons.today),
+      title: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateDeparture.replaceAll('.', '-')))),
+      subtitle: const Text("Забрали с точки. Дата"),
+      trailing: IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () {
+            showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2099),
+                locale: const Locale("ru", "RU")
+            ).then((date) {
+              setState(() {
+                if(date != null) {
+                  _dateDeparture = DateFormat('yyyy.MM.dd').format(date);
+                  _isEdit = true;
+                }
+              });
+            });
+          },
+          color: Colors.blue
+      ),
+    );
+  }
+
+  ListTile _buildDislocationService() {
+    return ListTile(
+      leading: const Icon(Icons.miscellaneous_services),
+        subtitle: _selectedDropdownService != null ? const Text('Местонахождение техники') : null,
+        title: DropdownButton<String>(
+          borderRadius: BorderRadius.circular(10.0),
+          isExpanded: true,
+          hint: const Text('Местонахождение техники'),
+          icon: _selectedDropdownService != null ? IconButton(
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: (){
+              setState(() {
+                _selectedDropdownService = null;
+              });}) : null,
+          value: _selectedDropdownService,
+          items: CategoryDropDownValueModel.service.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+          onChanged: (value){
+            setState(() {
+              _selectedDropdownService = value;
+              _isEdit = true;
+            });
+          },
+        )
+    );
+  }
+
+  ListTile _buildDateTransferForService() {
+    return ListTile(
+      leading: const Icon(Icons.today),
+      title: Text(_dateTransferForService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateTransferForService.replaceAll('.', '-')))),
+      subtitle: const Text("Дата сдачи в ремонт"),
+      trailing: IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () {
+            showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2099),
+                locale: const Locale("ru", "RU")
+            ).then((date) {
+              setState(() {
+                if(date != null) {
+                  _dateTransferForService = DateFormat('yyyy.MM.dd').format(date);
+                  _isEdit = true;
+                }
+              });
+            });
+          },
+          color: Colors.blue
+      ),
+    );
+  }
+
+  ListTile _buildDateDepartureFromService() {
+    return ListTile(
+      leading: const Icon(Icons.today),
+      title: Text(_dateDepartureFromService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateDepartureFromService.replaceAll('.', '-')))),
+      subtitle: const Text("Забрали из ремонта. Дата"),
+      trailing: IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () {
+            showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2099),
+                locale: const Locale("ru", "RU")
+            ).then((date) {
+              setState(() {
+                if(date != null) {
+                  _dateDepartureFromService = DateFormat('yyyy.MM.dd').format(date);
+                  _isEdit = true;
+                }
+              });
+            });
+          },
+          color: Colors.blue
+      ),
+    );
+  }
+
+  ListTile _buildWorksPerformed() {
+    return ListTile(
+      leading: const Icon(Icons.comment),
+      subtitle: _worksPerformed.text != '' ? const Text('Произведенные работы') : null,
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: "Произведенные работы"),
+        controller: _worksPerformed,
+        onChanged: (value){
+          setState(() {
+            _isEdit = true;
+          });
+        },
+      ),
+    );
+  }
+
+  ListTile _buildCostService() {
+    return ListTile(
+      leading: const Icon(Icons.shopify),
+      subtitle: _costService.text != '' ? const Text('Стоимость ремонта') : null,
+      title: TextFormField(
+        decoration: const InputDecoration(
+            hintText: 'Стоимость ремонта',
+            prefix: Text('₽ ')),
+        controller: _costService,
+        onChanged: (value){
+          setState(() {
+            _isEdit = true;
+          });
+        },
+        inputFormatters: [IntegerCurrencyInputFormatter()],
+        keyboardType: TextInputType.number,
+      )
+    );
+  }
+
+  ListTile _buildDiagnosisService() {
+    return ListTile(
+      leading: const Icon(Icons.comment),
+      subtitle: _diagnosisService.text != '' ? const Text('Диагноз мастерской') : null,
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: 'Диагноз мастерской'),
+        controller: _diagnosisService,
+        onChanged: (value){
+          setState(() {
+            _isEdit = true;
+          });
+        },
+      ),
+    );
+  }
+
+  ListTile _buildRecommendationsNotes() {
+    return ListTile(
+      leading: const Icon(Icons.comment),
+      subtitle: _recommendationsNotes.text != '' ? const Text('Рекомендации/примечания') : null,
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: 'Рекомендации/примечания (необязательно)'),
+        controller: _recommendationsNotes,
+        onChanged: (value){
+          setState(() {
+            _isEdit = true;
+          });
+        },
+      ),
+    );
+  }
+
+  ListTile _buildStatusNew() {
+    return ListTile(
+      leading: const Icon(Icons.copyright),
+      subtitle: _selectedDropdownStatusNew != null ? const Text('Новый статус') : null,
+      title: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(10.0),
+        isExpanded: true,
+        hint: const Text('Новый статус'),
+        icon: _selectedDropdownStatusNew != null ? IconButton(
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: (){
+              setState(() {
+                _selectedDropdownStatusNew = null;
+              });}) : null,
+        value: _selectedDropdownStatusNew,
+        items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (value){
+          setState(() {
+            _selectedDropdownStatusNew = value;
+            _isEdit = true;
+            _isEditNewStatusDislocation = true;
+          });
+        },
+      ),
+    );
+  }
+
+  ListTile _buildDislocationNew() {
+    return ListTile(
+      leading: const Icon(Icons.local_shipping),
+      subtitle: _selectedDropdownDislocationNew != null ? const Text('Куда уехал') : null,
+      title: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(10.0),
+        isExpanded: true,
+        hint: const Text('Куда уехал'),
+        icon: _selectedDropdownDislocationNew != null ? IconButton(
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: (){
+              setState(() {
+                _selectedDropdownDislocationNew = null;
+              });}) : null,
+        value: _selectedDropdownDislocationNew,
+        items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (value){
+          setState(() {
+            _selectedDropdownDislocationNew = value;
+            _isEdit = true;
+            _isEditNewStatusDislocation = true;
+          });
+        },
+      ),
+    );
+  }
+
+  ListTile _buildDateReceipt() {
+    return ListTile(
+      leading: const Icon(Icons.today),
+      title: Text(_dateReceipt == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateReceipt.replaceAll('.', '-')))),
+      subtitle: const Text("Дата поступления"),
+      trailing: IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () {
+            showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2099),
+                locale: const Locale("ru", "RU")
+            ).then((date) {
+              setState(() {
+                if(date != null) {
+                  _dateReceipt = DateFormat('yyyy.MM.dd').format(date);
+                  _isEdit = true;
+                }
+              });
+            });
+          },
+          color: Colors.blue
+      ),
     );
   }
 

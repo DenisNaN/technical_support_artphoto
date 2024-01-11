@@ -148,27 +148,33 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
         ),
         body: Form(
           key: _formKey,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(0, 22, 0, 0),
-            child: Column(children:[
-              const SizedBox(height: 20),
-              _buildInnerNumberTechnicListTile(),
-              _buildCategoryListTile(),
-              _buildDislocationOldListTile(),
-              _buildStatusListTile(),
-              _buildComplaintListTile(),
-              _buildDateDepartureListTile(),
-              _buildServiceDislocationListTile(),
-              _buildDateTransferForServiceListTile(),
-              _buildDateDepartureFromServiceListTile(),
-              _buildWorksPerformedListTile(),
-              _buildCostServiceListTile(),
-              _buildDiagnosisServiceListTile(),
-              _buildRecommendationsNotesListTile(),
-              _buildNewStatusListTile(),
-              _buildNewDislocationListTile(),
-              _buildDateReceiptListTile(),
-            ]),
+          child: Column(children: [
+            const Padding(
+                padding: EdgeInsets.fromLTRB(0, 40, 0, 10),
+                child: Text('Создание заявки на ремонт',
+                    style: TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),
+            Expanded(child:
+              ListView(
+                  padding: EdgeInsets.zero,
+                  children:[
+                    _buildInnerNumberTechnicListTile(),
+                    _buildCategoryListTile(),
+                    _buildDislocationOldListTile(),
+                    _buildStatusListTile(),
+                    _buildComplaintListTile(),
+                    _buildDateDepartureListTile(),
+                    _buildServiceDislocationListTile(),
+                    _buildDateTransferForServiceListTile(),
+                    _buildDateDepartureFromServiceListTile(),
+                    _buildWorksPerformedListTile(),
+                    _buildCostServiceListTile(),
+                    _buildDiagnosisServiceListTile(),
+                    _buildRecommendationsNotesListTile(),
+                    _buildNewStatusListTile(),
+                    _buildNewDislocationListTile(),
+                    _buildDateReceiptListTile(),
+                  ]))],
           ),
         )
     );
