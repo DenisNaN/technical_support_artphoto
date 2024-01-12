@@ -25,7 +25,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   String _dateFinishTestDrive = '';
   String _dateFinishTestDriveForSQL = '';
   final _resultTestDrive = TextEditingController();
-  String? _selectedDropdownNameTechnic;
+  String? _selectedDropdownCategory;
   String? _selectedDropdownDislocation;
   String? _selectedDropdownStatus;
   bool _switchTestDrive = false;
@@ -46,11 +46,6 @@ class _TechnicAddState extends State<TechnicAdd> {
 
   @override
   Widget build(BuildContext context) {
-    final numberFormatter = FilteringTextInputFormatter.allow(
-      RegExp(r'[0-9]'),
-    );
-
-
     return Scaffold(
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
@@ -69,7 +64,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                         // checking the unique number of the equipment
                         if (_formKey.currentState!.validate()) {
                           if (_innerNumberTechnic.text == "" ||
-                              _selectedDropdownNameTechnic == null ||
+                              _selectedDropdownCategory == null ||
                               _nameTechnic.text == "" ||
                               _costTechnic.text == "" ||
                               _selectedDropdownStatus == null ||
@@ -96,7 +91,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                                 technicLast.id! + 1,
                                 int.parse(_innerNumberTechnic.text),
                                 _nameTechnic.text,
-                                _selectedDropdownNameTechnic!,
+                                _selectedDropdownCategory!,
                                 int.parse(_costTechnic.text.replaceAll(",", "")),
                                 _dateForSQL,
                                 _selectedDropdownStatus!,
@@ -136,202 +131,253 @@ class _TechnicAddState extends State<TechnicAdd> {
         ),
         body: Form(
           key: _formKey,
-          child: ListView(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.fiber_new),
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: "Номер техники"),
-                  controller: _innerNumberTechnic,
-                  validator: (value) {
-                    List listInternalID = [];
-                    Technic.technicList.forEach((element) {listInternalID.add(element.internalID.toString());});
-                    if (listInternalID.contains(value)) {
-                      return 'Техника с таким номером уже есть';
-                    }
-                    return null;
-                  },
-                  inputFormatters: [numberFormatter],
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.print),
-                title: DropdownButton<String>(
-                  borderRadius: BorderRadius.circular(10.0),
-                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                  isExpanded: true,
-                  hint: const Text('Наименование техники'),
-                  icon: _selectedDropdownNameTechnic != null ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
-                      onPressed: (){
-                        setState(() {
-                          _selectedDropdownNameTechnic = null;
-                        });}) : null,
-                  value: _selectedDropdownNameTechnic,
-                  items: CategoryDropDownValueModel.nameEquipment.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? value){
-                    setState(() {
-                      _selectedDropdownNameTechnic = value!;
-                      if(value == 'Фотоаппарат') {
-                        _isCategoryPhotocamera = true;
-                        _dateFinishTestDriveForSQL = '';
-                      }
-                      else {
-                        _isCategoryPhotocamera = false;
-                        if(_dateFinishTestDriveForSQL == '' && _dateStartTestDriveForSQL != ''){
-                          DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDriveForSQL).add(const Duration(days: 14));
-                          _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
-                        }
-                      }
-                    });
-                  },
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.create),
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: "Модель техники"),
-                  controller: _nameTechnic,
-                ),
-              ),
-              ListTile(
-                  leading: const Icon(Icons.shopify),
-                  title: TextFormField(
-                    decoration: const InputDecoration(
-                        hintText: "Стоимость техники",
-                        prefix: Text('₽ ')),
-                    controller: _costTechnic,
-                    inputFormatters: [IntegerCurrencyInputFormatter()],
-                    keyboardType: TextInputType.number,
-                  )
-              ),
-              ListTile(
-                leading: const Icon(Icons.today),
-                title: const Text("Дата покупки техники"),
-                subtitle: Text(_dateBuyTechnic == "" ? DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now()) : _dateBuyTechnic),
-                trailing: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2099),
-                          locale: const Locale("ru", "RU")
-                      ).then((date) {
-                        setState(() {
-                          if(date != null) {
-                            _dateForSQL = DateFormat('yyyy.MM.dd').format(date);
-                            _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                          }
-                        });
-                      });
-                    },
-                    color: Colors.blue
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.copyright),
-                title: DropdownButton<String>(
-                  borderRadius: BorderRadius.circular(10.0),
-                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                  isExpanded: true,
-                  hint: const Text('Статус техники'),
-                  icon: _selectedDropdownStatus != null ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
-                      onPressed: (){
-                        setState(() {
-                          _selectedDropdownStatus = null;
-                        });}) : null,
-                  value: _selectedDropdownStatus,
-                  items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? value){
-                    setState(() {
-                      _selectedDropdownStatus = value!;
-                    });
-                  },
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.airport_shuttle),
-                title: DropdownButton<String>(
-                  borderRadius: BorderRadius.circular(10.0),
-                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                  isExpanded: true,
-                  hint: const Text('Дислокация техники'),
-                  icon: _selectedDropdownDislocation != null ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
-                      onPressed: (){
-                        setState(() {
-                          _selectedDropdownDislocation = null;
-                        });}) : null,
-                  value: _selectedDropdownDislocation,
-                  items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? value){
-                    setState(() {
-                      _selectedDropdownDislocation = value!;
-                    });
-                  },
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.comment),
-                title: TextFormField(
-                  decoration: const InputDecoration(hintText: "Комментарий (необязательно)"),
-                  controller: _comment,
-                ),
-              ),
-              ListTile(
-                title: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _switchTestDrive ? Text('Выключить тест-драйв ') : Text('Включить тест-драйв '),
-                      Switch(
-                          value: _switchTestDrive,
-                          onChanged: (value){
-                            setState(() {
-                              _switchTestDrive = value;
-                              if(!_switchTestDrive){
-                                _dateStartTestDriveForSQL = '';
-                                _dateFinishTestDriveForSQL = '';
-                                _resultTestDrive.text = '';
-                                _checkboxTestDrive = false;
-                              } else{
-                                _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
-                              }
-                              if(_switchTestDrive && !_checkboxTestDrive && _dateFinishTestDriveForSQL == '' && !_isCategoryPhotocamera){
-                                DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDriveForSQL).add(const Duration(days: 14));
-                                _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
-                              }
-                            });
-                          }
-                      ),
-                    ]
-                ),
-              ),
-              ListTile(title:
-              _switchTestDrive ? _buildTestDriveListTile() : const Text('Тест-драйв не проводился')
-              )
-            ],
-          ),
+          child:  Column(children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(0, 40, 0, 10),
+              child: Text('Добавление техники',
+                  style: TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),Expanded(child:
+            ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildInternalID(),
+                _buildNameCategory(),
+                _buildNameTechnic(),
+                _buildCostTechnic(),
+                _buildDateBuyTechnic(),
+                _buildStatus(),
+                _buildDislocation(),
+                _buildComment(),
+                _buildSwitchTestDrive(),
+                _buildTestDrive()
+              ],
+          ))])
         )
     );
+  }
+
+  final numberFormatter = FilteringTextInputFormatter.allow(
+    RegExp(r'[0-9]'),
+  );
+
+  ListTile _buildInternalID() {
+    return ListTile(
+      leading: const Icon(Icons.fiber_new),
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: "Номер техники"),
+        controller: _innerNumberTechnic,
+        validator: (value) {
+          List listInternalID = [];
+          Technic.technicList.forEach((element) {listInternalID.add(element.internalID.toString());});
+          if (listInternalID.contains(value)) {
+            return 'Техника с таким номером уже есть';
+          }
+          return null;
+        },
+        inputFormatters: [numberFormatter],
+        keyboardType: TextInputType.number,
+      ),
+    );
+  }
+
+  ListTile _buildNameCategory() {
+    return ListTile(
+      leading: const Icon(Icons.print),
+      title: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(10.0),
+        padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+        isExpanded: true,
+        hint: const Text('Наименование техники'),
+        icon: _selectedDropdownCategory != null ? IconButton(
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: (){
+              setState(() {
+                _selectedDropdownCategory = null;
+              });}) : null,
+        value: _selectedDropdownCategory,
+        items: CategoryDropDownValueModel.nameEquipment.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? value){
+          setState(() {
+            _selectedDropdownCategory = value!;
+            if(value == 'Фотоаппарат') {
+              _isCategoryPhotocamera = true;
+              _dateFinishTestDriveForSQL = '';
+            }
+            else {
+              _isCategoryPhotocamera = false;
+              if(_dateFinishTestDriveForSQL == '' && _dateStartTestDriveForSQL != ''){
+                DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDriveForSQL).add(const Duration(days: 14));
+                _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
+              }
+            }
+          });
+        },
+      ),
+    );
+  }
+
+  ListTile _buildNameTechnic() {
+    return ListTile(
+      leading: const Icon(Icons.create),
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: "Модель техники"),
+        controller: _nameTechnic,
+      ),
+    );
+  }
+
+  ListTile _buildCostTechnic() {
+    return ListTile(
+      leading: const Icon(Icons.shopify),
+      title: TextFormField(
+        decoration: const InputDecoration(
+            hintText: "Стоимость техники",
+            prefix: Text('₽ ')),
+        controller: _costTechnic,
+        inputFormatters: [IntegerCurrencyInputFormatter()],
+        keyboardType: TextInputType.number,
+      )
+    );
+  }
+
+  ListTile _buildDateBuyTechnic() {
+    return ListTile(
+      leading: const Icon(Icons.today),
+      title: const Text("Дата покупки техники"),
+      subtitle: Text(_dateBuyTechnic == "" ? DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now()) : _dateBuyTechnic),
+      trailing: IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () {
+            showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2099),
+                locale: const Locale("ru", "RU")
+            ).then((date) {
+              setState(() {
+                if(date != null) {
+                  _dateForSQL = DateFormat('yyyy.MM.dd').format(date);
+                  _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                }
+              });
+            });
+          },
+          color: Colors.blue
+      ),
+    );
+  }
+
+  ListTile _buildStatus() {
+    return ListTile(
+      leading: const Icon(Icons.copyright),
+      title: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(10.0),
+        padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+        isExpanded: true,
+        hint: const Text('Статус техники'),
+        icon: _selectedDropdownStatus != null ? IconButton(
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: (){
+              setState(() {
+                _selectedDropdownStatus = null;
+              });}) : null,
+        value: _selectedDropdownStatus,
+        items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? value){
+          setState(() {
+            _selectedDropdownStatus = value!;
+          });
+        },
+      ),
+    );
+  }
+
+  ListTile _buildDislocation() {
+    return ListTile(
+      leading: const Icon(Icons.airport_shuttle),
+      title: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(10.0),
+        padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+        isExpanded: true,
+        hint: const Text('Дислокация техники'),
+        icon: _selectedDropdownDislocation != null ? IconButton(
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: (){
+              setState(() {
+                _selectedDropdownDislocation = null;
+              });}) : null,
+        value: _selectedDropdownDislocation,
+        items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? value){
+          setState(() {
+            _selectedDropdownDislocation = value!;
+          });
+        },
+      ),
+    );
+  }
+
+  ListTile _buildComment() {
+    return ListTile(
+      leading: const Icon(Icons.comment),
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: "Комментарий (необязательно)"),
+        controller: _comment,
+      ),
+    );
+  }
+
+  ListTile _buildSwitchTestDrive() {
+    return ListTile(
+      title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _switchTestDrive ? const Text('Выключить тест-драйв ') : const Text('Включить тест-драйв '),
+            Switch(
+                value: _switchTestDrive,
+                onChanged: (value){
+                  setState(() {
+                    _switchTestDrive = value;
+                    if(!_switchTestDrive){
+                      _dateStartTestDriveForSQL = '';
+                      _dateFinishTestDriveForSQL = '';
+                      _resultTestDrive.text = '';
+                      _checkboxTestDrive = false;
+                    } else{
+                      _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(DateTime.now());
+                    }
+                    if(_switchTestDrive && !_checkboxTestDrive && _dateFinishTestDriveForSQL == '' && !_isCategoryPhotocamera){
+                      DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDriveForSQL).add(const Duration(days: 14));
+                      _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(finishTestDrive);
+                    }
+                  });
+                }
+            ),
+          ]
+      ),
+    );
+  }
+
+  ListTile _buildTestDrive() {
+   return ListTile(title:
+  _switchTestDrive ? _buildTestDriveListTile() : const Text('Тест-драйв не проводился')
+  );
   }
 
   ListTile _buildTestDriveListTile(){

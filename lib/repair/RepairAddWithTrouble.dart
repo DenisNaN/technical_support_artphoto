@@ -35,6 +35,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
   final _recommendationsNotes = TextEditingController();
   String _dateReceipt = "";
   bool _isBN = false;
+  bool _isEditComplaint = false;
   String? _selectedDropdownDislocationOld;
   String? _selectedDropdownStatusOld;
   String? _selectedDropdownService;
@@ -286,7 +287,21 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
   }
 
   ListTile _buildComplaintListTile(){
-    return ListTile(
+    return !_isEditComplaint ?
+    ListTile(
+      leading: const Icon(Icons.create),
+      title: Text(_complaint.text),
+      subtitle: const Text('Жалоба'),
+      trailing: IconButton(
+        icon: const Icon(Icons.edit, color: Colors.blue),
+        onPressed: (){
+          setState(() {
+            _isEditComplaint = true;
+          });
+        },
+      ),
+    ) :
+    ListTile(
       leading: const Icon(Icons.create),
       title: TextFormField(
         decoration: const InputDecoration(hintText: "Жалоба"),

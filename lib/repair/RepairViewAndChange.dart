@@ -149,7 +149,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
           child: Column(children: [
             const Padding(
                 padding: EdgeInsets.fromLTRB(0, 40, 0, 10),
-                child: Text('Заявка на ремонт',
+                child: Text('Внесение изменений в ремонт',
                     style: TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),
             Expanded(child:

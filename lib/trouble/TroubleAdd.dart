@@ -136,19 +136,24 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
         ),
         body: Form(
           key: _formKey,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(0, 22, 0, 0),
-            child: Column(children:[
-              const SizedBox(height: 10),
-              _buildInnerNumberTechnicListTile(),
-              _buildCategoryListTile(),
-              _buildDislocationListTile(),
-              _buildDateTroubleListTile(),
-              _buildComplaintListTile(),
-              _buildPhotoTroubleListTile(),
-            ]),
-          ),
-        )
+          child: Column(children: [
+            const Padding(
+                padding: EdgeInsets.fromLTRB(0, 40, 0, 10), child: Text('Добавление неисправности', style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),
+            Expanded(child:
+              ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildInnerNumberTechnicListTile(),
+                  _buildCategoryListTile(),
+                  _buildDislocationListTile(),
+                  _buildDateTroubleListTile(),
+                  _buildComplaintListTile(),
+                  _buildPhotoTroubleListTile(),
+                ]
+            ))
+          ])
+      )
     );
   }
 

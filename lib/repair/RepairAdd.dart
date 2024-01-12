@@ -135,7 +135,6 @@ class _RepairAddState extends State<RepairAdd> {
           key: _formKey,
           child: Column(
               children: [
-                // const SizedBox(height: 35),
                 const Padding(
                   padding: EdgeInsets.fromLTRB(0, 40, 0, 10),
                   child: Text('Создание заявки на ремонт',

@@ -128,133 +128,159 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
         ),
         body: Form(
           key: _formKey,
-          child: ListView(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.fiber_new),
-                title: widget.trouble.internalID != 0 ?
-                TextButton(
-                    style: TextButton.styleFrom(
-                        padding: const EdgeInsets.only(left: 0.0),
-                        alignment: Alignment.centerLeft,
-                        textStyle: const TextStyle(fontSize: 20)
-                    ),
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[indexTechnic]))).then(
-                              (value){
-                            setState(() {
-                              if(value != null) {
-                                Technic.technicList[indexTechnic] = value;
-                              }
-                            });
-                          });
-                    },
-                    child: Text('№ - $_innerNumberTechnic')
-                ) : const Text('БН'),
-              ),
-
-              widget.trouble.internalID != 0 ? ListTile(
-                leading: const Icon(Icons.medical_information),
-                title: Text('Наименование: ${Technic.technicList[indexTechnic].category}\n'
-                    'Откуда забрали: $_photosalon'),
-              ) : const SizedBox(),
-
-              widget.trouble.internalID != 0 ? ListTile(
-                leading: const Icon(Icons.date_range),
-                title: Text('Дата: '
-                    '${DateFormat('d MMMM yyyy', 'ru_RU').format(DateTime.parse(_dateTrouble.replaceAll('.', '-')))}'),
-              ) : const SizedBox(),
-
-              ListTile(
-                leading: const Icon(Icons.create),
-                title: Text('Жалоба:\n $_trouble')
-                ),
-
-              ListTile(
-                leading: const Icon(Icons.today),
-                title: _dateCheckFixTroubleEmployee != '' ? Text(
-                    'Закрытие сотрудником:\n'
-                    'Сотрудник: $_employeeCheckFixTrouble\n'
-                    'Дата: ${getFomattedDateForView(_dateCheckFixTroubleEmployee)}') :
-                const Text('Проблема сотрудником не закрыта'),
-                trailing: LoginPassword.access == 'admin' ?
-                Row(mainAxisSize: MainAxisSize.min, children: [
-                  SizedBox(width: 40, child: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      showDatePicker(
-                          context: context,
-                          initialDate: _dateCheckFixTroubleEmployee != '' ?
-                            DateTime.parse(_dateCheckFixTroubleEmployee.replaceAll('.', '-')) : DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2099),
-                          locale: const Locale("ru", "RU")
-                      ).then((date) {
-                        setState(() {
-                          if(date != null) {
-                            _dateCheckFixTroubleEmployee = DateFormat('yyyy.MM.dd').format(date);
-                            _employeeCheckFixTrouble = LoginPassword.login;
-                            _isEdit = true;
-                          }
-                        });
-                      });
-                    },
-                    color: Colors.blue)),
-                      IconButton(
-                          onPressed: (){
-                            setState(() {
-                              _dateCheckFixTroubleEmployee = '';
-                              _isEdit = true;
-                            });
-                          },
-                          icon: const Icon(Icons.clear))
-                ]) : null
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.today),
-                title: Text(_dateCheckFixTroubleEngineer == '' ? 'Для закрытия проблемы инженером выберите дату' :
-                        'Закрытие инженером:\n'
-                        'Сотрудник: $_engineerCheckFixTrouble\n'
-                        'Дата: ${getFomattedDateForView(_dateCheckFixTroubleEngineer)}'),
-                trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                  SizedBox(width: 40, child: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      showDatePicker(
-                          context: context,
-                          initialDate: _dateCheckFixTroubleEngineer != '' ?
-                            DateTime.parse(_dateCheckFixTroubleEngineer.replaceAll('.', '-')) : DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2099),
-                          locale: const Locale("ru", "RU")
-                      ).then((date) {
-                        setState(() {
-                          if(date != null) {
-                            _dateCheckFixTroubleEngineer = DateFormat('yyyy.MM.dd').format(date);
-                            _engineerCheckFixTrouble = LoginPassword.login;
-                            _isEdit = true;
-                          }
-                        });
-                      });
-                    },
-                    color: Colors.blue)),
-                  IconButton(
-                      onPressed: (){
-                        setState(() {
-                          _dateCheckFixTroubleEngineer = '';
-                          _isEdit = true;
-                        });
-                      },
-                      icon: const Icon(Icons.clear))
-                ])
-              ),
-              _photoTrouble.isNotEmpty ? _buildPhotoTroubleListTile() : const SizedBox(),
-              const SizedBox(height: 30),
-              _buildRequestRepair()
-            ],
-          ),
+          child:
+          Column(children: [
+            const Padding(
+                padding: EdgeInsets.fromLTRB(0, 40, 0, 10), child: Text('Внесение изменений в неисправность', style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),
+          Expanded(child:
+            ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildInternalID(),
+                widget.trouble.internalID != 0 ? _buildPhotosalon() : const SizedBox(),
+                widget.trouble.internalID != 0 ? _buildDateTrouble() : const SizedBox(),
+                _buildTrouble(),
+                _buildCloseTroubleEmployee(),
+                _buildCloseTroubleEngineer(),
+                _photoTrouble.isNotEmpty ? _buildPhotoTroubleListTile() : const SizedBox(),
+                const SizedBox(height: 30),
+                _buildRequestRepair()
+              ],
+            ))])
         )
+    );
+  }
+
+  ListTile _buildInternalID() {
+    return ListTile(
+      leading: const Icon(Icons.fiber_new),
+      title: widget.trouble.internalID != 0 ?
+      TextButton(
+          style: TextButton.styleFrom(
+              padding: const EdgeInsets.only(left: 0.0),
+              alignment: Alignment.centerLeft,
+              textStyle: const TextStyle(fontSize: 20)
+          ),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[indexTechnic]))).then(
+                    (value){
+                  setState(() {
+                    if(value != null) {
+                      Technic.technicList[indexTechnic] = value;
+                    }
+                  });
+                });
+          },
+          child: Text('№ - $_innerNumberTechnic')
+      ) : const Text('БН'),
+    );
+  }
+
+  ListTile _buildPhotosalon() {
+    return ListTile(
+      leading: const Icon(Icons.medical_information),
+      title: Text('Наименование: ${Technic.technicList[indexTechnic].category}\n'
+          'Откуда забрали: $_photosalon'),
+      );
+  }
+
+  ListTile _buildDateTrouble() {
+    return ListTile(
+      leading: const Icon(Icons.date_range),
+      title: Text('Дата: '
+          '${DateFormat('d MMMM yyyy', 'ru_RU').format(DateTime.parse(_dateTrouble.replaceAll('.', '-')))}'),
+    );
+  }
+
+  ListTile _buildTrouble() {
+    return ListTile(
+      leading: const Icon(Icons.create),
+      title: Text('Жалоба:\n $_trouble')
+    );
+  }
+
+  ListTile _buildCloseTroubleEmployee() {
+    return ListTile(
+      leading: const Icon(Icons.today),
+      title: _dateCheckFixTroubleEmployee != '' ? Text(
+          'Закрытие сотрудником:\n'
+          'Сотрудник: $_employeeCheckFixTrouble\n'
+          'Дата: ${getFomattedDateForView(_dateCheckFixTroubleEmployee)}') :
+      const Text('Проблема сотрудником не закрыта'),
+      trailing: LoginPassword.access == 'admin' ?
+      Row(mainAxisSize: MainAxisSize.min, children: [
+        SizedBox(width: 40, child: IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () {
+            showDatePicker(
+                context: context,
+                initialDate: _dateCheckFixTroubleEmployee != '' ?
+                  DateTime.parse(_dateCheckFixTroubleEmployee.replaceAll('.', '-')) : DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2099),
+                locale: const Locale("ru", "RU")
+            ).then((date) {
+              setState(() {
+                if(date != null) {
+                  _dateCheckFixTroubleEmployee = DateFormat('yyyy.MM.dd').format(date);
+                  _employeeCheckFixTrouble = LoginPassword.login;
+                  _isEdit = true;
+                }
+              });
+            });
+          },
+          color: Colors.blue)),
+            IconButton(
+                onPressed: (){
+                  setState(() {
+                    _dateCheckFixTroubleEmployee = '';
+                    _isEdit = true;
+                  });
+                },
+                icon: const Icon(Icons.clear))
+      ]) : null
+    );
+  }
+
+  ListTile _buildCloseTroubleEngineer() {
+    return ListTile(
+      leading: const Icon(Icons.today),
+      title: Text(_dateCheckFixTroubleEngineer == '' ? 'Для закрытия проблемы инженером выберите дату' :
+              'Закрытие инженером:\n'
+              'Сотрудник: $_engineerCheckFixTrouble\n'
+              'Дата: ${getFomattedDateForView(_dateCheckFixTroubleEngineer)}'),
+      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+        SizedBox(width: 40, child: IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () {
+            showDatePicker(
+                context: context,
+                initialDate: _dateCheckFixTroubleEngineer != '' ?
+                  DateTime.parse(_dateCheckFixTroubleEngineer.replaceAll('.', '-')) : DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2099),
+                locale: const Locale("ru", "RU")
+            ).then((date) {
+              setState(() {
+                if(date != null) {
+                  _dateCheckFixTroubleEngineer = DateFormat('yyyy.MM.dd').format(date);
+                  _engineerCheckFixTrouble = LoginPassword.login;
+                  _isEdit = true;
+                }
+              });
+            });
+          },
+          color: Colors.blue)),
+        IconButton(
+            onPressed: (){
+              setState(() {
+                _dateCheckFixTroubleEngineer = '';
+                _isEdit = true;
+              });
+            },
+            icon: const Icon(Icons.clear))
+      ])
     );
   }
 
