@@ -49,7 +49,7 @@ class ArtphotoTech extends StatelessWidget {
             title: Center(child: Text(LoginPassword.login)),
               bottom: const TabBar(tabs: [
                 Tab(icon: Icon(Icons.add_a_photo_outlined), text: "Техника"),
-                Tab(icon: Icon(Icons.add_chart), text: "Ремонт"),
+                Tab(icon: Icon(Icons.settings), text: "Ремонт"),
                 Tab(icon: Icon(Icons.assignment_turned_in), text: "Неисп-ти"),
                 Tab(icon: Icon(Icons.accessible), text: "История")
               ])),

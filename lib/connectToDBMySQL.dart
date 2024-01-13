@@ -406,6 +406,19 @@ class ConnectToDBMySQL {
           trouble.id
         ]);
   }
+
+  Future insertHistory(String section, int idSection, String descForHistory) async{
+    await ConnectToDBMySQL.connDB.connDatabase();
+    await _connDB!.query('INSERT INTO history ('
+        'section, idSection, description, login, date) '
+        'VALUES (?, ?, ?, ?, ?)', [
+      section,
+      idSection,
+      descForHistory,
+      LoginPassword.login,
+      DateFormat('yyyy.MM.dd').format(DateTime.now()),
+      ]);
+  }
   
   Future<List> getLastIdList() async{
     var resultTechnics = await _connDB!.query(

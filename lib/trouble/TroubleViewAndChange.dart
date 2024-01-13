@@ -128,8 +128,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
         ),
         body: Form(
           key: _formKey,
-          child:
-          Column(children: [
+          child: Column(children: [
             const Padding(
                 padding: EdgeInsets.fromLTRB(0, 40, 0, 10), child: Text('Внесение изменений в неисправность', style: TextStyle(
                 fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),

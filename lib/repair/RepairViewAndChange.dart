@@ -43,8 +43,29 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   bool _isEditNewStatusDislocation = false;
   int indexTechnic = 0;
 
+  late Repair oldRepairForHistory;
+
   @override
   void initState() {
+    oldRepairForHistory = Repair(
+        widget.repair.id,
+        widget.repair.internalID,
+        widget.repair.category,
+        widget.repair.dislocationOld,
+        widget.repair.status,
+        widget.repair.complaint,
+        widget.repair.dateDeparture,
+        widget.repair.serviceDislocation,
+        widget.repair.dateTransferForService,
+        widget.repair.dateDepartureFromService,
+        widget.repair.worksPerformed,
+        widget.repair.costService,
+        widget.repair.diagnosisService,
+        widget.repair.recommendationsNotes,
+        widget.repair.newStatus,
+        widget.repair.newDislocation,
+        widget.repair.dateReceipt);
+
     for(int i = 0; i < Technic.technicList.length; i++){
       if(Technic.technicList[i].internalID == widget.repair.internalID){
         indexTechnic = i;
@@ -61,7 +82,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     _dateTransferForService = widget.repair.dateTransferForService;
     _dateDepartureFromService = widget.repair.dateDepartureFromService;
     _worksPerformed.text = widget.repair.worksPerformed;
-    _costService.text = widget.repair.costService == 0 ? '' : '${widget.repair.costService}';
+    _costService.text = widget.repair.costService == -1 ? '' : '${widget.repair.costService}';
     _diagnosisService.text = widget.repair.diagnosisService;
     _recommendationsNotes.text = widget.repair.recommendationsNotes;
     _selectedDropdownStatusNew = widget.repair.newStatus == '' ? null : widget.repair.newStatus;
@@ -552,6 +573,10 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
         Technic.technicList[indexTechnic].status = repair.newStatus;
         Technic.technicList[indexTechnic].dislocation = repair.newDislocation;
       }
+
+      String descForHistory = descriptionForHistory(oldRepairForHistory, repair);
+      print(descForHistory);
+      ConnectToDBMySQL.connDB.insertHistory('Repair', repair.id!, descForHistory);
     }
     return repair;
   }
@@ -588,6 +613,117 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
           showCloseIcon: true,
         ),
       );
+    }
+    return result;
+  }
+
+  String descriptionForHistory(Repair repairOld, Repair repairNew){
+    String result = 'Заявка на ремонт №${repairOld.internalID} изменена:';
+
+    if(repairOld.complaint != repairNew.complaint){
+      result = '$result\n Жалоба изменена:\n'
+          '  Было: ${repairOld.complaint}\n'
+          '  Стало: ${repairNew.complaint}';
+    }
+    if(repairOld.dateDeparture != repairNew.dateDeparture){
+      result = '$result\n Дата вывоза с точки изменена:\n'
+          '  Было: ${repairOld.dateDeparture}\n'
+          '  Стало: ${repairNew.dateDeparture}';
+    }
+    if(repairOld.serviceDislocation != repairNew.serviceDislocation){
+      result = '$result\n Местонахождение техники изменено:\n'
+          '  Было: ${repairOld.serviceDislocation}\n'
+          '  Стало: ${repairNew.serviceDislocation}';
+    }
+    if(repairOld.dateTransferForService != repairNew.dateTransferForService){
+      if(repairOld.dateTransferForService == ''){
+        result = '$result\n Внесена дата сдачи в ремонт: '
+            '${repairNew.dateTransferForService}';
+      }else {
+        result = '$result\n Дата сдачи в ремонт изменена:\n'
+            '  Было: ${repairOld.dateTransferForService}\n'
+            '  Стало: ${repairNew.dateTransferForService}';
+      }
+    }
+    if(repairOld.dateDepartureFromService != repairNew.dateDepartureFromService){
+      if(repairOld.dateDepartureFromService == ''){
+        result = '$result\n Внесена дата вывоза из ремонта: '
+            '${repairNew.dateDepartureFromService}';
+      }else {
+      result = '$result\n Дата вывоза из ремонта изменена:\n'
+          '  Было: ${repairOld.dateDepartureFromService}\n'
+          '  Стало: ${repairNew.dateDepartureFromService}';
+      }
+    }
+    if(repairOld.worksPerformed != repairNew.worksPerformed){
+      if(repairOld.worksPerformed == ''){
+        result = '$result\n Внесены выполненые работы: '
+            '${repairNew.worksPerformed}';
+      }else {
+      result = '$result\n Выполненые работы изменены:\n'
+          '  Было: ${repairOld.worksPerformed}\n'
+          '  Стало: ${repairNew.worksPerformed}';
+      }
+    }
+    if(repairOld.costService != repairNew.costService){
+      if(repairOld.costService == -1){
+        result = '$result\n Внесена стоимость ремонта: '
+            '${repairNew.costService}';
+      }else {
+      result = '$result\n Стоимость ремонта изменена:\n'
+          '  Было: ${repairOld.costService}\n'
+          '  Стало: ${repairNew.costService}';
+      }
+    }
+    if(repairOld.diagnosisService != repairNew.diagnosisService){
+      if(repairOld.diagnosisService == ''){
+        result = '$result\n Внесен диагноз мастерской: '
+            '${repairNew.diagnosisService}';
+      }else {
+      result = '$result\n Диагноз мастерской изменен:\n'
+          '  Было: ${repairOld.diagnosisService}\n'
+          '  Стало: ${repairNew.diagnosisService}';
+      }
+    }
+    if(repairOld.recommendationsNotes != repairNew.recommendationsNotes){
+      if(repairOld.recommendationsNotes == ''){
+        result = '$result\n Внесены рекомендации: '
+            '${repairNew.recommendationsNotes}';
+      }else {
+      result = '$result\n Рекомендации изменены:\n'
+          '  Было: ${repairOld.recommendationsNotes}\n'
+          '  Стало: ${repairNew.recommendationsNotes}';
+      }
+    }
+    if(repairOld.newStatus != repairNew.newStatus){
+      if(repairOld.newStatus == ''){
+        result = '$result\n Внесен новый статус: '
+            '${repairNew.newStatus}';
+      }else {
+      result = '$result\n Новый статус изменен:\n'
+          '  Было: ${repairOld.newStatus}\n'
+          '  Стало: ${repairNew.newStatus}';
+      }
+    }
+    if(repairOld.newDislocation != repairNew.newDislocation){
+      if(repairOld.newDislocation == ''){
+        result = '$result\n Внесено новое местоположение техники: '
+            '${repairNew.newDislocation}';
+      }else {
+      result = '$result\n Новое местоположение техники изменено:\n'
+          '  Было: ${repairOld.newDislocation}\n'
+          '  Стало: ${repairNew.newDislocation}';
+      }
+    }
+    if(repairOld.dateReceipt != repairNew.dateReceipt){
+      if(repairOld.dateReceipt == ''){
+        result = '$result\n Внесена дата поступления на точку: '
+            '${repairNew.dateReceipt}';
+      }else {
+        result = '$result\n Дата поступления на точку изменена:\n'
+            '  Было: ${repairOld.dateReceipt}\n'
+            '  Стало: ${repairNew.dateReceipt}';
+      }
     }
     return result;
   }

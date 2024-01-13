@@ -339,7 +339,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
 
   ListTile _buildServiceDislocationListTile(){
     return ListTile(
-      leading: const Icon(Icons.language),
+      leading: const Icon(Icons.miscellaneous_services),
       title: DropdownButton<String>(
         borderRadius: BorderRadius.circular(10.0),
         isExpanded: true,
