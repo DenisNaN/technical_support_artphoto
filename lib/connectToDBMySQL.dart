@@ -4,6 +4,7 @@ import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
 import 'package:technical_support_artphoto/technics/Technic.dart';
 import 'package:technical_support_artphoto/trouble/Trouble.dart';
+import 'package:technical_support_artphoto/history/History.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 
 class ConnectToDBMySQL {
@@ -235,6 +236,37 @@ class ConnectToDBMySQL {
       Trouble trouble = Trouble(row[0], row[1].toString(),  dateTrouble,  row[3].toString(), row[4], row[5].toString(), dateCheckFixTroubleEmployee,
           row[7].toString(), dateCheckFixTroubleEngineer, row[9].toString(), image);
       list.add(trouble);
+    }
+    return list;
+  }
+
+  Future<List> getAllHistory() async{
+    var result = await _connDB!.query('SELECT * FROM history');
+
+    var list = [];
+    for (var row in result) {
+      // id-row[0], section-row[1],  idSection-row[2],  typeOperation-row[3], description-row[4], login-row[5],
+      // date-row[6]
+      String dateHystory = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
+
+      History history = History(row[0], row[1],  row[2],  row[3], row[4].toString(), row[5].toString(), dateHystory);
+      list.add(history);
+    }
+    var reversedList = List.from(list.reversed);
+    return reversedList;
+  }
+
+  Future<List> getRangeGreaterOnIDHistory(int id) async{
+    var result = await _connDB!.query('SELECT * FROM history WHERE id > ?', [id]);
+
+    var list = [];
+    for (var row in result) {
+      // id-row[0], section-row[1],  idSection-row[2],  typeOperation-row[3], description-row[4], login-row[5],
+      // date-row[6]
+      String dateHystory = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
+
+      History history = History(row[0], row[1],  row[2],  row[3], row[4].toString(), row[5].toString(), dateHystory);
+      list.add(history);
     }
     return list;
   }
