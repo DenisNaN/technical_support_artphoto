@@ -576,7 +576,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
       String descForHistory = descriptionForHistory(oldRepairForHistory, repair);
       print(descForHistory);
-      ConnectToDBMySQL.connDB.insertHistory('Repair', repair.id!, descForHistory);
+      ConnectToDBMySQL.connDB.insertHistory('Repair', repair.id!, 'edit', descForHistory);
     }
     return repair;
   }
