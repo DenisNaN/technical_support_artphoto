@@ -3,7 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 import '../ConnectToDBMySQL.dart';
+import '../history/History.dart';
+import '../history/HistorySQFlite.dart';
 import '../utils/categoryDropDownValueModel.dart';
+import '../utils/utils.dart';
 import 'Technic.dart';
 
 class TechnicAdd extends StatefulWidget {
@@ -47,6 +50,9 @@ class _TechnicAddState extends State<TechnicAdd> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          title: const Text('Добавление техники'),
+        ),
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
             child: Padding(
@@ -104,6 +110,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                             );
 
                             SaveEntity()._save(technic);
+                            addHistory(technic);
 
                             Navigator.pop(context, technic);
 
@@ -131,12 +138,7 @@ class _TechnicAddState extends State<TechnicAdd> {
         ),
         body: Form(
           key: _formKey,
-          child:  Column(children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 40, 0, 10),
-              child: Text('Добавление техники',
-                  style: TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),Expanded(child:
+          child:
             ListView(
               padding: EdgeInsets.zero,
               children: [
@@ -151,7 +153,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                 _buildSwitchTestDrive(),
                 _buildTestDrive()
               ],
-          ))])
+            )
         )
     );
   }
@@ -458,6 +460,34 @@ class _TechnicAddState extends State<TechnicAdd> {
       ],
       ),
     );
+  }
+
+  Future addHistory(Technic technic) async{
+    String descForHistory = descriptionForHistory(technic);
+    History historyForSQL = History(
+        History.historyList.last.id + 1,
+        'Technic',
+        technic.id!,
+        'create',
+        descForHistory,
+        LoginPassword.login,
+        DateFormat('yyyy.MM.dd').format(DateTime.now())
+    );
+
+    ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
+    HistorySQFlite.db.insertHistory(historyForSQL);
+    History.historyList.insert(0, historyForSQL);
+  }
+
+  String descriptionForHistory(Technic technic){
+    String internalID = technic.internalID == -1 ? 'БН' : '№${technic.internalID}';
+    String result = 'Новая техника $internalID добавленна';
+
+    return result;
+  }
+
+  String getDateFormat(String date) {
+    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 }
 

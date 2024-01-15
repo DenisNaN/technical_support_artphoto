@@ -96,6 +96,9 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          title: const Text('Добавление неисправности'),
+        ),
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
             child: Padding(
@@ -136,23 +139,18 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
         ),
         body: Form(
           key: _formKey,
-          child: Column(children: [
-            const Padding(
-                padding: EdgeInsets.fromLTRB(0, 40, 0, 10), child: Text('Добавление неисправности', style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),
-            Expanded(child:
-              ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  _buildInnerNumberTechnicListTile(),
-                  _buildCategoryListTile(),
-                  _buildDislocationListTile(),
-                  _buildDateTroubleListTile(),
-                  _buildComplaintListTile(),
-                  _buildPhotoTroubleListTile(),
-                ]
-            ))
-          ])
+          child:
+            ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildInnerNumberTechnicListTile(),
+                _buildCategoryListTile(),
+                _buildDislocationListTile(),
+                _buildDateTroubleListTile(),
+                _buildComplaintListTile(),
+                _buildPhotoTroubleListTile(),
+              ]
+            )
       )
     );
   }

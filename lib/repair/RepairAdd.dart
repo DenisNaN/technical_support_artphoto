@@ -3,8 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
 import '../ConnectToDBMySQL.dart';
+import '../history/History.dart';
+import '../history/HistorySQFlite.dart';
 import '../technics/Technic.dart';
 import '../utils/categoryDropDownValueModel.dart';
+import '../utils/utils.dart';
 import 'Repair.dart';
 
 class RepairAdd extends StatefulWidget {
@@ -136,35 +139,26 @@ class _RepairAddState extends State<RepairAdd> {
         ),
         body: Form(
           key: _formKey,
-          // child: Column(
-          //     children: [
-          //       const Padding(
-          //         padding: EdgeInsets.fromLTRB(0, 40, 0, 10),
-          //         child: Text('Создание заявки на ремонт',
-          //             style: TextStyle(
-          //                 fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),
-          //       Expanded(
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      children:[
-                        _buildInnerNumberTechnicListTile(),
-                        _buildCategoryListTile(),
-                        _buildDislocationOldListTile(),
-                        _buildStatusListTile(),
-                        _buildComplaintListTile(),
-                        _buildDateDepartureListTile(),
-                        _buildServiceDislocationListTile(),
-                        _buildDateTransferForServiceListTile(),
-                        _buildDateDepartureFromServiceListTile(),
-                        _buildWorksPerformedListTile(),
-                        _buildCostServiceListTile(),
-                        _buildDiagnosisServiceListTile(),
-                        _buildRecommendationsNotesListTile(),
-                        _buildNewStatusListTile(),
-                        _buildNewDislocationListTile(),
-                        _buildDateReceiptListTile(),
-                      ],
-          // ))]),
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children:[
+                _buildInnerNumberTechnicListTile(),
+                _buildCategoryListTile(),
+                _buildDislocationOldListTile(),
+                _buildStatusListTile(),
+                _buildComplaintListTile(),
+                _buildDateDepartureListTile(),
+                _buildServiceDislocationListTile(),
+                _buildDateTransferForServiceListTile(),
+                _buildDateDepartureFromServiceListTile(),
+                _buildWorksPerformedListTile(),
+                _buildCostServiceListTile(),
+                _buildDiagnosisServiceListTile(),
+                _buildRecommendationsNotesListTile(),
+                _buildNewStatusListTile(),
+                _buildNewDislocationListTile(),
+                _buildDateReceiptListTile(),
+              ],
           ),
         )
     );
@@ -574,7 +568,7 @@ class _RepairAddState extends State<RepairAdd> {
 
     ConnectToDBMySQL.connDB.insertRepairInDB(repair);
     RepairSQFlite.db.create(repair);
-    // ConnectToDBMySQL.connDB.insertHistory('Repair', repair.id!, 'edit', descForHistory);
+    addHistory(repair);
 
     Navigator.pop(context, repair);
 
@@ -590,6 +584,34 @@ class _RepairAddState extends State<RepairAdd> {
         showCloseIcon: true,
       ),
     );
+  }
+
+  Future addHistory(Repair repair) async{
+    String descForHistory = descriptionForHistory(repair);
+    History historyForSQL = History(
+        History.historyList.last.id + 1,
+        'Repair',
+        repair.id!,
+        'create',
+        descForHistory,
+        LoginPassword.login,
+        DateFormat('yyyy.MM.dd').format(DateTime.now())
+    );
+
+    ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
+    HistorySQFlite.db.insertHistory(historyForSQL);
+    History.historyList.insert(0, historyForSQL);
+  }
+
+  String descriptionForHistory(Repair repair){
+    String internalID = repair.internalID == -1 ? 'БН' : '№${repair.internalID}';
+    String result = 'Заявка на ремонт №$internalID добавленна';
+
+    return result;
+  }
+
+  String getDateFormat(String date) {
+    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 }
 

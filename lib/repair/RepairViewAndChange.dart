@@ -107,6 +107,9 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          title: const Text('Внесение изменений в ремонт'),
+        ),
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
             child: Padding(
@@ -170,31 +173,25 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
         ),
         body: Form(
           key: _formKey,
-          child: Column(children: [
-            const Padding(
-                padding: EdgeInsets.fromLTRB(0, 40, 0, 10),
-                child: Text('Внесение изменений в ремонт',
-                    style: TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),
-            Expanded(child:
-              ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  _buildInternalID(),
-                  _buildDataTechnick(),
-                  _buildComplait(),
-                  _buildDateDeparture(),
-                  _buildDislocationService(),
-                  _buildDateTransferForService(),
-                  _buildDateDepartureFromService(),
-                  _buildWorksPerformed(),
-                  _buildCostService(),
-                  _buildDiagnosisService(),
-                  _buildRecommendationsNotes(),
-                  _buildStatusNew(),
-                  _buildDislocationNew(),
-                  _buildDateReceipt()
-                ]))]
+          child:
+            ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildInternalID(),
+                _buildDataTechnick(),
+                _buildComplait(),
+                _buildDateDeparture(),
+                _buildDislocationService(),
+                _buildDateTransferForService(),
+                _buildDateDepartureFromService(),
+                _buildWorksPerformed(),
+                _buildCostService(),
+                _buildDiagnosisService(),
+                _buildRecommendationsNotes(),
+                _buildStatusNew(),
+                _buildDislocationNew(),
+                _buildDateReceipt()
+              ]
           )
         )
     );
@@ -576,21 +573,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
         Technic.technicList[indexTechnic].status = repair.newStatus;
         Technic.technicList[indexTechnic].dislocation = repair.newDislocation;
       }
-
-      String descForHistory = descriptionForHistory(oldRepairForHistory, repair);
-      History historyForSQL = History(
-          History.historyList.last.id,
-          'Repair',
-          repair.id!,
-          'edit',
-          descForHistory, 
-          LoginPassword.login,
-          DateFormat('yyyy.MM.dd').format(DateTime.now())
-      );
-
-      ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
-      HistorySQFlite.db.updateHistory(historyForSQL);
-      History.historyList.insert(0, historyForSQL);
+      addHistory(repair);
     }
     return repair;
   }
@@ -629,6 +612,23 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
       );
     }
     return result;
+  }
+
+  Future addHistory(Repair repair) async{
+    String descForHistory = descriptionForHistory(oldRepairForHistory, repair);
+    History historyForSQL = History(
+        History.historyList.last.id + 1,
+        'Repair',
+        repair.id!,
+        'edit',
+        descForHistory,
+        LoginPassword.login,
+        DateFormat('yyyy.MM.dd').format(DateTime.now())
+    );
+
+    ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
+    HistorySQFlite.db.insertHistory(historyForSQL);
+    History.historyList.insert(0, historyForSQL);
   }
 
   String descriptionForHistory(Repair repairOld, Repair repairNew){
@@ -683,11 +683,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     if(repairOld.costService != repairNew.costService){
       if(repairOld.costService == -1){
         result = '$result\n Внесена стоимость ремонта: '
-            '${repairNew.costService == -1 ? 0 : repairNew.costService}';
+            '${repairNew.costService == -1 ? 0 : repairNew.costService} р.';
       }else {
       result = '$result\n Стоимость ремонта изменена:\n'
-          '  Было: ${repairOld.costService == -1 ? 0 : repairNew.costService}\n'
-          '  Стало: ${repairNew.costService == -1 ? 0 : repairNew.costService}';
+          '  Было: ${repairOld.costService == -1 ? 0 : repairOld.costService} р.\n'
+          '  Стало: ${repairNew.costService == -1 ? 0 : repairNew.costService} р.';
       }
     }
     if(repairOld.diagnosisService != repairNew.diagnosisService){

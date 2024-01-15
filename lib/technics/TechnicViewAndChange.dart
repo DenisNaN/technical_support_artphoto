@@ -4,7 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 import '../ConnectToDBMySQL.dart';
+import '../history/History.dart';
+import '../history/HistorySQFlite.dart';
 import '../utils/categoryDropDownValueModel.dart';
+import '../utils/utils.dart';
 import 'Technic.dart';
 
 class TechnicViewAndChange extends StatefulWidget {
@@ -33,6 +36,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   bool _checkboxTestDrive = false;
   bool _switchTestDrive = false;
   late bool _isCategoryPhotocamera;
+  late Technic _oldTechnicForHistory;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -50,6 +54,21 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   @override
   void initState() {
     super.initState();
+    _oldTechnicForHistory = Technic(
+        widget.technic.id,
+        widget.technic.internalID,
+        widget.technic.name,
+        widget.technic.category,
+        widget.technic.cost,
+        widget.technic.dateBuyTechnic,
+        widget.technic.status,
+        widget.technic.dislocation,
+        widget.technic.comment,
+        widget.technic.dateStartTestDrive,
+        widget.technic.dateFinishTestDrive,
+        widget.technic.resultTestDrive,
+        widget.technic.checkboxTestDrive);
+
     _nameTechnic.text = widget.technic.name;
     _costTechnic.text = '${widget.technic.cost}';
     _selectedDropdownNameTechnic = widget.technic.category == '' ? null : widget.technic.category;
@@ -89,6 +108,9 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   Widget build(BuildContext context) {
     _isEdit = validateButtonSaveView();
     return Scaffold(
+        appBar: AppBar(
+          title: const Text('Внесение изменений в технику'),
+        ),
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
             child: Padding(
@@ -166,25 +188,22 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
         ),
         body: Form(
           key: _formKey,
-          child: Column(children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 40, 0, 10), child: Text('Внесение изменений в технику', style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),Expanded(child:
-          ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              _buildInternalID(),
-              _buildCategory(),
-              _buildNameTechnic(),
-              _buildCostTechnic(),
-              _buildDateBuyTechnic(),
-              _buildStatus(),
-              _buildDislocation(),
-              _buildComment(),
-              _buildSwitchTestDrive(),
-              _buildTestDrive()
-            ],
-          ))])
+          child:
+            ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildInternalID(),
+                _buildCategory(),
+                _buildNameTechnic(),
+                _buildCostTechnic(),
+                _buildDateBuyTechnic(),
+                _buildStatus(),
+                _buildDislocation(),
+                _buildComment(),
+                _buildSwitchTestDrive(),
+                _buildTestDrive()
+              ],
+          )
         )
     );
   }
@@ -547,6 +566,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     if(_isEditCategory || _isEditName || _isEditCost || _isEditDateBuy || _isEditComment || _isEditStatusDislocation || _isEditTestDrive || _isEditSwitch) {
       TechnicSQFlite.db.updateTechnic(technic);
     }
+    addHistory(technic);
   }
 
   bool validateButtonSaveView(){
@@ -558,8 +578,112 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     }
     return result;
   }
-}
 
+  Future addHistory(Technic technic) async{
+    String descForHistory = descriptionForHistory(_oldTechnicForHistory, technic);
+    History historyForSQL = History(
+        History.historyList.last.id + 1,
+        'Technic',
+        technic.id!,
+        'edit',
+        descForHistory,
+        LoginPassword.login,
+        DateFormat('yyyy.MM.dd').format(DateTime.now())
+    );
+
+    ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
+    HistorySQFlite.db.insertHistory(historyForSQL);
+    History.historyList.insert(0, historyForSQL);
+  }
+
+  String descriptionForHistory(Technic technicOld, Technic technicNew){
+    String internalID = technicOld.internalID == -1 ? 'БН' : '№${technicOld.internalID}';
+    String result = 'Техника $internalID изменена:';
+
+    if(technicOld.category != technicNew.category){
+      result = '$result\n Категория изменена:\n'
+          '  Было: ${technicOld.category}\n'
+          '  Стало: ${technicNew.category}';
+    }
+    if(technicOld.name != technicNew.name){
+      result = '$result\n Наименование техники изменено:\n'
+          '  Было: ${technicOld.name}\n'
+          '  Стало: ${technicNew.name}';
+    }
+    if(technicOld.cost != technicNew.cost){
+      result = '$result\n Стоимость техники изменена:\n'
+          '  Было: ${technicOld.cost}\n'
+          '  Стало: ${technicNew.cost}';
+    }
+    if(technicOld.dateBuyTechnic != technicNew.dateBuyTechnic){
+      result = '$result\n Дата покупки изменена:\n'
+          '  Было: ${getDateFormat(technicOld.dateBuyTechnic)}\n'
+          '  Стало: ${getDateFormat(technicNew.dateBuyTechnic)}';
+    }
+    if(technicOld.status != technicNew.status){
+        result = '$result\n Статус изменён:\n'
+          '  Было: ${technicOld.status}\n'
+          '  Стало: ${technicNew.status}';
+    }
+    if(technicOld.dislocation != technicNew.dislocation){
+        result = '$result\n Местонахождение изменено:\n'
+          '  Было: ${technicOld.dislocation}\n'
+          '  Стало: ${technicNew.dislocation}';
+    }
+    if(technicOld.comment != technicNew.comment){
+      if(technicOld.comment == ''){
+        result = '$result\n Комментарий внесён: '
+            '${technicNew.comment}';
+      }else {
+        result = '$result\n Комментарий изменён:\n'
+            '  Было: ${technicOld.comment}\n'
+            '  Стало: ${technicNew.comment}';
+      }
+    }
+    if(technicOld.dateStartTestDrive != technicNew.dateStartTestDrive){
+      if(technicOld.dateStartTestDrive == ''){
+        result = '$result\n Внесена дата начала тест-драйва: '
+            '${getDateFormat(technicNew.dateStartTestDrive)}';
+      }else {
+        result = '$result\n Дата начала тест-драйва изменена:\n'
+            '  Было: ${getDateFormat(technicOld.dateStartTestDrive)}\n'
+            '  Стало: ${getDateFormat(technicNew.dateStartTestDrive)}';
+      }
+    }
+    if(technicOld.dateFinishTestDrive != technicNew.dateFinishTestDrive){
+      if(technicOld.dateFinishTestDrive == ''){
+        result = '$result\n Внесена дата конца тест-драйва: '
+            '${getDateFormat(technicNew.dateFinishTestDrive)}';
+      }else {
+        result = '$result\n Дата конца тест-драйва изменена:\n'
+            '  Было: ${getDateFormat(technicOld.dateFinishTestDrive)}\n'
+            '  Стало: ${getDateFormat(technicNew.dateFinishTestDrive)}';
+      }
+    }
+    if(technicOld.resultTestDrive != technicNew.resultTestDrive){
+      if(technicOld.resultTestDrive == ''){
+        result = '$result\n Внесён результат тест-драйва: '
+            '${technicNew.resultTestDrive}';
+      }else {
+        result = '$result\n Результат тест-драйва изменён:\n'
+            '  Было: ${technicOld.resultTestDrive}\n'
+            '  Стало: ${technicNew.resultTestDrive}';
+      }
+    }
+    if(technicOld.checkboxTestDrive != technicNew.checkboxTestDrive){
+      if(technicOld.checkboxTestDrive == true){
+        result = '$result\n Тест-драйв завершён';
+      }else {
+        result = '$result\n Тест-драйв отменён:\n';
+      }
+    }
+    return result;
+  }
+
+  String getDateFormat(String date) {
+    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
+  }
+}
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {
 

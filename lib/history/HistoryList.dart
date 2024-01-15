@@ -64,7 +64,7 @@ class _HistoryListState extends State<HistoryList> {
     String section = '';
     String typeOperation = '';
     switch(History.historyList[index].section){
-      case 'Technick':
+      case 'Technic':
         section = 'Техника';
         break;
       case 'Repair':

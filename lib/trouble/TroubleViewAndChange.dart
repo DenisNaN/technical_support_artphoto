@@ -83,6 +83,9 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          title: const Text('Внесение изменений в неисп-ть'),
+        ),
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
             child: Padding(
@@ -127,11 +130,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
         ),
         body: Form(
           key: _formKey,
-          child: Column(children: [
-            const Padding(
-                padding: EdgeInsets.fromLTRB(0, 40, 0, 10), child: Text('Внесение изменений в неисправность', style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),
-          Expanded(child:
+          child:
             ListView(
               padding: EdgeInsets.zero,
               children: [
@@ -145,7 +144,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                 const SizedBox(height: 30),
                 _buildRequestRepair()
               ],
-            ))])
+            )
         )
     );
   }
