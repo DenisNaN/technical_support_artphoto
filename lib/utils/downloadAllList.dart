@@ -1,4 +1,5 @@
 import 'package:technical_support_artphoto/connectToDBMySQL.dart';
+import 'package:technical_support_artphoto/history/HistorySQFlite.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 import 'package:technical_support_artphoto/trouble/Trouble.dart';
@@ -6,6 +7,7 @@ import 'package:technical_support_artphoto/trouble/TroubleSQFlite.dart';
 import 'package:technical_support_artphoto/utils/categoryDropDownValueSQFlite.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
+import '../history/History.dart';
 import '../repair/RepairSQFlite.dart';
 import '../technics/Technic.dart';
 import 'categoryDropDownValueModel.dart';
@@ -20,7 +22,7 @@ class DownloadAllList{
     List listLastId = [];
     List listCount = [];
 
-    // rebootAllBasicListSQFlite();
+    rebootAllBasicListSQFlite();
     // rebootAllListCategorySQFlite('nameEquipment', 'name');
     // rebootAllListCategorySQFlite('photosalons', 'Фотосалон');
     // rebootAllListCategorySQFlite('service', 'repairmen');
@@ -36,7 +38,7 @@ class DownloadAllList{
 
       getAllHasNetwork(listLastId, listCount);
     } else{
-      getAllHasnotNetwork();
+      getAllHasNotNetwork();
     }
     return result;
   }
@@ -48,6 +50,8 @@ class DownloadAllList{
         await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']));
     Trouble.troubleList.addAll(
         await getAllActualTrouble(HasNetwork.isConnecting, listLastId[2]['id'], listCount[2]['countTrouble']));
+    History.historyList.addAll(
+        await getAllActualHistory(HasNetwork.isConnecting, listLastId[2]['id'], listCount[2]['countTrouble']));
     CategoryDropDownValueModel.nameEquipment.addAll((await getActualCategory(
         HasNetwork.isConnecting, 'nameEquipment', 'name', listCount[3]['countName'])) as Iterable<String>);
     CategoryDropDownValueModel.photosalons.addAll((await getActualCategory(
@@ -58,10 +62,11 @@ class DownloadAllList{
         HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[6]['countStatus'])) as Iterable<String>);
   }
 
-  Future getAllHasnotNetwork() async{
+  Future getAllHasNotNetwork() async{
     Technic.technicList.addAll(await getAllActualTechnics(HasNetwork.isConnecting));
     Repair.repairList.addAll(await getAllActualRepair(HasNetwork.isConnecting));
     Trouble.troubleList.addAll(await getAllActualTrouble(HasNetwork.isConnecting));
+    History.historyList.addAll(await getAllActualHistory(HasNetwork.isConnecting));
     CategoryDropDownValueModel.nameEquipment.addAll((await getActualCategory(
         HasNetwork.isConnecting, 'nameEquipment', 'name')) as Iterable<String>);
     CategoryDropDownValueModel.photosalons.addAll((await getActualCategory(
@@ -201,6 +206,49 @@ class DownloadAllList{
       }
     }
     return allTrouble;
+  }
+
+  Future<List> getAllActualHistory(bool isConnectInternet, [int lastId = 0, int countEntities = 0]) async{
+    List allHistory = [];
+    List addHistoryInSQFlite = [];
+
+    allHistory = await HistorySQFlite.db.getAllHistory();
+
+    if(!isConnectInternet) return allHistory;
+
+    if(allHistory.isNotEmpty){
+
+      int lastIdSQFlite = allHistory.first.id;
+      int lastIdMySQL = lastId;
+      if(lastIdSQFlite < lastIdMySQL){
+        var reversedAllHistory = List.from(allHistory.reversed);
+        addHistoryInSQFlite = await ConnectToDBMySQL.connDB.getRangeGreaterOnIDHistory(lastIdSQFlite);
+
+        for(var history in addHistoryInSQFlite){
+          HistorySQFlite.db.insertHistory(history);
+        }
+        reversedAllHistory.addAll(addHistoryInSQFlite);
+
+        allHistory.clear();
+        allHistory.addAll(reversedAllHistory.reversed);
+      }
+    } else {
+      allHistory = await ConnectToDBMySQL.connDB.getAllHistory();
+      for(var history in allHistory.reversed){
+        HistorySQFlite.db.insertHistory(history);
+      }
+    }
+
+    if(countEntities != allHistory.length){
+      HistorySQFlite.db.deleteTables();
+      HistorySQFlite.db.createTables();
+
+      allHistory = await ConnectToDBMySQL.connDB.getAllHistory();
+      for(var history in allHistory.reversed){
+        HistorySQFlite.db.insertHistory(history);
+      }
+    }
+    return allHistory;
   }
 
   Future<List> getActualCategory(

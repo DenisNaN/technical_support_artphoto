@@ -1,4 +1,3 @@
-import 'package:technical_support_artphoto/technics/Technic.dart';
 import 'package:technical_support_artphoto/utils/utils.dart' as utils;
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';

@@ -48,6 +48,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
 
   @override
   void initState() {
+    super.initState();
     for(int i = 0; i < Technic.technicList.length; i++){
       if(Technic.technicList[i].internalID == widget.trouble.internalID){
         indexTechnic = i;
@@ -94,7 +95,6 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
         }
       }
     });
-    super.initState();
   }
 
   @override

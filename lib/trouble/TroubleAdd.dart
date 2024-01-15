@@ -40,6 +40,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
 
   @override
   void initState() {
+    super.initState();
     _focusInnerNumberTechnic.addListener(() {
       if (!_focusInnerNumberTechnic.hasFocus) {
         technicFind =
@@ -79,7 +80,6 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
     )..addListener(() {
       transformationController.value = animation!.value;
     });
-    super.initState();
   }
 
   @override

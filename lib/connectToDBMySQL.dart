@@ -439,17 +439,17 @@ class ConnectToDBMySQL {
         ]);
   }
 
-  Future insertHistory(String section, int idSection, String typeOperation, String descForHistory) async{
+  Future insertHistory(History history) async{
     await ConnectToDBMySQL.connDB.connDatabase();
     await _connDB!.query('INSERT INTO history ('
         'section, idSection, typeOperation, description, login, date) '
         'VALUES (?, ?, ?, ?, ?, ?)', [
-      section,
-      idSection,
-      typeOperation,
-      descForHistory,
-      LoginPassword.login,
-      DateFormat('yyyy.MM.dd').format(DateTime.now()),
+        history.section,
+        history.idSection,
+        history.typeOperation,
+        history.description,
+        history.login,
+        history.date,
       ]);
   }
   

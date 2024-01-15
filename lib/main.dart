@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:technical_support_artphoto/history/HistoryList.dart';
 import 'package:technical_support_artphoto/repair/RepairList.dart';
 import 'package:technical_support_artphoto/splashScreen.dart';
 import 'package:technical_support_artphoto/technics/TechnicsList.dart';
@@ -54,7 +55,7 @@ class ArtphotoTech extends StatelessWidget {
                 Tab(icon: Icon(Icons.accessible), text: "История")
               ])),
           body: const TabBarView(
-              children: [TechnicsList(),RepairList(),TroubleList(),TechnicsList()]),
+              children: [TechnicsList(),RepairList(),TroubleList(),HistoryList()]),
           // children: [Appointments(), Contacts(), Notes(), Tasks()]),
         )
     );

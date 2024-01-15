@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:technical_support_artphoto/history/History.dart';
+import 'package:technical_support_artphoto/history/HistorySQFlite.dart';
 import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
 import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
+import 'package:technical_support_artphoto/utils/utils.dart';
 import '../ConnectToDBMySQL.dart';
 import '../technics/Technic.dart';
 import '../technics/TechnicViewAndChange.dart';
@@ -47,6 +50,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
 
   @override
   void initState() {
+    super.initState();
     oldRepairForHistory = Repair(
         widget.repair.id,
         widget.repair.internalID,
@@ -88,7 +92,6 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     _selectedDropdownStatusNew = widget.repair.newStatus == '' ? null : widget.repair.newStatus;
     _selectedDropdownDislocationNew = widget.repair.newDislocation == '' ? null : widget.repair.newDislocation;
     _dateReceipt = widget.repair.dateReceipt;
-    super.initState();
   }
 
   @override
@@ -575,8 +578,19 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
       }
 
       String descForHistory = descriptionForHistory(oldRepairForHistory, repair);
-      print(descForHistory);
-      ConnectToDBMySQL.connDB.insertHistory('Repair', repair.id!, 'edit', descForHistory);
+      History historyForSQL = History(
+          History.historyList.last.id,
+          'Repair',
+          repair.id!,
+          'edit',
+          descForHistory, 
+          LoginPassword.login,
+          DateFormat('yyyy.MM.dd').format(DateTime.now())
+      );
+
+      ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
+      HistorySQFlite.db.updateHistory(historyForSQL);
+      History.historyList.insert(0, historyForSQL);
     }
     return repair;
   }
@@ -618,7 +632,8 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   }
 
   String descriptionForHistory(Repair repairOld, Repair repairNew){
-    String result = 'Заявка на ремонт №${repairOld.internalID} изменена:';
+    String internalID = repairOld.internalID == -1 ? 'БН' : '№${repairOld.internalID}';
+    String result = 'Заявка на ремонт $internalID изменена:';
 
     if(repairOld.complaint != repairNew.complaint){
       result = '$result\n Жалоба изменена:\n'
@@ -627,8 +642,8 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     }
     if(repairOld.dateDeparture != repairNew.dateDeparture){
       result = '$result\n Дата вывоза с точки изменена:\n'
-          '  Было: ${repairOld.dateDeparture}\n'
-          '  Стало: ${repairNew.dateDeparture}';
+          '  Было: ${getDateFormat(repairOld.dateDeparture)}\n'
+          '  Стало: ${getDateFormat(repairNew.dateDeparture)}';
     }
     if(repairOld.serviceDislocation != repairNew.serviceDislocation){
       result = '$result\n Местонахождение техники изменено:\n'
@@ -638,21 +653,21 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     if(repairOld.dateTransferForService != repairNew.dateTransferForService){
       if(repairOld.dateTransferForService == ''){
         result = '$result\n Внесена дата сдачи в ремонт: '
-            '${repairNew.dateTransferForService}';
+            '${getDateFormat(repairNew.dateTransferForService)}';
       }else {
         result = '$result\n Дата сдачи в ремонт изменена:\n'
-            '  Было: ${repairOld.dateTransferForService}\n'
-            '  Стало: ${repairNew.dateTransferForService}';
+            '  Было: ${getDateFormat(repairOld.dateTransferForService)}\n'
+            '  Стало: ${getDateFormat(repairNew.dateTransferForService)}';
       }
     }
     if(repairOld.dateDepartureFromService != repairNew.dateDepartureFromService){
       if(repairOld.dateDepartureFromService == ''){
         result = '$result\n Внесена дата вывоза из ремонта: '
-            '${repairNew.dateDepartureFromService}';
+            '${getDateFormat(repairNew.dateDepartureFromService)}';
       }else {
       result = '$result\n Дата вывоза из ремонта изменена:\n'
-          '  Было: ${repairOld.dateDepartureFromService}\n'
-          '  Стало: ${repairNew.dateDepartureFromService}';
+          '  Было: ${getDateFormat(repairOld.dateDepartureFromService)}\n'
+          '  Стало: ${getDateFormat(repairNew.dateDepartureFromService)}';
       }
     }
     if(repairOld.worksPerformed != repairNew.worksPerformed){
@@ -668,11 +683,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     if(repairOld.costService != repairNew.costService){
       if(repairOld.costService == -1){
         result = '$result\n Внесена стоимость ремонта: '
-            '${repairNew.costService}';
+            '${repairNew.costService == -1 ? 0 : repairNew.costService}';
       }else {
       result = '$result\n Стоимость ремонта изменена:\n'
-          '  Было: ${repairOld.costService}\n'
-          '  Стало: ${repairNew.costService}';
+          '  Было: ${repairOld.costService == -1 ? 0 : repairNew.costService}\n'
+          '  Стало: ${repairNew.costService == -1 ? 0 : repairNew.costService}';
       }
     }
     if(repairOld.diagnosisService != repairNew.diagnosisService){
@@ -718,14 +733,18 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     if(repairOld.dateReceipt != repairNew.dateReceipt){
       if(repairOld.dateReceipt == ''){
         result = '$result\n Внесена дата поступления на точку: '
-            '${repairNew.dateReceipt}';
+            '${getDateFormat(repairNew.dateReceipt)}';
       }else {
         result = '$result\n Дата поступления на точку изменена:\n'
-            '  Было: ${repairOld.dateReceipt}\n'
-            '  Стало: ${repairNew.dateReceipt}';
+            '  Было: ${getDateFormat(repairOld.dateReceipt)}\n'
+            '  Стало: ${getDateFormat(repairNew.dateReceipt)}';
       }
     }
     return result;
+  }
+
+  String getDateFormat(String date) {
+    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 }
 

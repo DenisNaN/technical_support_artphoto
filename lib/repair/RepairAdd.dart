@@ -48,6 +48,7 @@ class _RepairAddState extends State<RepairAdd> {
 
   @override
   void initState() {
+    super.initState();
     _focusInnerNumberTechnic.addListener(() {
       if (!_focusInnerNumberTechnic.hasFocus) {
         technicFind =
@@ -78,7 +79,6 @@ class _RepairAddState extends State<RepairAdd> {
         }
       }
     });
-    super.initState();
   }
 
   @override
@@ -95,6 +95,9 @@ class _RepairAddState extends State<RepairAdd> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Создание заявки на ремонт'),
+      ),
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
             child: Padding(
@@ -133,14 +136,14 @@ class _RepairAddState extends State<RepairAdd> {
         ),
         body: Form(
           key: _formKey,
-          child: Column(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(0, 40, 0, 10),
-                  child: Text('Создание заявки на ремонт',
-                      style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),
-                Expanded(
+          // child: Column(
+          //     children: [
+          //       const Padding(
+          //         padding: EdgeInsets.fromLTRB(0, 40, 0, 10),
+          //         child: Text('Создание заявки на ремонт',
+          //             style: TextStyle(
+          //                 fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))),
+          //       Expanded(
                     child: ListView(
                       padding: EdgeInsets.zero,
                       children:[
@@ -161,7 +164,8 @@ class _RepairAddState extends State<RepairAdd> {
                         _buildNewDislocationListTile(),
                         _buildDateReceiptListTile(),
                       ],
-          ))]),
+          // ))]),
+          ),
         )
     );
   }
@@ -570,6 +574,7 @@ class _RepairAddState extends State<RepairAdd> {
 
     ConnectToDBMySQL.connDB.insertRepairInDB(repair);
     RepairSQFlite.db.create(repair);
+    // ConnectToDBMySQL.connDB.insertHistory('Repair', repair.id!, 'edit', descForHistory);
 
     Navigator.pop(context, repair);
 
