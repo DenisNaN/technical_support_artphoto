@@ -9,7 +9,7 @@ class TroubleSQFlite{
   static final TroubleSQFlite db = TroubleSQFlite._();
   Database? _db;
 
-  Future get database async{
+  Future database() async{
     _db ??= await init();
     return _db;
   }
@@ -63,7 +63,7 @@ class TroubleSQFlite{
   }
 
   Future insertTrouble(Trouble inTrouble) async {
-    Database db = await database;
+    Database db = await database();
 
     await db.execute(
         "INSERT INTO trouble (id, photosalon, dateTrouble, employee, internalID, "
@@ -93,7 +93,7 @@ class TroubleSQFlite{
   // }
 
   Future<List> getAllTrouble() async {
-    Database db = await database;
+    Database db = await database();
     var recs = await db.query("trouble");
     var list = recs.isNotEmpty ? recs.map((m) => troubleFromMap(m)).toList() : [];
     var reversedList = List.from(list.reversed);
@@ -101,23 +101,18 @@ class TroubleSQFlite{
   }
 
   Future updateTrouble(Trouble inTrouble) async {
-    Database db = await database;
+    Database db = await database();
     return await db.update("trouble", troubleToMap(inTrouble),
         where: "id = ?", whereArgs: [inTrouble.id]);
   }
 
-  // Future delete(int inID) async {
-  //   Database db = await database;
-  //   return await db.delete("technic", where: "id = ?", whereArgs: [inID]);
-  // }
-
   Future deleteTables() async{
-    Database db = await database;
+    Database db = await database();
     await db.rawQuery("DROP TABLE IF EXISTS trouble");
   }
 
   Future createTables() async{
-    Database db = await database;
+    Database db = await database();
     await db.rawQuery("CREATE TABLE IF NOT EXISTS trouble ("
         "id INTEGER, photosalon TEXT, dateTrouble TEXT, employee TEXT, "
         "internalID INTEGER, trouble TEXT, dateCheckFixTroubleEmployee TEXT,"
@@ -126,7 +121,7 @@ class TroubleSQFlite{
   }
 
   Future getTrouble() async{
-    Database db = await database;
+    Database db = await database();
     var recs = await db.rawQuery('SELECT * FROM trouble');
     recs.isNotEmpty ? recs.map((m) => print(m)) : [];
   }

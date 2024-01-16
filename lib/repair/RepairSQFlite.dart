@@ -10,7 +10,7 @@ class RepairSQFlite{
   static final RepairSQFlite db = RepairSQFlite._();
   Database? _db;
 
-  Future get database async{
+  Future database() async{
     _db ??= await init();
     return _db;
   }
@@ -86,7 +86,7 @@ class RepairSQFlite{
   }
 
   Future create(Repair inRepair) async {
-    Database db = await database;
+    Database db = await database();
 
     return await db.rawInsert(
         "INSERT INTO repair ("
@@ -128,13 +128,13 @@ class RepairSQFlite{
   }
 
   Future<Repair> get(int inID) async {
-    Database db = await database;
+    Database db = await database();
     var rec = await db.query("repair", where: "id = ?", whereArgs: [inID]);
     return repairFromMap(rec.first);
   }
 
   Future<List> getAllRepair() async {
-    Database db = await database;
+    Database db = await database();
     var recs = await db.query("repair");
     var list = recs.isNotEmpty ? recs.map((m) => repairFromMap(m)).toList() : [];
     var reversedList = List.from(list.reversed);
@@ -142,23 +142,18 @@ class RepairSQFlite{
   }
 
   Future update(Repair inRepair) async {
-    Database db = await database;
+    Database db = await database();
     return await db.update("repair", repairToMap(inRepair),
         where: "id = ?", whereArgs: [inRepair.id]);
   }
 
-  // Future delete(int inID) async {
-  //   Database db = await database;
-  //   return await db.delete("repair", where: "id = ?", whereArgs: [inID]);
-  // }
-
   Future deleteTable() async{
-    Database db = await database;
+    Database db = await database();
     return await db.rawQuery("DROP TABLE IF EXISTS repair");
   }
 
   Future createTable() async{
-    Database db = await database;
+    Database db = await database();
     return await db.rawQuery("CREATE TABLE IF NOT EXISTS repair ("
         "id INTEGER, "
         "internalID INTEGER, "

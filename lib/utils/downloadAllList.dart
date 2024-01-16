@@ -51,15 +51,15 @@ class DownloadAllList{
     Trouble.troubleList.addAll(
         await getAllActualTrouble(HasNetwork.isConnecting, listLastId[2]['id'], listCount[2]['countTrouble']));
     History.historyList.addAll(
-        await getAllActualHistory(HasNetwork.isConnecting, listLastId[2]['id'], listCount[2]['countTrouble']));
+        await getAllActualHistory(HasNetwork.isConnecting, listLastId[3]['id'], listCount[3]['countTrouble']));
     CategoryDropDownValueModel.nameEquipment.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'nameEquipment', 'name', listCount[3]['countName'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'nameEquipment', 'name', listCount[4]['countName'])) as Iterable<String>);
     CategoryDropDownValueModel.photosalons.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'photosalons', 'Фотосалон', listCount[4]['countPhotosalons'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'photosalons', 'Фотосалон', listCount[5]['countPhotosalons'])) as Iterable<String>);
     CategoryDropDownValueModel.service.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'service', 'repairmen', listCount[5]['countService'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'service', 'repairmen', listCount[6]['countService'])) as Iterable<String>);
     CategoryDropDownValueModel.statusForEquipment.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[6]['countStatus'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[7]['countStatus'])) as Iterable<String>);
   }
 
   Future getAllHasNotNetwork() async{
@@ -227,6 +227,7 @@ class DownloadAllList{
         for(var history in addHistoryInSQFlite){
           HistorySQFlite.db.insertHistory(history);
         }
+        updateAllRowsIfWereChanges(addHistoryInSQFlite);
         reversedAllHistory.addAll(addHistoryInSQFlite);
 
         allHistory.clear();
@@ -249,6 +250,29 @@ class DownloadAllList{
       }
     }
     return allHistory;
+  }
+
+  Future updateAllRowsIfWereChanges(List historyList) async{
+    if(historyList.isNotEmpty){
+      historyList.forEach((history) async {
+        if(history.typeOperation == 'edit'){
+          switch(history.section){
+            case 'Technic':
+              Technic? technic = await ConnectToDBMySQL.connDB.getTechnic(history.idSection);
+              if(technic != null) TechnicSQFlite.db.updateTechnic(technic);
+              break;
+            case 'Repair':
+              Repair? repair = await ConnectToDBMySQL.connDB.getRepair(history.idSectio);
+              if(repair != null) RepairSQFlite.db.update(repair);
+              break;
+            case 'Trouble':
+              Trouble? trouble = await ConnectToDBMySQL.connDB.getTrouble(history.idSection);
+              if(trouble != null) TroubleSQFlite.db.updateTrouble(trouble);
+              break;
+          }
+        }
+      });
+    }
   }
 
   Future<List> getActualCategory(

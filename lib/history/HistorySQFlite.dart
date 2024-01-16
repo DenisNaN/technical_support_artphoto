@@ -9,7 +9,7 @@ class HistorySQFlite{
   static final HistorySQFlite db = HistorySQFlite._();
   Database? _db;
 
-  Future get database async{
+  Future database() async{
     _db ??= await init();
     return _db;
   }
@@ -53,7 +53,7 @@ class HistorySQFlite{
   }
 
   Future insertHistory(History inHistory) async {
-    Database db = await database;
+    Database db = await database();
 
     await db.execute(
         "INSERT INTO history (id, section, idSection, "
@@ -78,7 +78,7 @@ class HistorySQFlite{
   // }
 
   Future<List> getAllHistory() async {
-    Database db = await database;
+    Database db = await database();
     var recs = await db.query("history");
     var list = recs.isNotEmpty ? recs.map((m) => historyFromMap(m)).toList() : [];
     var reversedList = List.from(list.reversed);
@@ -86,23 +86,18 @@ class HistorySQFlite{
   }
 
   Future updateHistory(History inHistory) async {
-    Database db = await database;
+    Database db = await database();
     return await db.update("history", historyToMap(inHistory),
         where: "id = ?", whereArgs: [inHistory.id]);
   }
 
-  // Future delete(int inID) async {
-  //   Database db = await database;
-  //   return await db.delete("technic", where: "id = ?", whereArgs: [inID]);
-  // }
-
   Future deleteTables() async{
-    Database db = await database;
+    Database db = await database();
     await db.rawQuery("DROP TABLE IF EXISTS history");
   }
 
   Future createTables() async{
-    Database db = await database;
+    Database db = await database();
     await db.rawQuery("CREATE TABLE IF NOT EXISTS history ("
         "id INTEGER, section TEXT, idSection INTEGER,"
         "typeOperation TEXT, description TEXT, login TEXT, date TEXT)");

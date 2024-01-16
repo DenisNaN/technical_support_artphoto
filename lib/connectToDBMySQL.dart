@@ -45,24 +45,8 @@ class ConnectToDBMySQL {
         'ORDER BY equipment.id');
 
     var list = [];
-    for (var row in result) {
-      // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4],
-      // dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8]
-      // dateStart-row[9], dateFinish-row[10], resultTestDrive-row[11],
-      // checkTestDrive-row[12]
-
-      String dateStartTestDrive = '';
-      if(row[9] != null && row[9].toString() != "-0001-11-30 00:00:00.000Z") dateStartTestDrive = getDateFormatted(row[9].toString());
-      String dateFinishTestDrive = '';
-      if(row[10] != null && row[10].toString() != "-0001-11-30 00:00:00.000Z") dateFinishTestDrive = getDateFormatted(row[10].toString());
-      bool checkTestDrive = false;
-      if(row[12] != null && row[12] == 1) checkTestDrive = true;
-
-      Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
-          getDateFormatted(row[5].toString()), row[6] ?? '', row[7] ?? '', row[8],
-          dateStartTestDrive, dateFinishTestDrive, row[11] ?? '', checkTestDrive);
-      list.add(technic);
-    }
+    Technic? technic = technicFromMap(result);
+    if(technic != null) list.add(technic);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
@@ -88,6 +72,20 @@ class ConnectToDBMySQL {
         'WHERE equipment.id > ?', [id]);
 
     var list = [];
+    Technic? technic = technicFromMap(result);
+    if(technic != null) list.add(technic);
+    var reversedList = List.from(list.reversed);
+    return reversedList;
+  }
+
+  Future<Technic?> getTechnic(int id) async {
+    var result = await _connDB!.query('SELECT * FROM equipment WHERE id = ?', [id]);
+    Technic? technic = technicFromMap(result);
+    return technic;
+  }
+
+  Technic? technicFromMap(var result){
+    Technic? technic;
     for (var row in result) {
       // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4],
       // dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8]
@@ -101,13 +99,11 @@ class ConnectToDBMySQL {
       bool checkTestDrive = false;
       if(row[12] != null && row[12] == 1) checkTestDrive = true;
 
-      Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
+      technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
           getDateFormatted(row[5].toString()), row[6] ?? '', row[7] ?? '', row[8],
           dateStartTestDrive, dateFinishTestDrive, row[11] ?? '', checkTestDrive);
-      list.add(technic);
     }
-    var reversedList = List.from(list.reversed);
-    return reversedList;
+    return technic;
   }
 
   Future<List> getAllRepair() async{
@@ -132,19 +128,8 @@ class ConnectToDBMySQL {
         'FROM repairEquipment');
 
     var list = [];
-    for (var row in result) {
-      // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
-      // dateTransferForService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
-      // recommendationsNotes-row[13], newStatus-row[14],  newDislocation-row[15], dateReceipt-row[16]
-      String dateDeparture = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
-      String dateTransferForService = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
-      String dateDepartureFromService = row[9].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[9].toString());
-      String dateReceipt = row[16].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[16].toString());
-
-      Repair repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferForService,
-          dateDepartureFromService, row[10],  row[11],  row[12], row[13], row[14], row[15], dateReceipt);
-      list.add(repair);
-    }
+    Repair? repair = repairFromMap(result);
+    if(repair != null) list.add(repair);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
@@ -171,6 +156,20 @@ class ConnectToDBMySQL {
         'FROM repairEquipment WHERE id > ?', [id]);
 
     var list = [];
+    Repair? repair = repairFromMap(result);
+    if(repair != null) list.add(repair);
+    var reversedList = List.from(list.reversed);
+    return reversedList;
+  }
+
+  Future<Repair?> getRepair(int id) async {
+    var result = await _connDB!.query('SELECT * FROM equipment WHERE id = ?', [id]);
+    Repair? repair = repairFromMap(result);
+    return repair;
+  }
+
+  Repair? repairFromMap(var result){
+    Repair? repair;
     for (var row in result) {
       // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
       // dateTransferForService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
@@ -178,13 +177,12 @@ class ConnectToDBMySQL {
       String dateDeparture = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
       String dateTransferForService = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
       String dateDepartureFromService = row[9].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[9].toString());
-      String dateReceipt = row[16].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[19].toString());
+      String dateReceipt = row[16].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[16].toString());
 
-      Repair repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferForService,
+      repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferForService,
           dateDepartureFromService, row[10],  row[11],  row[12], row[13], row[14], row[15], dateReceipt);
-      list.add(repair);
     }
-    return list;
+    return repair;
   }
 
   Future<List> getAllTrouble() async{
@@ -195,21 +193,8 @@ class ConnectToDBMySQL {
         'FROM Неисправности');
 
     var list = [];
-    for (var row in result) {
-      // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
-      // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
-      // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
-      String dateTrouble = row[2].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[2].toString());
-      String dateCheckFixTroubleEmployee = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
-      String dateCheckFixTroubleEngineer = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
-
-      Blob blobImage = row[10];
-      Uint8List image = Uint8List.fromList(blobImage.toBytes());
-
-      Trouble trouble = Trouble(row[0], row[1].toString(),  dateTrouble,  row[3].toString(), row[4], row[5].toString(), dateCheckFixTroubleEmployee,
-          row[7].toString(), dateCheckFixTroubleEngineer, row[9].toString(), image);
-      list.add(trouble);
-    }
+    Trouble? trouble = troubleFromMap(result);
+    if(trouble != null) list.add(trouble);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
@@ -222,6 +207,20 @@ class ConnectToDBMySQL {
         'FROM Неисправности WHERE id > ?', [id]);
 
     var list = [];
+    Trouble? trouble = troubleFromMap(result);
+    if(trouble != null) list.add(trouble);
+    var reversedList = List.from(list.reversed);
+    return reversedList;
+  }
+
+  Future<Trouble?> getTrouble(int id) async {
+    var result = await _connDB!.query('SELECT * FROM equipment WHERE id = ?', [id]);
+    Trouble? trouble = troubleFromMap(result);
+    return trouble;
+  }
+
+  Trouble? troubleFromMap(var result) {
+    Trouble? trouble;
     for (var row in result) {
       // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
       // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
@@ -233,25 +232,18 @@ class ConnectToDBMySQL {
       Blob blobImage = row[10];
       Uint8List image = Uint8List.fromList(blobImage.toBytes());
 
-      Trouble trouble = Trouble(row[0], row[1].toString(),  dateTrouble,  row[3].toString(), row[4], row[5].toString(), dateCheckFixTroubleEmployee,
+      trouble = Trouble(row[0], row[1].toString(),  dateTrouble,  row[3].toString(), row[4], row[5].toString(), dateCheckFixTroubleEmployee,
           row[7].toString(), dateCheckFixTroubleEngineer, row[9].toString(), image);
-      list.add(trouble);
     }
-    return list;
+    return trouble;
   }
 
   Future<List> getAllHistory() async{
     var result = await _connDB!.query('SELECT * FROM history');
 
     var list = [];
-    for (var row in result) {
-      // id-row[0], section-row[1],  idSection-row[2],  typeOperation-row[3], description-row[4], login-row[5],
-      // date-row[6]
-      String dateHystory = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
-
-      History history = History(row[0], row[1],  row[2],  row[3], row[4].toString(), row[5].toString(), dateHystory);
-      list.add(history);
-    }
+    History? history = historyFromMap(result);
+    if(history != null) list.add(history);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
@@ -260,15 +252,21 @@ class ConnectToDBMySQL {
     var result = await _connDB!.query('SELECT * FROM history WHERE id > ?', [id]);
 
     var list = [];
+    History? history = historyFromMap(result);
+    if(history != null) list.add(history);
+    var reversedList = List.from(list.reversed);
+    return reversedList;
+  }
+
+  History? historyFromMap(var result) {
+    History? history;
     for (var row in result) {
       // id-row[0], section-row[1],  idSection-row[2],  typeOperation-row[3], description-row[4], login-row[5],
       // date-row[6]
       String dateHystory = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
-
-      History history = History(row[0], row[1],  row[2],  row[3], row[4].toString(), row[5].toString(), dateHystory);
-      list.add(history);
+      history = History(row[0], row[1],  row[2],  row[3], row[4].toString(), row[5].toString(), dateHystory);
     }
-    return list;
+    return history;
   }
 
   String getDateFormatted(String date){
@@ -460,6 +458,8 @@ class ConnectToDBMySQL {
         'SELECT id FROM repairEquipment ORDER BY id DESC LIMIT 1');
     var resultTrouble = await _connDB!.query(
         'SELECT id FROM Неисправности ORDER BY id DESC LIMIT 1');
+    var resultHistory = await _connDB!.query(
+        'SELECT id FROM history ORDER BY id DESC LIMIT 1');
     var resultService = await _connDB!.query(
         'SELECT id FROM service ORDER BY id DESC LIMIT 1');
     var resultStatusForEquipment = await _connDB!.query(
@@ -473,6 +473,7 @@ class ConnectToDBMySQL {
     list.add(resultTechnics.last);
     list.add(resultRepair.last);
     list.add(resultTrouble.last);
+    list.add(resultHistory.last);
     list.add(resultService.last);
     list.add(resultStatusForEquipment.last);
     list.add(resultNameEquipment.last);
@@ -488,6 +489,8 @@ class ConnectToDBMySQL {
         'SELECT COUNT(*) AS countRepair FROM repairEquipment');
     var resultTrouble = await _connDB!.query(
         'SELECT COUNT(*) AS countTrouble FROM Неисправности');
+    var resultHistory = await _connDB!.query(
+        'SELECT COUNT(*) AS countTrouble FROM history');
     var resultNameEquipment = await _connDB!.query(
         'SELECT COUNT(*) AS countName FROM nameEquipment');
     var resultPhotosalons = await _connDB!.query(
@@ -501,6 +504,7 @@ class ConnectToDBMySQL {
     list.add(resultTechnics.last);
     list.add(resultRepair.last);
     list.add(resultTrouble.last);
+    list.add(resultHistory.last);
     list.add(resultNameEquipment.last);
     list.add(resultPhotosalons.last);
     list.add(resultService.last);

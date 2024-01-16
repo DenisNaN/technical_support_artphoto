@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:technical_support_artphoto/utils/downloadAllList.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 
 import '../main.dart';
@@ -21,6 +22,34 @@ class _LoginState extends State<Login> {
         title: const Text('Login'),
         centerTitle: true,
       ),
+      bottomNavigationBar:
+        Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: TextButton(
+            onPressed: (){
+              DownloadAllList.downloadAllList.rebootAllBasicListSQFlite();
+              DownloadAllList.downloadAllList.rebootAllListCategorySQFlite('nameEquipment', 'name');
+              DownloadAllList.downloadAllList.rebootAllListCategorySQFlite('photosalons', 'Фотосалон');
+              DownloadAllList.downloadAllList.rebootAllListCategorySQFlite('service', 'repairmen');
+              DownloadAllList.downloadAllList.rebootAllListCategorySQFlite('statusForEquipment', 'status');
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(Icons.add_task, size: 40, color: Colors.white),
+                      Expanded(
+                          child: Text(' Для корректной работы перезагрузите приложение')),
+                    ],
+                  ),
+                  duration: Duration(seconds: 60),
+                  showCloseIcon: true,
+                ),
+              );
+            },
+            child: Text('reset'),
+          ),
+        ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[

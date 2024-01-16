@@ -9,7 +9,7 @@ class TechnicSQFlite{
   static final TechnicSQFlite db = TechnicSQFlite._();
   Database? _db;
 
-  Future get database async{
+  Future database() async{
     _db ??= await init();
     return _db;
   }
@@ -71,7 +71,7 @@ class TechnicSQFlite{
   }
 
   Future insertEquipment(Technic inTechnic) async {
-    Database db = await database;
+    Database db = await database();
 
     await db.execute(
         "INSERT INTO equipment (id, internalID, name, category, cost, "
@@ -104,7 +104,7 @@ class TechnicSQFlite{
   // }
 
   Future<List> getAllTechnics() async {
-    Database db = await database;
+    Database db = await database();
     var recs = await db.query("equipment");
     var list = recs.isNotEmpty ? recs.map((m) => technicFromMap(m)).toList() : [];
     var reversedList = List.from(list.reversed);
@@ -112,13 +112,13 @@ class TechnicSQFlite{
   }
 
   Future updateTechnic(Technic inTechnic) async {
-    Database db = await database;
+    Database db = await database();
     return await db.update("equipment", technicToMap(inTechnic),
         where: "id = ?", whereArgs: [inTechnic.id]);
   }
 
   Future updateStatusDislocationTechnic(int id, String status, String dislocation) async {
-    Database db = await database;
+    Database db = await database();
     return await db.execute(
         'UPDATE equipment SET '
         'status = ?, '
@@ -134,12 +134,12 @@ class TechnicSQFlite{
   // }
 
   Future deleteTables() async{
-    Database db = await database;
+    Database db = await database();
     await db.rawQuery("DROP TABLE IF EXISTS equipment");
   }
 
   Future createTables() async{
-    Database db = await database;
+    Database db = await database();
     await db.rawQuery("CREATE TABLE IF NOT EXISTS equipment ("
         "id INTEGER, internalID INTEGER, name TEXT, category TEXT,"
         "cost INTEGER, dateBuyTechnic TEXT, status TEXT, dislocation TEXT, "
@@ -147,9 +147,9 @@ class TechnicSQFlite{
         "checkboxTestDrive TEXT, user TEXT)");
   }
 
-  Future getEquipment() async{
-    Database db = await database;
-    var recs = await db.rawQuery('SELECT * FROM equipment');
-    recs.isNotEmpty ? recs.map((m) => print(m)) : [];
+  Future<Technic> get(int inID) async {
+    Database db = await database();
+    var rec = await db.query("equipment", where: "id = ?", whereArgs: [inID]);
+    return technicFromMap(rec.first);
   }
 }
