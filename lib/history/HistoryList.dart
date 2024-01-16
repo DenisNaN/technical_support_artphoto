@@ -1,6 +1,13 @@
 import 'package:intl/intl.dart';
 import 'package:technical_support_artphoto/history/History.dart';
 import 'package:flutter/material.dart';
+import 'package:technical_support_artphoto/trouble/Trouble.dart';
+import 'package:technical_support_artphoto/trouble/TroubleViewAndChange.dart';
+
+import '../repair/Repair.dart';
+import '../repair/RepairViewAndChange.dart';
+import '../technics/Technic.dart';
+import '../technics/TechnicViewAndChange.dart';
 
 class HistoryList extends StatefulWidget {
   const HistoryList({super.key});
@@ -19,20 +26,29 @@ class _HistoryListState extends State<HistoryList> {
           separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: History.historyList.length,
           itemBuilder: (context, index) {
-            // bool isDoneHistory = isAllFieldsFilled(Repair.repairList[index]);
-
             return ListTile(
-                // onTap: () {
-                //   Navigator.push(context, MaterialPageRoute(
-                //       builder: (context) => RepairViewAndChange(repair: Repair.repairList[index])))
-                //       .then((value) {
-                //     setState(() {
-                //       if (value != null) {
-                //         Repair.repairList[index] = value;
-                //       }
-                //     });
-                //   });
-                // },
+                onTap: () {
+                  switch(History.historyList[index].section){
+                    case 'Technic':
+                      Technic technicFind = Technic.technicList.firstWhere((item) => item.id == History.historyList[index].idSection);
+                      Navigator.push(
+                          context, MaterialPageRoute(
+                          builder: (context) => TechnicViewAndChange(technic: technicFind)));
+                      break;
+                    case 'Repair':
+                      Repair repairFind = Repair.repairList.firstWhere((item) => item.id == History.historyList[index].idSection);
+                      Navigator.push(
+                          context, MaterialPageRoute(
+                          builder: (context) => RepairViewAndChange(repair: repairFind)));
+                      break;
+                    case 'Trouble':
+                      Trouble troubleFind = Trouble.troubleList.firstWhere((item) => item.id == History.historyList[index].idSection);
+                      Navigator.push(
+                          context, MaterialPageRoute(
+                          builder: (context) => TroubleViewAndChange(trouble: troubleFind)));
+                      break;
+                  }
+                },
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 title: _buildText(context, index)
             );
@@ -40,25 +56,6 @@ class _HistoryListState extends State<HistoryList> {
         )
     );
   }
-
-  // bool isAllFieldsFilled(Repair repair){
-  //   bool result = false;
-  //   if(repair.complaint != '' &&
-  //       repair.dateDeparture != '' &&
-  //       repair.dateTransferForService != '' &&
-  //       repair.serviceDislocation != '' &&
-  //       repair.dateDepartureFromService != '' &&
-  //       repair.worksPerformed != '' &&
-  //       repair.costService != null &&
-  //       repair.diagnosisService != '' &&
-  //       // repair.recommendationsNotes != '' &&
-  //       repair.dateReceipt != '' &&
-  //       repair.newStatus != '' &&
-  //       repair.newDislocation != ''){
-  //     result = true;
-  //   }
-  //   return result;
-  // }
 
   Text _buildText(BuildContext context, int index){
     String section = '';

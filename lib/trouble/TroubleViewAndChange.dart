@@ -7,6 +7,8 @@ import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 import 'package:technical_support_artphoto/trouble/TroubleSQFlite.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 import '../ConnectToDBMySQL.dart';
+import '../history/History.dart';
+import '../history/HistorySQFlite.dart';
 import '../repair/Repair.dart';
 import '../technics/Technic.dart';
 import '../technics/TechnicViewAndChange.dart';
@@ -34,20 +36,32 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
   String _dateCheckFixTroubleEngineer = '';
   String _engineerCheckFixTrouble = '';
   Uint8List _photoTrouble = Uint8List.fromList([]);
+  late Trouble _oldTroubleForHistory;
 
   late TransformationController transformationController;
   late AnimationController animationController;
   Animation<Matrix4>? animation;
   TapDownDetails? tapDownDetails;
 
-  // bool _isEditComplaint = false;
   bool _isEdit = false;
-  // bool _isEditNewStatusDislocation = false;
   int indexTechnic = 0;
 
   @override
   void initState() {
     super.initState();
+
+    _oldTroubleForHistory = Trouble(
+        widget.trouble.id,
+        widget.trouble.photosalon,
+        widget.trouble.dateTrouble,
+        widget.trouble.employee,
+        widget.trouble.internalID,
+        widget.trouble.trouble,
+        widget.trouble.dateCheckFixTroubleEmployee,
+        widget.trouble.employeeCheckFixTrouble,
+        widget.trouble.dateCheckFixTroubleEngineer,
+        widget.trouble.engineerCheckFixTrouble);
+
     for(int i = 0; i < Technic.technicList.length; i++){
       if(Technic.technicList[i].internalID == widget.trouble.internalID){
         indexTechnic = i;
@@ -203,7 +217,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
       title: _dateCheckFixTroubleEmployee != '' ? Text(
           'Закрытие сотрудником:\n'
           'Сотрудник: $_employeeCheckFixTrouble\n'
-          'Дата: ${getFomattedDateForView(_dateCheckFixTroubleEmployee)}') :
+          'Дата: ${getDateFormat(_dateCheckFixTroubleEmployee)}') :
       const Text('Проблема сотрудником не закрыта'),
       trailing: LoginPassword.access == 'admin' ?
       Row(mainAxisSize: MainAxisSize.min, children: [
@@ -246,7 +260,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
       title: Text(_dateCheckFixTroubleEngineer == '' ? 'Для закрытия проблемы инженером выберите дату' :
               'Закрытие инженером:\n'
               'Сотрудник: $_engineerCheckFixTrouble\n'
-              'Дата: ${getFomattedDateForView(_dateCheckFixTroubleEngineer)}'),
+              'Дата: ${getDateFormat(_dateCheckFixTroubleEngineer)}'),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         SizedBox(width: 40, child: IconButton(
           icon: const Icon(Icons.edit),
@@ -362,12 +376,57 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
     if(_isEdit) {
       ConnectToDBMySQL.connDB.updateTroubleInDB(trouble);
       TroubleSQFlite.db.updateTrouble(trouble);
+      addHistory(trouble);
     }
     return trouble;
   }
 
-  String getFomattedDateForView(String date){
-    return DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
+  Future addHistory(Trouble trouble) async{
+    String descForHistory = descriptionForHistory(_oldTroubleForHistory, trouble);
+    History historyForSQL = History(
+        History.historyList.last.id + 1,
+        'Trouble',
+        trouble.id!,
+        'edit',
+        descForHistory,
+        LoginPassword.login,
+        DateFormat('yyyy.MM.dd').format(DateTime.now())
+    );
+
+    ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
+    HistorySQFlite.db.insertHistory(historyForSQL);
+    History.historyList.insert(0, historyForSQL);
+  }
+
+  String descriptionForHistory(Trouble troubleOld, Trouble troubleNew){
+    String internalID = troubleOld.internalID == -1 ? 'БН' : '№${troubleOld.internalID}';
+    String result = 'Неисправность $internalID изменена:';
+
+    if(troubleOld.dateCheckFixTroubleEmployee != troubleNew.dateCheckFixTroubleEmployee){
+      if(troubleOld.dateCheckFixTroubleEmployee == ''){
+        result = '$result\n Внесена дата закрытия неисп-ти фотографом: '
+            '${getDateFormat(troubleNew.dateCheckFixTroubleEmployee)}';
+      }else {
+        result = '$result\n Дата закрытия неисп-ти фотографом изменена:\n'
+            '  Было: ${getDateFormat(troubleOld.dateCheckFixTroubleEmployee)}\n'
+            '  Стало: ${getDateFormat(troubleNew.dateCheckFixTroubleEmployee)}';
+      }
+    }
+    if(troubleOld.dateCheckFixTroubleEngineer != troubleNew.dateCheckFixTroubleEngineer){
+      if(troubleOld.dateCheckFixTroubleEngineer == ''){
+        result = '$result\n Внесена дата закрытия неисп-ти инженером: '
+            '${getDateFormat(troubleNew.dateCheckFixTroubleEngineer)}';
+      }else {
+        result = '$result\n Дата закрытия неисп-ти инженером изменена:\n'
+            '  Было: ${getDateFormat(troubleOld.dateCheckFixTroubleEngineer)}\n'
+            '  Стало: ${getDateFormat(troubleNew.dateCheckFixTroubleEngineer)}';
+      }
+    }
+    return result;
+  }
+
+  String getDateFormat(String date) {
+    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 }
 

@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:technical_support_artphoto/trouble/TroubleSQFlite.dart';
 import '../ConnectToDBMySQL.dart';
+import '../history/History.dart';
+import '../history/HistorySQFlite.dart';
 import '../technics/Technic.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import '../utils/utils.dart';
@@ -400,6 +402,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
 
     ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
     TroubleSQFlite.db.insertTrouble(trouble);
+    addHistory(trouble);
 
     Navigator.pop(context, trouble);
 
@@ -415,6 +418,34 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
         showCloseIcon: true,
       ),
     );
+  }
+
+  Future addHistory(Trouble trouble) async{
+    String descForHistory = descriptionForHistory(trouble);
+    History historyForSQL = History(
+        History.historyList.last.id + 1,
+        'Trouble',
+        trouble.id!,
+        'create',
+        descForHistory,
+        LoginPassword.login,
+        DateFormat('yyyy.MM.dd').format(DateTime.now())
+    );
+
+    ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
+    HistorySQFlite.db.insertHistory(historyForSQL);
+    History.historyList.insert(0, historyForSQL);
+  }
+
+  String descriptionForHistory(Trouble trouble){
+    String internalID = trouble.internalID == -1 ? 'БН' : '№${trouble.internalID}';
+    String result = 'Новая неисправность $internalID добавленна';
+
+    return result;
+  }
+
+  String getDateFormat(String date) {
+    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 
   Uint8List _decoderPhotoToBlob(File image) {
