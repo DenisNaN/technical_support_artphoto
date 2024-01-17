@@ -86,7 +86,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     _dateTransferForService = widget.repair.dateTransferForService;
     _dateDepartureFromService = widget.repair.dateDepartureFromService;
     _worksPerformed.text = widget.repair.worksPerformed;
-    _costService.text = widget.repair.costService == -1 ? '' : '${widget.repair.costService}';
+    _costService.text = widget.repair.costService == 0 ? '' : '${widget.repair.costService}';
     _diagnosisService.text = widget.repair.diagnosisService;
     _recommendationsNotes.text = widget.repair.recommendationsNotes;
     _selectedDropdownStatusNew = widget.repair.newStatus == '' ? null : widget.repair.newStatus;
@@ -536,8 +536,8 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   }
 
   Future<Repair> _save() async{
-    int costServ = -1;
-    _costService.text != "" ? costServ = int.parse(_costService.text.replaceAll(",", "")) : costServ = -1;
+    int costServ = 0;
+    _costService.text != "" ? costServ = int.parse(_costService.text.replaceAll(",", "")) : costServ = 0;
     _selectedDropdownStatusNew = _selectedDropdownStatusNew ?? '';
     _selectedDropdownDislocationNew = _selectedDropdownDislocationNew ?? '';
 
@@ -681,13 +681,13 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
       }
     }
     if(repairOld.costService != repairNew.costService){
-      if(repairOld.costService == -1){
+      if(repairOld.costService == 0){
         result = '$result\n Внесена стоимость ремонта: '
-            '${repairNew.costService == -1 ? 0 : repairNew.costService} р.';
+            '${repairNew.costService == 0 ? 0 : repairNew.costService} р.';
       }else {
       result = '$result\n Стоимость ремонта изменена:\n'
-          '  Было: ${repairOld.costService == -1 ? 0 : repairOld.costService} р.\n'
-          '  Стало: ${repairNew.costService == -1 ? 0 : repairNew.costService} р.';
+          '  Было: ${repairOld.costService == 0 ? 0 : repairOld.costService} р.\n'
+          '  Стало: ${repairNew.costService == 0 ? 0 : repairNew.costService} р.';
       }
     }
     if(repairOld.diagnosisService != repairNew.diagnosisService){

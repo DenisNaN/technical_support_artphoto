@@ -44,9 +44,7 @@ class ConnectToDBMySQL {
         'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
         'ORDER BY equipment.id');
 
-    var list = [];
-    Technic? technic = technicFromMap(result);
-    if(technic != null) list.add(technic);
+    var list = technicListFromMap(result);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
@@ -71,21 +69,19 @@ class ConnectToDBMySQL {
         'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
         'WHERE equipment.id > ?', [id]);
 
-    var list = [];
-    Technic? technic = technicFromMap(result);
-    if(technic != null) list.add(technic);
+    var list = technicListFromMap(result);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
 
   Future<Technic?> getTechnic(int id) async {
     var result = await _connDB!.query('SELECT * FROM equipment WHERE id = ?', [id]);
-    Technic? technic = technicFromMap(result);
+    Technic? technic = technicListFromMap(result).firstOrNull;
     return technic;
   }
 
-  Technic? technicFromMap(var result){
-    Technic? technic;
+  List technicListFromMap(var result){
+    List list = [];
     for (var row in result) {
       // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4],
       // dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8]
@@ -99,11 +95,12 @@ class ConnectToDBMySQL {
       bool checkTestDrive = false;
       if(row[12] != null && row[12] == 1) checkTestDrive = true;
 
-      technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
+      Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
           getDateFormatted(row[5].toString()), row[6] ?? '', row[7] ?? '', row[8],
           dateStartTestDrive, dateFinishTestDrive, row[11] ?? '', checkTestDrive);
+      list.add(technic);
     }
-    return technic;
+    return list;
   }
 
   Future<List> getAllRepair() async{
@@ -127,9 +124,7 @@ class ConnectToDBMySQL {
         'repairEquipment.dateReceipt '
         'FROM repairEquipment');
 
-    var list = [];
-    Repair? repair = repairFromMap(result);
-    if(repair != null) list.add(repair);
+    var list = repairListFromMap(result);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
@@ -155,21 +150,19 @@ class ConnectToDBMySQL {
         'repairEquipment.dateReceipt '
         'FROM repairEquipment WHERE id > ?', [id]);
 
-    var list = [];
-    Repair? repair = repairFromMap(result);
-    if(repair != null) list.add(repair);
+    var list = repairListFromMap(result);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
 
   Future<Repair?> getRepair(int id) async {
     var result = await _connDB!.query('SELECT * FROM equipment WHERE id = ?', [id]);
-    Repair? repair = repairFromMap(result);
+    Repair? repair = repairListFromMap(result).firstOrNull;
     return repair;
   }
 
-  Repair? repairFromMap(var result){
-    Repair? repair;
+  List repairListFromMap(var result){
+    List list = [];
     for (var row in result) {
       // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
       // dateTransferForService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
@@ -179,10 +172,11 @@ class ConnectToDBMySQL {
       String dateDepartureFromService = row[9].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[9].toString());
       String dateReceipt = row[16].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[16].toString());
 
-      repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferForService,
+      Repair repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferForService,
           dateDepartureFromService, row[10],  row[11],  row[12], row[13], row[14], row[15], dateReceipt);
+      list.add(repair);
     }
-    return repair;
+    return list;
   }
 
   Future<List> getAllTrouble() async{
@@ -192,9 +186,7 @@ class ConnectToDBMySQL {
         'ДатаУстрИнженер, ИнженерПодтверУстр, Фотография '
         'FROM Неисправности');
 
-    var list = [];
-    Trouble? trouble = troubleFromMap(result);
-    if(trouble != null) list.add(trouble);
+    var list = troubleListFromMap(result);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
@@ -206,21 +198,19 @@ class ConnectToDBMySQL {
         'ДатаУстрИнженер, ИнженерПодтверУстр, Фотография '
         'FROM Неисправности WHERE id > ?', [id]);
 
-    var list = [];
-    Trouble? trouble = troubleFromMap(result);
-    if(trouble != null) list.add(trouble);
+    var list = troubleListFromMap(result);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
 
   Future<Trouble?> getTrouble(int id) async {
     var result = await _connDB!.query('SELECT * FROM equipment WHERE id = ?', [id]);
-    Trouble? trouble = troubleFromMap(result);
+    Trouble? trouble = troubleListFromMap(result).firstOrNull;
     return trouble;
   }
 
-  Trouble? troubleFromMap(var result) {
-    Trouble? trouble;
+  List troubleListFromMap(var result) {
+    List list = [];
     for (var row in result) {
       // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
       // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
@@ -232,41 +222,37 @@ class ConnectToDBMySQL {
       Blob blobImage = row[10];
       Uint8List image = Uint8List.fromList(blobImage.toBytes());
 
-      trouble = Trouble(row[0], row[1].toString(),  dateTrouble,  row[3].toString(), row[4], row[5].toString(), dateCheckFixTroubleEmployee,
+      Trouble trouble = Trouble(row[0], row[1].toString(),  dateTrouble,  row[3].toString(), row[4], row[5].toString(), dateCheckFixTroubleEmployee,
           row[7].toString(), dateCheckFixTroubleEngineer, row[9].toString(), image);
+      list.add(trouble);
     }
-    return trouble;
+    return list;
   }
 
   Future<List> getAllHistory() async{
     var result = await _connDB!.query('SELECT * FROM history');
-
-    var list = [];
-    History? history = historyFromMap(result);
-    if(history != null) list.add(history);
+    var list = historyListFromMap(result);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
 
   Future<List> getRangeGreaterOnIDHistory(int id) async{
     var result = await _connDB!.query('SELECT * FROM history WHERE id > ?', [id]);
-
-    var list = [];
-    History? history = historyFromMap(result);
-    if(history != null) list.add(history);
+    var list = historyListFromMap(result);
     var reversedList = List.from(list.reversed);
     return reversedList;
   }
 
-  History? historyFromMap(var result) {
-    History? history;
+  List historyListFromMap(var result) {
+    List list = [];
     for (var row in result) {
       // id-row[0], section-row[1],  idSection-row[2],  typeOperation-row[3], description-row[4], login-row[5],
       // date-row[6]
       String dateHystory = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
-      history = History(row[0], row[1],  row[2],  row[3], row[4].toString(), row[5].toString(), dateHystory);
+      History history = History(row[0], row[1],  row[2],  row[3], row[4].toString(), row[5].toString(), dateHystory);
+      list.add(history);
     }
-    return history;
+    return list;
   }
 
   String getDateFormatted(String date){

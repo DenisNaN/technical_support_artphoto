@@ -22,7 +22,7 @@ class DownloadAllList{
     List listLastId = [];
     List listCount = [];
 
-    rebootAllBasicListSQFlite();
+    // rebootAllBasicListSQFlite();
     // rebootAllListCategorySQFlite('nameEquipment', 'name');
     // rebootAllListCategorySQFlite('photosalons', 'Фотосалон');
     // rebootAllListCategorySQFlite('service', 'repairmen');
@@ -262,7 +262,7 @@ class DownloadAllList{
               if(technic != null) TechnicSQFlite.db.updateTechnic(technic);
               break;
             case 'Repair':
-              Repair? repair = await ConnectToDBMySQL.connDB.getRepair(history.idSectio);
+              Repair? repair = await ConnectToDBMySQL.connDB.getRepair(history.idSection);
               if(repair != null) RepairSQFlite.db.update(repair);
               break;
             case 'Trouble':

@@ -26,7 +26,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
   final _innerNumberTechnic = TextEditingController();
   final String _innerNumberTechnicBN = "БН";
   final _focusInnerNumberTechnic = FocusNode();
-  final _categoryController = TextEditingController();
+  final _nameController = TextEditingController();
   String _dislocationOld = "";
   final _complaint = TextEditingController();
   String _dateDeparture = "";
@@ -67,7 +67,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
     _selectedDropdownService = CategoryDropDownValueModel.service.first;
 
     technickFinder();
-    _categoryController.text = !_isBN ? technicFind.category : '';
+    _nameController.text = !_isBN ? technicFind.name : '';
     _dislocationOld = !_isBN ? technicFind.dislocation : '';
 
     _focusInnerNumberTechnic.addListener(() {
@@ -78,6 +78,8 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
                 orElse: () =>
                     Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
                         'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false));
+        _nameController.text = technicFind.name;
+        _dislocationOld = technicFind.dislocation;
         if (technicFind.id == -1) {
           setState(() {
             _innerNumberTechnic.clear();
@@ -218,7 +220,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
       leading: const Icon(Icons.create),
       title: TextFormField(
         decoration: const InputDecoration(hintText: "Наименование техники"),
-        controller: _categoryController,
+        controller: _nameController,
       ),
     ) : ListTile(
       leading: const Icon(Icons.print),
@@ -553,7 +555,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
   bool _isValidateToSave(){
     bool validate = false;
     if((!_isBN ? _innerNumberTechnic.text != "" : _innerNumberTechnicBN == "БН") &&
-        _categoryController.text != "" &&
+        _nameController.text != "" &&
         (!_isBN ? _selectedDropdownDislocationOld != "" : _selectedDropdownDislocationOld != null) &&
         _selectedDropdownStatusOld != null &&
         _complaint.text != "" &&
@@ -577,7 +579,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
     Repair repair = Repair(
         repairLast.id! + 1,
         int.parse(_innerNumberTechnic.text),
-        _categoryController.text,
+        _nameController.text,
         _isBN ? _selectedDropdownDislocationOld! : _dislocationOld,
         _selectedDropdownStatusOld!,
         _complaint.text,

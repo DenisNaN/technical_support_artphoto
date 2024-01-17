@@ -493,7 +493,6 @@ class _TechnicAddState extends State<TechnicAdd> {
 
 class SaveEntity{
   void _save(Technic technic) async{
-    await ConnectToDBMySQL.connDB.connDatabase();
     ConnectToDBMySQL.connDB.insertTechnicInDB(technic);
     TechnicSQFlite.db.insertEquipment(technic);
   }

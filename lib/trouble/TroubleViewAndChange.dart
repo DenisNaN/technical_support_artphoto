@@ -217,7 +217,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
       title: _dateCheckFixTroubleEmployee != '' ? Text(
           'Закрытие сотрудником:\n'
           'Сотрудник: $_employeeCheckFixTrouble\n'
-          'Дата: ${getDateFormat(_dateCheckFixTroubleEmployee)}') :
+          'Дата: ${_dateCheckFixTroubleEmployee.isNotEmpty ? getDateFormat(_dateCheckFixTroubleEmployee) : ''}') :
       const Text('Проблема сотрудником не закрыта'),
       trailing: LoginPassword.access == 'admin' ?
       Row(mainAxisSize: MainAxisSize.min, children: [
@@ -260,7 +260,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
       title: Text(_dateCheckFixTroubleEngineer == '' ? 'Для закрытия проблемы инженером выберите дату' :
               'Закрытие инженером:\n'
               'Сотрудник: $_engineerCheckFixTrouble\n'
-              'Дата: ${getDateFormat(_dateCheckFixTroubleEngineer)}'),
+              'Дата: ${_dateCheckFixTroubleEngineer.isNotEmpty ? getDateFormat(_dateCheckFixTroubleEngineer) : ''}'),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         SizedBox(width: 40, child: IconButton(
           icon: const Icon(Icons.edit),
@@ -405,21 +405,21 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
     if(troubleOld.dateCheckFixTroubleEmployee != troubleNew.dateCheckFixTroubleEmployee){
       if(troubleOld.dateCheckFixTroubleEmployee == ''){
         result = '$result\n Внесена дата закрытия неисп-ти фотографом: '
-            '${getDateFormat(troubleNew.dateCheckFixTroubleEmployee)}';
+            '${troubleNew.dateCheckFixTroubleEmployee.isNotEmpty ? getDateFormat(troubleNew.dateCheckFixTroubleEmployee) : ''}';
       }else {
         result = '$result\n Дата закрытия неисп-ти фотографом изменена:\n'
-            '  Было: ${getDateFormat(troubleOld.dateCheckFixTroubleEmployee)}\n'
-            '  Стало: ${getDateFormat(troubleNew.dateCheckFixTroubleEmployee)}';
+            '  Было: ${troubleOld.dateCheckFixTroubleEmployee.isNotEmpty ? getDateFormat(troubleOld.dateCheckFixTroubleEmployee) : ''}\n'
+            '  Стало: ${troubleNew.dateCheckFixTroubleEmployee.isNotEmpty ? getDateFormat(troubleNew.dateCheckFixTroubleEmployee) : ''}';
       }
     }
     if(troubleOld.dateCheckFixTroubleEngineer != troubleNew.dateCheckFixTroubleEngineer){
       if(troubleOld.dateCheckFixTroubleEngineer == ''){
         result = '$result\n Внесена дата закрытия неисп-ти инженером: '
-            '${getDateFormat(troubleNew.dateCheckFixTroubleEngineer)}';
+            '${troubleNew.dateCheckFixTroubleEngineer.isNotEmpty ? getDateFormat(troubleNew.dateCheckFixTroubleEngineer) : ''}';
       }else {
         result = '$result\n Дата закрытия неисп-ти инженером изменена:\n'
-            '  Было: ${getDateFormat(troubleOld.dateCheckFixTroubleEngineer)}\n'
-            '  Стало: ${getDateFormat(troubleNew.dateCheckFixTroubleEngineer)}';
+            '  Было: ${troubleOld.dateCheckFixTroubleEngineer.isNotEmpty ? getDateFormat(troubleOld.dateCheckFixTroubleEngineer) : ''}\n'
+            '  Стало: ${troubleNew.dateCheckFixTroubleEngineer.isNotEmpty ? getDateFormat(troubleNew.dateCheckFixTroubleEngineer) : ''}';
       }
     }
     return result;

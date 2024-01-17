@@ -605,7 +605,7 @@ class _RepairAddState extends State<RepairAdd> {
 
   String descriptionForHistory(Repair repair){
     String internalID = repair.internalID == -1 ? 'БН' : '№${repair.internalID}';
-    String result = 'Заявка на ремонт №$internalID добавленна';
+    String result = 'Заявка на ремонт $internalID добавленна';
 
     return result;
   }

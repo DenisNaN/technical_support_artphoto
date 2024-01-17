@@ -1,6 +1,5 @@
 import 'package:intl/intl.dart';
 import 'package:technical_support_artphoto/repair/RepairViewAndChange.dart';
-import '../history/History.dart';
 import '../utils/hasNetwork.dart';
 import 'Repair.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +64,7 @@ class _RepairListState extends State<RepairList> {
         repair.serviceDislocation != '' &&
         repair.dateDepartureFromService != '' &&
         repair.worksPerformed != '' &&
-        repair.costService != null &&
+        repair.costService != 0 &&
         repair.diagnosisService != '' &&
         // repair.recommendationsNotes != '' &&
         repair.dateReceipt != '' &&
