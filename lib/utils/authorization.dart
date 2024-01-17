@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:technical_support_artphoto/utils/downloadAllList.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
-
 import '../main.dart';
 
 class Login extends StatefulWidget {
@@ -14,6 +13,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final _formkey = GlobalKey<FormState>();
   final myController = TextEditingController();
+  bool isStopRunForReset = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,21 +33,11 @@ class _LoginState extends State<Login> {
               DownloadAllList.downloadAllList.rebootAllListCategorySQFlite('service', 'repairmen');
               DownloadAllList.downloadAllList.rebootAllListCategorySQFlite('statusForEquipment', 'status');
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(Icons.add_task, size: 40, color: Colors.white),
-                      Expanded(
-                          child: Text(' Для корректной работы перезагрузите приложение')),
-                    ],
-                  ),
-                  duration: Duration(seconds: 60),
-                  showCloseIcon: true,
-                ),
-              );
+              setState(() {
+                isStopRunForReset = true;
+              });
             },
-            child: Text('reset'),
+            child: const Text('reset'),
           ),
         ),
       body: SingleChildScrollView(
@@ -69,7 +59,7 @@ class _LoginState extends State<Login> {
                   padding: const EdgeInsets.all(12.0),
                   child: Form(
                     key: _formkey,
-                    child: Column(
+                    child: !isStopRunForReset ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Padding(
@@ -126,7 +116,11 @@ class _LoginState extends State<Login> {
                               ),
                             ),
                           ),
-                        ]),
+                        ]) : const SizedBox(
+                                    width: 300,
+                                    child: Text('Перезагрузите приложение',
+                                        style: TextStyle(fontSize: 30, color: Colors.red),
+                                    textAlign: TextAlign.center)),
                   )),
             ),
           ],
