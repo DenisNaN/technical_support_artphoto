@@ -370,6 +370,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
         _employeeCheckFixTrouble,
         _dateCheckFixTroubleEngineer,
         _engineerCheckFixTrouble,
+        widget.trouble.photoTrouble
     );
 
     await ConnectToDBMySQL.connDB.connDatabase();

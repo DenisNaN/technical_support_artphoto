@@ -75,8 +75,25 @@ class ConnectToDBMySQL {
   }
 
   Future<Technic?> getTechnic(int id) async {
-    var result = await _connDB!.query('SELECT * FROM equipment WHERE id = ?', [id]);
-    Technic? technic = technicListFromMap(result).firstOrNull;
+    var result = await _connDB!.query('SELECT '
+        'equipment.id, '
+        'equipment.number, '
+        'equipment.name, '
+        'equipment.category, '
+        'equipment.cost, '
+        'equipment.dateBuy, '
+        's.status, '
+        's.dislocation, '
+        'equipment.comment, '
+        't.dateStart, '
+        't.dateFinish, '
+        't.result, '
+        't.checkEquipment '
+        'FROM equipment '
+        'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
+        'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
+        'WHERE equipment.id = ?', [id]);
+    Technic? technic = technicListFromMap(result).first;
     return technic;
   }
 
@@ -205,7 +222,7 @@ class ConnectToDBMySQL {
 
   Future<Trouble?> getTrouble(int id) async {
     var result = await _connDB!.query('SELECT * FROM Неисправности WHERE id = ?', [id]);
-    Trouble? trouble = troubleListFromMap(result).firstOrNull;
+    Trouble? trouble = troubleListFromMap(result).first;
     return trouble;
   }
 

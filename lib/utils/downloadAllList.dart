@@ -259,15 +259,36 @@ class DownloadAllList{
           switch(history.section){
             case 'Technic':
               Technic? technic = await ConnectToDBMySQL.connDB.getTechnic(history.idSection);
-              if(technic != null) TechnicSQFlite.db.updateTechnic(technic);
+              if(technic != null) {
+                TechnicSQFlite.db.updateTechnic(technic);
+                int index = -1;
+                Technic.technicList.forEach((element) {
+                  if(element.id == technic.id) index = Technic.technicList.indexOf(element);
+                });
+                if(index != -1) Technic.technicList[index] = technic;
+              }
               break;
             case 'Repair':
               Repair? repair = await ConnectToDBMySQL.connDB.getRepair(history.idSection);
-              if(repair != null) RepairSQFlite.db.update(repair);
+              if(repair != null) {
+                RepairSQFlite.db.update(repair);
+                int index = -1;
+                Repair.repairList.forEach((element) {
+                  if(element.id == repair.id) index = Repair.repairList.indexOf(element);
+                });
+                if(index != -1) Repair.repairList[index] = repair;
+              }
               break;
             case 'Trouble':
               Trouble? trouble = await ConnectToDBMySQL.connDB.getTrouble(history.idSection);
-              if(trouble != null) TroubleSQFlite.db.updateTrouble(trouble);
+              if(trouble != null) {
+                TroubleSQFlite.db.updateTrouble(trouble);
+                int index = -1;
+                Trouble.troubleList.forEach((element) {
+                  if(element.id == trouble.id) index = Trouble.troubleList.indexOf(element);
+                });
+                if(index != -1) Trouble.troubleList[index] = trouble;
+              }
               break;
           }
         }
