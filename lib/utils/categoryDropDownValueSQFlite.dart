@@ -41,12 +41,12 @@ class CategorySQFlite{
         [id, value]);
   }
 
-  Future<List> getCategory(String nameTable) async {
+  Future<List<String>> getCategory(String nameTable) async {
     Database db = await database;
     List<Map> recs = await db.query(nameTable);
 
-    List list = [];
-    for(int i = recs.length; i < 0; i--){
+    List<String> list = [];
+    for(int i = recs.length - 1; i >= 0; i--){
       list.add(recs[i].values.last);
     }
     return list;

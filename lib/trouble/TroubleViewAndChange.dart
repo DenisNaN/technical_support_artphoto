@@ -156,7 +156,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                 _buildCloseTroubleEngineer(),
                 _photoTrouble.isNotEmpty ? _buildPhotoTroubleListTile() : const SizedBox(),
                 const SizedBox(height: 30),
-                _buildRequestRepair()
+                HasNetwork.isConnecting ? _buildRequestRepair() : const SizedBox()
               ],
             )
         )

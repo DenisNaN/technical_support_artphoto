@@ -53,13 +53,13 @@ class DownloadAllList{
     History.historyList.addAll(
         await getAllActualHistory(HasNetwork.isConnecting, listLastId[3]['id'], listCount[3]['countTrouble']));
     CategoryDropDownValueModel.nameEquipment.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'nameEquipment', 'name', listCount[4]['countName'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'nameEquipment', 'name', listCount[4]['countName'])));
     CategoryDropDownValueModel.photosalons.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'photosalons', 'Фотосалон', listCount[5]['countPhotosalons'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'photosalons', 'Фотосалон', listCount[5]['countPhotosalons'])));
     CategoryDropDownValueModel.service.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'service', 'repairmen', listCount[6]['countService'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'service', 'repairmen', listCount[6]['countService'])));
     CategoryDropDownValueModel.statusForEquipment.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[7]['countStatus'])) as Iterable<String>);
+        HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[7]['countStatus'])));
   }
 
   Future getAllHasNotNetwork() async{
@@ -68,13 +68,13 @@ class DownloadAllList{
     Trouble.troubleList.addAll(await getAllActualTrouble(HasNetwork.isConnecting));
     History.historyList.addAll(await getAllActualHistory(HasNetwork.isConnecting));
     CategoryDropDownValueModel.nameEquipment.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'nameEquipment', 'name')) as Iterable<String>);
+        HasNetwork.isConnecting, 'nameEquipment', 'name')));
     CategoryDropDownValueModel.photosalons.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'photosalons', 'Фотосалон')) as Iterable<String>);
+        HasNetwork.isConnecting, 'photosalons', 'Фотосалон')));
     CategoryDropDownValueModel.service.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'service', 'repairmen')) as Iterable<String>);
+        HasNetwork.isConnecting, 'service', 'repairmen')));
     CategoryDropDownValueModel.statusForEquipment.addAll((await getActualCategory(
-        HasNetwork.isConnecting, 'statusForEquipment', 'status')) as Iterable<String>);
+        HasNetwork.isConnecting, 'statusForEquipment', 'status')));
   }
 
   Future<List> getAllActualTechnics(bool isConnectInternet, [int lastId = 0, int countEntities = 0]) async{
@@ -296,12 +296,12 @@ class DownloadAllList{
     }
   }
 
-  Future<List> getActualCategory(
+  Future<List<String>> getActualCategory(
       bool isConnectInternet,
       String nameTable,
       String nameCategory,
       [int countEntities = 0]) async{
-    List actualCategory = [];
+    List<String> actualCategory = [];
 
     actualCategory = await CategorySQFlite.db.getCategory(nameTable);
 

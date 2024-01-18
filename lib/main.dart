@@ -38,8 +38,34 @@ class SplashScreenArtphoto extends StatelessWidget {
   }
 }
 
-class ArtphotoTech extends StatelessWidget {
+class ArtphotoTech extends StatefulWidget {
   const ArtphotoTech({super.key});
+
+  @override
+  State<ArtphotoTech> createState() => _ArtphotoTechState();
+}
+
+class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderStateMixin{
+  late TabController _tabController;
+  int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(vsync: this, length: 4);
+    _tabController.addListener(() {
+      setState(() {
+        _selectedIndex = _tabController.index;
+        print(_selectedIndex);
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _tabController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,15 +74,17 @@ class ArtphotoTech extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             title: Center(child: Text(LoginPassword.login)),
-              bottom: const TabBar(tabs: [
-                Tab(icon: Icon(Icons.add_a_photo_outlined), text: "Техника"),
-                Tab(icon: Icon(Icons.settings), text: "Ремонт"),
-                Tab(icon: Icon(Icons.assignment_turned_in), text: "Неисп-ти"),
-                Tab(icon: Icon(Icons.accessible), text: "История")
-              ])),
-          body: const TabBarView(
-              children: [TechnicsList(),RepairList(),TroubleList(),HistoryList()]),
-          // children: [Appointments(), Contacts(), Notes(), Tasks()]),
+            bottom: TabBar(
+              controller: _tabController,
+                tabs: const [
+                  Tab(icon: Icon(Icons.add_a_photo_outlined), text: "Техника"),
+                  Tab(icon: Icon(Icons.settings), text: "Ремонт"),
+                  Tab(icon: Icon(Icons.assignment_turned_in), text: "Неисп-ти"),
+                  Tab(icon: Icon(Icons.history), text: "История")
+                ])),
+          body: TabBarView(
+            controller: _tabController,
+              children: const [TechnicsList(),RepairList(),TroubleList(),HistoryList()]),
         )
     );
   }

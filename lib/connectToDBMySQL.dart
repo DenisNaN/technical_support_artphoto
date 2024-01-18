@@ -527,7 +527,7 @@ class ConnectToDBMySQL {
     return map;
   }
 
-  Future<List> getPhotosalons() async{
+  Future<List<String>> getPhotosalons() async{
     var result = await _connDB!.query('SELECT '
         'Фотосалоны.id, '
         'Фотосалоны.Фотосалон '
@@ -541,7 +541,7 @@ class ConnectToDBMySQL {
     return list;
   }
 
-  Future<List> getStatusForEquipment() async{
+  Future<List<String>> getStatusForEquipment() async{
     var result = await _connDB!.query('SELECT '
         'statusForEquipment.id, '
         'statusForEquipment.status '
@@ -554,7 +554,7 @@ class ConnectToDBMySQL {
     return list;
   }
 
-  Future<List> getService() async{
+  Future<List<String>> getService() async{
     var result = await _connDB!.query('SELECT '
         'service.id, '
         'service.repairmen '
@@ -567,7 +567,7 @@ class ConnectToDBMySQL {
     return list;
   }
 
-  Future<List> getNameEquipment() async{
+  Future<List<String>> getNameEquipment() async{
     var result = await _connDB!.query('SELECT '
         'nameEquipment.id, '
         'nameEquipment.name '

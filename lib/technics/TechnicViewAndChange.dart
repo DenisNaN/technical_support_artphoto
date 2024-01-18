@@ -646,8 +646,8 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
             '${getDateFormat(technicNew.dateStartTestDrive)}';
       }else {
         result = '$result\n Дата начала тест-драйва изменена:\n'
-            '  Было: ${getDateFormat(technicOld.dateStartTestDrive)}\n'
-            '  Стало: ${getDateFormat(technicNew.dateStartTestDrive)}';
+            '  Было: ${technicOld.dateStartTestDrive != '' ? getDateFormat(technicOld.dateStartTestDrive) : ''}\n'
+            '  Стало: ${technicNew.dateStartTestDrive != '' ? getDateFormat(technicNew.dateStartTestDrive) : ''}';
       }
     }
     if(technicOld.dateFinishTestDrive != technicNew.dateFinishTestDrive){
@@ -656,8 +656,8 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
             '${getDateFormat(technicNew.dateFinishTestDrive)}';
       }else {
         result = '$result\n Дата конца тест-драйва изменена:\n'
-            '  Было: ${getDateFormat(technicOld.dateFinishTestDrive)}\n'
-            '  Стало: ${getDateFormat(technicNew.dateFinishTestDrive)}';
+            '  Было: ${technicOld.dateFinishTestDrive != '' ? getDateFormat(technicOld.dateFinishTestDrive) : ''}\n'
+            '  Стало: ${technicNew.dateFinishTestDrive != '' ? getDateFormat(technicNew.dateFinishTestDrive) : ''}';
       }
     }
     if(technicOld.resultTestDrive != technicNew.resultTestDrive){
