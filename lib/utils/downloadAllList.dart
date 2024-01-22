@@ -46,6 +46,7 @@ class DownloadAllList{
   Future getAllHasNetwork (List listLastId, List listCount) async{
     Technic.technicList.addAll(
         await getAllActualTechnics(HasNetwork.isConnecting, listLastId[0]['id'], listCount[0]['countEquipment']));
+    Technic.technicList.sort();
     Repair.repairList.addAll(
         await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']));
     Trouble.troubleList.addAll(
