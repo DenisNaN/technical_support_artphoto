@@ -19,8 +19,8 @@ class ConnectToDBMySQL {
 
   Future<MySqlConnection> _init() async {
     MySqlConnection connDB = await MySqlConnection.connect(ConnectionSettings(
+        host: 'server185.hosting.reg.ru', port: 3306, user: 'u1341994_admin', db: 'u1341994_artphoto', password: 'Google2345'));
         // host: '', port: , user: '', db: '', password: '')) ;
-        print('connectDatabase');
         return connDB;
     }
 
@@ -578,5 +578,15 @@ class ConnectToDBMySQL {
       list.add(row[1].toString());
     }
     return list;
+  }
+
+  Future<Map<String, int>> getColorForEquipment() async{
+    var result = await _connDB!.query('SELECT * FROM nameEquipment');
+
+    Map<String, int> map = {};
+    for (var row in result) {
+      map[row[1]] = int.parse(row[2]);
+    }
+    return map;
   }
 }

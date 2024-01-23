@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/categoryDropDownValueModel.dart';
 import 'Technic.dart';
 import 'TechnicAdd.dart';
 import 'TechnicViewAndChange.dart';
@@ -13,6 +14,13 @@ class TechnicsList extends StatefulWidget {
 }
 
 class _TechnicsListState extends State<TechnicsList> {
+  Map<String, int> colorForTechnic = {};
+
+  @override
+  void initState() {
+    super.initState();
+    colorForTechnic.addAll(CategoryDropDownValueModel.colorForEquipment);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +39,7 @@ class _TechnicsListState extends State<TechnicsList> {
           separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: Technic.technicList.length,
           itemBuilder: (context, index) {
+
             String dateStart = '';
             if(Technic.technicList[index].dateStartTestDrive != ''){
               dateStart = Technic.technicList[index].dateStartTestDrive;
@@ -59,16 +68,15 @@ class _TechnicsListState extends State<TechnicsList> {
     );
   }
 
-
   Text _buildTextWithTestDrive(BuildContext context, int index){
     DateTime dateStart = DateTime.parse(Technic.technicList[index].dateStartTestDrive.replaceAll('.', '-'));
     DateTime dateFinish;
     DateTime dateNow;
     String formatedStartDate = DateFormat("d MMMM yyyy", "ru_RU").format(dateStart);
     String formatedFinishDate = '';
-    Duration duration = Duration(days: 0);
+    Duration duration = const Duration(days: 0);
     bool isHaveFinishDate = false;
-    bool isEndTD = Technic.technicList[index].checkboxTestDrive;
+    const color = Color(0xff000000);
 
     if(Technic.technicList[index].dateFinishTestDrive != ''){
       dateFinish = DateTime.parse(Technic.technicList[index].dateFinishTestDrive.replaceAll('.', '-'));
@@ -78,11 +86,19 @@ class _TechnicsListState extends State<TechnicsList> {
       isHaveFinishDate = true;
     }
 
+
+
+
     return Text.rich(
         TextSpan(
             children:[
+              TextSpan(
+                text: '${Technic.technicList[index].dislocation}. ',
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: color)),
               TextSpan(text:
-                  '${Technic.technicList[index].dislocation}.  Статус: ${Technic.technicList[index].status}\n'),
+                  'Статус: ${Technic.technicList[index].status}\n'),
               isHaveFinishDate ?
               TextSpan(children: [
                 TextSpan(text:

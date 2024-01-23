@@ -56,7 +56,6 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
     _tabController.addListener(() {
       setState(() {
         _selectedIndex = _tabController.index;
-        print(_selectedIndex);
       });
     });
   }

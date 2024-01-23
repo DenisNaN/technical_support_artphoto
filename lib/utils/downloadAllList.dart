@@ -46,6 +46,7 @@ class DownloadAllList{
   Future getAllHasNetwork (List listLastId, List listCount) async{
     Technic.technicList.addAll(
         await getAllActualTechnics(HasNetwork.isConnecting, listLastId[0]['id'], listCount[0]['countEquipment']));
+    Technic.technicList.sort();
     Repair.repairList.addAll(
         await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']));
     Trouble.troubleList.addAll(
@@ -60,10 +61,12 @@ class DownloadAllList{
         HasNetwork.isConnecting, 'service', 'repairmen', listCount[6]['countService'])));
     CategoryDropDownValueModel.statusForEquipment.addAll((await getActualCategory(
         HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[7]['countStatus'])));
+    CategoryDropDownValueModel.colorForEquipment.addAll(await ConnectToDBMySQL.connDB.getColorForEquipment());
   }
 
   Future getAllHasNotNetwork() async{
     Technic.technicList.addAll(await getAllActualTechnics(HasNetwork.isConnecting));
+    Technic.technicList.sort();
     Repair.repairList.addAll(await getAllActualRepair(HasNetwork.isConnecting));
     Trouble.troubleList.addAll(await getAllActualTrouble(HasNetwork.isConnecting));
     History.historyList.addAll(await getAllActualHistory(HasNetwork.isConnecting));

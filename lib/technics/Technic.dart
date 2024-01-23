@@ -1,5 +1,5 @@
 
-class Technic{
+class Technic implements Comparable{
   static List technicList = [];
 
   int? id;
@@ -24,5 +24,11 @@ class Technic{
   @override
   String toString() {
     return "{ id=$id, internalID=$internalID, name=$name, category=$category, coast=$cost, dateCoast=$dateBuyTechnic, status=$status, dislocation=$dislocation, comment=$comment }";
+  }
+
+  @override
+  int compareTo(other) {
+    int dislocationDiference = dislocation.compareTo(other.dislocation);
+    return dislocationDiference != 0 ? dislocationDiference : category.compareTo(other.category);
   }
 }

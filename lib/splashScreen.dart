@@ -84,7 +84,7 @@ class dialogDontConnectDB extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset('assets/logo_icon.png'),
-            const Text("Не удалось подключиться к базе данных. Обратитесь к Денису",
+            const Text("Не удалось подключиться к базе данных.\nОбратитесь к Денису",
             textAlign: TextAlign.center,)
           ],
         ),
