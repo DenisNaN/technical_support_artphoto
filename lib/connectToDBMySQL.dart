@@ -7,6 +7,7 @@ import 'package:technical_support_artphoto/trouble/Trouble.dart';
 import 'package:technical_support_artphoto/history/History.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 
+
 class ConnectToDBMySQL {
   ConnectToDBMySQL._();
 
@@ -19,7 +20,6 @@ class ConnectToDBMySQL {
 
   Future<MySqlConnection> _init() async {
     MySqlConnection connDB = await MySqlConnection.connect(ConnectionSettings(
-        host: 'server185.hosting.reg.ru', port: 3306, user: 'u1341994_admin', db: 'u1341994_artphoto', password: 'Google2345'));
         // host: '', port: , user: '', db: '', password: '')) ;
         return connDB;
     }

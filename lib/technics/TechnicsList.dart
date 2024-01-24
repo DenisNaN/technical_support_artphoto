@@ -6,6 +6,7 @@ import 'TechnicViewAndChange.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 import 'package:intl/intl.dart';
 
+
 class TechnicsList extends StatefulWidget {
   const TechnicsList({super.key});
 

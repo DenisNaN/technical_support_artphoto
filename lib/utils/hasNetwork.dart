@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+
 class HasNetwork{
   static bool isConnecting = false;
 

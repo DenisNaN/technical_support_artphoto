@@ -5,6 +5,7 @@ import 'package:technical_support_artphoto/utils/authorization.dart';
 import 'package:technical_support_artphoto/utils/downloadAllList.dart';
 import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 

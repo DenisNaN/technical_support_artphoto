@@ -9,6 +9,7 @@ import '../utils/categoryDropDownValueModel.dart';
 import '../utils/utils.dart';
 import 'Technic.dart';
 
+
 class TechnicAdd extends StatefulWidget {
   const TechnicAdd({super.key});
 

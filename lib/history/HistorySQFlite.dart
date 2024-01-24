@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'History.dart';
 
+
 class HistorySQFlite{
   HistorySQFlite._();
 

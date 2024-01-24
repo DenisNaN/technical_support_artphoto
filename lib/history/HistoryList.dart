@@ -3,7 +3,6 @@ import 'package:technical_support_artphoto/history/History.dart';
 import 'package:flutter/material.dart';
 import 'package:technical_support_artphoto/trouble/Trouble.dart';
 import 'package:technical_support_artphoto/trouble/TroubleViewAndChange.dart';
-
 import '../repair/Repair.dart';
 import '../repair/RepairViewAndChange.dart';
 import '../technics/Technic.dart';

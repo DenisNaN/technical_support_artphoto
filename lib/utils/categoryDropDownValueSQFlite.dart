@@ -2,6 +2,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:technical_support_artphoto/utils/utils.dart' as utils;
 
+
 class CategorySQFlite{
   CategorySQFlite._();
 

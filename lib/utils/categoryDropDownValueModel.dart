@@ -1,4 +1,5 @@
 
+
 class CategoryDropDownValueModel{
   static List<String> nameEquipment = [];
   static List<String> photosalons = [];

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:technical_support_artphoto/repair/RepairAdd.dart';
 import 'package:technical_support_artphoto/repair/RepairAddWithTrouble.dart';
-import 'package:technical_support_artphoto/repair/RepairSQFlite.dart';
-import 'package:technical_support_artphoto/technics/TechnicSQFlite.dart';
 import 'package:technical_support_artphoto/trouble/TroubleSQFlite.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 import '../ConnectToDBMySQL.dart';
