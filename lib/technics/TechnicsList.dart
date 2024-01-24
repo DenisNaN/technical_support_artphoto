@@ -36,8 +36,8 @@ class _TechnicsListState extends State<TechnicsList> {
             } : null,
             child: const Icon(Icons.add, color: Colors.white)
             ),
-        body: ListView.separated(
-          separatorBuilder: (BuildContext context, int index) => const Divider(),
+        body: ListView.builder(
+          // separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: Technic.technicList.length,
           itemBuilder: (context, index) {
 
@@ -45,7 +45,13 @@ class _TechnicsListState extends State<TechnicsList> {
             if(Technic.technicList[index].dateStartTestDrive != ''){
               dateStart = Technic.technicList[index].dateStartTestDrive;
             }
+
+            Color color = const Color(0xffFFFFFF);
+            if(CategoryDropDownValueModel.colorForEquipment.isNotEmpty) {
+              color = Color(CategoryDropDownValueModel.colorForEquipment[Technic.technicList[index].dislocation]!);
+            }
             return ListTile(
+              tileColor: color,
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index]))).then((value){
                     setState(() {
@@ -63,9 +69,13 @@ class _TechnicsListState extends State<TechnicsList> {
   }
 
   Text _buildTextWithoutTestDrive(BuildContext context, int index){
-    return Text(
-            '${Technic.technicList[index].dislocation}.  Статус: ${Technic.technicList[index].status}\n'
-            'Тест-драйв не проводился'
+    Color color = const Color(0xff000000);
+    return Text.rich(TextSpan(children: [
+      TextSpan(text: '${Technic.technicList[index].dislocation}.',
+        style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+      TextSpan(text: ' Статус: ${Technic.technicList[index].status}\n'
+          'Тест-драйв не проводился')
+      ])
     );
   }
 
@@ -77,7 +87,7 @@ class _TechnicsListState extends State<TechnicsList> {
     String formatedFinishDate = '';
     Duration duration = const Duration(days: 0);
     bool isHaveFinishDate = false;
-    const color = Color(0xff000000);
+    Color color = const Color(0xff000000);
 
     if(Technic.technicList[index].dateFinishTestDrive != ''){
       dateFinish = DateTime.parse(Technic.technicList[index].dateFinishTestDrive.replaceAll('.', '-'));
@@ -86,18 +96,13 @@ class _TechnicsListState extends State<TechnicsList> {
       duration = dateFinish.difference(dateNow);
       isHaveFinishDate = true;
     }
-
-
-
-
     return Text.rich(
         TextSpan(
             children:[
               TextSpan(
                 text: '${Technic.technicList[index].dislocation}. ',
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: color)),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: color)),
               TextSpan(text:
                   'Статус: ${Technic.technicList[index].status}\n'),
               isHaveFinishDate ?

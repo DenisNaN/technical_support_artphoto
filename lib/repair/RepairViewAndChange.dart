@@ -46,6 +46,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   bool _isEdit = false;
   bool _isEditNewStatusDislocation = false;
   int indexTechnic = 0;
+  bool isTechnicFind = false;
 
   late Repair oldRepairForHistory;
 
@@ -74,6 +75,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     for(int i = 0; i < Technic.technicList.length; i++){
       if(Technic.technicList[i].internalID == widget.repair.internalID){
         indexTechnic = i;
+        isTechnicFind = true;
         break;
       }
     }
@@ -201,7 +203,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   ListTile _buildInternalID() {
   return ListTile (
     leading: const Icon(Icons.fiber_new),
-    title: widget.repair.internalID != -1 ?
+    title: widget.repair.internalID != -1 && isTechnicFind ?
           TextButton(
             style: TextButton.styleFrom(
               padding: const EdgeInsets.only(left: 0.0),
@@ -222,7 +224,8 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
             )
           )
         // )
-        : const Text('БН'),
+        :
+        widget.repair.internalID == -1 ? const Text('БН') : Text('№ - $_innerNumberTechnic'),
     );
   }
 

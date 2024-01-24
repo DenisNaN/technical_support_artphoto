@@ -33,6 +33,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
   String _dateCheckFixTroubleEngineer = '';
   String _engineerCheckFixTrouble = '';
   Uint8List _photoTrouble = Uint8List.fromList([]);
+  bool isTechnicFind = false;
   late Trouble _oldTroubleForHistory;
 
   late TransformationController transformationController;
@@ -62,6 +63,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
     for(int i = 0; i < Technic.technicList.length; i++){
       if(Technic.technicList[i].internalID == widget.trouble.internalID){
         indexTechnic = i;
+        isTechnicFind = true;
         break;
       }
     }
@@ -163,7 +165,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
   ListTile _buildInternalID() {
     return ListTile(
       leading: const Icon(Icons.fiber_new),
-      title: widget.trouble.internalID != 0 ?
+      title: widget.trouble.internalID != 0 && isTechnicFind ?
       TextButton(
           style: TextButton.styleFrom(
               padding: const EdgeInsets.only(left: 0.0),
@@ -181,7 +183,8 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                 });
           },
           child: Text('№ - $_innerNumberTechnic')
-      ) : const Text('БН'),
+      ) :
+      widget.trouble.internalID == 0 ? const Text('БН') : Text('№ - $_innerNumberTechnic'),
     );
   }
 

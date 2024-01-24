@@ -581,7 +581,7 @@ class ConnectToDBMySQL {
   }
 
   Future<Map<String, int>> getColorForEquipment() async{
-    var result = await _connDB!.query('SELECT * FROM nameEquipment');
+    var result = await _connDB!.query('SELECT * FROM colorsForPhotosalons');
 
     Map<String, int> map = {};
     for (var row in result) {
