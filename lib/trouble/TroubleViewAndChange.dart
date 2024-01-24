@@ -243,6 +243,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
                 onPressed: (){
                   setState(() {
                     _dateCheckFixTroubleEmployee = '';
+                    _employeeCheckFixTrouble = '';
                     _isEdit = true;
                   });
                 },

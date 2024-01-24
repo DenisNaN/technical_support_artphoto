@@ -102,11 +102,11 @@ class _TroubleListState extends State<TroubleList> {
           children: [
               Row(children: [SizedBox(
                   height: 30,
-                  child: Checkbox(value: checkboxValueEngineer, onChanged: (value){})), const Text('И')]),
+                  child: Checkbox(value: checkboxValueEmployee, onChanged: (value){})), const Text('Ф')]),
               Row(children: [SizedBox(
                   width: 48,
                   height: 30,
-                  child: Checkbox(value: checkboxValueEmployee, onChanged: (value){})), const Text('Ф')])
+                  child: Checkbox(value: checkboxValueEngineer, onChanged: (value){})), const Text('И')])
         ],)
       ],
     );
