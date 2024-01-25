@@ -17,12 +17,14 @@ class _TroubleListState extends State<TroubleList> {
 
   @override
   Widget build(BuildContext context) {
+    List troubleList = _getListSortTrouble();
+
     return Scaffold (
         floatingActionButton: FloatingActionButton(
             backgroundColor: HasNetwork.isConnecting ? Colors.blue : Colors.grey,
             onPressed: HasNetwork.isConnecting ? () {Navigator.push(context, MaterialPageRoute(builder: (context) => const TroubleAdd())).then((value) {
               setState(() {
-                if(value != null) Trouble.troubleList.insert(0, value);
+                if(value != null) troubleList.insert(0, value);
               });
             });
             } : null,
@@ -30,38 +32,50 @@ class _TroubleListState extends State<TroubleList> {
         ),
         body: ListView.separated(
           separatorBuilder: (BuildContext context, int index) => const Divider(),
-          itemCount: Trouble.troubleList.length,
+          itemCount: troubleList.length,
           itemBuilder: (context, index) {
-            bool isDoneTrouble = isAllFieldsFilled(Trouble.troubleList[index]);
+            bool isDoneTrouble = isAllFieldsFilled(troubleList[index]);
             return ListTile(
               onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => TroubleViewAndChange(trouble: Trouble.troubleList[index]))).then((value){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => TroubleViewAndChange(trouble: troubleList[index]))).then((value){
                   setState(() {
-                    if(value != null) Trouble.troubleList[index] = value;
+                    if(value != null) troubleList[index] = value;
                   });
                 });
               },
               tileColor: isDoneTrouble ? Colors.lightGreenAccent : null,
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-              title: _buildTitleListTile(context, index)
+              title: _buildTitleListTile(context, index, troubleList)
             );
           },
         )
     );
   }
 
-  Row _buildTitleListTile(BuildContext context, int index){
+  List _getListSortTrouble(){
+    List troubleList = [];
+
+    Trouble.troubleList.forEach((element) {
+      if(!isAllFieldsFilled(element)) troubleList.add(element);
+    });
+    Trouble.troubleList.forEach((element) {
+      if(isAllFieldsFilled(element)) troubleList.add(element);
+    });
+    return troubleList;
+  }
+
+  Row _buildTitleListTile(BuildContext context, int index, List troubleList){
     bool checkboxValueEngineer;
     bool checkboxValueEmployee;
     bool checkboxValuePhoto = false;
 
-    Trouble.troubleList[index].dateCheckFixTroubleEngineer != '' ? checkboxValueEngineer = true :
+    troubleList[index].dateCheckFixTroubleEngineer != '' ? checkboxValueEngineer = true :
       checkboxValueEngineer = false;
-    Trouble.troubleList[index].dateCheckFixTroubleEmployee != '' ? checkboxValueEmployee = true :
+    troubleList[index].dateCheckFixTroubleEmployee != '' ? checkboxValueEmployee = true :
     checkboxValueEmployee = false;
 
-    if(Trouble.troubleList[index].photoTrouble != null){
-      Trouble.troubleList[index].photoTrouble.isNotEmpty ? checkboxValuePhoto = true :
+    if(troubleList[index].photoTrouble != null){
+      troubleList[index].photoTrouble.isNotEmpty ? checkboxValuePhoto = true :
       checkboxValuePhoto = false;
     }
 
@@ -72,18 +86,18 @@ class _TroubleListState extends State<TroubleList> {
               TextSpan(children: [
                 TextSpan(
                     style: const TextStyle(fontWeight: FontWeight.bold),
-                    text: Trouble.troubleList[index].internalID != 0 ?
-                      '№ ${Trouble.troubleList[index].internalID} ' : 'БН '),
+                    text: troubleList[index].internalID != 0 ?
+                      '№ ${troubleList[index].internalID} ' : 'БН '),
                 TextSpan(
                     style: const TextStyle(fontWeight: FontWeight.bold),
-                    text: '${Trouble.troubleList[index].photosalon} '
-                        '${Trouble.troubleList[index].employee}\n'
+                    text: '${troubleList[index].photosalon} '
+                        '${troubleList[index].employee}\n'
                 ),
                 TextSpan(
                     style: const TextStyle(fontStyle: FontStyle.italic),
-                    text: '${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(Trouble.troubleList[index].dateTrouble.replaceAll('.', '-')))}\n'),
+                    text: '${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(troubleList[index].dateTrouble.replaceAll('.', '-')))}\n'),
                 TextSpan(
-                  text: 'Проблема: ${Trouble.troubleList[index].trouble}\n',
+                  text: 'Проблема: ${troubleList[index].trouble}\n',
                   children: [WidgetSpan(child:
                       Row(children: [
                         const Text( 'Фото: '),
