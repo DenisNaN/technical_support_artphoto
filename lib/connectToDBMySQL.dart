@@ -276,18 +276,20 @@ class ConnectToDBMySQL {
     return DateFormat('yyyy.MM.dd').format(DateTime.parse(date));
   }
 
-  Future insertTechnicInDB(Technic technic) async{
+  Future<int> insertTechnicInDB(Technic technic) async{
     await ConnectToDBMySQL.connDB.connDatabase();
-    await _connDB!.query(
+    var result = await _connDB!.query(
         'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [technic.internalID,  technic.category, technic.name, technic.dateBuyTechnic, technic.cost, technic.comment,
         LoginPassword.login]);
 
-   insertStatusInDB(technic.id!, technic.status, technic.dislocation);
+    int id = result.insertId!;
+    insertStatusInDB(id, technic.status, technic.dislocation);
 
     if(technic.dateStartTestDrive != '') {
       insertTestDriveInDB(technic);
     }
+    return result.insertId!;
   }
 
   Future insertTestDriveInDB(Technic technic) async{

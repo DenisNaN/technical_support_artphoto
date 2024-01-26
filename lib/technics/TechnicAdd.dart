@@ -99,8 +99,9 @@ class _TechnicAddState extends State<TechnicAdd> {
                               ),
                             );
                           } else {
-                            Technic technicLast = Technic.technicList
-                                .first;
+                            List tmpListTechnic = Technic.technicList;
+                            tmpListTechnic.sort((technic1, technic2) => technic1.id.compareTo(technic2.id));
+                            Technic technicLast = Technic.technicList.last;
                             Technic technic = Technic(
                                 technicLast.id! + 1,
                                 int.parse(_innerNumberTechnic.text),
@@ -501,7 +502,9 @@ class _TechnicAddState extends State<TechnicAdd> {
 
 class SaveEntity{
   void _save(Technic technic) async{
-    ConnectToDBMySQL.connDB.insertTechnicInDB(technic);
+    int id = -1;
+    id = await ConnectToDBMySQL.connDB.insertTechnicInDB(technic);
+    technic.id = id;
     TechnicSQFlite.db.insertEquipment(technic);
   }
 }
