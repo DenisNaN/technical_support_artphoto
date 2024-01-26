@@ -72,7 +72,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                         if (_formKey.currentState!.validate()) {
                           if (_innerNumberTechnic.text == "" ||
                               _selectedDropdownCategory == null ||
-                              _nameTechnic.text == "" ||
+                              // _nameTechnic.text == "" ||
                               _costTechnic.text == "" ||
                               _selectedDropdownStatus == null ||
                               _selectedDropdownDislocation == null) {

@@ -127,7 +127,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   TextButton(
                       onPressed: HasNetwork.isConnecting && _isEdit ? () {
                         if(_selectedDropdownNameTechnic == null ||
-                            _nameTechnic.text == "" ||
+                            // _nameTechnic.text == "" ||
                             _costTechnic.text == "" ||
                             _selectedDropdownStatus == null ||
                             _selectedDropdownDislocation == null){
