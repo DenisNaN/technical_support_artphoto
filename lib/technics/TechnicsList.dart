@@ -147,7 +147,8 @@ class _TechnicsListState extends State<TechnicsList> {
   }
 
   String _nameTechnic(int index){
-    String nameTechnic = '';
+    String nameTechnic = 'Модель не указана';
+    if(Technic.technicList[index].name == '') return nameTechnic;
     int lastSymbolNameTechnic = Technic.technicList[index].name.length;
     nameTechnic = '${Technic.technicList[index].name[0].toUpperCase()}${Technic.technicList[index].name.substring(1, lastSymbolNameTechnic).trim()}.';
     return nameTechnic;
