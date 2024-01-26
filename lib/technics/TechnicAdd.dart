@@ -48,6 +48,13 @@ class _TechnicAddState extends State<TechnicAdd> {
     super.dispose();
   }
 
+
+  @override
+  void initState() {
+    super.initState();
+    _nameTechnic.text = '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
