@@ -81,21 +81,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                               _costTechnic.text == "" ||
                               _selectedDropdownStatus == null ||
                               _selectedDropdownDislocation == null) {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(
-                              const SnackBar(
-                                content: Row(
-                                  children: [
-                                    Icon(Icons.bolt, size: 40,
-                                        color: Colors.white),
-                                    Text(
-                                        'Остались не заполненые поля'),
-                                  ],
-                                ),
-                                duration: Duration(seconds: 5),
-                                showCloseIcon: true,
-                              ),
-                            );
+                                viewSnackBar('Остались не заполненые поля');
                           } else {
                             List tmpListTechnic = Technic.technicList;
                             tmpListTechnic.sort((technic1, technic2) => technic1.id.compareTo(technic2.id));
@@ -118,21 +104,7 @@ class _TechnicAddState extends State<TechnicAdd> {
 
                             save(technic);
                             Navigator.pop(context, technic);
-
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(
-                              const SnackBar(
-                                content: Row(
-                                  children: [
-                                    Icon(Icons.add_task, size: 40,
-                                        color: Colors.white),
-                                    Text(' Техника добавлена'),
-                                  ],
-                                ),
-                                duration: Duration(seconds: 5),
-                                showCloseIcon: true,
-                              ),
-                            );
+                            viewSnackBar(' Техника добавлена');
                           }
                         }
                       },
@@ -501,6 +473,21 @@ class _TechnicAddState extends State<TechnicAdd> {
 
   String getDateFormat(String date) {
     return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
+  }
+
+  void viewSnackBar(String text){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.bolt, size: 40, color: Colors.white),
+            Text(text),
+          ],
+        ),
+        duration: const Duration(seconds: 5),
+        showCloseIcon: true,
+      ),
+    );
   }
 }
 
