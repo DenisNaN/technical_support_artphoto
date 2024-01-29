@@ -230,11 +230,19 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   }
 
   ListTile _buildDataTechnick() {
+    String technicStatusOld = 'Отсутствует.';
+    if(_selectedDropdownStatusOld != '' && _selectedDropdownStatusOld != null){
+      technicStatusOld = '${_selectedDropdownStatusOld}.';
+    }
+    String technicDislocationOld = 'Данные отсутствуют.';
+    if(_selectedDropdownDislocationOld != '' && _selectedDropdownDislocationOld != null){
+      technicDislocationOld = '${_selectedDropdownDislocationOld}.';
+    }
     return ListTile(
     leading: const Icon(Icons.medical_information),
     title: Text('Наименование: $_nameTechnic\n'
-                'Статус: $_selectedDropdownStatusOld'),
-    subtitle: Text('Откуда забрали: $_selectedDropdownDislocationOld'),
+        'Статус: $technicStatusOld'),
+    subtitle: Text('Откуда забрали: $technicDislocationOld'),
   );
   }
 
@@ -265,9 +273,14 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   }
 
   ListTile _buildDateDeparture() {
+    String dateDeparture = 'Отсутствует.';
+    if(_dateDeparture != ''){
+      dateDeparture = DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(
+          _dateDeparture.replaceAll('.', '-')));
+    }
     return ListTile(
       leading: const Icon(Icons.today),
-      title: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateDeparture.replaceAll('.', '-')))),
+      title: Text(dateDeparture),
       subtitle: const Text("Забрали с точки. Дата"),
       trailing: IconButton(
           icon: const Icon(Icons.edit),

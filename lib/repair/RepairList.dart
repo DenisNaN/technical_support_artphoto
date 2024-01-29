@@ -33,24 +33,23 @@ class _RepairListState extends State<RepairList> {
           separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: Repair.repairList.length,
           itemBuilder: (context, index) {
-            bool isDoneRepair = isAllFieldsFilled(Repair.repairList[index]);
+            Repair repair = Repair.repairList[index];
+            bool isDoneRepair = isAllFieldsFilled(repair);
 
             return ListTile(
               tileColor: isDoneRepair ? Colors.lightGreenAccent : null,
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => RepairViewAndChange(repair: Repair.repairList[index])))
+                      builder: (context) => RepairViewAndChange(repair: repair)))
                       .then((value) {
                     setState(() {
-                      if (value != null) {
-                        Repair.repairList[index] = value;
-                      }
+                      if (value != null) repair = value;
                     });
                   });
                 },
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                title: Repair.repairList[index].internalID == -1 ? _buildTextWithoutBN(context, index) : _buildTextWithBN(context, index),
-                subtitle: _buildTextWithoutTestDrive(context, index)
+                title: repair.internalID == -1 ? _buildTextWithoutBN(context, index) : _buildTextWithBN(context, index),
+                subtitle: _buildTextSubtitle(context, index)
             );
           },
         )
@@ -77,25 +76,57 @@ class _RepairListState extends State<RepairList> {
   }
 
   Text _buildTextWithBN(BuildContext context, int index){
+    String repairComplaint = 'Не внесли данные.';
+    if(Repair.repairList[index].complaint != '' && Repair.repairList[index].complaint != null){
+      repairComplaint = '${Repair.repairList[index].complaint}.';
+    }
+
     return Text('№ ${Repair.repairList[index].internalID}. ${Repair.repairList[index].category}.\n'
-        'Жалоба: ${Repair.repairList[index].complaint}.');
+        'Жалоба: $repairComplaint');
   }
 
   Text _buildTextWithoutBN(BuildContext context, int index){
+    String repairComplaint = 'Не внесли данные.';
+    if(Repair.repairList[index].complaint != '' && Repair.repairList[index].complaint != null){
+      repairComplaint = '${Repair.repairList[index].complaint}.';
+    }
+
     return Text('Без №. ${Repair.repairList[index].category}.\n'
-        'Жалоба: ${Repair.repairList[index].complaint}.');
+        'Жалоба: $repairComplaint');
   }
 
-  Text _buildTextWithoutTestDrive(BuildContext context, int index){
+  Text _buildTextSubtitle(BuildContext context, int index){
+    String repairStatus = 'Отсутствует.';
+    if(Repair.repairList[index].status != '' && Repair.repairList[index].status != null){
+        if(Repair.repairList[index].newStatus != '' && Repair.repairList[index].newStatus != null){
+          repairStatus = '${Repair.repairList[index].newStatus}.';
+        } else {
+          repairStatus = '${Repair.repairList[index].status}.';
+        }
+    }
+    String repairDislocation = 'Отсутствует.';
+    if(Repair.repairList[index].dislocationOld != '' && Repair.repairList[index].dislocationOld != null){
+      if(Repair.repairList[index].newDislocation != '' && Repair.repairList[index].newDislocation != null){
+        repairDislocation = '${Repair.repairList[index].newDislocation}.';
+      } else {
+        repairDislocation = '${Repair.repairList[index].dislocationOld}.';
+      }
+    }
+    String repairLastDate = 'Даты отсутствуют.';
+    if(Repair.repairList[index].dateDeparture != '') {
+      repairLastDate = 'Забрали с точки: ${getDateFormat(Repair.repairList[index].dateDeparture)}.';
+    }
+    if(Repair.repairList[index].dateTransferForService != ''){
+      repairLastDate = 'Сдали в ремонт: ${getDateFormat(Repair.repairList[index].dateTransferForService)}.';
+    }
+    if(Repair.repairList[index].dateDepartureFromService != ''){
+      repairLastDate = 'Забрали из ремонта: ${getDateFormat(Repair.repairList[index].dateDepartureFromService)}.';
+    }
+
     return Text(
-            'Статус: ${Repair.repairList[index].newStatus == "" ? Repair.repairList[index].status : Repair.repairList[index].newStatus}.\n'
-            'Дислокация: ${Repair.repairList[index].newDislocation == "" ?
-            Repair.repairList[index].serviceDislocation :
-            Repair.repairList[index].newDislocation}. '
-            '${Repair.repairList[index].dateReceipt == "" ? (Repair.repairList[index].dateTransferForService == "" ?
-            getDateFormat(Repair.repairList[index].dateDeparture) :
-            getDateFormat(Repair.repairList[index].dateTransferForService)) :
-            getDateFormat(Repair.repairList[index].dateReceipt)}'
+            'Статус: $repairStatus\n'
+            'Дислокация: $repairDislocation\n'
+            '$repairLastDate'
     );
   }
 
