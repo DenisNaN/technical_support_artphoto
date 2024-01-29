@@ -7,7 +7,6 @@ import 'package:technical_support_artphoto/trouble/Trouble.dart';
 import 'package:technical_support_artphoto/history/History.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 
-
 class ConnectToDBMySQL {
   ConnectToDBMySQL._();
 

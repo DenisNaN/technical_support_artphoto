@@ -29,7 +29,6 @@ class _TechnicsListState extends State<TechnicsList> {
             backgroundColor: HasNetwork.isConnecting ? Colors.blue : Colors.grey,
             onPressed: HasNetwork.isConnecting ? () {Navigator.push(context, MaterialPageRoute(builder: (context) => const TechnicAdd())).then((value) {
               setState(() {
-                Technic.technicList.sort();
                 if(value != null) Technic.technicList.insert(0, value);
               });
             });

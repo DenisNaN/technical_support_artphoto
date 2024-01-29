@@ -103,6 +103,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                             );
 
                             save(technic);
+                            Technic.technicList.sort();
                             Navigator.pop(context, technic);
                             viewSnackBar(' Техника добавлена');
                           }
