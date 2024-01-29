@@ -52,26 +52,18 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
                 orElse: () =>
                     Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
                         'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false));
-        _categoryController.text = technicFind.name;
+        if(technicFind.name == ''){
+          _categoryController.text = 'Модель не указана';
+        } else {
+          _categoryController.text = technicFind.name;
+        }
         _photosalon = technicFind.dislocation;
         if (technicFind.id == -1) {
           setState(() {
             _innerNumberTechnic.clear();
           });
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.bolt, size: 40, color: Colors.white),
-                  Text(
-                      'Teхника с этим номером\nв базе не найдена.'),
-                ],
-              ),
-              duration: Duration(seconds: 5),
-              showCloseIcon: true,
-            ),
-          );
+          viewSnackBar('Teхника с этим номером\nв базе не найдена.');
         }
       }
     });
@@ -118,18 +110,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           if(_isValidateToSave() == false){
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Row(
-                                  children: [
-                                    Icon(Icons.bolt, size: 40, color: Colors.white),
-                                    Text('Остались не заполненые поля'),
-                                  ],
-                                ),
-                                duration: Duration(seconds: 5),
-                                showCloseIcon: true,
-                              ),
-                            );
+                            viewSnackBar('Остались не заполненые поля');
                           }else{
                             _save();
                           }
@@ -199,7 +180,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
       ),
     ) : ListTile(
       leading: const Icon(Icons.print),
-      title: technicFind.id == -1 ? const Text('Введите номер техники') : Text('Наименование: ${technicFind.name}'),
+      title: technicFind.id == -1 ? const Text('Введите номер техники') : Text('Наименование: ${_categoryController.text}'),
     );
   }
 
@@ -385,13 +366,12 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
     return validate;
   }
 
-  void _save() {
-    if(imageFile != null) {
-      _photoTrouble = _decoderPhotoToBlob(imageFile!);
-    }
-
-    Trouble troubleLast = Trouble.troubleList.first;
-    Trouble trouble = Trouble(
+  void _save(){
+    Trouble trouble;
+    List tmpListTrouble = Trouble.troubleList;
+    tmpListTrouble.sort((Trouble1, Trouble2) => Trouble2.id.compareTo(Trouble1.id));
+    Trouble troubleLast = tmpListTrouble.first;
+    trouble = Trouble(
         troubleLast.id! + 1,
         _photosalon!,
         _dateTroubleForSQL,
@@ -401,24 +381,20 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
         imageFile != null ? _photoTrouble : null
     );
 
-    ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
+    _insertData(trouble);
+    Navigator.pop(context, trouble);
+    viewSnackBar(' Неисправность добавлена');
+  }
+
+  void _insertData(Trouble trouble) async{
+    if(imageFile != null) {
+      _photoTrouble = _decoderPhotoToBlob(imageFile!);
+    }
+    int id = -1;
+    id = await ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
+    trouble.id = id;
     TroubleSQFlite.db.insertTrouble(trouble);
     addHistory(trouble);
-
-    Navigator.pop(context, trouble);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.add_task, size: 40, color: Colors.white),
-            Text(' Неисправность добавлена'),
-          ],
-        ),
-        duration: Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
   }
 
   Future addHistory(Trouble trouble) async{
@@ -451,6 +427,21 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
 
   Uint8List _decoderPhotoToBlob(File image) {
     return image.readAsBytesSync();
+  }
+
+  void viewSnackBar(String text){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.bolt, size: 40, color: Colors.white),
+            Text(text),
+          ],
+        ),
+        duration: const Duration(seconds: 5),
+        showCloseIcon: true,
+      ),
+    );
   }
 }
 

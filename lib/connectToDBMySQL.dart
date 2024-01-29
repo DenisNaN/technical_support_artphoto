@@ -284,10 +284,10 @@ class ConnectToDBMySQL {
         LoginPassword.login]);
 
     int id = result.insertId!;
-    insertStatusInDB(id, technic.status, technic.dislocation);
+    await insertStatusInDB(id, technic.status, technic.dislocation);
 
     if(technic.dateStartTestDrive != '') {
-      insertTestDriveInDB(technic);
+      await insertTestDriveInDB(technic);
     }
     return result.insertId!;
   }
@@ -404,9 +404,9 @@ class ConnectToDBMySQL {
         ]);
   }
 
-  Future insertTroubleInDB(Trouble trouble) async{
+  Future<int> insertTroubleInDB(Trouble trouble) async{
     await ConnectToDBMySQL.connDB.connDatabase();
-    await _connDB!.query('INSERT INTO Неисправности ('
+    var result = await _connDB!.query('INSERT INTO Неисправности ('
         'Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, '
         'ДатаУстрСотр, СотрПодтверУстр, '
         'ДатаУстрИнженер, ИнженерПодтверУстр, Фотография) '
@@ -422,6 +422,7 @@ class ConnectToDBMySQL {
       trouble.engineerCheckFixTrouble,
       trouble.photoTrouble ?? ''
     ]);
+    return result.insertId!;
   }
 
   Future updateTroubleInDB(Trouble trouble) async{

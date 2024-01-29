@@ -48,7 +48,6 @@ class _TechnicAddState extends State<TechnicAdd> {
     super.dispose();
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -79,7 +78,6 @@ class _TechnicAddState extends State<TechnicAdd> {
                         if (_formKey.currentState!.validate()) {
                           if (_innerNumberTechnic.text == "" ||
                               _selectedDropdownCategory == null ||
-                              // _nameTechnic.text == "" ||
                               _costTechnic.text == "" ||
                               _selectedDropdownStatus == null ||
                               _selectedDropdownDislocation == null) {
@@ -118,9 +116,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                                 _checkboxTestDrive
                             );
 
-                            SaveEntity()._save(technic);
-                            addHistory(technic);
-
+                            save(technic);
                             Navigator.pop(context, technic);
 
                             ScaffoldMessenger.of(context)
@@ -471,6 +467,14 @@ class _TechnicAddState extends State<TechnicAdd> {
     );
   }
 
+  void save(Technic technic) async{
+    int id = -1;
+    id = await ConnectToDBMySQL.connDB.insertTechnicInDB(technic);
+    technic.id = id;
+    await TechnicSQFlite.db.insertEquipment(technic);
+    await addHistory(technic);
+  }
+
   Future addHistory(Technic technic) async{
     String descForHistory = descriptionForHistory(technic);
     History historyForSQL = History(
@@ -497,15 +501,6 @@ class _TechnicAddState extends State<TechnicAdd> {
 
   String getDateFormat(String date) {
     return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
-  }
-}
-
-class SaveEntity{
-  void _save(Technic technic) async{
-    int id = -1;
-    id = await ConnectToDBMySQL.connDB.insertTechnicInDB(technic);
-    technic.id = id;
-    TechnicSQFlite.db.insertEquipment(technic);
   }
 }
 

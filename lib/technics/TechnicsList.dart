@@ -141,7 +141,9 @@ class _TechnicsListState extends State<TechnicsList> {
   Color _getTileColor(int index){
     Color color = const Color(0xffFFFFFF);
     if(CategoryDropDownValueModel.colorForEquipment.isNotEmpty) {
-      color = Color(CategoryDropDownValueModel.colorForEquipment[Technic.technicList[index].dislocation]!);
+      String dislocation = Technic.technicList[index].dislocation;
+      color = Color(CategoryDropDownValueModel.colorForEquipment[dislocation]!);
+      // color = Color(CategoryDropDownValueModel.colorForEquipment[Technic.technicList[index].dislocation]!);
     }
     return color;
   }
