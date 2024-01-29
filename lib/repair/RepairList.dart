@@ -78,12 +78,12 @@ class _RepairListState extends State<RepairList> {
 
   Text _buildTextWithBN(BuildContext context, int index){
     return Text('№ ${Repair.repairList[index].internalID}. ${Repair.repairList[index].category}.\n'
-        'Жалоба: ${Repair.repairList[index].complaint}.' );
+        'Жалоба: ${Repair.repairList[index].complaint}.');
   }
 
   Text _buildTextWithoutBN(BuildContext context, int index){
     return Text('Без №. ${Repair.repairList[index].category}.\n'
-        'Жалоба: ${Repair.repairList[index].complaint}.' );
+        'Жалоба: ${Repair.repairList[index].complaint}.');
   }
 
   Text _buildTextWithoutTestDrive(BuildContext context, int index){
