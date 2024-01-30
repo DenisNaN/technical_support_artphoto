@@ -2,6 +2,7 @@
 
 class Repair{
   static List repairList = [];
+  static List<Map<int, int>> totalSumRepairs = [];
 
   int? id;
   int? internalID;

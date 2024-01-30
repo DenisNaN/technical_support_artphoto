@@ -93,7 +93,11 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     _diagnosisService.text = widget.repair.diagnosisService;
     _recommendationsNotes.text = widget.repair.recommendationsNotes;
     _selectedDropdownStatusNew = widget.repair.newStatus == '' ? null : widget.repair.newStatus;
-    _selectedDropdownDislocationNew = widget.repair.newDislocation == '' ? null : widget.repair.newDislocation;
+
+    int lastSymbolNameRepair = widget.repair.newDislocation.length;
+    _selectedDropdownDislocationNew = widget.repair.newDislocation == '' ? null :
+    '${widget.repair.newDislocation[0].toUpperCase()}${widget.repair.newDislocation.substring(1, lastSymbolNameRepair).trim()}';
+
     _dateReceipt = widget.repair.dateReceipt;
   }
 
@@ -505,7 +509,8 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
             onPressed: (){
               setState(() {
                 _selectedDropdownDislocationNew = null;
-              });}) : null,
+              });
+            }) : null,
         value: _selectedDropdownDislocationNew,
         items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(

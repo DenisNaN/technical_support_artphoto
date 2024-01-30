@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../repair/Repair.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import 'Technic.dart';
 import 'TechnicAdd.dart';
@@ -65,12 +66,23 @@ class _TechnicsListState extends State<TechnicsList> {
   }
 
   Text _buildTextWithoutTestDrive(BuildContext context, int index){
+    int TotalSumRepairs = 0;
+    for(Map<int, int> element in Repair.totalSumRepairs){
+      if(element[Technic.technicList[index].internalID] != null){
+        int coastReapair = element[Technic.technicList[index].internalID]!;
+        TotalSumRepairs += coastReapair;
+      }
+    }
+      // .where((element) => element[Technic.technicList[index].internalID] == Technic.technicList[index].internalID)
+      // .reduce((total, element) => total += int.parse(element[Technic.technicList[index].internalID].toString()));
+
     Color color = const Color(0xff000000);
     return Text.rich(TextSpan(children: [
       TextSpan(text: '${Technic.technicList[index].dislocation}.',
         style: TextStyle(fontWeight: FontWeight.bold, color: color)),
       TextSpan(text: ' Статус: ${Technic.technicList[index].status}\n'
-          'Тест-драйв не проводился')
+          'Тест-драйв не проводился\n'),
+      TextSpan(text: 'Итоговая сумма ремонта: $TotalSumRepairs р.')
       ])
     );
   }

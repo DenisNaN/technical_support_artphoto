@@ -166,16 +166,13 @@ class DownloadAllList{
       }
     }
 
-    List<Map<int, int>> totalSumRepairs = [];
-    allRepair.forEach((element) {
-      var result = allRepair.where((x) => x.costService != 0);
-      Map<int, int> idAndSum = {};
-      for(var entity in result){
-        idAndSum[entity.internalID] = entity.costService;
+    Map<int, int> idAndSum = {};
+    for(Repair elem in allRepair){
+      if(elem.costService! > 0){
+        Map<int, int> idAndSum = {elem.internalID!: elem.costService!};
+        Repair.totalSumRepairs.add(idAndSum);
       }
-      totalSumRepairs.add(idAndSum);
-    });
-
+    }
     return allRepair;
   }
 
