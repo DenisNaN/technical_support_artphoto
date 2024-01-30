@@ -66,23 +66,15 @@ class _TechnicsListState extends State<TechnicsList> {
   }
 
   Text _buildTextWithoutTestDrive(BuildContext context, int index){
-    int TotalSumRepairs = 0;
-    for(Map<int, int> element in Repair.totalSumRepairs){
-      if(element[Technic.technicList[index].internalID] != null){
-        int coastReapair = element[Technic.technicList[index].internalID]!;
-        TotalSumRepairs += coastReapair;
-      }
-    }
-      // .where((element) => element[Technic.technicList[index].internalID] == Technic.technicList[index].internalID)
-      // .reduce((total, element) => total += int.parse(element[Technic.technicList[index].internalID].toString()));
-
+    int totalSumRepairs = _getTotalSumRepairs(index);
     Color color = const Color(0xff000000);
     return Text.rich(TextSpan(children: [
       TextSpan(text: '${Technic.technicList[index].dislocation}.',
         style: TextStyle(fontWeight: FontWeight.bold, color: color)),
       TextSpan(text: ' Статус: ${Technic.technicList[index].status}\n'
           'Тест-драйв не проводился\n'),
-      TextSpan(text: 'Итоговая сумма ремонта: $TotalSumRepairs р.')
+      TextSpan(text: totalSumRepairs != 0 ? 'Итоговая сумма ремонта: $totalSumRepairs р.' :
+      'Ремонт не проводился'),
       ])
     );
   }
@@ -95,6 +87,7 @@ class _TechnicsListState extends State<TechnicsList> {
     String formatedFinishDate = '';
     Duration duration = const Duration(days: 0);
     bool isHaveFinishDate = false;
+    int totalSumRepairs = _getTotalSumRepairs(index);
     Color color = const Color(0xff000000);
 
     if(Technic.technicList[index].dateFinishTestDrive != ''){
@@ -115,6 +108,7 @@ class _TechnicsListState extends State<TechnicsList> {
                   'Статус: ${Technic.technicList[index].status}\n'),
               isHaveFinishDate ?
               TextSpan(children: [
+                TextSpan(text: 'Итоговая сумма ремонта: $totalSumRepairs р.\n'),
                 TextSpan(text:
                   'Начало тест-драйва: $formatedStartDate.\n'
                   'Конец тест-драйва: $formatedFinishDate.\n'),
@@ -137,6 +131,8 @@ class _TechnicsListState extends State<TechnicsList> {
                 )
               ]
               ),
+              TextSpan(text: totalSumRepairs != 0 ? '\nИтоговая сумма ремонта: $totalSumRepairs р.' :
+              '\nРемонт не проводился')
             ]
         )
     );
@@ -166,6 +162,17 @@ class _TechnicsListState extends State<TechnicsList> {
     int lastSymbolNameTechnic = Technic.technicList[index].name.length;
     nameTechnic = '${Technic.technicList[index].name[0].toUpperCase()}${Technic.technicList[index].name.substring(1, lastSymbolNameTechnic).trim()}.';
     return nameTechnic;
+  }
+
+  int _getTotalSumRepairs(int index){
+    int totalSumRepairs = 0;
+    for(TotalSumRepairs element in Repair.totalSumRepairs){
+      if(element.idTechnic == Technic.technicList[index].internalID){
+        int coastReapair = element.sumRepair;
+        totalSumRepairs += coastReapair;
+      }
+    }
+    return totalSumRepairs;
   }
 }
 

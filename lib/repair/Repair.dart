@@ -1,8 +1,7 @@
 
-
 class Repair{
   static List repairList = [];
-  static List<Map<int, int>> totalSumRepairs = [];
+  static List<TotalSumRepairs> totalSumRepairs = [];
 
   int? id;
   int? internalID;
@@ -45,4 +44,12 @@ class Repair{
   String toString() {
     return "{ id=$id, internalID=$internalID, name=$category, category=$status, coast=$serviceDislocation, dateCoast=$complaint}";
   }
+}
+
+class TotalSumRepairs{
+  late int idRepair;
+  late int idTechnic;
+  late int sumRepair;
+
+  TotalSumRepairs(this.idRepair, this.idTechnic, this.sumRepair);
 }

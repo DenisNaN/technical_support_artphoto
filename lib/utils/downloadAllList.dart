@@ -166,11 +166,10 @@ class DownloadAllList{
       }
     }
 
-    Map<int, int> idAndSum = {};
     for(Repair elem in allRepair){
       if(elem.costService! > 0){
-        Map<int, int> idAndSum = {elem.internalID!: elem.costService!};
-        Repair.totalSumRepairs.add(idAndSum);
+        TotalSumRepairs totalSumRepairs = TotalSumRepairs(elem.id!, elem.internalID!, elem.costService!);
+        Repair.totalSumRepairs.add(totalSumRepairs);
       }
     }
     return allRepair;

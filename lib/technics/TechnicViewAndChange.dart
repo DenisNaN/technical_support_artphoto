@@ -6,10 +6,11 @@ import 'package:technical_support_artphoto/utils/hasNetwork.dart';
 import '../ConnectToDBMySQL.dart';
 import '../history/History.dart';
 import '../history/HistorySQFlite.dart';
+import '../repair/Repair.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import '../utils/utils.dart';
 import 'Technic.dart';
-
+import 'TechnicTotalSumRepairs.dart';
 
 class TechnicViewAndChange extends StatefulWidget {
   final Technic technic;
@@ -197,6 +198,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                 _buildCategory(),
                 _buildNameTechnic(),
                 _buildCostTechnic(),
+                _buildTotalSumRepair(),
                 _buildDateBuyTechnic(),
                 _buildStatus(),
                 _buildDislocation(),
@@ -322,6 +324,38 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
         },
       ),
     );
+  }
+
+  ListTile _buildTotalSumRepair() {
+    int totalSumRepairs = 0;
+    try {
+      totalSumRepairs = _getTotalSumRepairs(widget.technic.internalID!);
+    }catch(e){}
+    return ListTile(
+      leading: const Icon(Icons.miscellaneous_services),
+      title: TextButton(
+          style: TextButton.styleFrom(
+              padding: const EdgeInsets.only(left: 0.0),
+              alignment: Alignment.centerLeft,
+              textStyle: const TextStyle(fontSize: 18)
+          ),
+          child: Text('$totalSumRepairs руб.'),
+        onPressed: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicTotalSumRepairs(internalId: widget.technic.internalID!)));
+        }),
+      subtitle: const Text('Итоговая стоимость ремонта'),
+    );
+  }
+
+  int _getTotalSumRepairs(int internalID){
+    int totalSumRepairs = 0;
+    for(TotalSumRepairs element in Repair.totalSumRepairs){
+      if(element.idTechnic == internalID){
+        int coastReapair = element.sumRepair;
+        totalSumRepairs += coastReapair;
+      }
+    }
+    return totalSumRepairs;
   }
 
   ListTile _buildDateBuyTechnic() {
