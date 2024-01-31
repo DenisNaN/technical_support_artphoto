@@ -328,23 +328,35 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
   ListTile _buildTotalSumRepair() {
     int totalSumRepairs = 0;
+    int countRepairs = _getListCountRepairs(widget.technic.internalID!).length;
     try {
       totalSumRepairs = _getTotalSumRepairs(widget.technic.internalID!);
     }catch(e){}
     return ListTile(
       leading: const Icon(Icons.miscellaneous_services),
-      title: TextButton(
+      title: countRepairs != 0 ? TextButton(
           style: TextButton.styleFrom(
               padding: const EdgeInsets.only(left: 0.0),
               alignment: Alignment.centerLeft,
               textStyle: const TextStyle(fontSize: 18)
           ),
-          child: Text('$totalSumRepairs руб.'),
+          child: Text('$totalSumRepairs руб. Кол-во ремонтов: $countRepairs'),
         onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicTotalSumRepairs(internalId: widget.technic.internalID!)));
-        }),
+            Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicTotalSumRepairs(internalId: widget.technic.internalID!)));
+        }) :
+      Text('$totalSumRepairs руб. Кол-во ремонтов: $countRepairs'),
       subtitle: const Text('Итоговая стоимость ремонта'),
     );
+  }
+
+  List _getListCountRepairs(int internalID) {
+    List totalSumRepairs = [];
+    Repair.totalSumRepairs.forEach((element) {
+      if (element.idTechnic == internalID) {
+        totalSumRepairs.add(element);
+      }
+    });
+    return totalSumRepairs;
   }
 
   int _getTotalSumRepairs(int internalID){

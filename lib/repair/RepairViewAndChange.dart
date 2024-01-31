@@ -562,6 +562,8 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     _costService.text != "" ? costServ = int.parse(_costService.text.replaceAll(",", "")) : costServ = 0;
     _selectedDropdownStatusNew = _selectedDropdownStatusNew ?? '';
     _selectedDropdownDislocationNew = _selectedDropdownDislocationNew ?? '';
+    _selectedDropdownDislocationOld = _selectedDropdownDislocationOld ?? '';
+    _selectedDropdownStatusOld = _selectedDropdownStatusOld ?? '';
 
     Repair repair = Repair(
         widget.repair.id,

@@ -39,7 +39,7 @@ class _TroubleListState extends State<TroubleList> {
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context) => TroubleViewAndChange(trouble: troubleList[index]))).then((value){
                   setState(() {
-                    if(value != null) troubleList[index] = value;
+                    if(value != null) Trouble.troubleList[index] = value;
                   });
                 });
               },

@@ -167,10 +167,8 @@ class DownloadAllList{
     }
 
     for(Repair elem in allRepair){
-      if(elem.costService! > 0){
         TotalSumRepairs totalSumRepairs = TotalSumRepairs(elem.id!, elem.internalID!, elem.costService!);
         Repair.totalSumRepairs.add(totalSumRepairs);
-      }
     }
     return allRepair;
   }

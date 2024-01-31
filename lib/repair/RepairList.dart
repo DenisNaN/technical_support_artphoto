@@ -40,10 +40,9 @@ class _RepairListState extends State<RepairList> {
               tileColor: isDoneRepair ? Colors.lightGreenAccent : null,
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => RepairViewAndChange(repair: repair)))
-                      .then((value) {
+                      builder: (context) => RepairViewAndChange(repair: repair))).then((value) {
                     setState(() {
-                      if (value != null) repair = value;
+                      if (value != null) Repair.repairList[index] = value;
                     });
                   });
                 },
