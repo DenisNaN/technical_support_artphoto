@@ -526,7 +526,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
               onPressed: () {
                 showDatePicker(
                     context: context,
-                    initialDate: DateTime.parse(widget.technic.dateStartTestDrive.replaceAll('.', '-')),
+                    initialDate: DateTime.parse(_dateStartTestDrive.replaceAll('.', '-')),
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2099),
                     locale: const Locale("ru", "RU")
@@ -553,7 +553,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
               onPressed: () {
                 showDatePicker(
                     context: context,
-                    initialDate: DateTime.parse(widget.technic.dateFinishTestDrive.replaceAll('.', '-')),
+                    initialDate: _dateFinishTestDrive != '' ? DateTime.parse(_dateFinishTestDrive.replaceAll('.', '-')) : DateTime.now(),
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2099),
                     locale: const Locale("ru", "RU")
