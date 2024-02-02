@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:technical_support_artphoto/utils/downloadAllList.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 import '../main.dart';
-
+import 'utils.dart' as utils;
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -18,9 +18,17 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    String? version = utils.packageInfo?.version;
     return Scaffold(
       appBar: AppBar(
-        title: const Row(children: [Expanded(child: Center(child:Text('Login'))), Text('version: ')],),
+        title: Row(children: [
+          const Expanded(child:
+            Center(child:
+              Padding(
+                  padding: EdgeInsets.only(left: 40),
+                  child: Text('Login')))),
+          Text('version:\n$version', style: const TextStyle(fontSize: 10, color: Colors.grey))
+        ]),
         centerTitle: true,
       ),
       bottomNavigationBar:

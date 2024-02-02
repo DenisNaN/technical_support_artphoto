@@ -1,3 +1,4 @@
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:technical_support_artphoto/connectToDBMySQL.dart';
 import 'package:technical_support_artphoto/history/HistorySQFlite.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
@@ -11,6 +12,7 @@ import '../history/History.dart';
 import '../repair/RepairSQFlite.dart';
 import '../technics/Technic.dart';
 import 'categoryDropDownValueModel.dart';
+import 'utils.dart' as utils;
 
 
 class DownloadAllList{
@@ -22,6 +24,8 @@ class DownloadAllList{
     bool result = true;
     List listLastId = [];
     List listCount = [];
+
+    utils.packageInfo = await PackageInfo.fromPlatform();
 
     // rebootAllBasicListSQFlite();
     // rebootAllListCategorySQFlite('nameEquipment', 'name');
