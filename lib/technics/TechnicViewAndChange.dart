@@ -728,7 +728,10 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   }
 
   String getDateFormat(String date) {
-    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
+    if(date != '') {
+      return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
+    }
+    return date;
   }
 }
 

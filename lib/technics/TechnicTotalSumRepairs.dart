@@ -3,21 +3,30 @@ import '../repair/Repair.dart';
 import '../repair/RepairViewAndChange.dart';
 import 'package:intl/intl.dart';
 
-class TechnicTotalSumRepairs extends StatelessWidget{
+class TechnicTotalSumRepairs extends StatefulWidget{
   final int internalId;
   const TechnicTotalSumRepairs({super.key, required this.internalId});
 
   @override
+  State<TechnicTotalSumRepairs> createState() => _TechnicTotalSumRepairsState();
+}
+
+class _TechnicTotalSumRepairsState extends State<TechnicTotalSumRepairs> {
+  int indexRepairList = -1;
+  int indexTotalSumRepairs = -1;
+
+  @override
   Widget build(BuildContext context) {
-    List listTotalSumRepair = _getListTotalSumRepairs(internalId);
+    List listTotalSumRepair = _getListTotalSumRepairs(widget.internalId);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Ремонты техники №$internalId')),
+      appBar: AppBar(title: Text('Ремонты техники №${widget.internalId}')),
       body: ListView.builder(
           itemCount: listTotalSumRepair.length,
           itemBuilder: (context, index){
             Repair? repair = _getRepair(index);
-            bool isDoneRepair = isAllFieldsFilled(repair!);
+            _getTotalSumRepairsIndex(repair!.internalID!);
+            bool isDoneRepair = isAllFieldsFilled(repair);
             return ListTile(
               title: _buildText(context, index),
               tileColor: isDoneRepair ? Colors.lightGreenAccent : null,
@@ -25,7 +34,16 @@ class TechnicTotalSumRepairs extends StatelessWidget{
               onTap: (){
                 Navigator.push(
                     context, MaterialPageRoute(
-                    builder: (context) => RepairViewAndChange(repair: repair)));
+                    builder: (context) => RepairViewAndChange(repair: repair))).then((value) {
+                  setState(() {
+                    if (value != null) {
+                      Repair.repairList[indexRepairList] = value;
+                      Repair.totalSumRepairs[indexTotalSumRepairs] = TotalSumRepairs(value.id, value.internalID, value.costService);
+                      // Repair.totalSumRepairs[indexTotalSumRepairs] = TotalSumRepairs(idRepair, idTechnic, sumRepair)value;
+                      listTotalSumRepair[index] = value;
+                    }
+                  });
+                });
               },
             );
           }
@@ -52,25 +70,43 @@ class TechnicTotalSumRepairs extends StatelessWidget{
     );
   }
 
-  Repair? _getRepair(int index){
-    List listTotalSumRepair = _getListTotalSumRepairs(internalId);
-    TotalSumRepairs totalSumRepair = listTotalSumRepair[index];
+  Repair? _getRepair(int indexRepair){
+    List listTotalSumRepair = _getListTotalSumRepairs(widget.internalId);
+    TotalSumRepairs totalSumRepair = listTotalSumRepair[indexRepair];
     int idRepair = totalSumRepair.idRepair;
     Repair? repair;
+    int index = 0;
     Repair.repairList.forEach((element) {
-      if(element.id == idRepair) repair = element;
+      if(element.id == idRepair) {
+        repair = element;
+        indexRepairList = index;
+      }
+      index++;
     });
     return repair;
   }
 
   List _getListTotalSumRepairs(int internalID){
     List totalSumRepairs = [];
+    // int index = 0;
     Repair.totalSumRepairs.forEach((element) {
       if(element.idTechnic == internalID){
         totalSumRepairs.add(element);
+        // indexTotalSumRepairs = index;
       }
+      // index++;
     });
     return totalSumRepairs;
+  }
+
+  void _getTotalSumRepairsIndex(int internalID){
+    int index = 0;
+    Repair.totalSumRepairs.forEach((element) {
+      if(element.idTechnic == internalID){
+        indexTotalSumRepairs = index;
+      }
+      index++;
+    });
   }
 
   bool isAllFieldsFilled(Repair repair){

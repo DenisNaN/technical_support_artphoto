@@ -20,7 +20,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Row(children: [Expanded(child: Center(child:Text('Login'))), Text('version: ')],),
         centerTitle: true,
       ),
       bottomNavigationBar:
