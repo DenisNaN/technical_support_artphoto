@@ -113,7 +113,7 @@ class _TechnicTotalSumRepairsState extends State<TechnicTotalSumRepairs> {
     bool result = false;
     if(repair.complaint != '' &&
         repair.dateDeparture != '' &&
-        repair.dateTransferForService != '' &&
+        repair.dateTransferInService != '' &&
         repair.serviceDislocation != '' &&
         repair.dateDepartureFromService != '' &&
         repair.worksPerformed != '' &&

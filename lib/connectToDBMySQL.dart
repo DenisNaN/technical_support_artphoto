@@ -129,7 +129,7 @@ class ConnectToDBMySQL {
         'repairEquipment.complaint, '
         'repairEquipment.dateDeparture, '
         'repairEquipment.serviceDislocation, '
-        'repairEquipment.dateTransferForService, '
+        'repairEquipment.dateTransferInService, '
         'repairEquipment.dateDepartureFromService, '
         'repairEquipment.worksPerformed, '
         'repairEquipment.costService, '
@@ -155,7 +155,7 @@ class ConnectToDBMySQL {
         'repairEquipment.complaint, '
         'repairEquipment.dateDeparture, '
         'repairEquipment.serviceDislocation, '
-        'repairEquipment.dateTransferForService, '
+        'repairEquipment.dateTransferInService, '
         'repairEquipment.dateDepartureFromService, '
         'repairEquipment.worksPerformed, '
         'repairEquipment.costService, '
@@ -181,14 +181,14 @@ class ConnectToDBMySQL {
     List list = [];
     for (var row in result) {
       // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
-      // dateTransferForService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
+      // dateTransferInService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
       // recommendationsNotes-row[13], newStatus-row[14],  newDislocation-row[15], dateReceipt-row[16]
       String dateDeparture = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
-      String dateTransferForService = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
+      String dateTransferInService = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
       String dateDepartureFromService = row[9].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[9].toString());
       String dateReceipt = row[16].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[16].toString());
 
-      Repair repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferForService,
+      Repair repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferInService,
           dateDepartureFromService, row[10],  row[11],  row[12], row[13], row[14], row[15], dateReceipt);
       list.add(repair);
     }
@@ -340,7 +340,7 @@ class ConnectToDBMySQL {
         'complaint, '
         'dateDeparture, '
         'serviceDislocation, '
-        'dateTransferForService, '
+        'dateTransferInService, '
         'dateDepartureFromService, '
         'worksPerformed, '
         'costService, '
@@ -357,7 +357,7 @@ class ConnectToDBMySQL {
       repair.complaint,
       repair.dateDeparture,
       repair.serviceDislocation,
-      repair.dateTransferForService,
+      repair.dateTransferInService,
       repair.dateDepartureFromService,
       repair.worksPerformed,
       repair.costService,
@@ -376,7 +376,7 @@ class ConnectToDBMySQL {
             'complaint = ?, '
             'dateDeparture = ?, '
             'serviceDislocation = ?, '
-            'dateTransferForService = ?, '
+            'dateTransferInService = ?, '
             'dateDepartureFromService = ?, '
             'worksPerformed = ?, '
             'costService = ?, '
@@ -390,7 +390,7 @@ class ConnectToDBMySQL {
           repair.complaint,
           repair.dateDeparture,
           repair.serviceDislocation,
-          repair.dateTransferForService,
+          repair.dateTransferInService,
           repair.dateDepartureFromService,
           repair.worksPerformed,
           repair.costService,

@@ -30,8 +30,8 @@ class _RepairAddState extends State<RepairAdd> {
   final _complaint = TextEditingController();
   String _dateDeparture = "";
   String _dateDepartureForSQL = "";
-  String _dateTransferForService = "";
-  String _dateTransferForServiceForSQL = "";
+  String _dateTransferInService = "";
+  String _dateTransferInServiceForSQL = "";
   String _dateDepartureFromService = "";
   String _dateDepartureFromServiceForSQL = "";
   final _worksPerformed = TextEditingController();
@@ -150,7 +150,7 @@ class _RepairAddState extends State<RepairAdd> {
                 _buildComplaintListTile(),
                 _buildDateDepartureListTile(),
                 _buildServiceDislocationListTile(),
-                _buildDateTransferForServiceListTile(),
+                _buildDateTransferInServiceListTile(),
                 _buildDateDepartureFromServiceListTile(),
                 _buildWorksPerformedListTile(),
                 _buildCostServiceListTile(),
@@ -337,11 +337,11 @@ class _RepairAddState extends State<RepairAdd> {
     );
   }
 
-  ListTile _buildDateTransferForServiceListTile(){
+  ListTile _buildDateTransferInServiceListTile(){
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Дата сдачи в ремонт"),
-      subtitle: Text(_dateTransferForService == "" ? "Выберите дату" : _dateTransferForService),
+      subtitle: Text(_dateTransferInService == "" ? "Выберите дату" : _dateTransferInService),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -354,8 +354,8 @@ class _RepairAddState extends State<RepairAdd> {
             ).then((date) {
               setState(() {
                 if(date != null) {
-                  _dateTransferForServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateTransferForService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                  _dateTransferInServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
+                  _dateTransferInService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
                 }
               });
             });
@@ -556,7 +556,7 @@ class _RepairAddState extends State<RepairAdd> {
         _complaint.text,
         _dateDepartureForSQL,
         _selectedDropdownService!,
-        _dateTransferForServiceForSQL,
+        _dateTransferInServiceForSQL,
         _dateDepartureFromServiceForSQL,
         _worksPerformed.text,
         costServ,

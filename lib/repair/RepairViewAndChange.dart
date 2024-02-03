@@ -29,7 +29,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   String _nameTechnic = '';
   final _complaintController = TextEditingController();
   String _dateDeparture = '';
-  String _dateTransferForService = '';
+  String _dateTransferInService = '';
   String _dateDepartureFromService = '';
   final _worksPerformed = TextEditingController();
   final _costService = TextEditingController();
@@ -62,7 +62,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
         widget.repair.complaint,
         widget.repair.dateDeparture,
         widget.repair.serviceDislocation,
-        widget.repair.dateTransferForService,
+        widget.repair.dateTransferInService,
         widget.repair.dateDepartureFromService,
         widget.repair.worksPerformed,
         widget.repair.costService,
@@ -86,7 +86,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     _complaintController.text = widget.repair.complaint;
     _dateDeparture = widget.repair.dateDeparture;
     _selectedDropdownService = widget.repair.serviceDislocation == '' ? null : widget.repair.serviceDislocation;
-    _dateTransferForService = widget.repair.dateTransferForService;
+    _dateTransferInService = widget.repair.dateTransferInService;
     _dateDepartureFromService = widget.repair.dateDepartureFromService;
     _worksPerformed.text = widget.repair.worksPerformed;
     _costService.text = widget.repair.costService == 0 ? '' : '${widget.repair.costService}';
@@ -189,7 +189,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
                 _buildComplait(),
                 _buildDateDeparture(),
                 _buildDislocationService(),
-                _buildDateTransferForService(),
+                _buildDateTransferInService(),
                 _buildDateDepartureFromService(),
                 _buildWorksPerformed(),
                 _buildCostService(),
@@ -340,10 +340,10 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     );
   }
 
-  ListTile _buildDateTransferForService() {
+  ListTile _buildDateTransferInService() {
     return ListTile(
       leading: const Icon(Icons.today),
-      title: Text(_dateTransferForService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateTransferForService.replaceAll('.', '-')))),
+      title: Text(_dateTransferInService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateTransferInService.replaceAll('.', '-')))),
       subtitle: const Text("Дата сдачи в ремонт"),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
@@ -357,7 +357,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
             ).then((date) {
               setState(() {
                 if(date != null) {
-                  _dateTransferForService = DateFormat('yyyy.MM.dd').format(date);
+                  _dateTransferInService = DateFormat('yyyy.MM.dd').format(date);
                   _isEdit = true;
                 }
               });
@@ -574,7 +574,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
         _complaintController.text,
         _dateDeparture,
         _selectedDropdownService!,
-        _dateTransferForService,
+        _dateTransferInService,
         _dateDepartureFromService,
         _worksPerformed.text,
         costServ,
@@ -674,14 +674,14 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
           '  Было: ${repairOld.serviceDislocation}\n'
           '  Стало: ${repairNew.serviceDislocation}';
     }
-    if(repairOld.dateTransferForService != repairNew.dateTransferForService){
-      if(repairOld.dateTransferForService == ''){
+    if(repairOld.dateTransferInService != repairNew.dateTransferInService){
+      if(repairOld.dateTransferInService == ''){
         result = '$result\n Внесена дата сдачи в ремонт: '
-            '${getDateFormat(repairNew.dateTransferForService)}';
+            '${getDateFormat(repairNew.dateTransferInService)}';
       }else {
         result = '$result\n Дата сдачи в ремонт изменена:\n'
-            '  Было: ${getDateFormat(repairOld.dateTransferForService)}\n'
-            '  Стало: ${getDateFormat(repairNew.dateTransferForService)}';
+            '  Было: ${getDateFormat(repairOld.dateTransferInService)}\n'
+            '  Стало: ${getDateFormat(repairNew.dateTransferInService)}';
       }
     }
     if(repairOld.dateDepartureFromService != repairNew.dateDepartureFromService){
@@ -768,6 +768,7 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   }
 
   String getDateFormat(String date) {
+    if(date == '') return '';
     return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 }

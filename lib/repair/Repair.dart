@@ -11,7 +11,7 @@ class Repair{
   String complaint = "";
   String dateDeparture = "";
   String serviceDislocation = "";
-  String dateTransferForService = "";
+  String dateTransferInService = "";
   String dateDepartureFromService = "";
   String worksPerformed = "";
   int? costService;
@@ -30,7 +30,7 @@ class Repair{
       this.complaint,
       this.dateDeparture,
       this.serviceDislocation,
-      this.dateTransferForService,
+      this.dateTransferInService,
       this.dateDepartureFromService,
       this.worksPerformed,
       this.costService,

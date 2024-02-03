@@ -5,7 +5,6 @@ import 'Repair.dart';
 import 'package:flutter/material.dart';
 import 'RepairAdd.dart';
 
-
 class RepairList extends StatefulWidget {
   const RepairList({super.key});
 
@@ -14,7 +13,6 @@ class RepairList extends StatefulWidget {
 }
 
 class _RepairListState extends State<RepairList> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold (
@@ -34,10 +32,10 @@ class _RepairListState extends State<RepairList> {
           itemCount: Repair.repairList.length,
           itemBuilder: (context, index) {
             Repair repair = Repair.repairList[index];
-            bool isDoneRepair = isAllFieldsFilled(repair);
+            Color tileColor = getColorForList(repair);
 
             return ListTile(
-              tileColor: isDoneRepair ? Colors.lightGreenAccent : null,
+              tileColor: tileColor,
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(
                       builder: (context) => RepairViewAndChange(repair: repair))).then((value) {
@@ -53,25 +51,6 @@ class _RepairListState extends State<RepairList> {
           },
         )
     );
-  }
-
-  bool isAllFieldsFilled(Repair repair){
-    bool result = false;
-    if(repair.complaint != '' &&
-        repair.dateDeparture != '' &&
-        repair.dateTransferForService != '' &&
-        repair.serviceDislocation != '' &&
-        repair.dateDepartureFromService != '' &&
-        repair.worksPerformed != '' &&
-        repair.costService != 0 &&
-        repair.diagnosisService != '' &&
-        // repair.recommendationsNotes != '' &&
-        repair.dateReceipt != '' &&
-        repair.newStatus != '' &&
-        repair.newDislocation != ''){
-      result = true;
-    }
-    return result;
   }
 
   Text _buildTextWithBN(BuildContext context, int index){
@@ -115,8 +94,8 @@ class _RepairListState extends State<RepairList> {
     if(Repair.repairList[index].dateDeparture != '') {
       repairLastDate = 'Забрали с точки: ${getDateFormat(Repair.repairList[index].dateDeparture)}.';
     }
-    if(Repair.repairList[index].dateTransferForService != ''){
-      repairLastDate = 'Сдали в ремонт: ${getDateFormat(Repair.repairList[index].dateTransferForService)}.';
+    if(Repair.repairList[index].dateTransferInService != ''){
+      repairLastDate = 'Сдали в ремонт: ${getDateFormat(Repair.repairList[index].dateTransferInService)}.';
     }
     if(Repair.repairList[index].dateDepartureFromService != ''){
       repairLastDate = 'Забрали из ремонта: ${getDateFormat(Repair.repairList[index].dateDepartureFromService)}.';
@@ -127,6 +106,45 @@ class _RepairListState extends State<RepairList> {
             'Дислокация: $repairDislocation\n'
             '$repairLastDate'
     );
+  }
+
+  Color getColorForList(Repair repair){
+    Color color = Colors.white;
+    String resultColor = fieldsFilled(repair);
+    switch(resultColor){
+      case 'red':
+        color = Colors.red.shade200;
+        break;
+      case 'yellow':
+        color = Colors.yellow.shade200;
+        break;
+      case 'green':
+        color = Colors.green.shade200;
+        break;
+    }
+    return color;
+  }
+
+  String fieldsFilled(Repair repair){
+    String result = 'yellow';
+    if(repair.complaint != '' &&
+        repair.dateDeparture != '' &&
+        repair.dateTransferInService != '' &&
+        repair.serviceDislocation != '' &&
+        repair.dateDepartureFromService != '' &&
+        repair.worksPerformed != '' &&
+        repair.costService != 0 &&
+        repair.diagnosisService != '' &&
+        repair.dateReceipt != '' &&
+        repair.newStatus != '' &&
+        repair.newDislocation != ''){
+      return 'green';
+    }
+    if(repair.dateTransferInService == '' ||
+        repair.serviceDislocation == ''){
+      return 'red';
+    }
+    return result;
   }
 
   String getDateFormat(String date) {

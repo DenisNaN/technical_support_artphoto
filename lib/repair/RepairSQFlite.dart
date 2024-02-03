@@ -27,7 +27,7 @@ class RepairSQFlite{
             "complaint TEXT, "
             "dateDeparture TEXT, "
             "serviceDislocation TEXT, "
-            "dateTransferForService TEXT, "
+            "dateTransferInService TEXT, "
             "dateDepartureFromService TEXT, "
             "worksPerformed TEXT, "
             "costService INTEGER, "
@@ -50,7 +50,7 @@ class RepairSQFlite{
       inMap['complaint'],
       inMap['dateDeparture'],
       inMap['serviceDislocation'],
-      inMap['dateTransferForService'],
+      inMap['dateTransferInService'],
       inMap['dateDepartureFromService'],
       inMap['worksPerformed'],
       inMap['costService'],
@@ -63,7 +63,7 @@ class RepairSQFlite{
   }
 
   Map<String, dynamic> repairToMap(Repair inRepair){
-    Map<String, dynamic> map = Map<String, dynamic>();
+    Map<String, dynamic> map = <String, dynamic>{};
     map['id'] = inRepair.id;
     map['internalID'] = inRepair.internalID;
     map['category'] = inRepair.category;
@@ -72,7 +72,7 @@ class RepairSQFlite{
     map['complaint'] = inRepair.complaint;
     map['dateDeparture'] = inRepair.dateDeparture;
     map['serviceDislocation'] = inRepair.serviceDislocation;
-    map['dateTransferForService'] = inRepair.dateTransferForService;
+    map['dateTransferInService'] = inRepair.dateTransferInService;
     map['dateDepartureFromService'] = inRepair.dateDepartureFromService;
     map['worksPerformed'] = inRepair.worksPerformed;
     map['costService'] = inRepair.costService;
@@ -97,7 +97,7 @@ class RepairSQFlite{
             "complaint, "
             "dateDeparture, "
             "serviceDislocation, "
-            "dateTransferForService, "
+            "dateTransferInService, "
             "dateDepartureFromService, "
             "worksPerformed, "
             "costService, "
@@ -115,7 +115,7 @@ class RepairSQFlite{
           inRepair.complaint,
           inRepair.dateDeparture,
           inRepair.serviceDislocation,
-          inRepair.dateTransferForService,
+          inRepair.dateTransferInService,
           inRepair.dateDepartureFromService,
           inRepair.worksPerformed,
           inRepair.costService,
@@ -162,7 +162,7 @@ class RepairSQFlite{
         "complaint TEXT, "
         "dateDeparture TEXT, "
         "serviceDislocation TEXT, "
-        "dateTransferForService TEXT, "
+        "dateTransferInService TEXT, "
         "dateDepartureFromService TEXT, "
         "worksPerformed TEXT, "
         "costService INTEGER, "

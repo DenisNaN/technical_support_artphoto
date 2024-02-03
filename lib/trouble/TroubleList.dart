@@ -34,7 +34,7 @@ class _TroubleListState extends State<TroubleList> {
           separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: troubleList.length,
           itemBuilder: (context, index) {
-            bool isDoneTrouble = isAllFieldsFilled(troubleList[index]);
+            bool isDoneTrouble = isFieldFilled(troubleList[index]);
             return ListTile(
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context) => TroubleViewAndChange(trouble: troubleList[index]))).then((value){
@@ -56,11 +56,22 @@ class _TroubleListState extends State<TroubleList> {
     List troubleList = [];
 
     Trouble.troubleList.forEach((element) {
-      if(!isAllFieldsFilled(element)) troubleList.add(element);
+      if(!isFieldFilled(element)) troubleList.add(element);
     });
+    troubleList.sort((element1, element2) =>
+        DateTime.parse(element2.dateTrouble.replaceAll('.', '-')).compareTo(
+            DateTime.parse(element1.dateTrouble.replaceAll('.', '-'))));
+    List tmpList = [];
     Trouble.troubleList.forEach((element) {
-      if(isAllFieldsFilled(element)) troubleList.add(element);
+      // if(isFieldFilled(element)) troubleList.add(element);
+      if(isFieldFilled(element)) {
+        tmpList.add(element);
+      }
     });
+    tmpList.sort((element1, element2) =>
+        DateTime.parse(element2.dateTrouble.replaceAll('.', '-')).compareTo(
+            DateTime.parse(element1.dateTrouble.replaceAll('.', '-'))));
+    troubleList.addAll(tmpList);
     return troubleList;
   }
 
@@ -126,10 +137,9 @@ class _TroubleListState extends State<TroubleList> {
     );
   }
 
-  bool isAllFieldsFilled(Trouble trouble){
+  bool isFieldFilled(Trouble trouble){
     bool result = false;
-    if(trouble.dateCheckFixTroubleEmployee != '' &&
-        trouble.dateCheckFixTroubleEngineer != ''){
+    if(trouble.dateCheckFixTroubleEmployee != ''){
       result = true;
     }
     return result;

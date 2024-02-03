@@ -31,7 +31,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
   String _dislocationOld = "";
   final _complaint = TextEditingController();
   String _dateDeparture = "";
-  String _dateTransferForService = "";
+  String _dateTransferInService = "";
   String _dateDepartureFromService = "";
   final _worksPerformed = TextEditingController();
   final _costService = TextEditingController();
@@ -170,7 +170,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
                   _buildComplaintListTile(),
                   _buildDateDepartureListTile(),
                   _buildServiceDislocationListTile(),
-                  _buildDateTransferForServiceListTile(),
+                  _buildDateTransferInServiceListTile(),
                   _buildDateDepartureFromServiceListTile(),
                   _buildWorksPerformedListTile(),
                   _buildCostServiceListTile(),
@@ -370,11 +370,11 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
     );
   }
 
-  ListTile _buildDateTransferForServiceListTile(){
+  ListTile _buildDateTransferInServiceListTile(){
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Дата сдачи в ремонт"),
-      subtitle: Text(_dateTransferForService == "" ? "Выберите дату" : getFomattedDateForView(_dateTransferForService)),
+      subtitle: Text(_dateTransferInService == "" ? "Выберите дату" : getFomattedDateForView(_dateTransferInService)),
       trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -387,7 +387,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
             ).then((date) {
               setState(() {
                 if(date != null) {
-                  _dateTransferForService = DateFormat('yyyy.MM.dd').format(date);
+                  _dateTransferInService = DateFormat('yyyy.MM.dd').format(date);
                 }
               });
             });
@@ -586,7 +586,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
         _complaint.text,
         _dateDeparture,
         _selectedDropdownService!,
-        _dateTransferForService,
+        _dateTransferInService,
         _dateDepartureFromService,
         _worksPerformed.text,
         costServ,

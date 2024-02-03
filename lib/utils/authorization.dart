@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:technical_support_artphoto/utils/downloadAllList.dart';
 import 'package:technical_support_artphoto/utils/utils.dart';
 import '../main.dart';
+import 'logo_matrixTransition_animate.dart';
 import 'utils.dart' as utils;
 
 class Login extends StatefulWidget {
@@ -22,12 +23,12 @@ class _LoginState extends State<Login> {
     return Scaffold(
       appBar: AppBar(
         title: Row(children: [
+          Text('v. $version', style: const TextStyle(fontSize: 12, color: Colors.white)),
           const Expanded(child:
-            Center(child:
-              Padding(
-                  padding: EdgeInsets.only(left: 40),
-                  child: Text('Login')))),
-          Text('version:\n$version', style: const TextStyle(fontSize: 10, color: Colors.grey))
+          Center(child:
+          Padding(
+              padding: EdgeInsets.only(right: 45),
+              child: Text('Login')))),
         ]),
         centerTitle: true,
       ),
@@ -52,16 +53,18 @@ class _LoginState extends State<Login> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 30.0),
+            const Padding(
+              padding: EdgeInsets.only(top: 10.0, bottom: 0),
               child: Center(
                 child: SizedBox(
                   width: 200,
                   height: 200,
-                  child: Image.asset('assets/logo.PNG'),
+                  child: MatrixTransitionLogo(),
+                  // child: Image.asset('assets/logo.PNG'),
                 ),
               ),
             ),
+            const Text('Авторизация', style: TextStyle(fontSize: 26)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Padding(
