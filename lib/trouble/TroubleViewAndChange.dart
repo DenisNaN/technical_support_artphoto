@@ -241,16 +241,17 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
               });
             });
           },
-          color: Colors.blue)),
-            IconButton(
-                onPressed: (){
-                  setState(() {
-                    _dateCheckFixTroubleEmployee = '';
-                    _employeeCheckFixTrouble = '';
-                    _isEdit = true;
-                  });
-                },
-                icon: const Icon(Icons.clear))
+          color: Colors.blue)
+        ),
+        IconButton(
+            onPressed: (){
+              setState(() {
+                _dateCheckFixTroubleEmployee = '';
+                _employeeCheckFixTrouble = '';
+                _isEdit = true;
+              });
+            },
+            icon: const Icon(Icons.clear))
       ]) : null
     );
   }

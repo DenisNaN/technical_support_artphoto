@@ -39,7 +39,12 @@ class _TroubleListState extends State<TroubleList> {
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context) => TroubleViewAndChange(trouble: troubleList[index]))).then((value){
                   setState(() {
-                    if(value != null) Trouble.troubleList[index] = value;
+                    if(value != null) {
+                      int tmpIndex = findIndexTouble(value);
+                      Trouble.troubleList[tmpIndex] = value;
+                      troubleList.clear();
+                      troubleList = _getListSortTrouble();
+                    }
                   });
                 });
               },
@@ -62,8 +67,8 @@ class _TroubleListState extends State<TroubleList> {
         DateTime.parse(element2.dateTrouble.replaceAll('.', '-')).compareTo(
             DateTime.parse(element1.dateTrouble.replaceAll('.', '-'))));
     List tmpList = [];
+
     Trouble.troubleList.forEach((element) {
-      // if(isFieldFilled(element)) troubleList.add(element);
       if(isFieldFilled(element)) {
         tmpList.add(element);
       }
@@ -143,5 +148,13 @@ class _TroubleListState extends State<TroubleList> {
       result = true;
     }
     return result;
+  }
+
+  int findIndexTouble(Trouble trouble){
+    int index = -1;
+    for(int i = 0; i < Trouble.troubleList.length; i++){
+      if(Trouble.troubleList[i].id == trouble.id) index = i;
+    }
+    return index;
   }
 }

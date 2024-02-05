@@ -23,7 +23,6 @@ class TechnicViewAndChange extends StatefulWidget {
 class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   final _nameTechnic = TextEditingController();
   final _costTechnic = TextEditingController();
-  late DateTime _dateBuy;
   String _dateBuyTechnic = '';
   String _dateBuyForSQL = '';
   final _comment = TextEditingController();
@@ -77,9 +76,9 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     _selectedDropdownStatus = widget.technic.status == '' ? null : widget.technic.status;
     _selectedDropdownDislocation = widget.technic.dislocation == '' ? null : widget.technic.dislocation;
 
-    _dateBuy = DateTime.parse(widget.technic.dateBuyTechnic.replaceAll('.', '-'));
-    _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(_dateBuy);
-    _dateBuyForSQL = DateFormat('yyyy.MM.dd').format(_dateBuy);
+    _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(widget.technic.dateBuyTechnic.replaceAll('.', '-')));
+    _dateBuyForSQL = DateFormat('yyyy.MM.dd').format(DateTime.parse(widget.technic.dateBuyTechnic.replaceAll('.', '-')));
+
     _comment.text = widget.technic.comment;
     if(widget.technic.dateStartTestDrive != ''){
       _switchTestDrive = true;
@@ -373,28 +372,44 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   ListTile _buildDateBuyTechnic() {
     return ListTile(
       leading: const Icon(Icons.today),
-      title: Text(_dateBuyTechnic == "" ? DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now()) : _dateBuyTechnic),
+      title: Text(_dateBuyTechnic == '' || _dateBuyTechnic == '30 ноября 0001'  ? 'Выберите дату' : _dateBuyTechnic),
       subtitle: const Text("Дата покупки техники"),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: _dateBuy,
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateBuyForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: _dateBuyTechnic == '' || _dateBuyTechnic == '30 ноября 0001' ?
+                      DateTime.now() :
+                        DateTime.parse(_dateBuyTechnic.replaceAll('.', '-')),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateBuyForSQL = DateFormat('yyyy.MM.dd').format(date);
+                      _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                      _isEditDateBuy = true;
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateBuyForSQL = '';
+                  _dateBuyTechnic = '';
                   _isEditDateBuy = true;
-                }
-              });
-            });
-          },
-          color: Colors.blue
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }

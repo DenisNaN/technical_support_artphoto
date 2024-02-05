@@ -229,26 +229,39 @@ class _TechnicAddState extends State<TechnicAdd> {
     return ListTile(
       leading: const Icon(Icons.today),
       title: const Text("Дата покупки техники"),
-      subtitle: Text(_dateBuyTechnic == "" ? DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.now()) : _dateBuyTechnic),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                }
-              });
-            });
-          },
-          color: Colors.blue
+      subtitle: Text(_dateBuyTechnic == "" ? 'Выберите дату' : _dateBuyTechnic),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateForSQL = DateFormat('yyyy.MM.dd').format(date);
+                      _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateForSQL = '';
+                  _dateBuyTechnic = '';
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }
