@@ -285,25 +285,38 @@ class _RepairAddState extends State<RepairAdd> {
       leading: const Icon(Icons.today),
       title: const Text("Забрали с точки. Дата"),
       subtitle: Text(_dateDeparture == "" ? "Выберите дату" : _dateDeparture),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateDepartureForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateDeparture = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                }
-              });
-            });
-          },
-          color: Colors.blue
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateDepartureForSQL = DateFormat('yyyy.MM.dd').format(date);
+                      _dateDeparture = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateDepartureForSQL = '';
+                  _dateDeparture   = '';
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }
@@ -342,25 +355,38 @@ class _RepairAddState extends State<RepairAdd> {
       leading: const Icon(Icons.today),
       title: const Text("Дата сдачи в ремонт"),
       subtitle: Text(_dateTransferInService == "" ? "Выберите дату" : _dateTransferInService),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateTransferInServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateTransferInService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                }
-              });
-            });
-          },
-          color: Colors.blue
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateTransferInServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
+                      _dateTransferInService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateTransferInServiceForSQL = '';
+                  _dateTransferInService = '';
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }
@@ -370,25 +396,38 @@ class _RepairAddState extends State<RepairAdd> {
       leading: const Icon(Icons.today),
       title: const Text("Забрали из ремонта. Дата"),
       subtitle: Text(_dateDepartureFromService == "" ? "Выберите дату" : _dateDepartureFromService),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateDepartureFromServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateDepartureFromService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                }
-              });
-            });
-          },
-          color: Colors.blue
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateDepartureFromServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
+                      _dateDepartureFromService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateDepartureFromServiceForSQL = '';
+                  _dateDepartureFromService = '';
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }
@@ -500,25 +539,38 @@ class _RepairAddState extends State<RepairAdd> {
       leading: const Icon(Icons.today),
       title: const Text("Дата поступления"),
       subtitle: Text(_dateReceipt == "" ? "Выберите дату" : _dateReceipt),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateReceiptForSQL = DateFormat('yyyy.MM.dd').format(date);
-                  _dateReceipt = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                }
-              });
-            });
-          },
-          color: Colors.blue
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateReceiptForSQL = DateFormat('yyyy.MM.dd').format(date);
+                      _dateReceipt = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateReceiptForSQL = '';
+                  _dateReceipt = '';
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }

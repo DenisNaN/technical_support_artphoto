@@ -61,7 +61,7 @@ class _TechnicTotalSumRepairsState extends State<TechnicTotalSumRepairs> {
     }
     return Text.rich(
         TextSpan(children: [
-          TextSpan(text: 'Наименование: ${repair.category}\n'),
+          TextSpan(text: 'Ремонтировал: ${repair.serviceDislocation}\n', style: const TextStyle(fontSize: 20)),
           TextSpan(text: 'Сумма ремонта: ${repair.costService}\n'),
           TextSpan(text: 'Жалоба: ${repair.complaint}\n'),
           TextSpan(text: 'Забрали с точки: ${getDateFormat(repair.dateDeparture)}\n')

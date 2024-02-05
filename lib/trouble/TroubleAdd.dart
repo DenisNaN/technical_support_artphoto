@@ -12,7 +12,6 @@ import '../utils/utils.dart';
 import 'package:image_picker/image_picker.dart';
 import 'Trouble.dart';
 
-
 class TroubleAdd extends StatefulWidget {
   const TroubleAdd({super.key});
 

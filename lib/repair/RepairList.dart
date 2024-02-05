@@ -26,51 +26,61 @@ class _RepairListState extends State<RepairList> {
               });
             } : null,
             child: const Icon(Icons.add, color: Colors.white)),
-        body: ListView.separated(
+        body: ListView.builder(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          separatorBuilder: (BuildContext context, int index) => const Divider(),
+          // separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: Repair.repairList.length,
           itemBuilder: (context, index) {
             Repair repair = Repair.repairList[index];
             Color tileColor = getColorForList(repair);
 
-            return ListTile(
-              tileColor: tileColor,
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => RepairViewAndChange(repair: repair))).then((value) {
-                    setState(() {
-                      if (value != null) Repair.repairList[index] = value;
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+              child: ListTile(
+                tileColor: tileColor,
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => RepairViewAndChange(repair: repair))).then((value) {
+                      setState(() {
+                        if (value != null) Repair.repairList[index] = value;
+                      });
                     });
-                  });
-                },
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                title: repair.internalID == -1 ? _buildTextWithoutBN(context, index) : _buildTextWithBN(context, index),
-                subtitle: _buildTextSubtitle(context, index)
+                  },
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                  title: _buildTextTitle(context, index),
+                  subtitle: _buildTextSubtitle(context, index),
+                  shape: RoundedRectangleBorder(
+                  // side: const BorderSide(width: 2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
             );
           },
         )
     );
   }
 
-  Text _buildTextWithBN(BuildContext context, int index){
+  Text _buildTextTitle(BuildContext context, int index){
     String repairComplaint = 'Не внесли данные.';
     if(Repair.repairList[index].complaint != '' && Repair.repairList[index].complaint != null){
       repairComplaint = '${Repair.repairList[index].complaint}.';
     }
 
-    return Text('№ ${Repair.repairList[index].internalID}. ${Repair.repairList[index].category}.\n'
-        'Жалоба: $repairComplaint');
-  }
-
-  Text _buildTextWithoutBN(BuildContext context, int index){
-    String repairComplaint = 'Не внесли данные.';
-    if(Repair.repairList[index].complaint != '' && Repair.repairList[index].complaint != null){
-      repairComplaint = '${Repair.repairList[index].complaint}.';
+    if(Repair.repairList[index].internalID != -1){
+      return Text.rich(TextSpan(children:
+        [TextSpan(text: '№ ${Repair.repairList[index].internalID}. ${Repair.repairList[index].category}.\n',
+          style: const TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: 'Жалоба: $repairComplaint')
+        ]
+      ));
+    } else{
+      return Text.rich(TextSpan(children:
+      [TextSpan(text: 'Без №. ${Repair.repairList[index].category}.\n',
+          style: const TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: 'Жалоба: $repairComplaint')
+      ]
+      ));
     }
-
-    return Text('Без №. ${Repair.repairList[index].category}.\n'
-        'Жалоба: $repairComplaint');
   }
 
   Text _buildTextSubtitle(BuildContext context, int index){
@@ -113,13 +123,13 @@ class _RepairListState extends State<RepairList> {
     String resultColor = fieldsFilled(repair);
     switch(resultColor){
       case 'red':
-        color = Colors.red.shade200;
+        color = Colors.red.shade100;
         break;
       case 'yellow':
-        color = Colors.yellow.shade200;
+        color = Colors.yellow.shade100;
         break;
       case 'green':
-        color = Colors.green.shade200;
+        color = Colors.green.shade100;
         break;
     }
     return color;

@@ -319,24 +319,36 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
       leading: const Icon(Icons.today),
       title: const Text("Забрали с точки. Дата"),
       subtitle: Text(_dateDeparture == "" ? "Выберите дату" : getFomattedDateForView(_dateDeparture)),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateDeparture = DateFormat('yyyy.MM.dd').format(date);
-                }
-              });
-            });
-          },
-          color: Colors.blue
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateDeparture = DateFormat('yyyy.MM.dd').format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateDeparture = '';
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }
@@ -375,24 +387,36 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
       leading: const Icon(Icons.today),
       title: const Text("Дата сдачи в ремонт"),
       subtitle: Text(_dateTransferInService == "" ? "Выберите дату" : getFomattedDateForView(_dateTransferInService)),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateTransferInService = DateFormat('yyyy.MM.dd').format(date);
-                }
-              });
-            });
-          },
-          color: Colors.blue
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateTransferInService = DateFormat('yyyy.MM.dd').format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateTransferInService = '';
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }
@@ -402,24 +426,36 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
       leading: const Icon(Icons.today),
       title: const Text("Забрали из ремонта. Дата"),
       subtitle: Text(_dateDepartureFromService == "" ? "Выберите дату" : getFomattedDateForView(_dateDepartureFromService)),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateDepartureFromService = DateFormat('yyyy.MM.dd').format(date);
-                }
-              });
-            });
-          },
-          color: Colors.blue
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateDepartureFromService = DateFormat('yyyy.MM.dd').format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateDepartureFromService = '';
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }
@@ -531,24 +567,36 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
       leading: const Icon(Icons.today),
       title: const Text("Дата поступления"),
       subtitle: Text(_dateReceipt == "" ? "Выберите дату" : getFomattedDateForView(_dateReceipt)),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateReceipt = DateFormat('yyyy.MM.dd').format(date);
-                }
-              });
-            });
-          },
-          color: Colors.blue
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateReceipt = DateFormat('yyyy.MM.dd').format(date);
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateReceipt = '';
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }

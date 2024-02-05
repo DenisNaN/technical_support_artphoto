@@ -286,25 +286,38 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
       leading: const Icon(Icons.today),
       title: Text(dateDeparture),
       subtitle: const Text("Забрали с точки. Дата"),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateDeparture = DateFormat('yyyy.MM.dd').format(date);
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateDeparture = DateFormat('yyyy.MM.dd').format(date);
+                      _isEdit = true;
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateDeparture = '';
                   _isEdit = true;
-                }
-              });
-            });
-          },
-          color: Colors.blue
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }
@@ -345,25 +358,38 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
       leading: const Icon(Icons.today),
       title: Text(_dateTransferInService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateTransferInService.replaceAll('.', '-')))),
       subtitle: const Text("Дата сдачи в ремонт"),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateTransferInService = DateFormat('yyyy.MM.dd').format(date);
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateTransferInService = DateFormat('yyyy.MM.dd').format(date);
+                      _isEdit = true;
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateTransferInService = '';
                   _isEdit = true;
-                }
-              });
-            });
-          },
-          color: Colors.blue
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }
@@ -373,25 +399,38 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
       leading: const Icon(Icons.today),
       title: Text(_dateDepartureFromService == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateDepartureFromService.replaceAll('.', '-')))),
       subtitle: const Text("Забрали из ремонта. Дата"),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateDepartureFromService = DateFormat('yyyy.MM.dd').format(date);
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateDepartureFromService = DateFormat('yyyy.MM.dd').format(date);
+                      _isEdit = true;
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateDepartureFromService = '';
                   _isEdit = true;
-                }
-              });
-            });
-          },
-          color: Colors.blue
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }
@@ -534,25 +573,38 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
       leading: const Icon(Icons.today),
       title: Text(_dateReceipt == '' ? 'Выберите дату' : DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateReceipt.replaceAll('.', '-')))),
       subtitle: const Text("Дата поступления"),
-      trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU")
-            ).then((date) {
-              setState(() {
-                if(date != null) {
-                  _dateReceipt = DateFormat('yyyy.MM.dd').format(date);
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2099),
+                    locale: const Locale("ru", "RU")
+                ).then((date) {
+                  setState(() {
+                    if(date != null) {
+                      _dateReceipt = DateFormat('yyyy.MM.dd').format(date);
+                      _isEdit = true;
+                    }
+                  });
+                });
+              },
+              color: Colors.blue
+          ),
+          IconButton(
+              onPressed: (){
+                setState(() {
+                  _dateReceipt = '';
                   _isEdit = true;
-                }
-              });
-            });
-          },
-          color: Colors.blue
+                });
+              },
+              icon: const Icon(Icons.clear))
+        ],
       ),
     );
   }
