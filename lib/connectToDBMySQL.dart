@@ -313,6 +313,7 @@ class ConnectToDBMySQL {
 
     await ConnectToDBMySQL.connDB.connDatabase();
     int id = await findLastTestDriveTechnic(technic);
+    print(id);
     await _connDB!.query(
         'UPDATE testDrive SET dateStart = ?, dateFinish = ?, result = ?, checkEquipment = ? WHERE id = ?',
         [
@@ -325,13 +326,21 @@ class ConnectToDBMySQL {
   }
 
   Future<int> findLastTestDriveTechnic(Technic technic) async {
-    int id = -1;
     await ConnectToDBMySQL.connDB.connDatabase();
     var result = await _connDB!.query(
         'SELECT id FROM testDrive WHERE idEquipment = ? ORDER BY id DESC LIMIT 1',
         [
           technic.id
         ]);
+    int id = lastTectDriveListFromMap(result);
+    return id;
+  }
+
+  int lastTectDriveListFromMap(var result) {
+    int id = -1;
+    for (var row in result) {
+      id = row[0];
+    }
     return id;
   }
 
