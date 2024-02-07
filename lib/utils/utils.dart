@@ -6,6 +6,7 @@ PackageInfo? packageInfo;
 
 class LoginPassword{
   static Map<String, List> loginPassword = {};
+  static List notificationsList = [];
   static String login = 'Артфото';
   static String access = '';
 }

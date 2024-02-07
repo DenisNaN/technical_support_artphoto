@@ -361,4 +361,13 @@ class DownloadAllList{
     CategorySQFlite.db.createTable(nameTable, nameCategory);
   }
 
+  List getNotifications(){
+    List notifications = [];
+
+    Technic.technicList.forEach((technic) {
+
+    });
+
+    return notifications;
+  }
 }
