@@ -295,7 +295,7 @@ class ConnectToDBMySQL {
     await ConnectToDBMySQL.connDB.connDatabase();
     await _connDB!.query(
         'INSERT INTO testDrive (idEquipment, category, dateStart, dateFinish, result, '
-            'checkEquipment, user) VALUES (?, ?, ?, ? , ?, ?, ?)',
+            'checkEquipment, user) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [
           technic.id,
           technic.category,
@@ -305,6 +305,34 @@ class ConnectToDBMySQL {
           technic.checkboxTestDrive,
           LoginPassword.login
         ]);
+  }
+
+  Future updateTestDriveInDB(Technic technic) async{
+    int checkBox = 0;
+    if(technic.checkboxTestDrive) checkBox = 1;
+
+    await ConnectToDBMySQL.connDB.connDatabase();
+    int id = await findLastTestDriveTechnic(technic);
+    await _connDB!.query(
+        'UPDATE testDrive SET dateStart = ?, dateFinish = ?, result = ?, checkEquipment = ? WHERE id = ?',
+        [
+          technic.dateStartTestDrive,
+          technic.dateFinishTestDrive,
+          technic.resultTestDrive,
+          checkBox,
+          id
+        ]);
+  }
+
+  Future<int> findLastTestDriveTechnic(Technic technic) async {
+    int id = -1;
+    await ConnectToDBMySQL.connDB.connDatabase();
+    var result = await _connDB!.query(
+        'SELECT id FROM testDrive WHERE idEquipment = ? ORDER BY id DESC LIMIT 1',
+        [
+          technic.id
+        ]);
+    return id;
   }
 
   Future insertStatusInDB(int id, String status, String dislocation) async{

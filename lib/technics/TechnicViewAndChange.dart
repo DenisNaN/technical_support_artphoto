@@ -80,7 +80,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     _dateBuyForSQL = DateFormat('yyyy.MM.dd').format(DateTime.parse(widget.technic.dateBuyTechnic.replaceAll('.', '-')));
 
     _comment.text = widget.technic.comment;
-    if(widget.technic.dateStartTestDrive != ''){
+    if(widget.technic.dateStartTestDrive != '' && !widget.technic.checkboxTestDrive){
       _switchTestDrive = true;
       _dateStartTestDrive = widget.technic.dateStartTestDrive;
       _dateStartTestDriveForSQL = widget.technic.dateStartTestDrive;
@@ -621,11 +621,16 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     if(_isEditStatusDislocation){
       ConnectToDBMySQL.connDB.insertStatusInDB(technic.id!, technic.status, technic.dislocation);
     }
-    if(_isEditTestDrive || _isEditSwitch){
+    if(_isEditSwitch && _switchTestDrive){
       ConnectToDBMySQL.connDB.insertTestDriveInDB(technic);
     }
+    if(_isEditTestDrive){
+      ConnectToDBMySQL.connDB.updateTestDriveInDB(technic);
+    }
 
-    if(_isEditCategory || _isEditName || _isEditCost || _isEditDateBuy || _isEditComment || _isEditStatusDislocation || _isEditTestDrive || _isEditSwitch) {
+    if(_isEditCategory || _isEditName || _isEditCost || _isEditDateBuy ||
+        _isEditComment || _isEditStatusDislocation || _isEditTestDrive ||
+        _isEditSwitch) {
       TechnicSQFlite.db.updateTechnic(technic);
     }
     addHistory(technic);
