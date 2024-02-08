@@ -627,7 +627,6 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     if(_isEditTestDrive){
       ConnectToDBMySQL.connDB.updateTestDriveInDB(technic);
     }
-
     if(_isEditCategory || _isEditName || _isEditCost || _isEditDateBuy ||
         _isEditComment || _isEditStatusDislocation || _isEditTestDrive ||
         _isEditSwitch) {

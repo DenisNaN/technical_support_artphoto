@@ -14,10 +14,16 @@ class TroubleList extends StatefulWidget {
 }
 
 class _TroubleListState extends State<TroubleList> {
+  List troubleList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    troubleList = _getListSortTrouble();
+  }
 
   @override
   Widget build(BuildContext context) {
-    List troubleList = _getListSortTrouble();
 
     return Scaffold (
         floatingActionButton: FloatingActionButton(

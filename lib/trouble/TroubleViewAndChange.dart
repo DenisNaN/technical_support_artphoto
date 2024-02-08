@@ -26,6 +26,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
 
   String _innerNumberTechnic = '';
   String? _photosalon;
+  String _employee = '';
   String _dateTrouble = '';
   String _trouble = '';
   String _dateCheckFixTroubleEmployee = '';
@@ -69,6 +70,7 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
     }
     _innerNumberTechnic = '${widget.trouble.internalID}';
     _photosalon = widget.trouble.photosalon;
+    _employee = widget.trouble.employee;
     _dateTrouble = widget.trouble.dateTrouble;
     _trouble = widget.trouble.trouble;
     _dateCheckFixTroubleEmployee = widget.trouble.dateCheckFixTroubleEmployee;
@@ -192,7 +194,8 @@ class _TroubleViewAndChangeState extends State<TroubleViewAndChange> with Single
     return ListTile(
       leading: const Icon(Icons.medical_information),
       title: Text('Наименование: ${Technic.technicList[indexTechnic].category}\n'
-          'Откуда забрали: $_photosalon'),
+          'Местонахождение: $_photosalon\n'
+          'Сотрудник: $_employee'),
       );
   }
 
