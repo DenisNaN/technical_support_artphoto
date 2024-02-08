@@ -5,7 +5,6 @@ import '../utils/hasNetwork.dart';
 import 'Trouble.dart';
 import 'package:intl/intl.dart';
 
-
 class TroubleList extends StatefulWidget {
   const TroubleList({super.key});
 
@@ -65,6 +64,7 @@ class _TroubleListState extends State<TroubleList> {
 
   List _getListSortTrouble(){
     List troubleList = [];
+    List tmpList = [];
 
     Trouble.troubleList.forEach((element) {
       if(!isFieldFilled(element)) troubleList.add(element);
@@ -72,7 +72,6 @@ class _TroubleListState extends State<TroubleList> {
     troubleList.sort((element1, element2) =>
         DateTime.parse(element2.dateTrouble.replaceAll('.', '-')).compareTo(
             DateTime.parse(element1.dateTrouble.replaceAll('.', '-'))));
-    List tmpList = [];
 
     Trouble.troubleList.forEach((element) {
       if(isFieldFilled(element)) {
@@ -100,7 +99,6 @@ class _TroubleListState extends State<TroubleList> {
       troubleList[index].photoTrouble.isNotEmpty ? checkboxValuePhoto = true :
       checkboxValuePhoto = false;
     }
-
     return Row(
       children: [
         Expanded(child:

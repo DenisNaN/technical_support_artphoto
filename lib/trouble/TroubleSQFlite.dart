@@ -3,7 +3,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'Trouble.dart';
 
-
 class TroubleSQFlite{
   TroubleSQFlite._();
 
@@ -75,7 +74,7 @@ class TroubleSQFlite{
           inTrouble.id,
           inTrouble.photosalon,
           inTrouble.dateTrouble,
-          utils.LoginPassword.login,
+          inTrouble.employee,
           inTrouble.internalID,
           inTrouble.trouble,
           inTrouble.dateCheckFixTroubleEmployee,

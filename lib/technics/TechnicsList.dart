@@ -43,23 +43,24 @@ class _TechnicsListState extends State<TechnicsList> {
             String dateStart = _dateStart(index);
             Color color = _getTileColor(index);
             String nameTechnic = _nameTechnic(index);
-            return ListTile(
-              tileColor: color,
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index]))).then((value){
-                    setState(() {
-                      if(value != null) Technic.technicList[index] = value;
-                    });
-                  });
-              },
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-              title: Text.rich(TextSpan(children: [
-                TextSpan(text: '№ ${Technic.technicList[index].internalID} '),
-                TextSpan(text: '${Technic.technicList[index].category}. ', style: const TextStyle(fontWeight: FontWeight.bold), ),
-                TextSpan(text: nameTechnic)
-              ])),
-              subtitle: dateStart != '' ? _buildTextWithTestDrive(context, index) : _buildTextWithoutTestDrive(context, index),
-            );
+            return Material(
+                child: ListTile(
+                  tileColor: color,
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index]))).then((value){
+                        setState(() {
+                          if(value != null) Technic.technicList[index] = value;
+                        });
+                      });
+                  },
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                  title: Text.rich(TextSpan(children: [
+                    TextSpan(text: '№ ${Technic.technicList[index].internalID} '),
+                    TextSpan(text: '${Technic.technicList[index].category}. ', style: const TextStyle(fontWeight: FontWeight.bold), ),
+                    TextSpan(text: nameTechnic)
+                  ])),
+                  subtitle: dateStart != '' ? _buildTextWithTestDrive(context, index) : _buildTextWithoutTestDrive(context, index),
+                ));
           },
         )
     );
@@ -148,9 +149,9 @@ class _TechnicsListState extends State<TechnicsList> {
 
   Color _getTileColor(int index){
     Color color = const Color(0xffFFFFFF);
-    if(CategoryDropDownValueModel.colorForEquipment.isNotEmpty) {
+    if(colorForTechnic.isNotEmpty) {
       String dislocation = Technic.technicList[index].dislocation;
-      color = Color(CategoryDropDownValueModel.colorForEquipment[dislocation]!);
+      color = Color(colorForTechnic[dislocation]!);
       // color = Color(CategoryDropDownValueModel.colorForEquipment[Technic.technicList[index].dislocation]!);
     }
     return color;
