@@ -2,6 +2,7 @@
 
 class Technic implements Comparable{
   static List technicList = [];
+  static List testDriveList = [];
 
   int? id;
   int? internalID;
@@ -12,6 +13,7 @@ class Technic implements Comparable{
   String status = "";
   String dislocation = "";
   String comment = "";
+  String testDriveDislocation = "";
   String dateStartTestDrive = '';
   String dateFinishTestDrive = '';
   String resultTestDrive = '';
@@ -21,6 +23,8 @@ class Technic implements Comparable{
       this.cost, this.dateBuyTechnic, this.status, this.dislocation,
       this.comment, this.dateStartTestDrive, this.dateFinishTestDrive,
       this.resultTestDrive, this.checkboxTestDrive);
+
+  Technic.testDrive();
 
   @override
   String toString() {

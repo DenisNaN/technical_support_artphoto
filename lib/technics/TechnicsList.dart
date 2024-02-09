@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import '../repair/Repair.dart';
 import '../utils/categoryDropDownValueModel.dart';
@@ -37,7 +39,6 @@ class _TechnicsListState extends State<TechnicsList> {
             child: const Icon(Icons.add, color: Colors.white)
             ),
         body: ListView.builder(
-          // separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: Technic.technicList.length,
           itemBuilder: (context, index) {
             String dateStart = _dateStart(index);
@@ -94,7 +95,7 @@ class _TechnicsListState extends State<TechnicsList> {
     if(Technic.technicList[index].dateFinishTestDrive != ''){
       dateFinish = DateTime.parse(Technic.technicList[index].dateFinishTestDrive.replaceAll('.', '-'));
       formatedFinishDate = DateFormat("d MMMM yyyy", "ru_RU").format(dateFinish);
-      dateNow = DateTime.now();
+      dateNow = DateTime.now().add(const Duration(days: -1));
       duration = dateFinish.difference(dateNow);
       isHaveFinishDate = true;
     }
@@ -115,7 +116,7 @@ class _TechnicsListState extends State<TechnicsList> {
                   'Конец тест-драйва: $formatedFinishDate.\n'),
                 duration.inDays > 0 && !Technic.technicList[index].checkboxTestDrive ?
                     TextSpan(
-                    text: 'Осталось дней до конца тест-драйва: ${duration.inDays}',
+                    text: 'До конца тест-драйва: ${duration.inDays} ${getDayAddition(duration.inDays)}',
                     style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)
                 ) : TextSpan(
                     text: !Technic.technicList[index].checkboxTestDrive ?
@@ -137,6 +138,23 @@ class _TechnicsListState extends State<TechnicsList> {
             ]
         )
     );
+  }
+
+  String getDayAddition(int num) {
+    double preLastDigit = num % 100 / 10;
+    if (preLastDigit.round() == 1) {
+      return "дней";
+    }
+    switch (num % 10) {
+      case 1:
+        return "день";
+      case 2:
+      case 3:
+      case 4:
+        return "дня";
+      default:
+        return "дней";
+    }
   }
 
   String _dateStart(int index){

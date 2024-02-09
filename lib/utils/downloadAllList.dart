@@ -66,7 +66,8 @@ class DownloadAllList{
         HasNetwork.isConnecting, 'service', 'repairmen', listCount[6]['countService'])));
     CategoryDropDownValueModel.statusForEquipment.addAll((await getActualCategory(
         HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[7]['countStatus'])));
-    CategoryDropDownValueModel.colorForEquipment.addAll(await ConnectToDBMySQL.connDB.getColorForEquipment());
+    CategoryDropDownValueModel.colorForEquipment.addAll(await getActualColorsForPhotosalons(
+        HasNetwork.isConnecting, listCount[8]['countColorsForPhotosalons']));
   }
 
   Future getAllHasNotNetwork() async{
@@ -83,6 +84,8 @@ class DownloadAllList{
         HasNetwork.isConnecting, 'service', 'repairmen')));
     CategoryDropDownValueModel.statusForEquipment.addAll((await getActualCategory(
         HasNetwork.isConnecting, 'statusForEquipment', 'status')));
+    CategoryDropDownValueModel.colorForEquipment.addAll(await getActualColorsForPhotosalons(
+        HasNetwork.isConnecting));
   }
 
   Future<List> getAllActualTechnics(bool isConnectInternet, [int lastId = 0, int countEntities = 0]) async{
@@ -125,7 +128,6 @@ class DownloadAllList{
         TechnicSQFlite.db.insertEquipment(technic);
       }
     }
-
     return allTechnics;
   }
 
@@ -347,6 +349,27 @@ class DownloadAllList{
     return actualCategory;
   }
 
+  Future<Map<String, int>> getActualColorsForPhotosalons(bool isConnectInternet, [int countEntities = 0]) async{
+    Map<String, int> actualCategory = {};
+    actualCategory = await CategorySQFlite.db.getColorsForPhotosalons();
+
+    if(!isConnectInternet) return actualCategory;
+
+    if(countEntities != actualCategory.length){
+      CategorySQFlite.db.deleteTableColorsForPhotosalons();
+      CategorySQFlite.db.createTableColorsForPhotosalons();
+
+      actualCategory = await ConnectToDBMySQL.connDB.getColorForEquipment();
+
+      int id = 0;
+      for(var category in actualCategory.entries.toList().reversed){
+        ++id;
+        CategorySQFlite.db.createColorsForPhotosalons(id, category.key, category.value.toString());
+      }
+    }
+    return actualCategory;
+  }
+
   Future rebootAllBasicListSQFlite() async{
     TechnicSQFlite.db.deleteTables();
     TechnicSQFlite.db.createTables();
@@ -359,6 +382,8 @@ class DownloadAllList{
   Future rebootAllListCategorySQFlite(String nameTable, String nameCategory) async{
     CategorySQFlite.db.deleteTable(nameTable);
     CategorySQFlite.db.createTable(nameTable, nameCategory);
+    CategorySQFlite.db.deleteTableColorsForPhotosalons();
+    CategorySQFlite.db.createTableColorsForPhotosalons();
   }
 
   List getNotifications(){

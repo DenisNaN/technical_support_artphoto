@@ -98,12 +98,6 @@ class TechnicSQFlite{
     );
   }
 
-  // Future<Technic> get(int inID) async {
-  //   Database db = await database;
-  //   var rec = await db.query("technic", where: "id = ?", whereArgs: [inID]);
-  //   return technicFromMap(rec.first);
-  // }
-
   Future<List> getAllTechnics() async {
     Database db = await database();
     var recs = await db.query("equipment");
@@ -128,11 +122,6 @@ class TechnicSQFlite{
       [status, dislocation, id]
     );
   }
-
-  // Future delete(int inID) async {
-  //   Database db = await database;
-  //   return await db.delete("technic", where: "id = ?", whereArgs: [inID]);
-  // }
 
   Future deleteTables() async{
     Database db = await database();

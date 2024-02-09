@@ -34,6 +34,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   String? _selectedDropdownNameTechnic;
   String? _selectedDropdownDislocation;
   String? _selectedDropdownStatus;
+  String? _selectedDropdownTestDriveDislocation;
   bool _checkboxTestDrive = false;
   bool _switchTestDrive = false;
   late bool _isCategoryPhotocamera;

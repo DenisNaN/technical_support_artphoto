@@ -23,7 +23,6 @@ class _TroubleListState extends State<TroubleList> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold (
         floatingActionButton: FloatingActionButton(
             backgroundColor: HasNetwork.isConnecting ? Colors.blue : Colors.grey,

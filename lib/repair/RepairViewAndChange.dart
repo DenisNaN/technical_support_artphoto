@@ -43,6 +43,9 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   String? _selectedDropdownDislocationNew;
 
   bool _isEditComplaint = false;
+  bool _isEditWorksPerformed = false;
+  bool _isEditDiagnosisService = false;
+  bool _isEditRecommendationsNotes = false;
   bool _isEdit = false;
   bool _isEditNewStatusDislocation = false;
   int indexTechnic = 0;
@@ -89,9 +92,12 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
     _dateTransferInService = widget.repair.dateTransferInService;
     _dateDepartureFromService = widget.repair.dateDepartureFromService;
     _worksPerformed.text = widget.repair.worksPerformed;
+    if(_worksPerformed.text == '') _isEditWorksPerformed = true;
     _costService.text = widget.repair.costService == 0 ? '' : '${widget.repair.costService}';
     _diagnosisService.text = widget.repair.diagnosisService;
+    if(_diagnosisService.text == '') _isEditDiagnosisService = true;
     _recommendationsNotes.text = widget.repair.recommendationsNotes;
+    if(_recommendationsNotes.text == '') _isEditRecommendationsNotes = true;
     _selectedDropdownStatusNew = widget.repair.newStatus == '' ? null : widget.repair.newStatus;
 
     int lastSymbolNameRepair = widget.repair.newDislocation.length;
@@ -208,45 +214,41 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   return ListTile (
     leading: const Icon(Icons.fiber_new),
     title: widget.repair.internalID != -1 && isTechnicFind ?
-          TextButton(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.only(left: 0.0),
-              alignment: Alignment.centerLeft,
-              textStyle: const TextStyle(fontSize: 20)
-            ),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[indexTechnic]))).then(
-                      (value){
-                    setState(() {
-                      if(value != null) {
-                        Technic.technicList[indexTechnic] = value;
-                      }
-                    });
-                  });
-            },
-            child: Text('№ - $_innerNumberTechnic'
-            )
-          )
-        // )
+      TextButton(
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.only(left: 0.0),
+          alignment: Alignment.centerLeft,
+          textStyle: const TextStyle(fontSize: 20)
+        ),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[indexTechnic]))).
+          then((value){
+                setState(() {
+                  if(value != null) {
+                    Technic.technicList[indexTechnic] = value;
+                  }
+                });
+              });
+          },
+        child: Text('№ - $_innerNumberTechnic'))
         :
         widget.repair.internalID == -1 ? const Text('БН') : Text('№ - $_innerNumberTechnic'),
     );
   }
 
   ListTile _buildDataTechnick() {
-    String technicStatusOld = 'Отсутствует.';
-    if(_selectedDropdownStatusOld != '' && _selectedDropdownStatusOld != null){
-      technicStatusOld = '${_selectedDropdownStatusOld}.';
-    }
     String technicDislocationOld = 'Данные отсутствуют.';
     if(_selectedDropdownDislocationOld != '' && _selectedDropdownDislocationOld != null){
-      technicDislocationOld = '${_selectedDropdownDislocationOld}.';
+      technicDislocationOld = '$_selectedDropdownDislocationOld.';
     }
     return ListTile(
-    leading: const Icon(Icons.medical_information),
-    title: Text('Наименование: $_nameTechnic\n'
-        'Статус: $technicStatusOld'),
-    subtitle: Text('Откуда забрали: $technicDislocationOld'),
+      leading: const Icon(Icons.dataset_linked_rounded),
+      title: Text.rich(TextSpan(children: [
+        const TextSpan(text: 'Наименование: ', style: TextStyle(fontStyle: FontStyle.italic)),
+        TextSpan(text: '$_nameTechnic\n', style: const TextStyle(fontWeight: FontWeight.bold)),
+        const TextSpan(text: 'Откуда забрали: ', style: TextStyle(fontStyle: FontStyle.italic)),
+        TextSpan(text: technicDislocationOld, style: const TextStyle(fontWeight: FontWeight.bold))
+      ]))
   );
   }
 
@@ -436,19 +438,28 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   }
 
   ListTile _buildWorksPerformed() {
-    return ListTile(
-      leading: const Icon(Icons.comment),
-      subtitle: _worksPerformed.text != '' ? const Text('Произведенные работы') : null,
-      title: TextFormField(
-        decoration: const InputDecoration(hintText: "Произведенные работы"),
-        controller: _worksPerformed,
-        onChanged: (value){
-          setState(() {
-            _isEdit = true;
-          });
-        },
-      ),
-    );
+    return _isEditWorksPerformed ?
+      ListTile(
+        leading: const Icon(Icons.create),
+        title: TextFormField(
+          decoration: const InputDecoration(hintText: "Произведенные работы"),
+          controller: _worksPerformed,
+        ),
+      ) :
+      ListTile(
+        leading: const Icon(Icons.comment),
+        title: Text(_worksPerformed.text),
+        subtitle: const Text('Произведенные работы'),
+        trailing: IconButton(
+          icon: const Icon(Icons.edit, color: Colors.blue),
+          onPressed: (){
+            setState(() {
+              _isEditWorksPerformed = true;
+              _isEdit = true;
+            });
+          },
+        ),
+      );
   }
 
   ListTile _buildCostService() {
@@ -472,30 +483,48 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
   }
 
   ListTile _buildDiagnosisService() {
-    return ListTile(
-      leading: const Icon(Icons.comment),
-      subtitle: _diagnosisService.text != '' ? const Text('Диагноз мастерской') : null,
-      title: TextFormField(
-        decoration: const InputDecoration(hintText: 'Диагноз мастерской'),
-        controller: _diagnosisService,
-        onChanged: (value){
-          setState(() {
-            _isEdit = true;
-          });
-        },
-      ),
-    );
+    return _isEditDiagnosisService ?
+      ListTile(
+        leading: const Icon(Icons.create),
+        title: TextFormField(
+          decoration: const InputDecoration(hintText: 'Диагноз мастерской'),
+          controller: _diagnosisService,
+        ),
+      ) :
+      ListTile(
+        leading: const Icon(Icons.comment),
+        title: Text(_diagnosisService.text),
+        subtitle: const Text('Диагноз мастерской'),
+        trailing: IconButton(
+          icon: const Icon(Icons.edit, color: Colors.blue),
+          onPressed: (){
+            setState(() {
+              _isEditDiagnosisService = true;
+              _isEdit = true;
+            });
+          },
+        ),
+      );
   }
 
   ListTile _buildRecommendationsNotes() {
-    return ListTile(
-      leading: const Icon(Icons.comment),
-      subtitle: _recommendationsNotes.text != '' ? const Text('Рекомендации/примечания') : null,
+    return _isEditRecommendationsNotes ?
+    ListTile(
+      leading: const Icon(Icons.create),
       title: TextFormField(
-        decoration: const InputDecoration(hintText: 'Рекомендации/примечания (необязательно)'),
+        decoration: const InputDecoration(hintText: 'Рекомендации/примечания'),
         controller: _recommendationsNotes,
-        onChanged: (value){
+      ),
+    ) :
+    ListTile(
+      leading: const Icon(Icons.comment),
+      title: Text(_recommendationsNotes.text),
+      subtitle: const Text('Рекомендации/примечания'),
+      trailing: IconButton(
+        icon: const Icon(Icons.edit, color: Colors.blue),
+        onPressed: (){
           setState(() {
+            _isEditRecommendationsNotes = true;
             _isEdit = true;
           });
         },

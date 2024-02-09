@@ -510,6 +510,8 @@ class ConnectToDBMySQL {
         'SELECT id FROM nameEquipment ORDER BY id DESC LIMIT 1');
     var resultPhotosalons = await _connDB!.query(
         'SELECT id FROM Фотосалоны ORDER BY id DESC LIMIT 1');
+    var resultColorsForPhotosalons = await _connDB!.query(
+        'SELECT id FROM colorsForPhotosalons ORDER BY id DESC LIMIT 1');
 
     List list = [];
     list.add(resultTechnics.last);
@@ -520,6 +522,7 @@ class ConnectToDBMySQL {
     list.add(resultStatusForEquipment.last);
     list.add(resultNameEquipment.last);
     list.add(resultPhotosalons.last);
+    list.add(resultColorsForPhotosalons.last);
 
     return list;
   }
@@ -541,6 +544,8 @@ class ConnectToDBMySQL {
         'SELECT COUNT(*) AS countService FROM service');
     var resultStatusForEquipment = await _connDB!.query(
         'SELECT COUNT(*) AS countStatus FROM statusForEquipment');
+    var resultColorsForPhotosalons = await _connDB!.query(
+        'SELECT COUNT(*) AS countColorsForPhotosalons FROM colorsForPhotosalons');
 
     List list = [];
     list.add(resultTechnics.last);
@@ -551,6 +556,7 @@ class ConnectToDBMySQL {
     list.add(resultPhotosalons.last);
     list.add(resultService.last);
     list.add(resultStatusForEquipment.last);
+    list.add(resultColorsForPhotosalons.last);
 
     return list;
   }

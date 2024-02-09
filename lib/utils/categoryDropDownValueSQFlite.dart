@@ -29,6 +29,10 @@ class CategorySQFlite{
     db.rawQuery("CREATE TABLE IF NOT EXISTS statusForEquipment ("
         "id INTEGER, "
         "status TEXT)");
+    db.rawQuery("CREATE TABLE IF NOT EXISTS colorsForPhotosalons ("
+        "id INTEGER, "
+        "photosalon TEXT, "
+        "color TEXT)");
     return db;
   }
 
@@ -63,5 +67,36 @@ class CategorySQFlite{
     return await db.rawQuery('CREATE TABLE IF NOT EXISTS $nameTable ('
         'id INTEGER, '
         '$nameCategory TEXT)');
+  }
+
+  Future<Map<String, int>> getColorsForPhotosalons() async {
+    Database db = await database;
+    List<Map> recs = await db.query('colorsForPhotosalons');
+
+    Map<String, int> map = {};
+    recs.forEach((element) {
+      map[element['photosalon']] = int.parse(element['color']);
+    });
+    return map;
+  }
+
+  Future createColorsForPhotosalons(int id, String key, String value) async {
+    Database db = await database;
+    return await db.rawInsert(
+        'INSERT INTO colorsForPhotosalons ('
+            'id, photosalon, color) '
+            'VALUES (?, ?, ?)',
+        [id, key, value]);
+  }
+
+  Future deleteTableColorsForPhotosalons() async{
+    Database db = await database;
+    return await db.rawQuery('DROP TABLE IF EXISTS colorsForPhotosalons');
+  }
+
+  Future createTableColorsForPhotosalons() async{
+    Database db = await database;
+    return await db.rawQuery('CREATE TABLE IF NOT EXISTS colorsForPhotosalons ('
+        'id INTEGER, photosalon TEXT, color TEXT)');
   }
 }
