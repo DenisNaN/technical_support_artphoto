@@ -20,9 +20,10 @@ class TechnicSQFlite{
     Database db = await openDatabase(path, version: 1, onOpen: (db){},
         onCreate: (Database inDB, int inVersion) async {
           await inDB.execute("CREATE TABLE IF NOT EXISTS equipment ("
-              "id INTEGER, internalID INTEGER, name TEXT, category TEXT,"
+              "id INTEGER, internalID INTEGER, name TEXT, category TEXT, "
               "cost INTEGER, dateBuyTechnic TEXT, status TEXT, dislocation TEXT, "
-              "comment TEXT, dateStartTestDrive TEXT, dateFinishTestDrive TEXT, resultTestDrive TEXT,"
+              "comment TEXT, testDriveDislocation TEXT, dateStartTestDrive TEXT, "
+              "dateFinishTestDrive TEXT, resultTestDrive TEXT, "
               "checkboxTestDrive TEXT, user TEXT)");
         });
     return db;
@@ -42,6 +43,7 @@ class TechnicSQFlite{
         inMap['status'],
         inMap['dislocation'],
         inMap['comment'],
+        inMap['testDriveDislocation'],
         inMap['dateStartTestDrive'],
         inMap['dateFinishTestDrive'],
         inMap['resultTestDrive'],
@@ -64,6 +66,7 @@ class TechnicSQFlite{
     map['status'] = inTechnic.status;
     map['dislocation'] = inTechnic.dislocation;
     map['comment'] = inTechnic.comment;
+    map['testDriveDislocation'] = inTechnic.testDriveDislocation;
     map['dateStartTestDrive'] = inTechnic.dateStartTestDrive;
     map['dateFinishTestDrive'] = inTechnic.dateFinishTestDrive;
     map['resultTestDrive'] = inTechnic.resultTestDrive;
@@ -76,9 +79,10 @@ class TechnicSQFlite{
 
     await db.execute(
         "INSERT INTO equipment (id, internalID, name, category, cost, "
-            "dateBuyTechnic, status, dislocation, comment, dateStartTestDrive, "
-            "dateFinishTestDrive, resultTestDrive, checkboxTestDrive, user) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "dateBuyTechnic, status, dislocation, comment, testDriveDislocation,"
+            " dateStartTestDrive, dateFinishTestDrive, resultTestDrive, "
+            "checkboxTestDrive, user) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           inTechnic.id,
           inTechnic.internalID,
@@ -89,6 +93,7 @@ class TechnicSQFlite{
           inTechnic.status,
           inTechnic.dislocation,
           inTechnic.comment,
+          inTechnic.testDriveDislocation,
           inTechnic.dateStartTestDrive,
           inTechnic.dateFinishTestDrive,
           inTechnic.resultTestDrive,
@@ -133,7 +138,8 @@ class TechnicSQFlite{
     await db.rawQuery("CREATE TABLE IF NOT EXISTS equipment ("
         "id INTEGER, internalID INTEGER, name TEXT, category TEXT,"
         "cost INTEGER, dateBuyTechnic TEXT, status TEXT, dislocation TEXT, "
-        "comment TEXT, dateStartTestDrive TEXT, dateFinishTestDrive TEXT, resultTestDrive TEXT,"
+        "comment TEXT, testDriveDislocation TEXT, dateStartTestDrive TEXT, "
+        "dateFinishTestDrive TEXT, resultTestDrive TEXT,"
         "checkboxTestDrive TEXT, user TEXT)");
   }
 

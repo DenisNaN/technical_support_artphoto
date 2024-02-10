@@ -11,7 +11,6 @@ import '../utils/categoryDropDownValueModel.dart';
 import '../utils/utils.dart';
 import 'Repair.dart';
 
-
 class RepairAddWithTrouble extends StatefulWidget {
   final Trouble trouble;
 
@@ -48,7 +47,8 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
   int indexTechnic = 0;
 
   Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
-      'dislocation', 'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false);
+      'dislocation', 'comment', 'testDriveDislocation', 'dateStartTestDrive',
+      'dateFinishTestDrive', 'resultTestDrive', false);
 
   @override
   void initState() {
@@ -78,26 +78,15 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
                 .toString() == _innerNumberTechnic.text,
                 orElse: () =>
                     Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
-                        'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false));
+                        'comment', 'testDriveDislocation', 'dateStartTestDrive', 'dateFinishTestDrive',
+                        'resultTestDrive', false));
         _nameController.text = technicFind.name;
         _dislocationOld = technicFind.dislocation;
         if (technicFind.id == -1) {
           setState(() {
             _innerNumberTechnic.clear();
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.bolt, size: 40, color: Colors.white),
-                  Text(
-                      'Teхника с этим номером\nв базе не найдена.'),
-                ],
-              ),
-              duration: Duration(seconds: 5),
-              showCloseIcon: true,
-            ),
-          );
+          viewSnackBar('Teхника с этим номером\nв базе не найдена.');
         }
       }
     });
@@ -136,18 +125,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
                   TextButton(
                       onPressed: () {
                         if(_isValidateToSave() == false){
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.bolt, size: 40, color: Colors.white),
-                                  Text('Остались не заполненые поля'),
-                                ],
-                              ),
-                              duration: Duration(seconds: 5),
-                              showCloseIcon: true,
-                            ),
-                          );
+                          viewSnackBar('Остались не заполненые поля');
                         }else{
                           _save();
                         }
@@ -649,20 +627,8 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
     RepairSQFlite.db.create(repair);
     addHistory(repair);
 
+    viewSnackBar(' Техника в ремонт добавлена');
     Navigator.pop(context, repair);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.add_task, size: 40, color: Colors.white),
-            Text(' Техника в ремонт добавлена'),
-          ],
-        ),
-        duration: Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
   }
 
   Future addHistory(Repair repair) async{
@@ -695,7 +661,8 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
             .toString() == _innerNumberTechnic.text,
             orElse: () =>
                 Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
-                    'comment', 'dateStartTestDrive', 'dateFinishTestDrive', 'resultTestDrive', false));
+                    'comment', 'testDriveDislocation', 'dateStartTestDrive', 'dateFinishTestDrive',
+                    'resultTestDrive', false));
     if (technicFind.id == -1) {
       setState(() {
         _isBN = true;
@@ -707,6 +674,21 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
 
   String getFomattedDateForView(String date){
     return DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
+  }
+
+  void viewSnackBar(String text){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.bolt, size: 40, color: Colors.white),
+            Text(text),
+          ],
+        ),
+        duration: const Duration(seconds: 5),
+        showCloseIcon: true,
+      ),
+    );
   }
 }
 

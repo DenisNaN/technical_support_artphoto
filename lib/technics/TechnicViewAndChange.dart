@@ -31,7 +31,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
   String _dateFinishTestDrive = '';
   String _dateFinishTestDriveForSQL = '';
   final _resultTestDrive = TextEditingController();
-  String? _selectedDropdownNameTechnic;
+  String? _selectedDropdownCategory;
   String? _selectedDropdownDislocation;
   String? _selectedDropdownStatus;
   String? _selectedDropdownTestDriveDislocation;
@@ -66,6 +66,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
         widget.technic.status,
         widget.technic.dislocation,
         widget.technic.comment,
+        widget.technic.testDriveDislocation,
         widget.technic.dateStartTestDrive,
         widget.technic.dateFinishTestDrive,
         widget.technic.resultTestDrive,
@@ -73,9 +74,10 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
     _nameTechnic.text = widget.technic.name;
     _costTechnic.text = '${widget.technic.cost}';
-    _selectedDropdownNameTechnic = widget.technic.category == '' ? null : widget.technic.category;
+    _selectedDropdownCategory = widget.technic.category == '' ? null : widget.technic.category;
     _selectedDropdownStatus = widget.technic.status == '' ? null : widget.technic.status;
     _selectedDropdownDislocation = widget.technic.dislocation == '' ? null : widget.technic.dislocation;
+    _selectedDropdownTestDriveDislocation = widget.technic.dislocation == '' ? null : widget.technic.testDriveDislocation;
 
     _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(widget.technic.dateBuyTechnic.replaceAll('.', '-')));
     _dateBuyForSQL = DateFormat('yyyy.MM.dd').format(DateTime.parse(widget.technic.dateBuyTechnic.replaceAll('.', '-')));
@@ -103,6 +105,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     _nameTechnic.dispose();
     _costTechnic.dispose();
     _comment.dispose();
+    _resultTestDrive.dispose();
     super.dispose();
   }
 
@@ -127,34 +130,21 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   const Spacer(),
                   TextButton(
                       onPressed: HasNetwork.isConnecting && _isEdit ? () {
-                        if(_selectedDropdownNameTechnic == null ||
-                            // _nameTechnic.text == "" ||
-                            _costTechnic.text == "" ||
-                            _selectedDropdownStatus == null ||
-                            _selectedDropdownDislocation == null){
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.bolt, size: 40, color: Colors.white),
-                                  Text('Остались не заполненые поля'),
-                                ],
-                              ),
-                              duration: Duration(seconds: 5),
-                              showCloseIcon: true,
-                            ),
-                          );
+                        String validationEmptyFields = validateEmptyFields();
+                        if (validationEmptyFields != '') {
+                          viewSnackBar(validationEmptyFields);
                         }else{
                           Technic technic = Technic(
                               widget.technic.id,
                               widget.technic.internalID,
                               _nameTechnic.text,
-                              _selectedDropdownNameTechnic!,
+                              _selectedDropdownCategory!,
                               int.parse(_costTechnic.text.replaceAll(",", "")),
                               _dateBuyForSQL,
                               _selectedDropdownStatus!,
                               _selectedDropdownDislocation!,
                               _comment.text,
+                              _selectedDropdownTestDriveDislocation ??= '',
                               _dateStartTestDriveForSQL,
                               _dateFinishTestDriveForSQL,
                               _resultTestDrive.text,
@@ -162,20 +152,8 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                           );
 
                           _save(technic);
+                          viewSnackBar(' Изменения внесены');
                           Navigator.pop(context, technic);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.add_task, size: 40, color: Colors.white),
-                                  Text(' Изменения внесены'),
-                                ],
-                              ),
-                              duration: Duration(seconds: 5),
-                              showCloseIcon: true,
-                            ),
-                          );
                         }
                       } : null,
                       child: HasNetwork.isConnecting && _isEdit ?
@@ -227,13 +205,13 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
         borderRadius: BorderRadius.circular(10.0),
         isExpanded: true,
         hint: const Text('Выберите категорию'),
-        icon: _selectedDropdownNameTechnic != null ? IconButton(
+        icon: _selectedDropdownCategory != null ? IconButton(
             icon: const Icon(Icons.clear, color: Colors.grey),
             onPressed: (){
               setState(() {
-                _selectedDropdownNameTechnic = null;
+                _selectedDropdownCategory = null;
               });}) : null,
-        value: _selectedDropdownNameTechnic,
+        value: _selectedDropdownCategory,
         items: CategoryDropDownValueModel.nameEquipment.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
@@ -242,7 +220,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
         }).toList(),
         onChanged: (String? value){
           setState(() {
-            _selectedDropdownNameTechnic = value!;
+            _selectedDropdownCategory = value!;
             _isEditCategory = true;
             if(value == 'Фотоаппарат') {
               _isCategoryPhotocamera = true;
@@ -707,6 +685,16 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
             '  Стало: ${technicNew.comment}';
       }
     }
+    if(technicOld.testDriveDislocation != technicNew.testDriveDislocation){
+      if(technicOld.testDriveDislocation == ''){
+        result = '$result\n Внесено местопроведение тест-драйва: '
+            '${technicNew.testDriveDislocation}';
+      }else {
+        result = '$result\n Местопроведение тест-драйва изменено:\n'
+            '  Было: ${technicOld.testDriveDislocation}\n'
+            '  Стало: ${technicNew.testDriveDislocation}';
+      }
+    }
     if(technicOld.dateStartTestDrive != technicNew.dateStartTestDrive){
       if(technicOld.dateStartTestDrive == ''){
         result = '$result\n Внесена дата начала тест-драйва: '
@@ -752,6 +740,77 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
       return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
     }
     return date;
+  }
+
+  String validateEmptyFields(){
+    String result = '';
+    String tmpResult = '';
+    int countEmptyFields = 0;
+
+    if(_selectedDropdownCategory == null){
+      tmpResult += 'Наименование техники, ';
+      countEmptyFields++;
+    }
+    if(_costTechnic.text == ""){
+      tmpResult += 'Стоимость техники, ';
+      countEmptyFields++;
+    }
+    if(_dateBuyTechnic == ""){
+      tmpResult += 'Дата покупки техники, ';
+      countEmptyFields++;
+    }
+    if(_selectedDropdownStatus == null){
+      tmpResult += 'Статус техники, ';
+      countEmptyFields++;
+    }
+    if(_selectedDropdownDislocation == null){
+      tmpResult += 'Дислокация техники, ';
+      countEmptyFields++;
+    }
+    if(_switchTestDrive &&
+        _selectedDropdownTestDriveDislocation == null){
+      tmpResult += 'Место проведение тест-драйва, ';
+      countEmptyFields++;
+    }
+
+    if(countEmptyFields > 0){
+      tmpResult.trim().replaceFirst(',', '', tmpResult.length-1);
+      result = getFieldAddition(countEmptyFields);
+      result += tmpResult;
+    }
+    return result;
+  }
+
+  String getFieldAddition(int num) {
+    double preLastDigit = num % 100 / 10;
+    if (preLastDigit.round() == 1) {
+      return "Не заполнено $num полей: ";
+    }
+    switch (num % 10) {
+      case 1:
+        return "Не заполнено $num поле: ";
+      case 2:
+      case 3:
+      case 4:
+        return "Не заполнены $num поля: ";
+      default:
+        return "Не заполнено $num полей: ";
+    }
+  }
+
+  void viewSnackBar(String text){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.bolt, size: 40, color: Colors.white),
+            Text(text),
+          ],
+        ),
+        duration: const Duration(seconds: 5),
+        showCloseIcon: true,
+      ),
+    );
   }
 }
 

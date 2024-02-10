@@ -9,7 +9,6 @@ import '../utils/categoryDropDownValueModel.dart';
 import '../utils/utils.dart';
 import 'Technic.dart';
 
-
 class TechnicAdd extends StatefulWidget {
   const TechnicAdd({super.key});
 
@@ -32,6 +31,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   String? _selectedDropdownCategory;
   String? _selectedDropdownDislocation;
   String? _selectedDropdownStatus;
+  String? _selectedDropdownTestDriveDislocation;
   bool _switchTestDrive = false;
   bool _checkboxTestDrive = false;
   bool _isCategoryPhotocamera = false;
@@ -76,16 +76,14 @@ class _TechnicAddState extends State<TechnicAdd> {
                       onPressed: () {
                         // checking the unique number of the equipment
                         if (_formKey.currentState!.validate()) {
-                          if (_innerNumberTechnic.text == "" ||
-                              _selectedDropdownCategory == null ||
-                              _costTechnic.text == "" ||
-                              _selectedDropdownStatus == null ||
-                              _selectedDropdownDislocation == null) {
-                                viewSnackBar('Остались не заполненые поля');
+                          String validationEmptyFields = validateEmptyFields();
+                          if (validationEmptyFields != '') {
+                                viewSnackBar(validationEmptyFields);
                           } else {
                             List tmpListTechnic = Technic.technicList;
                             tmpListTechnic.sort((technic1, technic2) => technic1.id.compareTo(technic2.id));
                             Technic technicLast = Technic.technicList.last;
+
                             Technic technic = Technic(
                                 technicLast.id! + 1,
                                 int.parse(_innerNumberTechnic.text),
@@ -96,6 +94,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                                 _selectedDropdownStatus!,
                                 _selectedDropdownDislocation!,
                                 _comment.text,
+                                _selectedDropdownTestDriveDislocation ??= '',
                                 _dateStartTestDriveForSQL,
                                 _dateFinishTestDriveForSQL,
                                 _resultTestDrive.text,
@@ -375,10 +374,38 @@ class _TechnicAddState extends State<TechnicAdd> {
 
   ListTile _buildTestDriveListTile(){
     return ListTile(
-      // leading: const Icon(Icons.create),
       title: Column(children: [
+        ListTile(
+          leading: const Icon(Icons.airport_shuttle),
+          title: DropdownButton<String>(
+            borderRadius: BorderRadius.circular(10.0),
+            padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+            isExpanded: true,
+            hint: const Text('Место проведения тест-драйва'),
+            icon: _selectedDropdownTestDriveDislocation != null ? IconButton(
+                icon: const Icon(Icons.clear, color: Colors.grey),
+                onPressed: (){
+                  setState(() {
+                    _selectedDropdownTestDriveDislocation = null;
+                  }
+                  );
+                }) : null,
+            value: _selectedDropdownTestDriveDislocation,
+            items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (String? value){
+              setState(() {
+                _selectedDropdownTestDriveDislocation = value!;
+              });
+            },
+          ),
+        ),
       ListTile(
-        contentPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+        contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
         leading: const Icon(Icons.today),
         title: const Text("Дата начала тест-драйва"),
         subtitle: Text(_dateStartTestDrive),
@@ -502,6 +529,66 @@ class _TechnicAddState extends State<TechnicAdd> {
         showCloseIcon: true,
       ),
     );
+  }
+
+  String validateEmptyFields(){
+    String result = '';
+    String tmpResult = '';
+    int countEmptyFields = 0;
+
+    if(_innerNumberTechnic.text == ""){
+      tmpResult += 'Номер техники, ';
+      countEmptyFields++;
+    }
+    if(_selectedDropdownCategory == null){
+      tmpResult += 'Наименование техники, ';
+      countEmptyFields++;
+    }
+    if(_costTechnic.text == ""){
+      tmpResult += 'Стоимость техники, ';
+      countEmptyFields++;
+    }
+    if(_dateBuyTechnic == ""){
+      tmpResult += 'Дата покупки техники, ';
+      countEmptyFields++;
+    }
+    if(_selectedDropdownStatus == null){
+      tmpResult += 'Статус техники, ';
+      countEmptyFields++;
+    }
+    if(_selectedDropdownDislocation == null){
+      tmpResult += 'Дислокация техники, ';
+      countEmptyFields++;
+    }
+    if(_switchTestDrive &&
+        _selectedDropdownTestDriveDislocation == null){
+      tmpResult += 'Место проведение тест-драйва, ';
+      countEmptyFields++;
+    }
+
+    if(countEmptyFields > 0){
+      tmpResult.trim().replaceFirst(',', '', tmpResult.length-1);
+      result = getFieldAddition(countEmptyFields);
+      result += tmpResult;
+    }
+    return result;
+  }
+
+  String getFieldAddition(int num) {
+    double preLastDigit = num % 100 / 10;
+    if (preLastDigit.round() == 1) {
+      return "Не заполнено $num полей: ";
+    }
+    switch (num % 10) {
+      case 1:
+        return "Не заполнено $num поле: ";
+      case 2:
+      case 3:
+      case 4:
+        return "Не заполнены $num поля: ";
+      default:
+        return "Не заполнено $num полей: ";
+    }
   }
 }
 

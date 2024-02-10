@@ -21,10 +21,11 @@ class Technic implements Comparable{
 
   Technic(this.id, this.internalID, this.name, this.category,
       this.cost, this.dateBuyTechnic, this.status, this.dislocation,
-      this.comment, this.dateStartTestDrive, this.dateFinishTestDrive,
-      this.resultTestDrive, this.checkboxTestDrive);
+      this.comment, this.testDriveDislocation, this.dateStartTestDrive,
+      this.dateFinishTestDrive, this.resultTestDrive, this.checkboxTestDrive);
 
-  Technic.testDrive();
+  Technic.testDrive(this.testDriveDislocation, this.dateStartTestDrive,
+      this.dateFinishTestDrive, this.resultTestDrive, this.checkboxTestDrive);
 
   @override
   String toString() {
