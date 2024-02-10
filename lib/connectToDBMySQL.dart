@@ -116,7 +116,7 @@ class ConnectToDBMySQL {
 
       Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
           getDateFormatted(row[5].toString()), row[6] ?? '', row[7] ?? '', row[8],
-          row[9] ?? '', dateStartTestDrive, dateFinishTestDrive, row[11] ?? '', checkTestDrive);
+          row[9] ?? '', dateStartTestDrive, dateFinishTestDrive, row[12] ?? '', checkTestDrive);
       list.add(technic);
     }
     return list;
