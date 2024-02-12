@@ -317,7 +317,6 @@ class ConnectToDBMySQL {
 
     await ConnectToDBMySQL.connDB.connDatabase();
     int id = await findLastTestDriveTechnic(technic);
-    print(id);
     await _connDB!.query(
         'UPDATE testDrive SET testDriveDislocation = ?, dateStart = ?, dateFinish = ?, '
             'result = ?, checkEquipment = ? WHERE id = ?',
