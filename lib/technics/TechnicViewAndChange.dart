@@ -77,7 +77,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     _selectedDropdownCategory = widget.technic.category == '' ? null : widget.technic.category;
     _selectedDropdownStatus = widget.technic.status == '' ? null : widget.technic.status;
     _selectedDropdownDislocation = widget.technic.dislocation == '' ? null : widget.technic.dislocation;
-    _selectedDropdownTestDriveDislocation = widget.technic.dislocation == '' ? null : widget.technic.testDriveDislocation;
+    _selectedDropdownTestDriveDislocation = widget.technic.testDriveDislocation == '' ? null : widget.technic.testDriveDislocation;
 
     _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(widget.technic.dateBuyTechnic.replaceAll('.', '-')));
     _dateBuyForSQL = DateFormat('yyyy.MM.dd').format(DateTime.parse(widget.technic.dateBuyTechnic.replaceAll('.', '-')));
@@ -144,7 +144,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                               _selectedDropdownStatus!,
                               _selectedDropdownDislocation!,
                               _comment.text,
-                              _selectedDropdownTestDriveDislocation ??= '',
+                              _selectedDropdownTestDriveDislocation ?? '',
                               _dateStartTestDriveForSQL,
                               _dateFinishTestDriveForSQL,
                               _resultTestDrive.text,
@@ -512,6 +512,34 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
       title: Column(children: [
         ListTile(
           contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+          leading: const Icon(Icons.airport_shuttle),
+          title: DropdownButton<String>(
+            isExpanded: true,
+            hint: const Text('Место тест-драйва'),
+            icon: _selectedDropdownTestDriveDislocation != null ? IconButton(
+                icon: const Icon(Icons.clear, color: Colors.grey),
+                onPressed: (){
+                  setState(() {
+                    _selectedDropdownTestDriveDislocation = null;
+                  }
+                  );
+                }) : null,
+            value: _selectedDropdownTestDriveDislocation,
+            items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (String? value){
+              setState(() {
+                _selectedDropdownTestDriveDislocation = value!;
+              });
+            },
+          ),
+        ),
+        ListTile(
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
           leading: const Icon(Icons.today),
           title: const Text("Дата начала тест-драйва"),
           subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateStartTestDriveForSQL.replaceAll('.', '-')))),
@@ -769,14 +797,14 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     }
     if(_switchTestDrive &&
         _selectedDropdownTestDriveDislocation == null){
-      tmpResult += 'Место проведение тест-драйва, ';
+      tmpResult += 'Место тест-драйва, ';
       countEmptyFields++;
     }
 
     if(countEmptyFields > 0){
-      tmpResult.trim().replaceFirst(',', '', tmpResult.length-1);
+      tmpResult = tmpResult.trim().replaceFirst(',', '', tmpResult.length-5);
       result = getFieldAddition(countEmptyFields);
-      result += tmpResult;
+      result += '${tmpResult}.';
     }
     return result;
   }

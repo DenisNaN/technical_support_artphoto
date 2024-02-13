@@ -17,14 +17,16 @@ class Technic implements Comparable{
   String dateFinishTestDrive = '';
   String resultTestDrive = '';
   bool checkboxTestDrive = false;
+  String userTestDrive = '';
 
   Technic(this.id, this.internalID, this.name, this.category,
       this.cost, this.dateBuyTechnic, this.status, this.dislocation,
       this.comment, this.testDriveDislocation, this.dateStartTestDrive,
       this.dateFinishTestDrive, this.resultTestDrive, this.checkboxTestDrive);
 
-  Technic.testDrive(this.testDriveDislocation, this.dateStartTestDrive,
-      this.dateFinishTestDrive, this.resultTestDrive, this.checkboxTestDrive);
+  Technic.testDrive(this.internalID, this.category, this.testDriveDislocation,
+      this.dateStartTestDrive, this.dateFinishTestDrive, this.resultTestDrive,
+      this.checkboxTestDrive, this.userTestDrive);
 
   @override
   String toString() {

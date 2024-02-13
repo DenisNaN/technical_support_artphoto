@@ -376,12 +376,11 @@ class _TechnicAddState extends State<TechnicAdd> {
     return ListTile(
       title: Column(children: [
         ListTile(
+          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
           leading: const Icon(Icons.airport_shuttle),
           title: DropdownButton<String>(
-            borderRadius: BorderRadius.circular(10.0),
-            padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
             isExpanded: true,
-            hint: const Text('Место проведения тест-драйва'),
+            hint: const Text('Место тест-драйва'),
             icon: _selectedDropdownTestDriveDislocation != null ? IconButton(
                 icon: const Icon(Icons.clear, color: Colors.grey),
                 onPressed: (){
@@ -520,9 +519,10 @@ class _TechnicAddState extends State<TechnicAdd> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
+          mainAxisSize: MainAxisSize.max,
           children: [
             const Icon(Icons.bolt, size: 40, color: Colors.white),
-            Text(text),
+            Flexible(child: Text(text)),
           ],
         ),
         duration: const Duration(seconds: 5),
@@ -562,14 +562,14 @@ class _TechnicAddState extends State<TechnicAdd> {
     }
     if(_switchTestDrive &&
         _selectedDropdownTestDriveDislocation == null){
-      tmpResult += 'Место проведение тест-драйва, ';
+      tmpResult += 'Место тест-драйва, ';
       countEmptyFields++;
     }
 
     if(countEmptyFields > 0){
-      tmpResult.trim().replaceFirst(',', '', tmpResult.length-1);
+      tmpResult = tmpResult.trim().replaceFirst(',', '', tmpResult.length-5);
       result = getFieldAddition(countEmptyFields);
-      result += tmpResult;
+      result += '${tmpResult}.';
     }
     return result;
   }

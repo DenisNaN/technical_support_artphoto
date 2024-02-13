@@ -44,6 +44,8 @@ class _TechnicsListState extends State<TechnicsList> {
             String dateStart = _dateStart(index);
             Color color = _getTileColor(index);
             String nameTechnic = _nameTechnic(index);
+            List testDriveList = _getListTestDrive(Technic.technicList[index]);
+
             return Material(
                 child: ListTile(
                   tileColor: color,
@@ -60,28 +62,31 @@ class _TechnicsListState extends State<TechnicsList> {
                     TextSpan(text: '${Technic.technicList[index].category}. ', style: const TextStyle(fontWeight: FontWeight.bold), ),
                     TextSpan(text: nameTechnic)
                   ])),
-                  subtitle: dateStart != '' ? _buildTextWithTestDrive(context, index) : _buildTextWithoutTestDrive(context, index),
+                  subtitle: dateStart != '' ?
+                    _buildTextWithTestDrive(context, index, testDriveList) :
+                    _buildTextWithoutTestDrive(context, index, testDriveList),
                 ));
           },
         )
     );
   }
 
-  Text _buildTextWithoutTestDrive(BuildContext context, int index){
+  Text _buildTextWithoutTestDrive(BuildContext context, int index, List testDriveList){
     int totalSumRepairs = _getTotalSumRepairs(index);
     Color color = const Color(0xff000000);
     return Text.rich(TextSpan(children: [
       TextSpan(text: '${Technic.technicList[index].dislocation}.',
         style: TextStyle(fontWeight: FontWeight.bold, color: color)),
-      TextSpan(text: ' Статус: ${Technic.technicList[index].status}\n'
-          'Тест-драйв не проводился\n'),
+      testDriveList.isEmpty ? TextSpan(text: ' Статус: ${Technic.technicList[index].status}\n'
+          'Тест-драйв не проводился\n') : TextSpan(text: ' Статус: ${Technic.technicList[index].status}\n'
+          'Кол-во тест-драйвов: ${testDriveList.length}\n'),
       TextSpan(text: totalSumRepairs != 0 ? 'Итоговая сумма ремонта: $totalSumRepairs р.' :
       'Ремонт не проводился'),
       ])
     );
   }
 
-  Text _buildTextWithTestDrive(BuildContext context, int index){
+  Text _buildTextWithTestDrive(BuildContext context, int index, List testDriveList){
     DateTime dateStart = DateTime.parse(Technic.technicList[index].dateStartTestDrive.replaceAll('.', '-'));
     DateTime dateFinish;
     DateTime dateNow;
@@ -129,8 +134,9 @@ class _TechnicsListState extends State<TechnicsList> {
               TextSpan(children:[
                 TextSpan(text: 'Дата тест-драйва: $formatedStartDate.\n'),
                 TextSpan(text: Technic.technicList[index].checkboxTestDrive ? 'Тест-драйв завершен' : 'Тест-драйв не завершен',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Technic.technicList[index].checkboxTestDrive ? Colors.green : Colors.blue)
-                )
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Technic.technicList[index].checkboxTestDrive ?
+                          Colors.green : Colors.blue)),
+                TextSpan(text: 'Кол-во тест-драйвов: ${testDriveList.length}')
               ]
               ),
               TextSpan(text: totalSumRepairs != 0 ? '\nИтоговая сумма ремонта: $totalSumRepairs р.' :
@@ -192,6 +198,16 @@ class _TechnicsListState extends State<TechnicsList> {
       }
     }
     return totalSumRepairs;
+  }
+
+  List _getListTestDrive(Technic technic){
+    List list = [];
+    for(var element in Technic.testDriveList){
+      if(technic.id == element.internalID){
+        list.add(element);
+      }
+    }
+    return list;
   }
 }
 

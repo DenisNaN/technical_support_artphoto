@@ -122,6 +122,28 @@ class ConnectToDBMySQL {
     return list;
   }
 
+  Future<List> getAllTestDrive() async {
+    List list = [];
+    var result = await _connDB!.query('SELECT * FROM testDrive');
+    // id-row[0], idEquipment-row[1],  category-row[2],  testDriveDislocation-row[3],
+    // dateStart-row[4], dateFinish-row[5], result-row[6], checkEquipment-row[7], user-row[8]
+
+    for(var row in result){
+      String dateStartTestDrive = '';
+      if(row[4] != null && row[4].toString() != "-0001-11-30 00:00:00.000Z") dateStartTestDrive = getDateFormatted(row[4].toString());
+      String dateFinishTestDrive = '';
+      if(row[5] != null && row[5].toString() != "-0001-11-30 00:00:00.000Z") dateFinishTestDrive = getDateFormatted(row[5].toString());
+      bool checkTestDrive = false;
+      if(row[7] != null && row[7] == 1) checkTestDrive = true;
+      
+      Technic testDriveTechnic = Technic.testDrive(
+          row[1], row[2], row[3], dateStartTestDrive, dateFinishTestDrive,
+          row[6], checkTestDrive, row[8]);
+      list.add(testDriveTechnic);
+    }
+    return list;
+  }
+
   Future<List> getAllRepair() async{
     var result = await _connDB!.query('SELECT '
         'repairEquipment.id, '
