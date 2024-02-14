@@ -33,10 +33,21 @@ class _RepairListState extends State<RepairList> {
             Repair repair = Repair.repairList[index];
             Color tileColor = getColorForList(repair);
 
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+            return Container(
+              margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: tileColor,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 4,
+                      offset: Offset(2, 4), // Shadow position
+                    ),
+                  ]
+              ),
+              padding: const EdgeInsets.fromLTRB(3, 3, 3, 3),
               child: ListTile(
-                tileColor: tileColor,
                   onTap: () {
                     Navigator.push(context, MaterialPageRoute(
                         builder: (context) => RepairViewAndChange(repair: repair))).then((value) {
@@ -45,7 +56,6 @@ class _RepairListState extends State<RepairList> {
                       });
                     });
                   },
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                   title: _buildTextTitle(context, index),
                   subtitle: _buildTextSubtitle(context, index),
                   shape: RoundedRectangleBorder(

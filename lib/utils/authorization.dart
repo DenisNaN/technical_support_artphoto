@@ -22,6 +22,14 @@ class _LoginState extends State<Login> {
     String? version = utils.packageInfo?.version;
     return Scaffold(
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+                colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
+          ),
+        ),
         title: Row(children: [
           Text('v. $version', style: const TextStyle(fontSize: 12, color: Colors.white)),
           const Expanded(child:

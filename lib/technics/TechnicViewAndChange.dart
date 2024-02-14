@@ -546,10 +546,9 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
               colors: [Colors.lightBlueAccent, Colors.purpleAccent],
               begin: Alignment.bottomLeft,
               end: Alignment.topRight,
-              // stops: [0.4, 0.7],
               tileMode: TileMode.repeated,
             ),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
                 color: Colors.grey,
                 blurRadius: 4,
