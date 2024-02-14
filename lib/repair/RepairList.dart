@@ -28,7 +28,6 @@ class _RepairListState extends State<RepairList> {
             child: const Icon(Icons.add, color: Colors.white)),
         body: ListView.builder(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          // separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: Repair.repairList.length,
           itemBuilder: (context, index) {
             Repair repair = Repair.repairList[index];
@@ -50,8 +49,7 @@ class _RepairListState extends State<RepairList> {
                   title: _buildTextTitle(context, index),
                   subtitle: _buildTextSubtitle(context, index),
                   shape: RoundedRectangleBorder(
-                  // side: const BorderSide(width: 2),
-                  borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20),
                 ),
               ),
             );

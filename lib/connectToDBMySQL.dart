@@ -21,7 +21,7 @@ class ConnectToDBMySQL {
     MySqlConnection connDB = await MySqlConnection.connect(ConnectionSettings(
         // host: '', port: , user: '', db: '', password: '')) ;
         return connDB;
-    }
+  }
 
   Future<List> getAllTechnics() async{
     var result = await _connDB!.query('SELECT '

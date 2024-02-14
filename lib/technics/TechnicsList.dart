@@ -115,7 +115,6 @@ class _TechnicsListState extends State<TechnicsList> {
                   'Статус: ${Technic.technicList[index].status}\n'),
               isHaveFinishDate ?
               TextSpan(children: [
-                TextSpan(text: 'Итоговая сумма ремонта: $totalSumRepairs р.\n'),
                 TextSpan(text:
                   'Начало тест-драйва: $formatedStartDate.\n'
                   'Конец тест-драйва: $formatedFinishDate.\n'),
@@ -136,9 +135,8 @@ class _TechnicsListState extends State<TechnicsList> {
                 TextSpan(text: Technic.technicList[index].checkboxTestDrive ? 'Тест-драйв завершен' : 'Тест-драйв не завершен',
                         style: TextStyle(fontWeight: FontWeight.bold, color: Technic.technicList[index].checkboxTestDrive ?
                           Colors.green : Colors.blue)),
-                TextSpan(text: 'Кол-во тест-драйвов: ${testDriveList.length}')
-              ]
-              ),
+                // TextSpan(text: 'Кол-во тест-драйвов: ${testDriveList.length}')
+              ]),
               TextSpan(text: totalSumRepairs != 0 ? '\nИтоговая сумма ремонта: $totalSumRepairs р.' :
               '\nРемонт не проводился')
             ]
