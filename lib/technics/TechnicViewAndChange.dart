@@ -115,6 +115,14 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     _isEdit = validateButtonSaveView();
     return Scaffold(
         appBar: AppBar(
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
+            ),
+          ),
           title: const Text('Внесение изменений в технику'),
         ),
         bottomNavigationBar: Padding(
@@ -532,13 +540,22 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
       child: Container(
         decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 2),
-            boxShadow: [BoxShadow(
-              color: Colors.grey,
-              // borderRadius: BorderRadius.all(Radius.circular(5.0)),
-              blurRadius: 5.0,
-              offset: const Offset(1.0, 5.0),
-            )]),
+            color: Colors.teal,
+            borderRadius: BorderRadius.circular(20),
+            gradient: const LinearGradient(
+              colors: [Colors.lightBlueAccent, Colors.purpleAccent],
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
+              // stops: [0.4, 0.7],
+              tileMode: TileMode.repeated,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey,
+                blurRadius: 4,
+                offset: Offset(2, 4), // Shadow position
+              ),
+            ]),
         child: ListTile(
           title: Column(children: [
             ListTile(

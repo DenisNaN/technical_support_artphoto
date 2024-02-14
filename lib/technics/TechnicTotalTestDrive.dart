@@ -17,7 +17,8 @@ class _TechnicTotalTestDriveState extends State<TechnicTotalTestDrive> {
     List listTotalTestDrive = getListTotalTestDrive(widget.technicId);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Тест-драйв техники №${widget.technicinternalID}')),
+      appBar: AppBar(
+          title: Text('Тест-драйв техники №${widget.technicinternalID}')),
       body: ListView.builder(
           itemCount: listTotalTestDrive.length,
           itemBuilder: (context, index){

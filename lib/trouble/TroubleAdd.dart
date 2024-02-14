@@ -93,6 +93,14 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
+            ),
+          ),
           title: const Text('Добавление неисправности'),
         ),
         bottomNavigationBar: Padding(

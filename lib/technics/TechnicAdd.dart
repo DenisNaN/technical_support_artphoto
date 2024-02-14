@@ -58,6 +58,14 @@ class _TechnicAddState extends State<TechnicAdd> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
+            ),
+          ),
           title: const Text('Добавление техники'),
         ),
         bottomNavigationBar: Padding(

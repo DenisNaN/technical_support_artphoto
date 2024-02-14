@@ -33,6 +33,8 @@ class SplashScreenArtphoto extends StatelessWidget {
         ],
         theme: ThemeData(
           useMaterial3: false,
+          // appBarTheme: AppBarTheme(
+          //     backgroundColor: Colors.purple)
         ),
         home: const SplashScreen()
     );
@@ -73,6 +75,14 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
         length: 4,
         child: Scaffold(
           appBar: AppBar(
+              flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.bottomLeft,
+                      end: Alignment.topRight,
+                      colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
+                ),
+              ),
             title: Center(child: Text(LoginPassword.login)),
             bottom: TabBar(
               controller: _tabController,
