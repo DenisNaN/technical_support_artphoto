@@ -112,17 +112,11 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
 
   @override
   Widget build(BuildContext context) {
+    ColorAppBar colorAppBar = ColorAppBar();
     _isEdit = validateButtonSaveView();
     return Scaffold(
         appBar: AppBar(
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.bottomLeft,
-                  end: Alignment.topRight,
-                  colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
-            ),
-          ),
+          flexibleSpace: colorAppBar.color(),
           title: const Text('Внесение изменений в технику'),
         ),
         bottomNavigationBar: Padding(
@@ -540,14 +534,14 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
       child: Container(
         decoration: BoxDecoration(
-            color: Colors.teal,
+            color: Colors.blue.shade50,
             borderRadius: BorderRadius.circular(20),
-            gradient: const LinearGradient(
-              colors: [Colors.lightBlueAccent, Colors.purpleAccent],
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-              tileMode: TileMode.repeated,
-            ),
+            // gradient: const LinearGradient(
+            //   colors: [Colors.lightBlueAccent, Colors.purpleAccent],
+            //   begin: Alignment.bottomLeft,
+            //   end: Alignment.topRight,
+            //   tileMode: TileMode.repeated,
+            // ),
             boxShadow: const [
               BoxShadow(
                 color: Colors.grey,

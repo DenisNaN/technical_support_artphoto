@@ -34,27 +34,41 @@ class _TroubleListState extends State<TroubleList> {
             } : null,
             child: const Icon(Icons.add, color: Colors.white)
         ),
-        body: ListView.separated(
-          separatorBuilder: (BuildContext context, int index) => const Divider(),
+        body: ListView.builder(
+          // separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: troubleList.length,
           itemBuilder: (context, index) {
             bool isDoneTrouble = isFieldFilled(troubleList[index]);
-            return ListTile(
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => TroubleViewAndChange(trouble: troubleList[index]))).then((value){
-                  setState(() {
-                    if(value != null) {
-                      int tmpIndex = findIndexTouble(value);
-                      Trouble.troubleList[tmpIndex] = value;
-                      troubleList.clear();
-                      troubleList = _getListSortTrouble();
-                    }
+            return Container(
+              margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey, width: 0.5),
+                  borderRadius: BorderRadius.circular(10),
+                  color: isDoneTrouble ? Colors.lightGreenAccent : Colors.white,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 4,
+                      offset: Offset(2, 4), // Shadow position
+                    ),
+                  ]
+              ),
+              child: ListTile(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => TroubleViewAndChange(trouble: troubleList[index]))).then((value){
+                    setState(() {
+                      if(value != null) {
+                        int tmpIndex = findIndexTouble(value);
+                        Trouble.troubleList[tmpIndex] = value;
+                        troubleList.clear();
+                        troubleList = _getListSortTrouble();
+                      }
+                    });
                   });
-                });
-              },
-              tileColor: isDoneTrouble ? Colors.lightGreenAccent : null,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-              title: _buildTitleListTile(context, index, troubleList)
+                },
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                title: _buildTitleListTile(context, index, troubleList)
+              ),
             );
           },
         )

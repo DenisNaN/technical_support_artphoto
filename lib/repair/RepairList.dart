@@ -131,7 +131,7 @@ class _RepairListState extends State<RepairList> {
     String resultColor = fieldsFilled(repair);
     switch(resultColor){
       case 'red':
-        color = Colors.red.shade100;
+        color = Colors.deepOrangeAccent.shade100;
         break;
       case 'yellow':
         color = Colors.yellow.shade100;

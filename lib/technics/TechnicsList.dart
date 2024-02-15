@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import '../repair/Repair.dart';
 import '../utils/categoryDropDownValueModel.dart';
@@ -27,6 +25,7 @@ class _TechnicsListState extends State<TechnicsList> {
 
   @override
   Widget build(BuildContext context) {
+    int indexForCheck = 0;
     return Scaffold (
         floatingActionButton: FloatingActionButton(
             backgroundColor: HasNetwork.isConnecting ? Colors.blue : Colors.grey,
@@ -46,25 +45,36 @@ class _TechnicsListState extends State<TechnicsList> {
             String nameTechnic = _nameTechnic(index);
             List testDriveList = _getListTestDrive(Technic.technicList[index]);
 
+            if(indexForCheck == Technic.technicList.length - 1) indexForCheck = 0;
+            indexForCheck++;
+
             return Material(
-                child: ListTile(
-                  tileColor: color,
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index]))).then((value){
-                        setState(() {
-                          if(value != null) Technic.technicList[index] = value;
-                        });
-                      });
-                  },
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                  title: Text.rich(TextSpan(children: [
-                    TextSpan(text: '№ ${Technic.technicList[index].internalID} '),
-                    TextSpan(text: '${Technic.technicList[index].category}. ', style: const TextStyle(fontWeight: FontWeight.bold), ),
-                    TextSpan(text: nameTechnic)
-                  ])),
-                  subtitle: dateStart != '' ?
-                    _buildTextWithTestDrive(context, index, testDriveList) :
-                    _buildTextWithoutTestDrive(context, index, testDriveList),
+                child: Column(
+                  children: [
+                    Technic.technicList[index].dislocation ==
+                        Technic.technicList[indexForCheck].dislocation ?
+                          const SizedBox() :
+                            Text('${Technic.technicList[index].dislocation}'),
+                    ListTile(
+                      tileColor: color,
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index]))).then((value){
+                            setState(() {
+                              if(value != null) Technic.technicList[index] = value;
+                            });
+                          });
+                      },
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                      title: Text.rich(TextSpan(children: [
+                        TextSpan(text: '№ ${Technic.technicList[index].internalID} '),
+                        TextSpan(text: '${Technic.technicList[index].category}. ', style: const TextStyle(fontWeight: FontWeight.bold), ),
+                        TextSpan(text: nameTechnic)
+                      ])),
+                      subtitle: dateStart != '' ?
+                        _buildTextWithTestDrive(context, index, testDriveList) :
+                        _buildTextWithoutTestDrive(context, index, testDriveList),
+                    ),
+                  ],
                 ));
           },
         )
@@ -72,16 +82,14 @@ class _TechnicsListState extends State<TechnicsList> {
   }
 
   Text _buildTextWithoutTestDrive(BuildContext context, int index, List testDriveList){
-    int totalSumRepairs = _getTotalSumRepairs(index);
     Color color = const Color(0xff000000);
     return Text.rich(TextSpan(children: [
       TextSpan(text: '${Technic.technicList[index].dislocation}.',
         style: TextStyle(fontWeight: FontWeight.bold, color: color)),
       testDriveList.isEmpty ? TextSpan(text: ' Статус: ${Technic.technicList[index].status}\n'
-          'Тест-драйв не проводился\n') : TextSpan(text: ' Статус: ${Technic.technicList[index].status}\n'
-          'Кол-во тест-драйвов: ${testDriveList.length}\n'),
-      TextSpan(text: totalSumRepairs != 0 ? 'Итоговая сумма ремонта: $totalSumRepairs р.' :
-      'Ремонт не проводился'),
+          'Тест-драйв не проводился') : TextSpan(text: ' Статус: ${Technic.technicList[index].status}\n'
+          'Кол-во тест-драйвов: ${testDriveList.length}'),
+      getTotalSumRepairs(index)
       ])
     );
   }
@@ -94,7 +102,6 @@ class _TechnicsListState extends State<TechnicsList> {
     String formatedFinishDate = '';
     Duration duration = const Duration(days: 0);
     bool isHaveFinishDate = false;
-    int totalSumRepairs = _getTotalSumRepairs(index);
     Color color = const Color(0xff000000);
 
     if(Technic.technicList[index].dateFinishTestDrive != ''){
@@ -135,13 +142,17 @@ class _TechnicsListState extends State<TechnicsList> {
                 TextSpan(text: Technic.technicList[index].checkboxTestDrive ? 'Тест-драйв завершен' : 'Тест-драйв не завершен',
                         style: TextStyle(fontWeight: FontWeight.bold, color: Technic.technicList[index].checkboxTestDrive ?
                           Colors.green : Colors.blue)),
-                // TextSpan(text: 'Кол-во тест-драйвов: ${testDriveList.length}')
               ]),
-              TextSpan(text: totalSumRepairs != 0 ? '\nИтоговая сумма ремонта: $totalSumRepairs р.' :
-              '\nРемонт не проводился')
+              getTotalSumRepairs(index)
             ]
         )
     );
+  }
+
+  TextSpan getTotalSumRepairs(int index){
+    int totalSumRepairs = _getTotalSumRepairs(index);
+    return TextSpan(text: totalSumRepairs != 0 ? '\nИтоговая сумма ремонта: $totalSumRepairs р.' :
+    '\nРемонт не проводился');
   }
 
   String getDayAddition(int num) {

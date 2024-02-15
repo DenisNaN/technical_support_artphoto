@@ -15,7 +15,6 @@ class _TechnicTotalTestDriveState extends State<TechnicTotalTestDrive> {
   @override
   Widget build(BuildContext context) {
     List listTotalTestDrive = getListTotalTestDrive(widget.technicId);
-
     return Scaffold(
       appBar: AppBar(
           title: Text('Тест-драйв техники №${widget.technicinternalID}')),
@@ -24,10 +23,24 @@ class _TechnicTotalTestDriveState extends State<TechnicTotalTestDrive> {
           itemBuilder: (context, index){
             Technic? technicTectDrive = listTotalTestDrive[index];
             bool isDoneTestDrive = isFinishTestDrive(technicTectDrive);
-            return ListTile(
-              title: _buildText(context, technicTectDrive),
-              tileColor: isDoneTestDrive ? Colors.lightGreenAccent : null,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20)
+            return Container(
+              margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey, width: 0.5),
+                  borderRadius: BorderRadius.circular(10),
+                  color: isDoneTestDrive ? Colors.lightGreenAccent : Colors.white,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 4,
+                      offset: Offset(2, 4), // Shadow position
+                    ),
+                  ]
+              ),
+              child: ListTile(
+                title: _buildText(context, technicTectDrive),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20)
+              ),
             );
           }
       ),
@@ -53,12 +66,11 @@ class _TechnicTotalTestDriveState extends State<TechnicTotalTestDrive> {
 
   List getListTotalTestDrive(int TechnicId){
     List totalTestDrive = [];
-    // int index = 0;
-    Technic.testDriveList.forEach((element) {
-      if(element.internalID == TechnicId){
-        totalTestDrive.add(element);
+    for(int i = Technic.testDriveList.length - 1; i >= 0; i--){
+      if(Technic.testDriveList[i].internalID == TechnicId){
+        totalTestDrive.add(Technic.testDriveList[i]);
       }
-    });
+    }
     return totalTestDrive;
   }
 

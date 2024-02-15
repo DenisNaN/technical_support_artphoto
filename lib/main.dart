@@ -71,18 +71,12 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    ColorAppBar colorAppBar = ColorAppBar();
     return DefaultTabController(
         length: 4,
         child: Scaffold(
           appBar: AppBar(
-              flexibleSpace: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.bottomLeft,
-                      end: Alignment.topRight,
-                      colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
-                ),
-              ),
+              flexibleSpace: colorAppBar.color(),
             title: Center(child: Text(LoginPassword.login)),
             bottom: TabBar(
               controller: _tabController,

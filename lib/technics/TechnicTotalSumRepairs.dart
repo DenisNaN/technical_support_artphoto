@@ -27,24 +27,37 @@ class _TechnicTotalSumRepairsState extends State<TechnicTotalSumRepairs> {
             Repair? repair = _getRepair(index);
             _getTotalSumRepairsIndex(repair!.internalID!);
             bool isDoneRepair = isAllFieldsFilled(repair);
-            return ListTile(
-              title: _buildText(context, index),
-              tileColor: isDoneRepair ? Colors.lightGreenAccent : null,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-              onTap: (){
-                Navigator.push(
-                    context, MaterialPageRoute(
-                    builder: (context) => RepairViewAndChange(repair: repair))).then((value) {
-                  setState(() {
-                    if (value != null) {
-                      Repair.repairList[indexRepairList] = value;
-                      Repair.totalSumRepairs[indexTotalSumRepairs] = TotalSumRepairs(value.id, value.internalID, value.costService);
-                      // Repair.totalSumRepairs[indexTotalSumRepairs] = TotalSumRepairs(idRepair, idTechnic, sumRepair)value;
-                      listTotalSumRepair[index] = value;
-                    }
+            return Container(
+              margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey, width: 0.5),
+                  borderRadius: BorderRadius.circular(10),
+                  color: isDoneRepair ? Colors.lightGreenAccent : Colors.white,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 4,
+                      offset: Offset(2, 4), // Shadow position
+                    ),
+                  ]
+              ),
+              child: ListTile(
+                title: _buildText(context, index),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                onTap: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(
+                      builder: (context) => RepairViewAndChange(repair: repair))).then((value) {
+                    setState(() {
+                      if (value != null) {
+                        Repair.repairList[indexRepairList] = value;
+                        Repair.totalSumRepairs[indexTotalSumRepairs] = TotalSumRepairs(value.id, value.internalID, value.costService);
+                        listTotalSumRepair[index] = value;
+                      }
+                    });
                   });
-                });
-              },
+                },
+              ),
             );
           }
       ),

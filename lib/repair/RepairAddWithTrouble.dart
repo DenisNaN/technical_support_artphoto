@@ -105,17 +105,10 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
 
   @override
   Widget build(BuildContext context) {
+    ColorAppBar colorAppBar = ColorAppBar();
     return Scaffold(
-
         appBar: AppBar(
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.bottomLeft,
-                  end: Alignment.topRight,
-                  colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
-            ),
-          ),
+          flexibleSpace: colorAppBar.color(),
           title: const Text('Создание заявки на ремонт'),
         ),
         bottomNavigationBar: Padding(

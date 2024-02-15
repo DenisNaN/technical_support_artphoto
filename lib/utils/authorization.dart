@@ -19,17 +19,11 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    ColorAppBar colorAppBar = ColorAppBar();
     String? version = utils.packageInfo?.version;
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
-                colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
-          ),
-        ),
+        flexibleSpace: colorAppBar.color(),
         title: Row(children: [
           Text('v. $version', style: const TextStyle(fontSize: 12, color: Colors.white)),
           const Expanded(child:
