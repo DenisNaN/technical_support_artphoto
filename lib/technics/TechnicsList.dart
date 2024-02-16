@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_group_list_view/flutter_group_list_view.dart';
 import '../repair/Repair.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import 'Technic.dart';
@@ -16,16 +17,29 @@ class TechnicsList extends StatefulWidget {
 
 class _TechnicsListState extends State<TechnicsList> {
   Map<String, int> colorForTechnic = {};
+  Map<String, int> headerGroup = {};
 
   @override
   void initState() {
     super.initState();
     colorForTechnic.addAll(CategoryDropDownValueModel.colorForEquipment);
+
+    CategoryDropDownValueModel.photosalons.sort();
+    for(String photosalon in CategoryDropDownValueModel.photosalons){
+      headerGroup[photosalon] = -1;
+    }
+    int i = 0;
+    for(Technic technic in Technic.technicList){
+      headerGroup[technic.dislocation] = i++;
+    }
+
+    for(final element in headerGroup.entries){
+
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    int indexForCheck = 0;
     return Scaffold (
         floatingActionButton: FloatingActionButton(
             backgroundColor: HasNetwork.isConnecting ? Colors.blue : Colors.grey,
@@ -37,7 +51,8 @@ class _TechnicsListState extends State<TechnicsList> {
             } : null,
             child: const Icon(Icons.add, color: Colors.white)
             ),
-        body: ListView.builder(
+        body:
+        ListView.builder(
           itemCount: Technic.technicList.length,
           itemBuilder: (context, index) {
             String dateStart = _dateStart(index);
@@ -45,16 +60,11 @@ class _TechnicsListState extends State<TechnicsList> {
             String nameTechnic = _nameTechnic(index);
             List testDriveList = _getListTestDrive(Technic.technicList[index]);
 
-            if(indexForCheck == Technic.technicList.length - 1) indexForCheck = 0;
-            indexForCheck++;
-
             return Material(
                 child: Column(
                   children: [
-                    Technic.technicList[index].dislocation ==
-                        Technic.technicList[indexForCheck].dislocation ?
-                          const SizedBox() :
-                            Text('${Technic.technicList[index].dislocation}'),
+                    // Technic.technicList[index].dislocation == Technic.technicList[indexForCheck].dislocation ?
+                    //       const SizedBox() : Text('${Technic.technicList[index].dislocation}'),
                     ListTile(
                       tileColor: color,
                       onTap: (){
