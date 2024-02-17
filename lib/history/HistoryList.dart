@@ -20,36 +20,47 @@ class _HistoryListState extends State<HistoryList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold (
-        body: ListView.separated(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          separatorBuilder: (BuildContext context, int index) => const Divider(),
+        body: ListView.builder(
           itemCount: History.historyList.length,
           itemBuilder: (context, index) {
-            return ListTile(
-                onTap: () {
-                  switch(History.historyList[index].section){
-                    case 'Technic':
-                      Technic technicFind = Technic.technicList.firstWhere((item) => item.id == History.historyList[index].idSection);
-                      Navigator.push(
-                          context, MaterialPageRoute(
-                          builder: (context) => TechnicViewAndChange(technic: technicFind)));
-                      break;
-                    case 'Repair':
-                      Repair repairFind = Repair.repairList.firstWhere((item) => item.id == History.historyList[index].idSection);
-                      Navigator.push(
-                          context, MaterialPageRoute(
-                          builder: (context) => RepairViewAndChange(repair: repairFind)));
-                      break;
-                    case 'Trouble':
-                      Trouble troubleFind = Trouble.troubleList.firstWhere((item) => item.id == History.historyList[index].idSection);
-                      Navigator.push(
-                          context, MaterialPageRoute(
-                          builder: (context) => TroubleViewAndChange(trouble: troubleFind)));
-                      break;
-                  }
-                },
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                title: _buildText(context, index)
+            return Container(
+              margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 4,
+                      offset: Offset(2, 4), // Shadow position
+                    ),
+                  ]
+              ),
+              child: ListTile(
+                  onTap: () {
+                    switch(History.historyList[index].section){
+                      case 'Technic':
+                        Technic technicFind = Technic.technicList.firstWhere((item) => item.id == History.historyList[index].idSection);
+                        Navigator.push(
+                            context, MaterialPageRoute(
+                            builder: (context) => TechnicViewAndChange(technic: technicFind)));
+                        break;
+                      case 'Repair':
+                        Repair repairFind = Repair.repairList.firstWhere((item) => item.id == History.historyList[index].idSection);
+                        Navigator.push(
+                            context, MaterialPageRoute(
+                            builder: (context) => RepairViewAndChange(repair: repairFind)));
+                        break;
+                      case 'Trouble':
+                        Trouble troubleFind = Trouble.troubleList.firstWhere((item) => item.id == History.historyList[index].idSection);
+                        Navigator.push(
+                            context, MaterialPageRoute(
+                            builder: (context) => TroubleViewAndChange(trouble: troubleFind)));
+                        break;
+                    }
+                  },
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                  title: _buildText(context, index)
+              ),
             );
           },
         )

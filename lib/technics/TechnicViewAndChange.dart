@@ -523,7 +523,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                   textStyle: const TextStyle(fontSize: 18)),
               onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicTotalTestDrive(
-                technicId: widget.technic.id!, technicinternalID: widget.technic.internalID!)));
+                technicId: widget.technic.id!, technicInternalID: widget.technic.internalID!)));
             }, child: Text('Кол-во тест-драйвов: ${listTestDrive.length}')) :
           const Text('Тест-драйв не проводился')
     );
@@ -536,12 +536,6 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
         decoration: BoxDecoration(
             color: Colors.blue.shade50,
             borderRadius: BorderRadius.circular(20),
-            // gradient: const LinearGradient(
-            //   colors: [Colors.lightBlueAccent, Colors.purpleAccent],
-            //   begin: Alignment.bottomLeft,
-            //   end: Alignment.topRight,
-            //   tileMode: TileMode.repeated,
-            // ),
             boxShadow: const [
               BoxShadow(
                 color: Colors.grey,

@@ -35,7 +35,6 @@ class _TroubleListState extends State<TroubleList> {
             child: const Icon(Icons.add, color: Colors.white)
         ),
         body: ListView.builder(
-          // separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: troubleList.length,
           itemBuilder: (context, index) {
             bool isDoneTrouble = isFieldFilled(troubleList[index]);

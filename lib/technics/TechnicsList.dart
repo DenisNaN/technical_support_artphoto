@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_group_list_view/flutter_group_list_view.dart';
 import '../repair/Repair.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import 'Technic.dart';
@@ -28,13 +27,9 @@ class _TechnicsListState extends State<TechnicsList> {
     for(String photosalon in CategoryDropDownValueModel.photosalons){
       headerGroup[photosalon] = -1;
     }
-    int i = 0;
-    for(Technic technic in Technic.technicList){
-      headerGroup[technic.dislocation] = i++;
-    }
-
-    for(final element in headerGroup.entries){
-
+    int index = Technic.technicList.length - 1;
+    for(int i = Technic.technicList.length - 1; i >= 0; i--){
+      headerGroup[Technic.technicList[i].dislocation] = index--;
     }
   }
 
@@ -63,8 +58,8 @@ class _TechnicsListState extends State<TechnicsList> {
             return Material(
                 child: Column(
                   children: [
-                    // Technic.technicList[index].dislocation == Technic.technicList[indexForCheck].dislocation ?
-                    //       const SizedBox() : Text('${Technic.technicList[index].dislocation}'),
+                    index == headerGroup[Technic.technicList[index].dislocation] ?
+                          _getTextHeader(index) : const SizedBox.shrink(),
                     ListTile(
                       tileColor: color,
                       onTap: (){
@@ -198,6 +193,29 @@ class _TechnicsListState extends State<TechnicsList> {
       // color = Color(CategoryDropDownValueModel.colorForEquipment[Technic.technicList[index].dislocation]!);
     }
     return color;
+  }
+
+  Container _getTextHeader(int index){
+    return Container(width: double.maxFinite, height: 30, alignment: Alignment.center,
+      decoration: const BoxDecoration(
+          gradient: LinearGradient(
+          begin: Alignment.bottomLeft,
+          end: Alignment.topRight,
+          colors: [Colors.indigoAccent, Colors.blue]),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              blurRadius: 4,
+              offset: Offset(2, 4), // Shadow position
+            ),
+          ]),
+      child: Text('${Technic.technicList[index].dislocation}',
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontStyle: FontStyle.italic,
+          fontSize: 20,
+          color: Colors.white)),
+    );
   }
 
   String _nameTechnic(int index){

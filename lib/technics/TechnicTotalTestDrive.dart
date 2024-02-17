@@ -4,8 +4,8 @@ import 'package:intl/intl.dart';
 
 class TechnicTotalTestDrive extends StatefulWidget {
   final int technicId;
-  final int technicinternalID;
-  const TechnicTotalTestDrive({super.key, required this.technicId, required this.technicinternalID});
+  final int technicInternalID;
+  const TechnicTotalTestDrive({super.key, required this.technicId, required this.technicInternalID});
 
   @override
   State<TechnicTotalTestDrive> createState() => _TechnicTotalTestDriveState();
@@ -17,7 +17,7 @@ class _TechnicTotalTestDriveState extends State<TechnicTotalTestDrive> {
     List listTotalTestDrive = getListTotalTestDrive(widget.technicId);
     return Scaffold(
       appBar: AppBar(
-          title: Text('Тест-драйв техники №${widget.technicinternalID}')),
+          title: Text('Тест-драйв техники №${widget.technicInternalID}')),
       body: ListView.builder(
           itemCount: listTotalTestDrive.length,
           itemBuilder: (context, index){
