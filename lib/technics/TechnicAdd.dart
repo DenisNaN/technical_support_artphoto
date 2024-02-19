@@ -374,109 +374,124 @@ class _TechnicAddState extends State<TechnicAdd> {
   );
   }
 
-  ListTile _buildTestDriveListTile(){
-    return ListTile(
-      title: Column(children: [
-        ListTile(
-          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-          leading: const Icon(Icons.airport_shuttle),
-          title: DropdownButton<String>(
-            isExpanded: true,
-            hint: const Text('Место тест-драйва'),
-            icon: _selectedDropdownTestDriveDislocation != null ? IconButton(
-                icon: const Icon(Icons.clear, color: Colors.grey),
-                onPressed: (){
-                  setState(() {
-                    _selectedDropdownTestDriveDislocation = null;
-                  }
+  Padding _buildTestDriveListTile(){
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.blue.shade50,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.grey,
+                blurRadius: 4,
+                offset: Offset(2, 4), // Shadow position
+              ),
+            ]),
+        child: ListTile(
+          title: Column(children: [
+            ListTile(
+              contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+              leading: const Icon(Icons.airport_shuttle),
+              title: DropdownButton<String>(
+                isExpanded: true,
+                hint: const Text('Место тест-драйва'),
+                icon: _selectedDropdownTestDriveDislocation != null ? IconButton(
+                    icon: const Icon(Icons.clear, color: Colors.grey),
+                    onPressed: (){
+                      setState(() {
+                        _selectedDropdownTestDriveDislocation = null;
+                      }
+                      );
+                    }) : null,
+                value: _selectedDropdownTestDriveDislocation,
+                items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
                   );
-                }) : null,
-            value: _selectedDropdownTestDriveDislocation,
-            items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-            onChanged: (String? value){
-              setState(() {
-                _selectedDropdownTestDriveDislocation = value!;
-              });
-            },
-          ),
-        ),
-      ListTile(
-        contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-        leading: const Icon(Icons.today),
-        title: const Text("Дата начала тест-драйва"),
-        subtitle: Text(_dateStartTestDrive),
-        trailing: IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2099),
-                  locale: const Locale("ru", "RU")
-              ).then((date) {
-                setState(() {
-                  if(date != null) {
-                    _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
-                    _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                  }
-                });
-              });
-            },
-            color: Colors.blue
-            ),
-          ),
-        !_isCategoryPhotocamera ? ListTile(
-          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-          leading: const Icon(Icons.today),
-          title: const Text("Дата конца тест-драйва"),
-          subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateFinishTestDriveForSQL.replaceAll('.', '-')))),
-          trailing: IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2099),
-                    locale: const Locale("ru", "RU")
-                ).then((date) {
+                }).toList(),
+                onChanged: (String? value){
                   setState(() {
-                    if(date != null) {
-                      _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
-                      _dateFinishTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                    }
+                    _selectedDropdownTestDriveDislocation = value!;
                   });
+                },
+              ),
+            ),
+          ListTile(
+            contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+            leading: const Icon(Icons.today),
+            title: const Text("Дата начала тест-драйва"),
+            subtitle: Text(_dateStartTestDrive),
+            trailing: IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () {
+                  showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2099),
+                      locale: const Locale("ru", "RU")
+                  ).then((date) {
+                    setState(() {
+                      if(date != null) {
+                        _dateStartTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
+                        _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                      }
+                    });
+                  });
+                },
+                color: Colors.blue
+                ),
+              ),
+            !_isCategoryPhotocamera ? ListTile(
+              contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+              leading: const Icon(Icons.today),
+              title: const Text("Дата конца тест-драйва"),
+              subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateFinishTestDriveForSQL.replaceAll('.', '-')))),
+              trailing: IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2099),
+                        locale: const Locale("ru", "RU")
+                    ).then((date) {
+                      setState(() {
+                        if(date != null) {
+                          _dateFinishTestDriveForSQL = DateFormat('yyyy.MM.dd').format(date);
+                          _dateFinishTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                        }
+                      });
+                    });
+                  },
+                  color: Colors.blue
+              ),
+            ) : const SizedBox.shrink(),
+            ListTile(
+              contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+              leading: const Icon(Icons.create),
+              title: TextFormField(
+                decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
+                controller: _resultTestDrive,
+              ),
+            ),
+            CheckboxListTile(
+              contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+              title: const Text('Тест-драйв выполнен'),
+              secondary: const Icon(Icons.check),
+              value: _checkboxTestDrive,
+              onChanged: (bool? value) {
+                setState(() {
+                  _checkboxTestDrive = value!;
                 });
-              },
-              color: Colors.blue
-          ),
-        ) : const SizedBox.shrink(),
-        ListTile(
-          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-          leading: const Icon(Icons.create),
-          title: TextFormField(
-            decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
-            controller: _resultTestDrive,
+              }
+            )
+          ],
           ),
         ),
-        CheckboxListTile(
-          contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-          title: const Text('Тест-драйв выполнен'),
-          secondary: const Icon(Icons.check),
-          value: _checkboxTestDrive,
-          onChanged: (bool? value) {
-            setState(() {
-              _checkboxTestDrive = value!;
-            });
-          }
-        )
-      ],
       ),
     );
   }

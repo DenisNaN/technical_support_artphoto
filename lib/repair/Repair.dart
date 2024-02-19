@@ -20,6 +20,7 @@ class Repair{
   String newStatus = "";
   String newDislocation = "";
   String dateReceipt = "";
+  int? idTestDrive;
 
   Repair(
       this.id,
