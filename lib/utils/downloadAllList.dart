@@ -53,7 +53,6 @@ class DownloadAllList{
         await getAllActualTechnics(HasNetwork.isConnecting, listLastId[0]['id'], listCount[0]['countEquipment']));
     Technic.technicList.sort();
     Technic.testDriveList.addAll(await ConnectToDBMySQL.connDB.getAllTestDrive());
-
     Repair.repairList.addAll(
         await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']));
     Trouble.troubleList.addAll(
@@ -391,7 +390,7 @@ class DownloadAllList{
   List getNotifications(){
     List notifications = [];
 
-    Technic.technicList.forEach((technic) {
+    Repair.repairList.forEach((repair) {
 
     });
 

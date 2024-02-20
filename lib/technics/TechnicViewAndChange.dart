@@ -478,12 +478,12 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
       title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _switchTestDrive ? const Text('Выключить тест-драйв ') : const Text('Включить тест-драйв '),
-            Switch(
+            _switchTestDrive ? const SizedBox.shrink() : const Text('Включить тест-драйв '),
+            _switchTestDrive ? const Text('Тест-драйв') : Switch(
                 value: _switchTestDrive,
                 onChanged: (value){
                   setState(() {
-                    _switchTestDrive = value;
+                    _switchTestDrive = true;
                     _isEditSwitch = true;
                     if(!_switchTestDrive){
                       _dateStartTestDriveForSQL = '';
