@@ -392,12 +392,7 @@ class DownloadAllList{
   List getNotifications(){
     List notifications = [];
 
-    Repair.repairList.forEach((repair) {
-      DateTime? dateDepFromServ = getDate(repair.dateDepartureFromService);
-      if(dateDepFromServ != null){
-        if(dateDepFromServ > )
-      }
-    });
+
 
     return notifications;
   }

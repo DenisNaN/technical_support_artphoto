@@ -186,7 +186,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                 _buildComment(),
                 _buildSwitchTestDrive(),
                 _switchTestDrive ? _buildTestDriveListTile() : const SizedBox(),
-                _buildTestDrive()
+                _buildTotalTestDrive()
               ],
           )
         )
@@ -506,7 +506,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
     );
   }
 
-  ListTile _buildTestDrive() {
+  ListTile _buildTotalTestDrive() {
     List listTestDrive = [];
     Technic.testDriveList.forEach((element) {
       if(element.internalID == widget.technic.id){
@@ -666,10 +666,14 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
       ConnectToDBMySQL.connDB.insertStatusInDB(technic.id!, technic.status, technic.dislocation);
     }
     if(_isEditSwitch && _switchTestDrive){
-      ConnectToDBMySQL.connDB.insertTestDriveInDB(technic);
+      await ConnectToDBMySQL.connDB.insertTestDriveInDB(technic);
+      Technic.testDriveList.clear();
+      Technic.testDriveList.addAll(await ConnectToDBMySQL.connDB.getAllTestDrive());
     }
     if(_isEditTestDrive){
-      ConnectToDBMySQL.connDB.updateTestDriveInDB(technic);
+      await  ConnectToDBMySQL.connDB.updateTestDriveInDB(technic);
+      Technic.testDriveList.clear();
+      Technic.testDriveList.addAll(await ConnectToDBMySQL.connDB.getAllTestDrive());
     }
     if(_isEditCategory || _isEditName || _isEditCost || _isEditDateBuy ||
         _isEditComment || _isEditStatusDislocation || _isEditTestDrive ||

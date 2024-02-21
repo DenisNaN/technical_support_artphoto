@@ -331,6 +331,12 @@ class ConnectToDBMySQL {
           technic.checkboxTestDrive,
           LoginPassword.login
         ]);
+
+    int idLastTestDrive = await findLastTestDriveTechnic(technic);
+    int idLastRepair = await findLastRepair(technic);
+    await _connDB!.query(
+        'UPDATE repairEquipment SET idTestDrive = ? WHERE id = ?',
+        [idLastTestDrive, idLastRepair]);
   }
 
   Future updateTestDriveInDB(Technic technic) async{
@@ -368,6 +374,17 @@ class ConnectToDBMySQL {
     for (var row in result) {
       id = row[0];
     }
+    return id;
+  }
+
+  Future<int> findLastRepair(Technic technic) async {
+    await ConnectToDBMySQL.connDB.connDatabase();
+    var result = await _connDB!.query(
+        'SELECT id FROM repairEquipment WHERE number = ? ORDER BY id DESC LIMIT 1',
+        [
+          technic.internalID
+        ]);
+    int id = lastTectDriveListFromMap(result);
     return id;
   }
 

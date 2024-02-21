@@ -40,8 +40,21 @@ class _TechnicsListState extends State<TechnicsList> {
             backgroundColor: HasNetwork.isConnecting ? Colors.blue : Colors.grey,
             onPressed: HasNetwork.isConnecting ? () {Navigator.push(context, MaterialPageRoute(builder: (context) => const TechnicAdd())).then((value) {
               setState(() {
-                if(value != null) Technic.technicList.insert(0, value);
-              });
+                if(value != null) {
+                  Technic.technicList.insert(0, value);
+                  // if(value.dateStartTestDrive != ''){
+                  //   Technic.testDriveList.insert(0, Technic.testDrive(
+                  //     value.internalID,
+                  //     value.category,
+                  //     value.testDriveDislocation,
+                  //     value.dateStartTestDrive,
+                  //     value.dateFinishTestDrive,
+                  //     value.resultTestDrive,
+                  //     value.checkboxTestDrive,
+                  //     value.userTestDrive));
+                  // }
+                }}
+              );
             });
             } : null,
             child: const Icon(Icons.add, color: Colors.white)
@@ -65,7 +78,20 @@ class _TechnicsListState extends State<TechnicsList> {
                       onTap: (){
                         Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: Technic.technicList[index]))).then((value){
                             setState(() {
-                              if(value != null) Technic.technicList[index] = value;
+                              if(value != null) {
+                                Technic.technicList[index] = value;
+                                // if(value.dateStartTestDrive != ''){
+                                //   Technic.testDriveList.insert(0, Technic.testDrive(
+                                //     value.internalID,
+                                //     value.category,
+                                //     value.testDriveDislocation,
+                                //     value.dateStartTestDrive,
+                                //     value.dateFinishTestDrive,
+                                //     value.resultTestDrive,
+                                //     value.checkboxTestDrive,
+                                //     value.userTestDrive));
+                                // }
+                              }
                             });
                           });
                       },
