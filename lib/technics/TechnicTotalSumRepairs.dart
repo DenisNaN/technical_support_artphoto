@@ -101,13 +101,10 @@ class _TechnicTotalSumRepairsState extends State<TechnicTotalSumRepairs> {
 
   List _getListTotalSumRepairs(int internalID){
     List totalSumRepairs = [];
-    // int index = 0;
     Repair.totalSumRepairs.forEach((element) {
       if(element.idTechnic == internalID){
         totalSumRepairs.add(element);
-        // indexTotalSumRepairs = index;
       }
-      // index++;
     });
     return totalSumRepairs;
   }
@@ -132,7 +129,6 @@ class _TechnicTotalSumRepairsState extends State<TechnicTotalSumRepairs> {
         repair.worksPerformed != '' &&
         repair.costService != 0 &&
         repair.diagnosisService != '' &&
-        // repair.recommendationsNotes != '' &&
         repair.dateReceipt != '' &&
         repair.newStatus != '' &&
         repair.newDislocation != ''){

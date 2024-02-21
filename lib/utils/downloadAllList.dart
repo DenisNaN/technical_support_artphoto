@@ -12,8 +12,8 @@ import '../history/History.dart';
 import '../repair/RepairSQFlite.dart';
 import '../technics/Technic.dart';
 import 'categoryDropDownValueModel.dart';
+import 'package:intl/intl.dart';
 import 'utils.dart' as utils;
-
 
 class DownloadAllList{
   DownloadAllList._();
@@ -55,6 +55,8 @@ class DownloadAllList{
     Technic.testDriveList.addAll(await ConnectToDBMySQL.connDB.getAllTestDrive());
     Repair.repairList.addAll(
         await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']));
+
+
     Trouble.troubleList.addAll(
         await getAllActualTrouble(HasNetwork.isConnecting, listLastId[2]['id'], listCount[2]['countTrouble']));
     History.historyList.addAll(
@@ -391,9 +393,19 @@ class DownloadAllList{
     List notifications = [];
 
     Repair.repairList.forEach((repair) {
-
+      DateTime? dateDepFromServ = getDate(repair.dateDepartureFromService);
+      if(dateDepFromServ != null){
+        if(dateDepFromServ > )
+      }
     });
 
     return notifications;
+  }
+
+  DateTime? getDate(String date) {
+    if(date != '') {
+      return DateTime.parse(date.replaceAll('.', '-'));
+    }
+    return null;
   }
 }
