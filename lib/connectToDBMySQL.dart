@@ -379,18 +379,18 @@ class ConnectToDBMySQL {
     return id;
   }
 
-  Future<Technic> findLastTestDrive(Technic technic) async {
-    await ConnectToDBMySQL.connDB.connDatabase();
-    var result = await _connDB!.query(
-        'SELECT * FROM repairEq'
-            ''
-            'uipment WHERE number = ? ORDER BY id DESC LIMIT 1',
-        [
-          technic.internalID
-        ]);
-    Technic testDrive = Technic.testDrive(internalID, category, testDriveDislocation, dateStartTestDrive, dateFinishTestDrive, resultTestDrive, checkboxTestDrive, userTestDrive)
-    return id;
-  }
+  // Future<Technic> findLastTestDrive(Technic technic) async {
+  //   await ConnectToDBMySQL.connDB.connDatabase();
+  //   var result = await _connDB!.query(
+  //       'SELECT * FROM repairEq'
+  //           ''
+  //           'uipment WHERE number = ? ORDER BY id DESC LIMIT 1',
+  //       [
+  //         technic.internalID
+  //       ]);
+  //   Technic testDrive = Technic.testDrive(internalID, category, testDriveDislocation, dateStartTestDrive, dateFinishTestDrive, resultTestDrive, checkboxTestDrive, userTestDrive)
+  //   return id;
+  // }
 
   Future<int> findLastRepair(Technic technic) async {
     await ConnectToDBMySQL.connDB.connDatabase();

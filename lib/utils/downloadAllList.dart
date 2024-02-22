@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:technical_support_artphoto/connectToDBMySQL.dart';
 import 'package:technical_support_artphoto/history/HistorySQFlite.dart';
@@ -14,7 +12,6 @@ import '../history/History.dart';
 import '../repair/RepairSQFlite.dart';
 import '../technics/Technic.dart';
 import 'categoryDropDownValueModel.dart';
-import 'package:intl/intl.dart';
 import 'notifications.dart';
 import 'utils.dart' as utils;
 
@@ -58,7 +55,7 @@ class DownloadAllList{
     Technic.testDriveList.addAll(await ConnectToDBMySQL.connDB.getAllTestDrive());
     Repair.repairList.addAll(
         await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']));
-
+    Notifications.notificationsList.addAll(await getNotifications());
 
     Trouble.troubleList.addAll(
         await getAllActualTrouble(HasNetwork.isConnecting, listLastId[2]['id'], listCount[2]['countTrouble']));
@@ -392,28 +389,67 @@ class DownloadAllList{
     CategorySQFlite.db.createTableColorsForPhotosalons();
   }
 
-  Future<List> getNotifications() async{
+  List getNotifications() {
     List notifications = [];
+    notifications.addAll(getListNotificationsAfterRepairBetter1Day());
+    notifications.addAll(getListNotificationsTechnicInRepairBetter21Days());
+    notifications.addAll(getListNotificationsTechnicTestDriveNotComplatedBetter14Days());
 
+    return notifications;
+  }
+
+  List getListNotificationsAfterRepairBetter1Day(){
+    List notifications = [];
     // тест-драйв больше одного дня после ремонта для Копиров и Фотоаппаратов
     Technic.technicList.forEach((technic) {
       if(technic.category == 'Копир' || technic.category == 'фотоаппарат'){
-        Repair repair = Repair.repairList.firstWhere((repair) => repair.internalID == technic.internalID);
-        if(repair.idTestDrive != 0){
-
+        Repair? repair = Repair.repairList.firstWhere((repair) => repair.internalID == technic.internalID, orElse: () => null);
+        if(repair != null && repair.dateDepartureFromService != '' && repair.idTestDrive == 0){
+          Duration? duration = DateTime.now().difference(getDate(repair.dateDepartureFromService)!);
+          if(duration.inDays > 1){
+            notifications.add(Notifications(
+                'Не сделан тест-драйв ${repair.category.trim()}а. После ремонта прошло: ${duration.inDays} ${getDayAddition(duration.inDays)}',
+                repair.id));
+          }
         }
-
-
-        Duration? duration = getDate(repair.dateDepartureFromService)?.difference(DateTime.now());
-        if(duration != null && duration.inDays > 1){
-          notifications.add(Notifications(
-            'После ремонта ${repair.category}а не сделан тест-драйв ${duration.inDays} ${getDayAddition(duration.inDays)}',
-            repair.id));
-        }
-
       }
     });
+    return notifications;
+  }
 
+  List getListNotificationsTechnicInRepairBetter21Days() {
+    List notifications = [];
+    // техника в ремонте больше 21 дня
+    Technic.technicList.forEach((technic) {
+        Repair? repair = Repair.repairList.firstWhere((repair) =>
+        repair.internalID == technic.internalID, orElse: () => null);
+        if (repair != null && repair.dateDepartureFromService == '') {
+          Duration? duration = DateTime.now().difference(getDate(repair.dateDepartureFromService)!);
+          print(duration.inDays);
+          if (duration.inDays > 21) {
+            notifications.add(Notifications(
+                'Техника ${repair.category.trim()} №${repair.internalID} в ремонте: ${duration
+                    .inDays} ${getDayAddition(duration.inDays)}', repair.id));
+          }
+        }
+    });
+    return notifications;
+  }
+
+  List getListNotificationsTechnicTestDriveNotComplatedBetter14Days() {
+    List notifications = [];
+    // техника в ремонте больше 21 дня
+    Technic.technicList.forEach((technic) {
+      if (technic.dateStartTestDrive != '' && technic.checkboxTestDrive == false) {
+        Duration? duration = DateTime.now().difference(getDate(technic.dateStartTestDrive)!);
+        print(duration.inDays);
+        if (duration.inDays > 21) {
+          notifications.add(Notifications(
+              'У техники ${technic.category.trim()} №${technic.internalID} тест-драйв не завершен: '
+                  '${duration.inDays} ${getDayAddition(duration.inDays)}', technic.id));
+        }
+      }
+    });
     return notifications;
   }
 
