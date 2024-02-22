@@ -334,7 +334,7 @@ class ConnectToDBMySQL {
           LoginPassword.login
         ]);
 
-    int idLastTestDrive = await findLastTestDriveTechnic(technic);
+    int idLastTestDrive = await findIDLastTestDriveTechnic(technic);
     int idLastRepair = await findLastRepair(technic);
     await _connDB!.query(
         'UPDATE repairEquipment SET idTestDrive = ? WHERE id = ?',
@@ -346,7 +346,7 @@ class ConnectToDBMySQL {
     if(technic.checkboxTestDrive) checkBox = 1;
 
     await ConnectToDBMySQL.connDB.connDatabase();
-    int id = await findLastTestDriveTechnic(technic);
+    int id = await findIDLastTestDriveTechnic(technic);
     await _connDB!.query(
         'UPDATE testDrive SET testDriveDislocation = ?, dateStart = ?, dateFinish = ?, '
             'result = ?, checkEquipment = ? WHERE id = ?',
@@ -360,7 +360,7 @@ class ConnectToDBMySQL {
         ]);
   }
 
-  Future<int> findLastTestDriveTechnic(Technic technic) async {
+  Future<int> findIDLastTestDriveTechnic(Technic technic) async {
     await ConnectToDBMySQL.connDB.connDatabase();
     var result = await _connDB!.query(
         'SELECT id FROM testDrive WHERE idEquipment = ? ORDER BY id DESC LIMIT 1',
@@ -376,6 +376,19 @@ class ConnectToDBMySQL {
     for (var row in result) {
       id = row[0];
     }
+    return id;
+  }
+
+  Future<Technic> findLastTestDrive(Technic technic) async {
+    await ConnectToDBMySQL.connDB.connDatabase();
+    var result = await _connDB!.query(
+        'SELECT * FROM repairEq'
+            ''
+            'uipment WHERE number = ? ORDER BY id DESC LIMIT 1',
+        [
+          technic.internalID
+        ]);
+    Technic testDrive = Technic.testDrive(internalID, category, testDriveDislocation, dateStartTestDrive, dateFinishTestDrive, resultTestDrive, checkboxTestDrive, userTestDrive)
     return id;
   }
 

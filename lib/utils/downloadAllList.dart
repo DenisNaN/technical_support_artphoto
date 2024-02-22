@@ -392,22 +392,25 @@ class DownloadAllList{
     CategorySQFlite.db.createTableColorsForPhotosalons();
   }
 
-  List getNotifications(){
+  Future<List> getNotifications() async{
     List notifications = [];
 
     // тест-драйв больше одного дня после ремонта для Копиров и Фотоаппаратов
     Technic.technicList.forEach((technic) {
       if(technic.category == 'Копир' || technic.category == 'фотоаппарат'){
         Repair repair = Repair.repairList.firstWhere((repair) => repair.internalID == technic.internalID);
+        if(repair.idTestDrive != 0){
+
+        }
+
+
         Duration? duration = getDate(repair.dateDepartureFromService)?.difference(DateTime.now());
         if(duration != null && duration.inDays > 1){
           notifications.add(Notifications(
             'После ремонта ${repair.category}а не сделан тест-драйв ${duration.inDays} ${getDayAddition(duration.inDays)}',
             repair.id));
         }
-        if(technic.status == 'Неисправна'){
-          notifications
-        }
+
       }
     });
 
