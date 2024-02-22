@@ -596,7 +596,8 @@ class _RepairAddState extends State<RepairAdd> {
         _recommendationsNotes.text,
         newStatusStr,
         newDislocationStr,
-        _dateReceiptForSQL
+        _dateReceiptForSQL,
+        0
     );
 
     ConnectToDBMySQL.connDB.insertRepairInDB(repair);

@@ -18,6 +18,7 @@ class Technic implements Comparable{
   String resultTestDrive = '';
   bool checkboxTestDrive = false;
   String userTestDrive = '';
+  int? idTestDrive;
 
   Technic(this.id, this.internalID, this.name, this.category,
       this.cost, this.dateBuyTechnic, this.status, this.dislocation,

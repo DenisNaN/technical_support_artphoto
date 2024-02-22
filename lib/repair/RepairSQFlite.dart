@@ -35,7 +35,8 @@ class RepairSQFlite{
             "recommendationsNotes TEXT, "
             "newStatus TEXT, "
             "newDislocation TEXT, "
-            "dateReceipt TEXT)");
+            "dateReceipt TEXT,"
+            "idTestDrive INTEGER)");
       });
     return db;
   }
@@ -58,7 +59,8 @@ class RepairSQFlite{
       inMap['recommendationsNotes'],
       inMap['newStatus'],
       inMap['newDislocation'],
-      inMap['dateReceipt']);
+      inMap['dateReceipt'],
+      inMap['idTestDrive']);
     return repair;
   }
 
@@ -81,6 +83,7 @@ class RepairSQFlite{
     map['newStatus'] = inRepair.newStatus;
     map['newDislocation'] = inRepair.newDislocation;
     map['dateReceipt'] = inRepair.dateReceipt;
+    map['idTestDrive'] = inRepair.idTestDrive;
     return map;
   }
 
@@ -105,8 +108,9 @@ class RepairSQFlite{
             "recommendationsNotes, "
             "newStatus, "
             "newDislocation, "
-            "dateReceipt) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "dateReceipt,"
+            "idTestDrive) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [inRepair.id,
           inRepair.internalID,
           inRepair.category,
@@ -123,7 +127,8 @@ class RepairSQFlite{
           inRepair.recommendationsNotes,
           inRepair.newStatus,
           inRepair.newDislocation,
-          inRepair.dateReceipt]);
+          inRepair.dateReceipt,
+          inRepair.idTestDrive]);
   }
 
   Future<Repair> get(int inID) async {
@@ -170,6 +175,7 @@ class RepairSQFlite{
         "recommendationsNotes TEXT, "
         "newStatus TEXT, "
         "newDislocation TEXT, "
-        "dateReceipt TEXT)");
+        "dateReceipt TEXT,"
+        "idTestDrive INTEGER)");
   }
 }

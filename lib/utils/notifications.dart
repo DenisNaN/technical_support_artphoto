@@ -1,9 +1,10 @@
 
 class Notifications{
-  late int idOperation;
-  late String name;
+
+  String description = '';
+  int? idSection;
 
   static List notificationsList = [];
 
-  Notifications(this.idOperation, this.name);
+  Notifications(this.description, this.idSection);
 }

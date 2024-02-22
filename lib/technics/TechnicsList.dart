@@ -42,17 +42,6 @@ class _TechnicsListState extends State<TechnicsList> {
               setState(() {
                 if(value != null) {
                   Technic.technicList.insert(0, value);
-                  // if(value.dateStartTestDrive != ''){
-                  //   Technic.testDriveList.insert(0, Technic.testDrive(
-                  //     value.internalID,
-                  //     value.category,
-                  //     value.testDriveDislocation,
-                  //     value.dateStartTestDrive,
-                  //     value.dateFinishTestDrive,
-                  //     value.resultTestDrive,
-                  //     value.checkboxTestDrive,
-                  //     value.userTestDrive));
-                  // }
                 }}
               );
             });
@@ -80,17 +69,6 @@ class _TechnicsListState extends State<TechnicsList> {
                             setState(() {
                               if(value != null) {
                                 Technic.technicList[index] = value;
-                                // if(value.dateStartTestDrive != ''){
-                                //   Technic.testDriveList.insert(0, Technic.testDrive(
-                                //     value.internalID,
-                                //     value.category,
-                                //     value.testDriveDislocation,
-                                //     value.dateStartTestDrive,
-                                //     value.dateFinishTestDrive,
-                                //     value.resultTestDrive,
-                                //     value.checkboxTestDrive,
-                                //     value.userTestDrive));
-                                // }
                               }
                             });
                           });

@@ -162,7 +162,8 @@ class ConnectToDBMySQL {
         'repairEquipment.recommendationsNotes, '
         'repairEquipment.newStatus, '
         'repairEquipment.newDislocation, '
-        'repairEquipment.dateReceipt '
+        'repairEquipment.dateReceipt, '
+        'repairEquipment.idTestDrive '
         'FROM repairEquipment');
 
     var list = repairListFromMap(result);
@@ -188,7 +189,8 @@ class ConnectToDBMySQL {
         'repairEquipment.recommendationsNotes, '
         'repairEquipment.newStatus, '
         'repairEquipment.newDislocation, '
-        'repairEquipment.dateReceipt '
+        'repairEquipment.dateReceipt, '
+        'repairEquipment.idTestDrive '
         'FROM repairEquipment WHERE id > ?', [id]);
 
     var list = repairListFromMap(result);
@@ -207,14 +209,14 @@ class ConnectToDBMySQL {
     for (var row in result) {
       // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
       // dateTransferInService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
-      // recommendationsNotes-row[13], newStatus-row[14],  newDislocation-row[15], dateReceipt-row[16]
+      // recommendationsNotes-row[13], newStatus-row[14],  newDislocation-row[15], dateReceipt-row[16], idTestDrive-row[17]
       String dateDeparture = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
       String dateTransferInService = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
       String dateDepartureFromService = row[9].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[9].toString());
       String dateReceipt = row[16].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[16].toString());
 
       Repair repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferInService,
-          dateDepartureFromService, row[10],  row[11],  row[12], row[13], row[14], row[15], dateReceipt);
+          dateDepartureFromService, row[10],  row[11],  row[12], row[13], row[14], row[15], dateReceipt, row[17]);
       list.add(repair);
     }
     return list;

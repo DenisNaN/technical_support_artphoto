@@ -73,7 +73,8 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
         widget.repair.recommendationsNotes,
         widget.repair.newStatus,
         widget.repair.newDislocation,
-        widget.repair.dateReceipt);
+        widget.repair.dateReceipt,
+        widget.repair.idTestDrive);
 
     for(int i = 0; i < Technic.technicList.length; i++){
       if(Technic.technicList[i].internalID == widget.repair.internalID){
@@ -665,7 +666,8 @@ class _RepairViewAndChangeState extends State<RepairViewAndChange> {
         _recommendationsNotes.text,
         _selectedDropdownStatusNew!,
         _selectedDropdownDislocationNew!,
-        _dateReceipt
+        _dateReceipt,
+        0
     );
 
     await ConnectToDBMySQL.connDB.connDatabase();

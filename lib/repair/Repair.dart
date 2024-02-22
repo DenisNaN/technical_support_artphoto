@@ -39,7 +39,8 @@ class Repair{
       this.recommendationsNotes,
       this.newStatus,
       this.newDislocation,
-      this.dateReceipt);
+      this.dateReceipt,
+      this.idTestDrive);
 
   @override
   String toString() {

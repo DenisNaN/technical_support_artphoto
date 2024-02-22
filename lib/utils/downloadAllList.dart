@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:technical_support_artphoto/connectToDBMySQL.dart';
 import 'package:technical_support_artphoto/history/HistorySQFlite.dart';
@@ -13,6 +15,7 @@ import '../repair/RepairSQFlite.dart';
 import '../technics/Technic.dart';
 import 'categoryDropDownValueModel.dart';
 import 'package:intl/intl.dart';
+import 'notifications.dart';
 import 'utils.dart' as utils;
 
 class DownloadAllList{
@@ -392,7 +395,21 @@ class DownloadAllList{
   List getNotifications(){
     List notifications = [];
 
-
+    // тест-драйв больше одного дня после ремонта для Копиров и Фотоаппаратов
+    Technic.technicList.forEach((technic) {
+      if(technic.category == 'Копир' || technic.category == 'фотоаппарат'){
+        Repair repair = Repair.repairList.firstWhere((repair) => repair.internalID == technic.internalID);
+        Duration? duration = getDate(repair.dateDepartureFromService)?.difference(DateTime.now());
+        if(duration != null && duration.inDays > 1){
+          notifications.add(Notifications(
+            'После ремонта ${repair.category}а не сделан тест-драйв ${duration.inDays} ${getDayAddition(duration.inDays)}',
+            repair.id));
+        }
+        if(technic.status == 'Неисправна'){
+          notifications
+        }
+      }
+    });
 
     return notifications;
   }
@@ -402,5 +419,22 @@ class DownloadAllList{
       return DateTime.parse(date.replaceAll('.', '-'));
     }
     return null;
+  }
+
+  String getDayAddition(int num) {
+    double preLastDigit = num % 100 / 10;
+    if (preLastDigit.round() == 1) {
+      return "дней";
+    }
+    switch (num % 10) {
+      case 1:
+        return "день";
+      case 2:
+      case 3:
+      case 4:
+        return "дня";
+      default:
+        return "дней";
+    }
   }
 }
