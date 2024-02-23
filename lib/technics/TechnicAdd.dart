@@ -95,6 +95,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                                 _dateForSQL,
                                 _selectedDropdownStatus!,
                                 _selectedDropdownDislocation!,
+                                DateFormat('yyyy.MM.dd').format(DateTime.now()),
                                 _comment.text,
                                 _selectedDropdownTestDriveDislocation ??= '',
                                 _dateStartTestDriveForSQL,

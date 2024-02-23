@@ -11,6 +11,7 @@ class Technic implements Comparable{
   String dateBuyTechnic = "";
   String status = "";
   String dislocation = "";
+  String dateChangeStatus = '';
   String comment = "";
   String testDriveDislocation = "";
   String dateStartTestDrive = '';
@@ -20,9 +21,9 @@ class Technic implements Comparable{
   String userTestDrive = '';
   int? idTestDrive;
 
-  Technic(this.id, this.internalID, this.name, this.category,
-      this.cost, this.dateBuyTechnic, this.status, this.dislocation,
-      this.comment, this.testDriveDislocation, this.dateStartTestDrive,
+  Technic(this.id, this.internalID, this.name, this.category, this.cost,
+      this.dateBuyTechnic, this.status, this.dislocation, this.comment,
+      this.testDriveDislocation, this.dateChangeStatus, this.dateStartTestDrive,
       this.dateFinishTestDrive, this.resultTestDrive, this.checkboxTestDrive);
 
   Technic.testDrive(this.internalID, this.category, this.testDriveDislocation,

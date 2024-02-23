@@ -38,7 +38,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
   TapDownDetails? tapDownDetails;
 
   Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
-      'dislocation', 'comment', 'testDriveDislocation', 'dateStartTestDrive',
+      'dislocation', 'dateChangeStatus', 'comment', 'testDriveDislocation', 'dateStartTestDrive',
       'dateFinishTestDrive', 'resultTestDrive', false);
 
   @override
@@ -51,7 +51,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
                 .toString() == _innerNumberTechnic.text,
                 orElse: () =>
                     Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
-                        'comment', 'testDriveDislocation', 'dateStartTestDrive',
+                        'dateChangeStatus', 'comment', 'testDriveDislocation', 'dateStartTestDrive',
                         'dateFinishTestDrive', 'resultTestDrive', false));
         if(technicFind.name == ''){
           _categoryController.text = 'Модель не указана';

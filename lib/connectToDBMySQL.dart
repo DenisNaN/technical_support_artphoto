@@ -33,6 +33,7 @@ class ConnectToDBMySQL {
         'equipment.dateBuy, '
         's.status, '
         's.dislocation, '
+        's.date, '
         'equipment.comment, '
         't.testDriveDislocation, '
         't.dateStart, '
@@ -59,6 +60,7 @@ class ConnectToDBMySQL {
         'equipment.dateBuy, '
         's.status, '
         's.dislocation, '
+        's.date, '
         'equipment.comment, '
         't.testDriveDislocation, '
         't.dateStart, '
@@ -85,6 +87,7 @@ class ConnectToDBMySQL {
         'equipment.dateBuy, '
         's.status, '
         's.dislocation, '
+        's.date, '
         'equipment.comment, '
         't.testDriveDislocation, '
         't.dateStart, '
@@ -103,20 +106,21 @@ class ConnectToDBMySQL {
     List list = [];
     for (var row in result) {
       // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4],
-      // dateBuy-row[5], status-row[6], dislocation-row[7], comment-row[8], testDriveDislocation-row[9],
-      // dateStart-row[10], dateFinish-row[11], resultTestDrive-row[12],
-      // checkTestDrive-row[13]
+      // dateBuy-row[5], status-row[6], dislocation-row[7], dateChangeStatus-row[8], comment-row[9], testDriveDislocation-row[10],
+      // dateStart-row[11], dateFinish-row[12], resultTestDrive-row[13], checkTestDrive-row[14]
 
+      String dateChangeStatus = '';
+      if(row[8] != null && row[8].toString() != "-0001-11-30 00:00:00.000Z") dateChangeStatus = getDateFormatted(row[8].toString());
       String dateStartTestDrive = '';
-      if(row[10] != null && row[10].toString() != "-0001-11-30 00:00:00.000Z") dateStartTestDrive = getDateFormatted(row[10].toString());
+      if(row[11] != null && row[11].toString() != "-0001-11-30 00:00:00.000Z") dateStartTestDrive = getDateFormatted(row[11].toString());
       String dateFinishTestDrive = '';
-      if(row[11] != null && row[11].toString() != "-0001-11-30 00:00:00.000Z") dateFinishTestDrive = getDateFormatted(row[11].toString());
+      if(row[12] != null && row[12].toString() != "-0001-11-30 00:00:00.000Z") dateFinishTestDrive = getDateFormatted(row[12].toString());
       bool checkTestDrive = false;
-      if(row[13] != null && row[13] == 1) checkTestDrive = true;
+      if(row[14] != null && row[14] == 1) checkTestDrive = true;
 
       Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
-          getDateFormatted(row[5].toString()), row[6] ?? '', row[7] ?? '', row[8],
-          row[9] ?? '', dateStartTestDrive, dateFinishTestDrive, row[12] ?? '', checkTestDrive);
+          getDateFormatted(row[5].toString()), row[6] ?? '', row[7] ?? '', dateChangeStatus,
+          row[9] ?? '', row[10] ?? '', dateStartTestDrive, dateFinishTestDrive, row[13] ?? '', checkTestDrive);
       list.add(technic);
     }
     return list;
@@ -378,19 +382,6 @@ class ConnectToDBMySQL {
     }
     return id;
   }
-
-  // Future<Technic> findLastTestDrive(Technic technic) async {
-  //   await ConnectToDBMySQL.connDB.connDatabase();
-  //   var result = await _connDB!.query(
-  //       'SELECT * FROM repairEq'
-  //           ''
-  //           'uipment WHERE number = ? ORDER BY id DESC LIMIT 1',
-  //       [
-  //         technic.internalID
-  //       ]);
-  //   Technic testDrive = Technic.testDrive(internalID, category, testDriveDislocation, dateStartTestDrive, dateFinishTestDrive, resultTestDrive, checkboxTestDrive, userTestDrive)
-  //   return id;
-  // }
 
   Future<int> findLastRepair(Technic technic) async {
     await ConnectToDBMySQL.connDB.connDatabase();

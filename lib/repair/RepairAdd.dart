@@ -47,7 +47,7 @@ class _RepairAddState extends State<RepairAdd> {
   String? _selectedDropdownDislocationNew;
 
   Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
-      'dislocation', 'comment', 'testDriveDislocation', 'dateStartTestDrive',
+      'dislocation', 'dateChangeStatus', 'comment', 'testDriveDislocation', 'dateStartTestDrive',
       'dateFinishTestDrive', 'resultTestDrive', false);
 
   @override
@@ -59,7 +59,7 @@ class _RepairAddState extends State<RepairAdd> {
             Technic.technicList.firstWhere((item) => item.internalID
                 .toString() == _innerNumberTechnic.text,
                 orElse: () =>
-                    Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
+                    Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation', 'dateChangeStatus',
                         'comment', 'testDriveDislocation', 'dateStartTestDrive', 'dateFinishTestDrive',
                         'resultTestDrive', false));
         _category = technicFind.name;

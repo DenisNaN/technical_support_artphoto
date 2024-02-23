@@ -7,6 +7,7 @@ import 'package:technical_support_artphoto/repair/RepairList.dart';
 import 'package:technical_support_artphoto/splashScreen.dart';
 import 'package:technical_support_artphoto/technics/TechnicsList.dart';
 import 'package:technical_support_artphoto/trouble/TroubleList.dart';
+import 'package:technical_support_artphoto/utils/notifications.dart';
 import 'utils/utils.dart' as utils;
 import 'package:technical_support_artphoto/utils/utils.dart';
 
@@ -77,7 +78,7 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
         child: Scaffold(
           appBar: AppBar(
               flexibleSpace: colorAppBar.color(),
-            title: Center(child: Text(LoginPassword.login)),
+            title: buildTitleAppBar(),
             bottom: TabBar(
               controller: _tabController,
                 tabs: const [
@@ -91,5 +92,36 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
               children: const [TechnicsList(),RepairList(),TroubleList(),HistoryList()]),
         )
     );
+  }
+
+  Row buildTitleAppBar(){
+    return Row(children: [
+      Text(LoginPassword.login),
+      Expanded(
+        child: Container(
+          alignment: Alignment.centerRight,
+          child: Stack(
+            children: [
+              Notifications.notificationsList.isNotEmpty ?
+                const Icon(Icons.notifications_active, size: 30) : const Icon(Icons.notifications_off, size: 30),
+              Positioned(
+                top: -3,
+                child:
+                  SizedBox(
+                    width: 40,
+                    height: 50,
+                    child: TextButton(
+                      child: Text('${Notifications.notificationsList.length}',
+                        // style: TextStyle(color: Colors.red)
+                      ),
+                      onPressed: () {
+
+                      }),
+                  ),
+              )
+            ],
+          ),
+      ))
+    ]);
   }
 }

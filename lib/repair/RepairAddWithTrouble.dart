@@ -47,7 +47,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
   int indexTechnic = 0;
 
   Technic technicFind = Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status',
-      'dislocation', 'comment', 'testDriveDislocation', 'dateStartTestDrive',
+      'dislocation', 'dateChangeStatus', 'comment', 'testDriveDislocation', 'dateStartTestDrive',
       'dateFinishTestDrive', 'resultTestDrive', false);
 
   @override
@@ -67,7 +67,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
     _dateDeparture = DateFormat('yyyy.MM.dd').format(DateTime.now());
     _selectedDropdownService = CategoryDropDownValueModel.service.first;
 
-    technickFinder();
+    technicFinder();
     _nameController.text = !_isBN ? technicFind.name : '';
     _dislocationOld = !_isBN ? technicFind.dislocation : '';
 
@@ -77,7 +77,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
             Technic.technicList.firstWhere((item) => item.internalID
                 .toString() == _innerNumberTechnic.text,
                 orElse: () =>
-                    Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
+                    Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation', 'dateChangeStatus',
                         'comment', 'testDriveDislocation', 'dateStartTestDrive', 'dateFinishTestDrive',
                         'resultTestDrive', false));
         _nameController.text = technicFind.name;
@@ -657,12 +657,12 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
     return result;
   }
 
-  void technickFinder(){
+  void technicFinder(){
     technicFind =
         Technic.technicList.firstWhere((item) => item.internalID
             .toString() == _innerNumberTechnic.text,
             orElse: () =>
-                Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
+                Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation', 'dateChangeStatus',
                     'comment', 'testDriveDislocation', 'dateStartTestDrive', 'dateFinishTestDrive',
                     'resultTestDrive', false));
     if (technicFind.id == -1) {
