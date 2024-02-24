@@ -401,16 +401,16 @@ class DownloadAllList{
 
   List getListNotificationsAfterRepairBetter1Day(){
     List notifications = [];
-    // тест-драйв больше одного дня после ремонта для Копиров и Фотоаппаратов
+    // тест-драйв не сделан больше одного дня после ремонта для Копиров и Фотоаппаратов
     Technic.technicList.forEach((technic) {
-      if(technic.category == 'Копир' || technic.category == 'фотоаппарат'){
+      if(technic.category == 'Копир' || technic.category == 'Фотоаппарат'){
         Repair? repair = Repair.repairList.firstWhere((repair) => repair.internalID == technic.internalID, orElse: () => null);
         if(repair != null && repair.dateDepartureFromService != '' && repair.idTestDrive == 0){
           Duration? duration = DateTime.now().difference(getDate(repair.dateDepartureFromService)!);
           if(duration.inDays > 1){
             notifications.add(Notifications(
-                'Не сделан тест-драйв ${repair.category.trim()}а. После ремонта прошло: ${duration.inDays} ${getDayAddition(duration.inDays)}',
-                repair.id));
+                'Не сделан тест-драйв ${repair.category.trim()}а №${repair.internalID}. После ремонта прошло: ${duration.inDays} ${getDayAddition(duration.inDays)}',
+                technic.id, 'Technic'));
           }
         }
       }
@@ -429,7 +429,7 @@ class DownloadAllList{
           if (duration.inDays > 21) {
             notifications.add(Notifications(
                 'Техника ${repair.category.trim()} №${repair.internalID} в ремонте: ${duration
-                    .inDays} ${getDayAddition(duration.inDays)}', repair.id));
+                    .inDays} ${getDayAddition(duration.inDays)}', repair.id, 'Repair'));
           }
         }
     });
@@ -445,7 +445,7 @@ class DownloadAllList{
         if (duration.inDays > 14) {
           notifications.add(Notifications(
               'У техники ${technic.category.trim()} №${technic.internalID} тест-драйв не завершен: '
-                  '${duration.inDays} ${getDayAddition(duration.inDays)}', technic.id));
+                  '${duration.inDays} ${getDayAddition(duration.inDays)}', technic.id, 'Technic'));
         }
       }
     });
@@ -454,14 +454,14 @@ class DownloadAllList{
 
   List getListNotificationsTechnicBadAndNotInRepairBetter7Days() {
     List notifications = [];
-    // тест-драйв не завершен больше 14 дней
+    // техника неисправна и не в ремонте больше 7 дней
     Technic.technicList.forEach((technic) {
       if (technic.status == 'Неисправна' && technic.dateChangeStatus != '') {
         Duration? duration = DateTime.now().difference(getDate(technic.dateChangeStatus)!);
         if (duration.inDays > 7) {
           notifications.add(Notifications(
               'Техника ${technic.category.trim()} №${technic.internalID} неисправна и не в ремонте: '
-                  '${duration.inDays} ${getDayAddition(duration.inDays)}', technic.id));
+                  '${duration.inDays} ${getDayAddition(duration.inDays)}', technic.id, 'Technic'));
         }
       }
     });

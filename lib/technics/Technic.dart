@@ -22,8 +22,8 @@ class Technic implements Comparable{
   int? idTestDrive;
 
   Technic(this.id, this.internalID, this.name, this.category, this.cost,
-      this.dateBuyTechnic, this.status, this.dislocation, this.comment,
-      this.testDriveDislocation, this.dateChangeStatus, this.dateStartTestDrive,
+      this.dateBuyTechnic, this.status, this.dislocation, this.dateChangeStatus,
+      this.comment, this.testDriveDislocation, this.dateStartTestDrive,
       this.dateFinishTestDrive, this.resultTestDrive, this.checkboxTestDrive);
 
   Technic.testDrive(this.internalID, this.category, this.testDriveDislocation,
