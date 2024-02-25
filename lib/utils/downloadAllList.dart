@@ -406,14 +406,14 @@ class DownloadAllList{
       if(technic.category == 'Копир' || technic.category == 'Фотоаппарат'){
         Repair? repair = Repair.repairList.firstWhere((repair) => repair.internalID == technic.internalID, orElse: () => null);
 
-        // bool dateTransferInServiceAfterDateStartTestDriveTechnic = false;
-        bool dateTransferInServiceAfterDateStartTestDriveTechnic = ;
+        bool isDateTransferInServiceAfterDateStartTestDriveTechnic = false;
         if(repair != null && repair.dateDepartureFromService != '' && technic.dateStartTestDrive != '') {
-          dateTransferInServiceAfterDateStartTestDriveTechnic = getDate(repair.dateDepartureFromService)!.
-            isAfter(getDate(technic.dateStartTestDrive)!);
+          isDateTransferInServiceAfterDateStartTestDriveTechnic = getDate(repair.dateDepartureFromService)!.
+            isBefore(getDate(technic.dateStartTestDrive)!);
         }
 
-        if(repair != null && repair.dateDepartureFromService != '' && repair.idTestDrive == 0){
+        if(repair != null && repair.dateDepartureFromService != '' &&
+            repair.idTestDrive == 0 && !isDateTransferInServiceAfterDateStartTestDriveTechnic){
           Duration? duration = DateTime.now().difference(getDate(repair.dateDepartureFromService)!);
           if(duration.inDays > 1){
             notifications.add(Notifications(
