@@ -11,6 +11,7 @@ import 'package:technical_support_artphoto/technics/Technic.dart';
 import 'package:technical_support_artphoto/technics/TechnicViewAndChange.dart';
 import 'package:technical_support_artphoto/technics/TechnicsList.dart';
 import 'package:technical_support_artphoto/trouble/TroubleList.dart';
+import 'package:technical_support_artphoto/utils/downloadAllList.dart';
 import 'package:technical_support_artphoto/utils/notifications.dart';
 import 'utils/utils.dart' as utils;
 import 'package:technical_support_artphoto/utils/utils.dart';
@@ -170,64 +171,70 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
     );
   }
 
-  ListView _buildListForBottomSheet() {
-    return ListView.builder(
-      itemCount: Notifications.notificationsList.length,
-      itemBuilder: (context, index) {
-        return Container(
-          margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              gradient: const LinearGradient(
-                  colors: [Colors.white54, Colors.white],
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.grey,
-                  blurRadius: 4,
-                  offset: Offset(2, 4), // Shadow position
-                ),
-              ]
-          ),
-          child: ListTile(
-              onTap: () {
-                switch(Notifications.notificationsList[index].section){
-                  case 'Technic':
-                    Technic? technicFind = Technic.technicList.firstWhere((item) => item.id == Notifications.notificationsList[index].idSection,
-                        orElse: () => null);
-                    print(technicFind);
-                    if(technicFind != null) {
-                      Navigator.push(
-                          context, MaterialPageRoute(
-                          builder: (context) =>
-                              TechnicViewAndChange(technic: technicFind)));
-                      break;
-                    }
-                  case 'Repair':
-                    Repair? repairFind = Repair.repairList.firstWhere((item) => item.id == Notifications.notificationsList[index].idSection,
-                        orElse: () => null);
-                    if(repairFind != null) {
-                      Navigator.push(
-                          context, MaterialPageRoute(
-                          builder: (context) => RepairViewAndChange(repair: repairFind)));
-                      break;
-                    }
-                }
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => TroubleViewAndChange(trouble: troubleList[index]))).then((value){
-                //   setState(() {
-                //     if(value != null) {
-                //
-                //     }
-                //   });
-                // });
-              },
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-              title: Text(Notifications.notificationsList[index].description)
-          ),
+  RefreshIndicator _buildListForBottomSheet() {
+    return RefreshIndicator(
+      onRefresh: () {
+        return Future.delayed(
+          const Duration(seconds: 1),
+            (){
+              setState(() {
+                Notifications.notificationsList.clear();
+                Notifications.notificationsList.addAll(DownloadAllList.downloadAllList.getNotifications());
+              });
+            }
         );
-      });
+      },
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: Notifications.notificationsList.length,
+        itemBuilder: (context, index) {
+          return Container(
+            margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                gradient: const LinearGradient(
+                    colors: [Colors.white54, Colors.white],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.grey,
+                    blurRadius: 4,
+                    offset: Offset(2, 4), // Shadow position
+                  ),
+                ]
+            ),
+            child: ListTile(
+                onTap: () {
+                  switch(Notifications.notificationsList[index].section){
+                    case 'Technic':
+                      Technic? technicFind = Technic.technicList.firstWhere((item) => item.id == Notifications.notificationsList[index].idSection,
+                          orElse: () => null);
+                      if(technicFind != null) {
+                        Navigator.push(
+                            context, MaterialPageRoute(
+                            builder: (context) =>
+                                TechnicViewAndChange(technic: technicFind)));
+                        break;
+                      }
+                    case 'Repair':
+                      Repair? repairFind = Repair.repairList.firstWhere((item) => item.id == Notifications.notificationsList[index].idSection,
+                          orElse: () => null);
+                      if(repairFind != null) {
+                        Navigator.push(
+                            context, MaterialPageRoute(
+                            builder: (context) => RepairViewAndChange(repair: repairFind)));
+                        break;
+                      }
+                  }
+                },
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                title: Text(Notifications.notificationsList[index].description)
+            ),
+          );
+        }),
+    );
   }
 
 

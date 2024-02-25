@@ -391,7 +391,7 @@ class DownloadAllList{
 
   List getNotifications() {
     List notifications = [];
-    notifications.addAll(getListNotificationsAfterRepairBetter1Day());
+    notifications.addAll(getListNotificationsDontTestDriveAfterRepairBetter1Day());
     notifications.addAll(getListNotificationsTechnicInRepairBetter21Days());
     notifications.addAll(getListNotificationsTechnicTestDriveNotComplatedBetter14Days());
     notifications.addAll(getListNotificationsTechnicBadAndNotInRepairBetter7Days());
@@ -399,12 +399,20 @@ class DownloadAllList{
     return notifications;
   }
 
-  List getListNotificationsAfterRepairBetter1Day(){
+  List getListNotificationsDontTestDriveAfterRepairBetter1Day(){
     List notifications = [];
     // тест-драйв не сделан больше одного дня после ремонта для Копиров и Фотоаппаратов
     Technic.technicList.forEach((technic) {
       if(technic.category == 'Копир' || technic.category == 'Фотоаппарат'){
         Repair? repair = Repair.repairList.firstWhere((repair) => repair.internalID == technic.internalID, orElse: () => null);
+
+        // bool dateTransferInServiceAfterDateStartTestDriveTechnic = false;
+        bool dateTransferInServiceAfterDateStartTestDriveTechnic = ;
+        if(repair != null && repair.dateDepartureFromService != '' && technic.dateStartTestDrive != '') {
+          dateTransferInServiceAfterDateStartTestDriveTechnic = getDate(repair.dateDepartureFromService)!.
+            isAfter(getDate(technic.dateStartTestDrive)!);
+        }
+
         if(repair != null && repair.dateDepartureFromService != '' && repair.idTestDrive == 0){
           Duration? duration = DateTime.now().difference(getDate(repair.dateDepartureFromService)!);
           if(duration.inDays > 1){
