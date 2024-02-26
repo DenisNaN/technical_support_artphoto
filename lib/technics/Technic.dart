@@ -1,6 +1,7 @@
 
 class Technic implements Comparable{
   static List technicList = [];
+  static List tmpTechnicList = [];
   static List testDriveList = [];
 
   int? id;
