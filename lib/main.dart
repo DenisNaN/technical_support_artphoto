@@ -54,6 +54,7 @@ class ArtphotoTech extends StatefulWidget {
 
 class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderStateMixin{
   late TabController _tabController;
+  final _findController = TextEditingController();
   int _selectedIndex = 0;
 
   @override
@@ -101,16 +102,27 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
     return Row(children: [
       Text(LoginPassword.login),
       Expanded(
+        child: ListTile(
+          leading: Icon(Icons.search),
+          title: TextFormField(
+            decoration: const InputDecoration(hintText: "Поиск"),
+            controller: _findController,
+          ),
+        ),
+      ),
+      Expanded(
         child: Container(
           alignment: Alignment.centerRight,
           child: myAppBarIconNotifications()
-      ))
+      )),
     ]);
   }
 
   Widget myAppBarIconNotifications(){
     return GestureDetector(
       onTap: (){
+        Notifications.notificationsList.clear();
+        Notifications.notificationsList.addAll(DownloadAllList.downloadAllList.getNotifications());
         showModalBottomSheet<void>(
           enableDrag: true,
           showDragHandle: true,
@@ -180,6 +192,7 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
               setState(() {
                 Notifications.notificationsList.clear();
                 Notifications.notificationsList.addAll(DownloadAllList.downloadAllList.getNotifications());
+                Navigator.pop(context);
               });
             }
         );
@@ -212,6 +225,7 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
                       Technic? technicFind = Technic.technicList.firstWhere((item) => item.id == Notifications.notificationsList[index].idSection,
                           orElse: () => null);
                       if(technicFind != null) {
+                        Navigator.pop(context);
                         Navigator.push(
                             context, MaterialPageRoute(
                             builder: (context) =>
@@ -222,6 +236,7 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
                       Repair? repairFind = Repair.repairList.firstWhere((item) => item.id == Notifications.notificationsList[index].idSection,
                           orElse: () => null);
                       if(repairFind != null) {
+                        Navigator.pop(context);
                         Navigator.push(
                             context, MaterialPageRoute(
                             builder: (context) => RepairViewAndChange(repair: repairFind)));
