@@ -13,7 +13,6 @@ import '../utils/hasNetwork.dart';
 import 'package:intl/intl.dart';
 import 'Repair.dart';
 
-
 class RepairViewAndChange extends StatefulWidget {
   final Repair repair;
   const RepairViewAndChange({super.key, required this.repair});

@@ -10,7 +10,7 @@ import 'package:technical_support_artphoto/splashScreen.dart';
 import 'package:technical_support_artphoto/technics/Technic.dart';
 import 'package:technical_support_artphoto/technics/TechnicViewAndChange.dart';
 import 'package:technical_support_artphoto/technics/TechnicsList.dart';
-import 'package:technical_support_artphoto/technics/ViewFindTechnic.dart';
+import 'package:technical_support_artphoto/findedEntitys/ViewFindedTechnic.dart';
 import 'package:technical_support_artphoto/trouble/TroubleList.dart';
 import 'package:technical_support_artphoto/utils/downloadAllList.dart';
 import 'package:technical_support_artphoto/utils/notifications.dart';
@@ -55,7 +55,6 @@ class ArtphotoTech extends StatefulWidget {
 
 class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderStateMixin{
   late TabController _tabController;
-  final _findController = TextEditingController();
   int _selectedIndex = 0;
 
   @override
@@ -103,49 +102,59 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-      Text(LoginPassword.login),
-      Expanded(
-        flex: 5,
-        child: Container(height: 40,
-          padding: const EdgeInsets.only(left: 20, top: 5),
-          child: TextField(
-            decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    setState(() {
-                      _findController.text = '';
-                    });
-                  }),
-                contentPadding: const EdgeInsets.only(top: 5, left: 10),
-                filled: true,
-                fillColor: Colors.white70,
-              hintText: "Поиск",
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10))
+          Text(LoginPassword.login),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: CircleBorder(),
+                padding: EdgeInsets.all(12),
+              ),
+              child: Icon(Icons.search),
+              onPressed: () {
+                switch (_selectedIndex){
+                  case 0:
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTechnic()));
+                    break;
+                }
+              },
             ),
-            controller: _findController,
-            onSubmitted: (value)=> setState(() {
-              getListFindTechnic();
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindTechnic()));
-              }),
           ),
-        ),
-      ),
+      // Expanded(
+      //   flex: 5,
+      //   child: Container(height: 40,
+      //     padding: const EdgeInsets.only(left: 20, top: 5),
+      //     child: TextField(
+      //       decoration: InputDecoration(
+      //           prefixIcon: const Icon(Icons.search),
+      //           suffixIcon: IconButton(
+      //             icon: const Icon(Icons.clear),
+      //             onPressed: () {
+      //               setState(() {
+      //                 _findController.text = '';
+      //               });
+      //             }),
+      //           contentPadding: const EdgeInsets.only(top: 5, left: 10),
+      //           filled: true,
+      //           fillColor: Colors.white70,
+      //         hintText: "Поиск",
+      //         border: OutlineInputBorder(
+      //             borderRadius: BorderRadius.circular(10))
+      //       ),
+      //       controller: _findController,
+      //       onSubmitted: (value)=> setState(() {
+      //         getListFindTechnic();
+      //         Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindTechnic()));
+      //         }),
+      //     ),
+      //   ),
+      // ),
       Expanded(
-        flex: 1,
         child: Container(
           alignment: Alignment.centerRight,
           child: myAppBarIconNotifications()
       )),
     ]);
-  }
-
-  void getListFindTechnic(){
-    Technic.tmpTechnicList.clear();
-    Technic technic = Technic.tmpTechnicList.firstWhere((element) => element == _findController.text);
-    Technic.tmpTechnicList.add(technic);
   }
 
   Widget myAppBarIconNotifications(){
