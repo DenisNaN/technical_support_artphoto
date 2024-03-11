@@ -107,10 +107,18 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                shape: CircleBorder(),
-                padding: EdgeInsets.all(12),
+                shadowColor: Colors.transparent,
+                backgroundColor: Colors.black.withOpacity(0.4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: const EdgeInsets.all(12),
               ),
-              child: Icon(Icons.search),
+              child: const Row(children: [
+                  Icon(Icons.search),
+                  Text('Поиск и сортировка')
+                ],
+              ),
               onPressed: () {
                 switch (_selectedIndex){
                   case 0:
@@ -120,35 +128,6 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
               },
             ),
           ),
-      // Expanded(
-      //   flex: 5,
-      //   child: Container(height: 40,
-      //     padding: const EdgeInsets.only(left: 20, top: 5),
-      //     child: TextField(
-      //       decoration: InputDecoration(
-      //           prefixIcon: const Icon(Icons.search),
-      //           suffixIcon: IconButton(
-      //             icon: const Icon(Icons.clear),
-      //             onPressed: () {
-      //               setState(() {
-      //                 _findController.text = '';
-      //               });
-      //             }),
-      //           contentPadding: const EdgeInsets.only(top: 5, left: 10),
-      //           filled: true,
-      //           fillColor: Colors.white70,
-      //         hintText: "Поиск",
-      //         border: OutlineInputBorder(
-      //             borderRadius: BorderRadius.circular(10))
-      //       ),
-      //       controller: _findController,
-      //       onSubmitted: (value)=> setState(() {
-      //         getListFindTechnic();
-      //         Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindTechnic()));
-      //         }),
-      //     ),
-      //   ),
-      // ),
       Expanded(
         child: Container(
           alignment: Alignment.centerRight,
