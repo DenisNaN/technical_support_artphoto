@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:technical_support_artphoto/findedEntitys/ViewFindedRepairs.dart';
+import 'package:technical_support_artphoto/findedEntitys/ViewFindedTroubles.dart';
 import 'package:technical_support_artphoto/history/HistoryList.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
 import 'package:technical_support_artphoto/repair/RepairList.dart';
@@ -104,7 +105,7 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(LoginPassword.login),
-          Padding(
+          _selectedIndex == 3 ? const SizedBox() : Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -127,6 +128,9 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
                     break;
                   case 1:
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedRepairs()));
+                    break;
+                  case 2:
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTrouble()));
                     break;
                 }
               },

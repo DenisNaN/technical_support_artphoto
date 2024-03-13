@@ -44,36 +44,49 @@ class _ViewFindedTechnicState extends State<ViewFindedTechnic> {
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: colorAppBar.color(),
-        title: Container(height: 40,
-          padding: const EdgeInsets.only(left: 20, top: 5),
-          child: TextField(
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            focusNode: myFocusNode,
-            decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    setState(() {
-                      _findController.text = '';
-                      tmpTechnicList.clear();
-                      tmpTechnicList.addAll(Technic.technicList);
-                      regularize = -1;
-                      filtersMap.clear();
-                    });
-                  }),
-                contentPadding: const EdgeInsets.only(top: 5, left: 10),
-                filled: true,
-                fillColor: Colors.white70,
-              hintText: "Поиск",
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10))
-            ),
-            controller: _findController,
-            keyboardType: TextInputType.number,
-            onSubmitted: (value)=> setState(() {
-              getListFindTechnic(value);
-              }),
+        title: Container(
+          height: 40,
+          child: Row(
+            children: [
+              Flexible(
+                child: TextField(
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  focusNode: myFocusNode,
+                  decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
+                      contentPadding: const EdgeInsets.only(top: 5, left: 10),
+                      filled: true,
+                      fillColor: Colors.white70,
+                    hintText: "Поиск",
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10))
+                  ),
+                  controller: _findController,
+                  keyboardType: TextInputType.number,
+                  onSubmitted: (value)=> setState(() {
+                    getListFindTechnic(value);
+                    }),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: TextButton(
+                    onPressed: (){
+                      setState(() {
+                        _findController.text = '';
+                        tmpTechnicList.clear();
+                        tmpTechnicList.addAll(Technic.technicList);
+                        regularize = -1;
+                        filtersMap.clear();
+                      });
+                    },
+                    child: const Row(
+                      children: [
+                        Icon(Icons.clear, color: Colors.white,),
+                        Text('Сброс', style: TextStyle(color: Colors.white),),
+                      ])),
+              )
+            ],
           ),
         ),
       ),

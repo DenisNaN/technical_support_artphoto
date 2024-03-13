@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:technical_support_artphoto/findedEntitys/FiltersForTrouble.dart';
+import 'package:technical_support_artphoto/trouble/Trouble.dart';
 import 'package:intl/intl.dart';
-import 'package:technical_support_artphoto/findedEntitys/FiltersForRepair.dart';
-import 'package:technical_support_artphoto/findedEntitys/FiltersForTechnic.dart';
-import '../repair/Repair.dart';
-import '../repair/RepairViewAndChange.dart';
+import '../trouble/TroubleViewAndChange.dart';
 import '../utils/utils.dart';
+import 'FiltersForTechnic.dart';
 
-class ViewFindedRepairs extends StatefulWidget {
-  const ViewFindedRepairs({super.key});
+class ViewFindedTrouble extends StatefulWidget {
+  const ViewFindedTrouble({super.key});
 
   @override
-  State<ViewFindedRepairs> createState() => _ViewFindedRepairsState();
+  State<ViewFindedTrouble> createState() => _ViewFindedTroubleState();
 }
 
-class _ViewFindedRepairsState extends State<ViewFindedRepairs> {
-  List tmpRepairsList = [];
+class _ViewFindedTroubleState extends State<ViewFindedTrouble> {
+  List tmpTroubleList = [];
   final _findController = TextEditingController();
   late FocusNode myFocusNode;
   int regularize = -1;
@@ -24,7 +24,7 @@ class _ViewFindedRepairsState extends State<ViewFindedRepairs> {
   @override
   void initState() {
     super.initState();
-    tmpRepairsList.addAll(Repair.repairList);
+    tmpTroubleList = _getListSortTrouble();
     myFocusNode = FocusNode();
     myFocusNode.requestFocus();
   }
@@ -61,7 +61,7 @@ class _ViewFindedRepairsState extends State<ViewFindedRepairs> {
                     controller: _findController,
                     keyboardType: TextInputType.number,
                     onSubmitted: (value)=> setState(() {
-                      getListFindRepairs(value);
+                      getListFindTroubles(value);
                     }),
                   ),
                 ),
@@ -71,8 +71,8 @@ class _ViewFindedRepairsState extends State<ViewFindedRepairs> {
                       onPressed: (){
                         setState(() {
                           _findController.text = '';
-                          tmpRepairsList.clear();
-                          tmpRepairsList.addAll(Repair.repairList);
+                          tmpTroubleList.clear();
+                          tmpTroubleList = _getListSortTrouble();
                           regularize = -1;
                           filtersMap.clear();
                         });
@@ -109,13 +109,13 @@ class _ViewFindedRepairsState extends State<ViewFindedRepairs> {
                     onPressed: (){
                       setState(() {
                         if(regularize == 1){
-                          tmpRepairsList.sort((a, b) => a.internalID.compareTo(b.internalID));
+                          tmpTroubleList.sort((a, b) => a.internalID.compareTo(b.internalID));
                           regularize = 0;
                         } else if(regularize == 0){
-                          tmpRepairsList.sort((a, b) => b.internalID.compareTo(a.internalID));
+                          tmpTroubleList.sort((a, b) => b.internalID.compareTo(a.internalID));
                           regularize = 1;
                         }else{
-                          tmpRepairsList.sort((a, b) => a.internalID.compareTo(b.internalID));
+                          tmpTroubleList.sort((a, b) => a.internalID.compareTo(b.internalID));
                           regularize = 0;
                         }
                       });
@@ -140,18 +140,16 @@ class _ViewFindedRepairsState extends State<ViewFindedRepairs> {
                       padding: const EdgeInsets.all(12),
                     ),
                     onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => FiltersForRepair(filtMap: filtersMap))).then((map){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => FiltersForTrouble(filtMap: filtersMap))).then((map){
                         setState(() {
                           if(map != null){
-                            tmpRepairsList.clear();
+                            tmpTroubleList.clear();
                             filtersMap.clear();
-                            Repair.repairList.forEach((element) {
+                            Trouble.troubleList.forEach((element) {
                               int countCoincidence = 0;
                               map.forEach((key, value) {
-                                if(element.category == value) countCoincidence++;
-                                if(element.status == value) countCoincidence++;
-                                if(element.dislocationOld == value) countCoincidence++;
-                                if(countCoincidence == map.length) tmpRepairsList.add(element);
+                                if(element.photosalon == value) countCoincidence++;
+                                if(countCoincidence == map.length) tmpTroubleList.add(element);
                                 filtersMap[key] = value;
                               });
                             });
@@ -168,17 +166,15 @@ class _ViewFindedRepairsState extends State<ViewFindedRepairs> {
               ],),
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: tmpRepairsList.length,
+                  itemCount: tmpTroubleList.length,
                   itemBuilder: (context, index) {
-                    Repair repair = tmpRepairsList[index];
-                    Color tileColor = getColorForList(repair);
-
+                    bool isDoneTrouble = isFieldFilled(tmpTroubleList[index]);
                     return Container(
                       margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
                       decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey, width: 0.5),
                           borderRadius: BorderRadius.circular(10),
-                          color: tileColor,
+                          color: isDoneTrouble ? Colors.lightGreenAccent : Colors.white,
                           boxShadow: const [
                             BoxShadow(
                               color: Colors.grey,
@@ -187,21 +183,21 @@ class _ViewFindedRepairsState extends State<ViewFindedRepairs> {
                             ),
                           ]
                       ),
-                      padding: const EdgeInsets.fromLTRB(3, 3, 3, 3),
                       child: ListTile(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => RepairViewAndChange(repair: tmpRepairsList[index]))).then((value) {
-                            setState(() {
-                              if (value != null) tmpRepairsList[index] = value;
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => TroubleViewAndChange(trouble: tmpTroubleList[index]))).then((value){
+                              setState(() {
+                                if(value != null) {
+                                  int tmpIndex = findIndexTouble(value);
+                                  Trouble.troubleList[tmpIndex] = value;
+                                  tmpTroubleList.clear();
+                                  tmpTroubleList = _getListSortTrouble();
+                                }
+                              });
                             });
-                          });
-                        },
-                        title: _buildTextTitle(context, index),
-                        subtitle: _buildTextSubtitle(context, index),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+                          },
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                          title: _buildTitleListTile(context, index, tmpTroubleList)
                       ),
                     );
                   },
@@ -213,118 +209,117 @@ class _ViewFindedRepairsState extends State<ViewFindedRepairs> {
     );
   }
 
-  void getListFindRepairs(dynamic value){
+  void getListFindTroubles(dynamic value){
     if(value != ''){
       int numberTechnic = int.parse(value);
-      var repairs = Repair.repairList.where((element) => element.internalID == numberTechnic);
-      if(repairs.isEmpty) {
+      var troubles = Trouble.troubleList.where((element) => element.internalID == numberTechnic);
+      if(troubles.isEmpty) {
         viewSnackBar('Ремонт не найден');
       } else {
-        tmpRepairsList.clear();
-        tmpRepairsList.addAll(repairs);
+        tmpTroubleList.clear();
+        tmpTroubleList.addAll(troubles);
       }
     }
   }
 
-  Text _buildTextTitle(BuildContext context, int index){
-    String repairComplaint = 'Не внесли данные.';
-    if(tmpRepairsList[index].complaint != '' && tmpRepairsList[index].complaint != null){
-      repairComplaint = '${tmpRepairsList[index].complaint}.';
-    }
+  List _getListSortTrouble(){
+    List troubleList = [];
+    List tmpList = [];
 
-    if(tmpRepairsList[index].internalID != -1){
-      return Text.rich(TextSpan(children:
-      [TextSpan(text: '№ ${tmpRepairsList[index].internalID}. ${tmpRepairsList[index].category}.\n',
-          style: const TextStyle(fontWeight: FontWeight.bold)),
-        TextSpan(text: 'Жалоба: $repairComplaint')
-      ]
-      ));
-    } else{
-      return Text.rich(TextSpan(children:
-      [TextSpan(text: 'Без №. ${tmpRepairsList[index].category}.\n',
-          style: const TextStyle(fontWeight: FontWeight.bold)),
-        TextSpan(text: 'Жалоба: $repairComplaint')
-      ]
-      ));
-    }
+    Trouble.troubleList.forEach((element) {
+      if(!isFieldFilled(element)) troubleList.add(element);
+    });
+    troubleList.sort((element1, element2) =>
+        DateTime.parse(element2.dateTrouble.replaceAll('.', '-')).compareTo(
+            DateTime.parse(element1.dateTrouble.replaceAll('.', '-'))));
+
+    Trouble.troubleList.forEach((element) {
+      if(isFieldFilled(element)) {
+        tmpList.add(element);
+      }
+    });
+    tmpList.sort((element1, element2) =>
+        DateTime.parse(element2.dateTrouble.replaceAll('.', '-')).compareTo(
+            DateTime.parse(element1.dateTrouble.replaceAll('.', '-'))));
+    troubleList.addAll(tmpList);
+    return troubleList;
   }
 
-  Text _buildTextSubtitle(BuildContext context, int index){
-    String repairStatus = 'Отсутствует.';
-    if(tmpRepairsList[index].status != '' && tmpRepairsList[index].status != null){
-      if(tmpRepairsList[index].newStatus != '' && tmpRepairsList[index].newStatus != null){
-        repairStatus = '${tmpRepairsList[index].newStatus}.';
-      } else {
-        repairStatus = '${tmpRepairsList[index].status}.';
-      }
-    }
-    String repairDislocation = 'Отсутствует.';
-    if(tmpRepairsList[index].dislocationOld != '' && tmpRepairsList[index].dislocationOld != null){
-      if(tmpRepairsList[index].newDislocation != '' && tmpRepairsList[index].newDislocation != null){
-        repairDislocation = '${tmpRepairsList[index].newDislocation}.';
-      } else {
-        repairDislocation = '${tmpRepairsList[index].dislocationOld}.';
-      }
-    }
-    String repairLastDate = 'Даты отсутствуют.';
-    if(tmpRepairsList[index].dateDeparture != '') {
-      repairLastDate = 'Забрали с точки: ${getDateFormat(tmpRepairsList[index].dateDeparture)}.';
-    }
-    if(tmpRepairsList[index].dateTransferInService != ''){
-      repairLastDate = 'Сдали в ремонт: ${getDateFormat(tmpRepairsList[index].dateTransferInService)}.';
-    }
-    if(tmpRepairsList[index].dateDepartureFromService != ''){
-      repairLastDate = 'Забрали из ремонта: ${getDateFormat(tmpRepairsList[index].dateDepartureFromService)}.';
-    }
+  Row _buildTitleListTile(BuildContext context, int index, List troubleList){
+    bool checkboxValueEngineer;
+    bool checkboxValueEmployee;
+    bool checkboxValuePhoto = false;
 
-    return Text(
-        'Статус: $repairStatus\n'
-            'Дислокация: $repairDislocation\n'
-            '$repairLastDate'
+    troubleList[index].dateCheckFixTroubleEngineer != '' ? checkboxValueEngineer = true :
+    checkboxValueEngineer = false;
+    troubleList[index].dateCheckFixTroubleEmployee != '' ? checkboxValueEmployee = true :
+    checkboxValueEmployee = false;
+
+    if(troubleList[index].photoTrouble != null){
+      troubleList[index].photoTrouble.isNotEmpty ? checkboxValuePhoto = true :
+      checkboxValuePhoto = false;
+    }
+    return Row(
+      children: [
+        Expanded(child:
+        Text.rich(
+            TextSpan(children: [
+              TextSpan(
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  text: troubleList[index].internalID != 0 ?
+                  '№ ${troubleList[index].internalID} ' : 'БН '),
+              TextSpan(
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  text: '${troubleList[index].photosalon} '
+                      '${troubleList[index].employee}\n'
+              ),
+              TextSpan(
+                  style: const TextStyle(fontStyle: FontStyle.italic),
+                  text: '${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(troubleList[index].dateTrouble.replaceAll('.', '-')))}\n'),
+              TextSpan(
+                  text: 'Проблема: ${troubleList[index].trouble}\n',
+                  children: [WidgetSpan(child:
+                  Row(children: [
+                    const Text( 'Фото: '),
+                    SizedBox(
+                        width: 30,
+                        height: 10,
+                        child: Checkbox(value: checkboxValuePhoto, onChanged: null)),
+                  ]
+                  )
+                  )
+                  ]
+              )
+            ],
+            ))),
+        Column(
+          children: [
+            Row(children: [SizedBox(
+                height: 30,
+                child: Checkbox(value: checkboxValueEmployee, onChanged: (value){})), const Text('Ф')]),
+            Row(children: [SizedBox(
+                width: 48,
+                height: 30,
+                child: Checkbox(value: checkboxValueEngineer, onChanged: (value){})), const Text('И')])
+          ],)
+      ],
     );
   }
 
-  Color getColorForList(Repair repair){
-    Color color = Colors.white;
-    String resultColor = fieldsFilled(repair);
-    switch(resultColor){
-      case 'red':
-        color = Colors.deepOrange.shade100;
-        break;
-      case 'yellow':
-        color = Colors.yellow.shade100;
-        break;
-      case 'green':
-        color = Colors.green.shade100;
-        break;
-    }
-    return color;
-  }
-
-  String fieldsFilled(Repair repair){
-    String result = 'yellow';
-    if(repair.complaint != '' &&
-        repair.dateDeparture != '' &&
-        repair.dateTransferInService != '' &&
-        repair.serviceDislocation != '' &&
-        repair.dateDepartureFromService != '' &&
-        repair.worksPerformed != '' &&
-        repair.costService != 0 &&
-        repair.diagnosisService != '' &&
-        repair.dateReceipt != '' &&
-        repair.newStatus != '' &&
-        repair.newDislocation != ''){
-      return 'green';
-    }
-    if(repair.dateTransferInService == '' ||
-        repair.serviceDislocation == ''){
-      return 'red';
+  bool isFieldFilled(Trouble trouble){
+    bool result = false;
+    if(trouble.dateCheckFixTroubleEmployee != ''){
+      result = true;
     }
     return result;
   }
 
-  String getDateFormat(String date) {
-    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
+  int findIndexTouble(Trouble trouble){
+    int index = -1;
+    for(int i = 0; i < Trouble.troubleList.length; i++){
+      if(Trouble.troubleList[i].id == trouble.id) index = i;
+    }
+    return index;
   }
 
   void viewSnackBar(String text){
