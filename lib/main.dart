@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:technical_support_artphoto/findedEntitys/ViewFindedRepairs.dart';
 import 'package:technical_support_artphoto/history/HistoryList.dart';
 import 'package:technical_support_artphoto/repair/Repair.dart';
 import 'package:technical_support_artphoto/repair/RepairList.dart';
@@ -123,6 +124,9 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
                 switch (_selectedIndex){
                   case 0:
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTechnic()));
+                    break;
+                  case 1:
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedRepairs()));
                     break;
                 }
               },
@@ -269,6 +273,4 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
         }),
     );
   }
-
-
 }

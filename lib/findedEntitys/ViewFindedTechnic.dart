@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:technical_support_artphoto/findedEntitys/FiltersForTechnic.dart';
 import '../repair/Repair.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import '../technics/Technic.dart';
@@ -20,6 +21,7 @@ class _ViewFindedTechnicState extends State<ViewFindedTechnic> {
   final _findController = TextEditingController();
   late FocusNode myFocusNode;
   int regularize = -1;
+  Map filtersMap = {};
 
   @override
   void initState() {
@@ -57,6 +59,7 @@ class _ViewFindedTechnicState extends State<ViewFindedTechnic> {
                       tmpTechnicList.clear();
                       tmpTechnicList.addAll(Technic.technicList);
                       regularize = -1;
+                      filtersMap.clear();
                     });
                   }),
                 contentPadding: const EdgeInsets.only(top: 5, left: 10),
@@ -126,7 +129,26 @@ class _ViewFindedTechnicState extends State<ViewFindedTechnic> {
                     ),
                     padding: const EdgeInsets.all(12),
                   ),
-                  onPressed: (){},
+                  onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => FiltersForTechnic(filtMap: filtersMap))).then((map){
+                      setState(() {
+                        if(map != null){
+                          tmpTechnicList.clear();
+                          filtersMap.clear();
+                          Technic.technicList.forEach((element) {
+                            int countCoincidence = 0;
+                            map.forEach((key, value) {
+                              if(element.category == value) countCoincidence++;
+                              if(element.status == value) countCoincidence++;
+                              if(element.dislocation == value) countCoincidence++;
+                              if(countCoincidence == map.length) tmpTechnicList.add(element);
+                              filtersMap[key] = value;
+                            });
+                          });
+                        }
+                      });
+                    });
+                  },
                   child: const Row(
                     children: [
                       Icon(Icons.filter_alt),
