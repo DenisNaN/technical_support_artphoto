@@ -78,6 +78,7 @@ class ConnectToDBMySQL {
   }
 
   Future<Technic?> getTechnic(int id) async {
+    Technic? technic = null;
     var result = await _connDB!.query('SELECT '
         'equipment.id, '
         'equipment.number, '
@@ -98,7 +99,9 @@ class ConnectToDBMySQL {
         'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
         'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
         'WHERE equipment.id = ?', [id]);
-    Technic? technic = technicListFromMap(result).first;
+    if(result.isNotEmpty) {
+      technic = technicListFromMap(result).first;
+    }
     return technic;
   }
 
@@ -203,8 +206,11 @@ class ConnectToDBMySQL {
   }
 
   Future<Repair?> getRepair(int id) async {
+    Repair? repair = null;
     var result = await _connDB!.query('SELECT * FROM repairEquipment WHERE id = ?', [id]);
-    Repair? repair = repairListFromMap(result).first;
+    if(result.isNotEmpty) {
+      repair = repairListFromMap(result).first;
+    }
     return repair;
   }
 

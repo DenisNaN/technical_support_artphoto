@@ -403,23 +403,26 @@ class DownloadAllList{
     List notifications = [];
     // тест-драйв не сделан больше одного дня после ремонта для Копиров и Фотоаппаратов
     Technic.technicList.forEach((technic) {
-      if(technic.category == 'Копир' || technic.category == 'Фотоаппарат'){
-        Repair? repair = Repair.repairList.firstWhere((repair) => repair.internalID == technic.internalID, orElse: () => null);
+        if (technic.category == 'Копир' || technic.category == 'Фотоаппарат'){
+          if(technic.status != 'Донор' && technic.status != 'Списана' && technic.status != 'Неисправна' && technic.status != 'В ремонте') {
+            Repair? repair = Repair.repairList.firstWhere((repair) => repair.internalID == technic.internalID, orElse: () => null);
 
-        bool isDateTransferInServiceAfterDateStartTestDriveTechnic = false;
-        if(repair != null && repair.dateDepartureFromService != '' && technic.dateStartTestDrive != '') {
-          isDateTransferInServiceAfterDateStartTestDriveTechnic = getDate(repair.dateDepartureFromService)!.
-            isBefore(getDate(technic.dateStartTestDrive)!);
-        }
+            bool isDateTransferInServiceAfterDateStartTestDriveTechnic = false;
+            if (repair != null && repair.dateDepartureFromService != '' && technic.dateStartTestDrive != '') {
+              isDateTransferInServiceAfterDateStartTestDriveTechnic = getDate(repair.dateDepartureFromService)!.
+              isBefore(getDate(technic.dateStartTestDrive)!);
+            }
 
-        if(repair != null && repair.dateDepartureFromService != '' &&
-            repair.idTestDrive == 0 && !isDateTransferInServiceAfterDateStartTestDriveTechnic){
-          Duration? duration = DateTime.now().difference(getDate(repair.dateDepartureFromService)!);
-          if(duration.inDays > 1){
-            notifications.add(Notifications(
-                'Не сделан тест-драйв ${repair.category.trim()}а №${repair.internalID}. После ремонта прошло: ${duration.inDays} ${getDayAddition(duration.inDays)}',
-                technic.id, 'Technic'));
-          }
+            if (repair != null && repair.dateDepartureFromService != '' &&
+                repair.idTestDrive == 0 && !isDateTransferInServiceAfterDateStartTestDriveTechnic) {
+              Duration? duration = DateTime.now().difference(getDate(repair.dateDepartureFromService)!);
+              if (duration.inDays > 1) {
+                notifications.add(Notifications(
+                  'Не сделан тест-драйв ${repair.category.trim()}а №${repair.internalID}. После ремонта прошло: ${duration.inDays} ${getDayAddition(
+                      duration.inDays)}',
+                  technic.id, 'Technic'));
+              }
+            }
         }
       }
     });

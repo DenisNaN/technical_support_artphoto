@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:technical_support_artphoto/findedEntitys/FiltersForRepair.dart';
-import 'package:technical_support_artphoto/findedEntitys/FiltersForTechnic.dart';
 import '../repair/Repair.dart';
 import '../repair/RepairViewAndChange.dart';
 import '../utils/utils.dart';
@@ -193,7 +192,14 @@ class _ViewFindedRepairsState extends State<ViewFindedRepairs> {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => RepairViewAndChange(repair: tmpRepairsList[index]))).then((value) {
                             setState(() {
-                              if (value != null) tmpRepairsList[index] = value;
+                              if (value != null) {
+                                for(int i = 0; i < Repair.repairList.length; i++){
+                                  if(Repair.repairList[i].internalID == value.internalID){
+                                    Repair.repairList[i] = value;
+                                  }
+                                }
+                                tmpRepairsList[index] = value;
+                              }
                             });
                           });
                         },

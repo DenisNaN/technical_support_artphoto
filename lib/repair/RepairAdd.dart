@@ -6,6 +6,7 @@ import '../ConnectToDBMySQL.dart';
 import '../history/History.dart';
 import '../history/HistorySQFlite.dart';
 import '../technics/Technic.dart';
+import '../technics/TechnicSQFlite.dart';
 import '../utils/categoryDropDownValueModel.dart';
 import '../utils/utils.dart';
 import 'Repair.dart';
@@ -603,6 +604,22 @@ class _RepairAddState extends State<RepairAdd> {
     ConnectToDBMySQL.connDB.insertRepairInDB(repair);
     RepairSQFlite.db.create(repair);
     addHistory(repair);
+
+    if(newStatusStr != '' || newDislocationStr != ''){
+      int indexTechnic = -1;
+      for(int i = 0; i < Technic.technicList.length; i++){
+        if(Technic.technicList[i].internalID == int.parse(_innerNumberTechnic.text)){
+          indexTechnic = i;
+          break;
+        }
+      }
+
+      repair.dateReceipt = DateFormat('yyyy.MM.dd').format(DateTime.now());
+      ConnectToDBMySQL.connDB.insertStatusInDB(Technic.technicList[indexTechnic].id!, newStatusStr, newDislocationStr);
+      TechnicSQFlite.db.updateStatusDislocationTechnic(Technic.technicList[indexTechnic].id, newStatusStr, newDislocationStr);
+      Technic.technicList[indexTechnic].status = newStatusStr;
+      Technic.technicList[indexTechnic].dislocation = newDislocationStr;
+    }
 
     viewSnackBar(' Техника в ремонт добавлена');
     Navigator.pop(context, repair);

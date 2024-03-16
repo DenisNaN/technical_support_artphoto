@@ -42,14 +42,14 @@ class _TechnicsListState extends State<TechnicsList> {
               setState(() {
                 if(value != null) {
                   Technic.technicList.insert(0, value);
+                  Technic.technicList.sort();
                 }}
               );
             });
             } : null,
             child: const Icon(Icons.add, color: Colors.white)
             ),
-        body:
-        ListView.builder(
+        body: ListView.builder(
           itemCount: Technic.technicList.length,
           itemBuilder: (context, index) {
             String dateStart = _dateStart(index);

@@ -147,8 +147,6 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
   Widget myAppBarIconNotifications(){
     return GestureDetector(
       onTap: (){
-        Notifications.notificationsList.clear();
-        Notifications.notificationsList.addAll(DownloadAllList.downloadAllList.getNotifications());
         showModalBottomSheet<void>(
           enableDrag: true,
           showDragHandle: true,
@@ -209,21 +207,8 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
     );
   }
 
-  RefreshIndicator _buildListForBottomSheet() {
-    return RefreshIndicator(
-      onRefresh: () {
-        return Future.delayed(
-          const Duration(seconds: 1),
-            (){
-              setState(() {
-                Notifications.notificationsList.clear();
-                Notifications.notificationsList.addAll(DownloadAllList.downloadAllList.getNotifications());
-                Navigator.pop(context);
-              });
-            }
-        );
-      },
-      child: ListView.builder(
+  ListView _buildListForBottomSheet() {
+    return ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: Notifications.notificationsList.length,
         itemBuilder: (context, index) {
@@ -254,8 +239,16 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
                         Navigator.pop(context);
                         Navigator.push(
                             context, MaterialPageRoute(
-                            builder: (context) =>
-                                TechnicViewAndChange(technic: technicFind)));
+                            builder: (context) => TechnicViewAndChange(technic: technicFind))).then((value) {
+                          setState(() {
+                            if(value != null) {
+                              Technic.technicList[Technic.technicList.indexWhere((element) =>
+                              element.id == Notifications.notificationsList[index].idSection)] = value;
+                              Notifications.notificationsList.clear();
+                              Notifications.notificationsList.addAll(DownloadAllList.downloadAllList.getNotifications());
+                            }
+                          });
+                        });
                         break;
                       }
                     case 'Repair':
@@ -265,7 +258,16 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
                         Navigator.pop(context);
                         Navigator.push(
                             context, MaterialPageRoute(
-                            builder: (context) => RepairViewAndChange(repair: repairFind)));
+                            builder: (context) => RepairViewAndChange(repair: repairFind))).then((value) {
+                          setState(() {
+                            if(value != null) {
+                              Repair.repairList[Repair.repairList.indexWhere((element) =>
+                              element.id == Notifications.notificationsList[index].idSection)] = value;
+                              Notifications.notificationsList.clear();
+                              Notifications.notificationsList.addAll(DownloadAllList.downloadAllList.getNotifications());
+                            }
+                          });
+                        });
                         break;
                       }
                   }
@@ -274,7 +276,6 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
                 title: Text(Notifications.notificationsList[index].description)
             ),
           );
-        }),
-    );
+        });
   }
 }

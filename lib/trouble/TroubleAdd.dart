@@ -46,25 +46,31 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
     super.initState();
     _focusInnerNumberTechnic.addListener(() {
       if (!_focusInnerNumberTechnic.hasFocus) {
-        technicFind =
-            Technic.technicList.firstWhere((item) => item.internalID
-                .toString() == _innerNumberTechnic.text,
-                orElse: () =>
-                    Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
-                        'dateChangeStatus', 'comment', 'testDriveDislocation', 'dateStartTestDrive',
-                        'dateFinishTestDrive', 'resultTestDrive', false));
-        if(technicFind.name == ''){
-          _categoryController.text = 'Модель не указана';
-        } else {
-          _categoryController.text = technicFind.name;
-        }
-        _photosalon = technicFind.dislocation;
-        if (technicFind.id == -1) {
+        if(_innerNumberTechnic.text != ''){
+          technicFind =
+              Technic.technicList.firstWhere((item) => item.internalID
+                  .toString() == _innerNumberTechnic.text,
+                  orElse: () =>
+                      Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation',
+                          'dateChangeStatus', 'comment', 'testDriveDislocation', 'dateStartTestDrive',
+                          'dateFinishTestDrive', 'resultTestDrive', false));
+          if(technicFind.id != -1){
+            _categoryController.text = technicFind.name;
+            _photosalon = technicFind.dislocation;
+          } else {
+            setState(() {
+              _innerNumberTechnic.clear();
+              _photosalon = null;
+              _categoryController.text = '';
+            });
+            viewSnackBar('Teхника с этим номером\nв базе не найдена.');
+          }
+        }else{
           setState(() {
             _innerNumberTechnic.clear();
+            _photosalon = null;
+            _categoryController.text = '';
           });
-
-          viewSnackBar('Teхника с этим номером\nв базе не найдена.');
         }
       }
     });
@@ -341,7 +347,6 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
         ).animate(
           CurveTween(curve: Curves.easeOut).animate(animationController)
         );
-
         animationController.forward(from: 0);
       },
       child: InteractiveViewer(
@@ -393,6 +398,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
     if(imageFile != null) {
       _photoTrouble = _decoderPhotoToBlob(imageFile!);
     }
+    trouble.photoTrouble = _photoTrouble;
     int id = -1;
     id = await ConnectToDBMySQL.connDB.insertTroubleInDB(trouble);
     trouble.id = id;

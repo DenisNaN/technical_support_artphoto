@@ -28,7 +28,11 @@ class _TroubleListState extends State<TroubleList> {
             backgroundColor: HasNetwork.isConnecting ? Colors.blue : Colors.grey,
             onPressed: HasNetwork.isConnecting ? () {Navigator.push(context, MaterialPageRoute(builder: (context) => const TroubleAdd())).then((value) {
               setState(() {
-                if(value != null) Trouble.troubleList.insert(0, value);
+                if(value != null) {
+                  Trouble.troubleList.insert(0, value);
+                  troubleList.clear();
+                  troubleList = _getListSortTrouble();
+                }
               });
             });
             } : null,

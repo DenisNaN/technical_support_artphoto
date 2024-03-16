@@ -369,7 +369,7 @@ class _TechnicViewAndChangeState extends State<TechnicViewAndChange> {
                     context: context,
                     initialDate: _dateBuyTechnic == '' || _dateBuyTechnic == '30 ноября 0001' ?
                       DateTime.now() :
-                        DateTime.parse(_dateBuyTechnic.replaceAll('.', '-')),
+                        DateTime.parse(_dateBuyForSQL.replaceAll('.', '-')),
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2099),
                     locale: const Locale("ru", "RU")

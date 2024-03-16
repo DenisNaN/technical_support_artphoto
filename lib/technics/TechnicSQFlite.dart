@@ -2,7 +2,7 @@ import 'package:technical_support_artphoto/technics/Technic.dart';
 import 'package:technical_support_artphoto/utils/utils.dart' as utils;
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-
+import 'package:intl/intl.dart';
 
 class TechnicSQFlite{
   TechnicSQFlite._();
@@ -125,10 +125,10 @@ class TechnicSQFlite{
     return await db.execute(
         'UPDATE equipment SET '
         'status = ?, '
-        'dislocation = ? '
-        'dateChangeStatus = ? ,'
+        'dislocation = ?, '
+        'dateChangeStatus = ? '
         'WHERE id = ?',
-      [status, dislocation, id]
+      [status, dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now()), id]
     );
   }
 

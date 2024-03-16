@@ -61,7 +61,7 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
     }
 
     _innerNumberTechnic.text = widget.trouble.internalID.toString();
-    _innerNumberTechnic.text == '0' ? _isBN = true : _isBN = false;
+    _innerNumberTechnic.text == "0" ? _isBN = true : _isBN = false;
     _selectedDropdownStatusOld = 'Неисправна';
     _complaint.text = widget.trouble.trouble;
     _dateDeparture = DateFormat('yyyy.MM.dd').format(DateTime.now());
@@ -665,13 +665,6 @@ class _RepairAddWithTroubleState extends State<RepairAddWithTrouble> {
                 Technic(-1, -1, 'name', 'category', -1, 'dateBuyTechnic', 'status', 'dislocation', 'dateChangeStatus',
                     'comment', 'testDriveDislocation', 'dateStartTestDrive', 'dateFinishTestDrive',
                     'resultTestDrive', false));
-    if (technicFind.id == -1) {
-      setState(() {
-        _isBN = true;
-      });
-    } else {
-      _isBN = false;
-    }
   }
 
   String getFomattedDateForView(String date){

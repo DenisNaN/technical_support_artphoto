@@ -187,6 +187,11 @@ class _ViewFindedTechnicState extends State<ViewFindedTechnic> {
                               Navigator.push(context, MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: tmpTechnicList[index]))).then((value){
                                 setState(() {
                                   if(value != null) {
+                                    for(int i = 0; i < Technic.technicList.length; i++){
+                                      if(Technic.technicList[i].internalID == value.internalID){
+                                        Technic.technicList[i] = value;
+                                      }
+                                    }
                                     tmpTechnicList[index] = value;
                                   }
                                 });
