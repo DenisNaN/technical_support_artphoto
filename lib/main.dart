@@ -1,19 +1,25 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
+import 'package:technical_support_artphoto/core/utils/utils.dart';
 import 'package:technical_support_artphoto/features/start_screens/authorization.dart';
 import 'package:technical_support_artphoto/features/start_screens/splash_screen.dart';
 import 'package:technical_support_artphoto/features/technics/technics_list.dart';
+import 'package:technical_support_artphoto/core/utils/utils.dart' as utils;
 
 void main() {
-  // startMeUp() {
-  // WidgetsFlutterBinding.ensureInitialized();
-  runApp(ChangeNotifierProvider(create: (_) => ProviderModel(), child: const SplashScreenArtphoto()));
-  // }
-  // startMeUp();
+  startMeUp() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    utils.packageInfo = packageInfo;
+    runApp(ChangeNotifierProvider(create: (_) => ProviderModel(), child: const SplashScreenArtphoto()));
+  }
+
+  startMeUp();
 }
 
 class SplashScreenArtphoto extends StatelessWidget {
@@ -49,7 +55,7 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 4);
+    _tabController = TabController(vsync: this, length: 1);
     _tabController.addListener(() {
       setState(() {
         _selectedIndex = _tabController.index;
@@ -66,20 +72,21 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    // ColorAppBar colorAppBar = ColorAppBar();
+    ColorAppBar colorAppBar = ColorAppBar();
     return DefaultTabController(
         length: 1,
         child: Scaffold(
           appBar: AppBar(
-              // flexibleSpace: colorAppBar.color(),
+              flexibleSpace: colorAppBar.color(),
               title: buildTitleAppBar(providerModel.user.keys.first),
               bottom: TabBar(controller: _tabController, tabs: const [
-                Tab(icon: Icon(Icons.add_a_photo_outlined), text: "Техника"),
+                Tab(icon: Icon(Icons.add_a_photo_outlined), text: "Главная"),
                 // Tab(icon: Icon(Icons.settings), text: "Ремонт"),
                 // Tab(icon: Icon(Icons.assignment_turned_in), text: "Неисп-ти"),
                 // Tab(icon: Icon(Icons.history), text: "История")
               ])),
           body: TabBarView(controller: _tabController, children: const [Technicslist()]),
+          // bottomNavigationBar: ,
         ));
   }
 
@@ -255,4 +262,28 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
 //         );
 //       });
 // }
+}
+
+class MyBottomAppBar extends StatelessWidget {
+  const MyBottomAppBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    ColorAppBar colorAppBar = ColorAppBar();
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+            begin: Alignment.bottomLeft,
+            end: Alignment.topRight,
+            colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
+      ),
+      child: Scaffold(bottomNavigationBar: ,)
+      // child: BottomNavigationBar(
+      //   items: const <BottomNavigationBarItem>[
+      //     BottomNavigationBarItem(icon: Icon(Icons.add_a_photo_outlined), label: 'Главная'),
+      //   ],
+      //   selectedItemColor: Colors.blueAccent,
+      // ),
+    );
+  }
 }

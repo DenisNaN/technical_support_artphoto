@@ -5,11 +5,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 Directory? docsDir;
 PackageInfo? packageInfo;
 
-// class LoginPassword{
-//   static String login = 'Артфото';
-//   static String access = '';
-// }
-
 class ColorAppBar{
   Container color(){
     return Container(

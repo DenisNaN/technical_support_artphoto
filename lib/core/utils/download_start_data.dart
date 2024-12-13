@@ -1,12 +1,7 @@
-import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/core/data/connect_db_my_sql.dart';
 import 'package:technical_support_artphoto/core/domain/models/photosalon.dart';
 import 'package:technical_support_artphoto/core/domain/models/repair.dart';
 import 'package:technical_support_artphoto/core/domain/models/storage.dart';
-import '../domain/models/user.dart';
-import 'categoryDropDownValueModel.dart';
-import 'notifications.dart';
-import 'utils.dart' as utils;
 
 class DownloadStartData {
   DownloadStartData._();
@@ -14,47 +9,70 @@ class DownloadStartData {
   static final DownloadStartData downloadStartData = DownloadStartData._();
 
   Future<Map<String, dynamic>> getStartData() async {
-    Map<String, Map<String, dynamic>> result = {};
+    Map<String, dynamic> result = {};
+
     Map<String, Photosalon> photosalons = {};
     Map<String, Repair> repairs = {};
     Map<String, Storage> storages = {};
 
+    // CategoryDropDown
+    List<String> namePhotosalons;
+    List<String> nameEquipment;
+    List<String> services;
+    List<String> statusForEquipment;
+    Map<String, int> colorsForEquipment;
+
     await ConnectDbMySQL.connDB.connDatabase();
+
     photosalons = await ConnectDbMySQL.connDB.fetchPhotosalons();
     repairs = await ConnectDbMySQL.connDB.fetchRepairs();
     storages = await ConnectDbMySQL.connDB.fetchStorages();
+
+    namePhotosalons = await ConnectDbMySQL.connDB.fetchNamePhotosalons();
+    namePhotosalons.addAll(await ConnectDbMySQL.connDB.fetchNameStorages());
+    nameEquipment = await ConnectDbMySQL.connDB.fetchNameEquipment();
+    services = await ConnectDbMySQL.connDB.fetchServices();
+    statusForEquipment = await ConnectDbMySQL.connDB.fetchStatusForEquipment();
+    colorsForEquipment = await ConnectDbMySQL.connDB.fetchColorsForEquipment();
 
     result['Photosalons'] = photosalons;
     result['Repairs'] = repairs;
     result['Storages'] = storages;
 
+    result['namePhotosalons'] = namePhotosalons;
+    result['nameEquipment'] = nameEquipment;
+    result['services'] = services;
+    result['statusForEquipment'] = statusForEquipment;
+    result['colorsForEquipment'] = colorsForEquipment;
+
     return result;
   }
 
-//   Future getAllHasNetwork (List listLastId, List listCount) async{
-//     Technic.technicList.addAll(
-//         await getAllActualTechnics(HasNetwork.isConnecting, listLastId[0]['id'], listCount[0]['countEquipment']));
-//     Technic.technicList.sort();
-//     Technic.testDriveList.addAll(await ConnectDbMySQL.connDB.getAllTestDrive());
-//     Repair.repairList.addAll(
-//         await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']));
-//     Notifications.notificationsList.addAll(getNotifications());
-//
-//     Trouble.troubleList.addAll(
-//         await getAllActualTrouble(HasNetwork.isConnecting, listLastId[2]['id'], listCount[2]['countTrouble']));
-//     History.historyList.addAll(
-//         await getAllActualHistory(HasNetwork.isConnecting, listLastId[3]['id'], listCount[3]['countTrouble']));
-//     CategoryDropDownValueModel.nameEquipment.addAll((await getActualCategory(
-//         HasNetwork.isConnecting, 'nameEquipment', 'name', listCount[4]['countName'])));
-//     CategoryDropDownValueModel.photosalons.addAll((await getActualCategory(
-//         HasNetwork.isConnecting, 'photosalons', 'Фотосалон', listCount[5]['countPhotosalons'])));
-//     CategoryDropDownValueModel.service.addAll((await getActualCategory(
-//         HasNetwork.isConnecting, 'service', 'repairmen', listCount[6]['countService'])));
-//     CategoryDropDownValueModel.statusForEquipment.addAll((await getActualCategory(
-//         HasNetwork.isConnecting, 'statusForEquipment', 'status', listCount[7]['countStatus'])));
-//     CategoryDropDownValueModel.colorForEquipment.addAll(await getActualColorsForPhotosalons(
-//         HasNetwork.isConnecting, listCount[8]['countColorsForPhotosalons']));
-//   }
+  // Map<String, List<String>> getCategoriesDropDownValueModel() async {
+    // Technic.technicList.addAll(
+    //     await getAllActualTechnics(HasNetwork.isConnecting, listLastId[0]['id'], listCount[0]['countEquipment']));
+    // Technic.technicList.sort();
+    // Technic.testDriveList.addAll(await ConnectDbMySQL.connDB.getAllTestDrive());
+    // Repair.repairList.addAll(
+    //     await getAllActualRepair(HasNetwork.isConnecting, listLastId[1]['id'], listCount[1]['countRepair']));
+    // Notifications.notificationsList.addAll(getNotifications());
+
+    // Trouble.troubleList.addAll(
+    //     await getAllActualTrouble(HasNetwork.isConnecting, listLastId[2]['id'], listCount[2]['countTrouble']));
+    // History.historyList.addAll(
+    //     await getAllActualHistory(HasNetwork.isConnecting, listLastId[3]['id'], listCount[3]['countTrouble']));
+  //   CategoryDropDownValueModel.nameEquipment
+  //       .addAll((await getActualCategory('nameEquipment')));
+  //   CategoryDropDownValueModel.photosalons
+  //       .addAll((await getActualCategory('photosalons')));
+  //   CategoryDropDownValueModel.service
+  //       .addAll((await getActualCategory('service')));
+  //   CategoryDropDownValueModel.statusForEquipment
+  //       .addAll((await getActualCategory('statusForEquipment')));
+  //   CategoryDropDownValueModel.colorForEquipment
+  //       .addAll(await getActualColorsForPhotosalons());
+  // }
+
 //
 //   Future getAllHasNotNetwork() async{
 //     Technic.technicList.addAll(await getAllActualTechnics(HasNetwork.isConnecting));
@@ -295,83 +313,31 @@ class DownloadStartData {
 //       });
 //     }
 //   }
-//
-//   Future<List<String>> getActualCategory(
-//       bool isConnectInternet,
-//       String nameTable,
-//       String nameCategory,
-//       [int countEntities = 0]) async{
-//     List<String> actualCategory = [];
-//
-//     actualCategory = await CategorySQFlite.db.getCategory(nameTable);
-//
-//     if(!isConnectInternet) return actualCategory;
-//
-//     if(countEntities != actualCategory.length){
-//       CategorySQFlite.db.deleteTable(nameTable);
-//       CategorySQFlite.db.createTable(nameTable, nameCategory);
-//
-//       switch(nameTable){
-//         case 'nameEquipment':
-//           actualCategory = await ConnectDbMySQL.connDB.getNameEquipment();
-//           break;
-//         case 'photosalons':
-//           actualCategory = await ConnectDbMySQL.connDB.getPhotosalons();
-//           break;
-//         case 'service':
-//           actualCategory = await ConnectDbMySQL.connDB.getService();
-//           break;
-//         case 'statusForEquipment':
-//           actualCategory = await ConnectDbMySQL.connDB.getStatusForEquipment();
-//           break;
-//       }
-//
-//       int id = 0;
-//       for(var category in actualCategory.reversed){
-//         ++id;
-//         CategorySQFlite.db.create(nameTable, nameCategory, id, category);
-//       }
-//     }
-//     return actualCategory;
-//   }
-//
-//   Future<Map<String, int>> getActualColorsForPhotosalons(bool isConnectInternet, [int countEntities = 0]) async{
-//     Map<String, int> actualCategory = {};
-//     actualCategory = await CategorySQFlite.db.getColorsForPhotosalons();
-//
-//     if(!isConnectInternet) return actualCategory;
-//
-//     if(countEntities != actualCategory.length){
-//       CategorySQFlite.db.deleteTableColorsForPhotosalons();
-//       CategorySQFlite.db.createTableColorsForPhotosalons();
-//
-//       actualCategory = await ConnectDbMySQL.connDB.getColorForEquipment();
-//
-//       int id = 0;
-//       for(var category in actualCategory.entries.toList().reversed){
-//         ++id;
-//         CategorySQFlite.db.createColorsForPhotosalons(id, category.key, category.value.toString());
-//       }
-//     }
-//     return actualCategory;
-//   }
-//
-//   Future rebootAllBasicListSQFlite() async{
-//     TechnicSQFlite.db.deleteTables();
-//     TechnicSQFlite.db.createTables();
-//     RepairSQFlite.db.deleteTable();
-//     RepairSQFlite.db.createTable();
-//     TroubleSQFlite.db.deleteTables();
-//     TroubleSQFlite.db.createTables();
-//   }
-//
-//   Future rebootAllListCategorySQFlite(String nameTable, String nameCategory) async{
-//     CategorySQFlite.db.deleteTable(nameTable);
-//     CategorySQFlite.db.createTable(nameTable, nameCategory);
-//     CategorySQFlite.db.deleteTableColorsForPhotosalons();
-//     CategorySQFlite.db.createTableColorsForPhotosalons();
-//   }
-//
+
+  // Future<List<String>> getActualCategory(String nameTable) async {
+  //   List<String> actualCategory = [];
+  //
+  //   switch (nameTable) {
+  //     case 'nameEquipment':
+  //       actualCategory = await ConnectDbMySQL.connDB.getNameEquipment();
+  //       break;
+  //     case 'photosalons':
+  //       actualCategory = await ConnectDbMySQL.connDB.getPhotosalons();
+  //       break;
+  //     case 'service':
+  //       actualCategory = await ConnectDbMySQL.connDB.getService();
+  //       break;
+  //     case 'statusForEquipment':
+  //       actualCategory = await ConnectDbMySQL.connDB.getStatusForEquipment();
+  //       break;
+  //   }
+  //   return actualCategory;
+  // }
+  //
+  // Future<Map<String, int>> getActualColorsForPhotosalons([int countEntities = 0]) async {
+  //   return await ConnectDbMySQL.connDB.getColorForEquipment();
+  // }
+
 //   List getNotifications() {
 //     List notifications = [];
 //     notifications.addAll(getListNotificationsDontTestDriveAfterRepairBetter1Day());

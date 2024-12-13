@@ -8,6 +8,13 @@ class ProviderModel with ChangeNotifier {
   late final Map<String, Photosalon> _photosolons;
   late final Map<String, Repair> _repairs;
   late final Map<String, Storage> _storages;
+
+  late final List<String> _namesEquipments;
+  late final List<String> _namesPhotosalons;
+  late final List<String> _services;
+  late final List<String> _statusForEquipment;
+  late final Map<String, int> _colorsForEquipment;
+
   final Map<String, String> user = {'user': 'not access'};
 
   Map<String, Photosalon> get photosolons => _photosolons;
@@ -16,11 +23,30 @@ class ProviderModel with ChangeNotifier {
 
   Map<String, Storage> get storages => _storages;
 
+  List<String> get namesPhotosalons => _namesPhotosalons;
+
+  List<String> get services => _services;
+
+  List<String> get statusForEquipment => _statusForEquipment;
+
+  Map<String, int> get colorsForEquipment => _colorsForEquipment;
+
+  List<String> get namesEquipments => _namesEquipments;
+
   void downloadAllElements(
       Map<String, Photosalon> photosalons, Map<String, Repair> repairs, Map<String, Storage> storages) {
     _photosolons = photosalons;
     _repairs = repairs;
     _storages = storages;
+  }
+
+  void downloadAllCategoryDropDown(List<String> namesEquipments, List<String> namePhotosalons, List<String> services,
+      List<String> statusForEquipment, Map<String, int> colorsForEquipment) {
+    _namesEquipments = namesEquipments;
+    _namesPhotosalons = namePhotosalons;
+    _services = services;
+    _statusForEquipment = statusForEquipment;
+    _colorsForEquipment = colorsForEquipment;
   }
 
   void addTechnicInPhotosalon(String name, Technic technic) {

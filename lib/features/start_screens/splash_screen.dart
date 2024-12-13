@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
 import 'package:technical_support_artphoto/features/start_screens/authorization.dart';
-import 'package:technical_support_artphoto/main.dart';
 import '../../core/utils/download_start_data.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -33,15 +32,20 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     return FutureBuilder(
         future: DownloadStartData.downloadStartData.getStartData(),
         builder: (context, snapshot) {
-          // Check for errors
           if (snapshot.hasError) {
             return const DialogDontConnectDB();
           }
           if (snapshot.hasData) {
             providerModel.downloadAllElements(
                 snapshot.data!['Photosalons'], snapshot.data!['Repairs'], snapshot.data!['Storages']);
-            WidgetsBinding.instance.addPostFrameCallback((_){
-              Navigator.pushReplacementNamed(context, '/Authorization');
+            providerModel.downloadAllCategoryDropDown(
+                snapshot.data!['nameEquipment'],
+                snapshot.data!['namePhotosalons'],
+                snapshot.data!['services'],
+                snapshot.data!['statusForEquipment'],
+                snapshot.data!['colorsForEquipment']);
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.pushReplacement(context, _createRoute());
             });
           }
           return Scaffold(
@@ -53,7 +57,17 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('assets/logo_icon.png'),
+                  Hero(tag: 'logo_hero', child: Image.asset('assets/logo/logo.png')),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Техническая\n Поддержка',
+                    style: TextStyle(fontSize: 35),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
                   CircularProgressIndicator(),
                 ],
               ),
@@ -61,6 +75,26 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           );
         });
   }
+}
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => const Authorization(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return ScaleTransition(
+        scale: Tween<double>(
+          begin: 0.0,
+          end: 1.0,
+        ).animate(
+          CurvedAnimation(
+            parent: animation,
+            curve: Curves.fastOutSlowIn,
+          ),
+        ),
+        child: child,
+      );
+    },
+  );
 }
 
 class DialogDontConnectDB extends StatelessWidget {
@@ -77,7 +111,7 @@ class DialogDontConnectDB extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/logo_icon.png'),
+            Image.asset('assets/logo/logo_tech_sup.png'),
             const Text(
               "Не удалось подключиться к базе данных.\nОбратитесь к Денису",
               textAlign: TextAlign.center,

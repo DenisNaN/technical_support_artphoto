@@ -6,6 +6,7 @@ import 'package:technical_support_artphoto/core/domain/models/storage.dart';
 import 'package:technical_support_artphoto/core/domain/models/user.dart';
 import 'package:technical_support_artphoto/core/domain/technical_support_repository.dart';
 import '../domain/models/technic.dart';
+import 'package:intl/intl.dart';
 
 class ConnectDbMySQL implements TechnicalSupportRepository{
   ConnectDbMySQL._();
@@ -33,8 +34,11 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
         'SELECT login, access FROM loginPassword WHERE password = $password');
 
     User user = User('user', 'no access');
-    for (var row in result) {
-      user = User(row[0], row[1]);
+
+    if(result.isNotEmpty){
+      for (var row in result) {
+        user = User(row[0], row[1]);
+      }
     }
     return user;
   }
@@ -180,32 +184,7 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //   return [];
   // }
   //
-  // Future<List> getRangeGreaterOnIDTechnics(int id) async{
-  //   var result = await _connDB!.query('SELECT '
-  //       'equipment.id, '
-  //       'equipment.number, '
-  //       'equipment.name, '
-  //       'equipment.category, '
-  //       'equipment.cost, '
-  //       'equipment.dateBuy, '
-  //       's.status, '
-  //       's.dislocation, '
-  //       's.date, '
-  //       'equipment.comment, '
-  //       't.testDriveDislocation, '
-  //       't.dateStart, '
-  //       't.dateFinish, '
-  //       't.result, '
-  //       't.checkEquipment '
-  //       'FROM equipment '
-  //       'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
-  //       'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
-  //       'WHERE equipment.id > ?', [id]);
-  //
-  //   var list = technicListFromMap(result);
-  //   var reversedList = List.from(list.reversed);
-  //   return reversedList;
-  // }
+
   //
   // Future<Technic?> getTechnic(int id) async {
   //   Technic? technic = null;
@@ -308,32 +287,7 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //   return reversedList;
   // }
   //
-  // Future<List> getRangeGreaterOnIDRepairs(int id) async{
-  //   var result = await _connDB!.query('SELECT '
-  //       'repairEquipment.id, '
-  //       'repairEquipment.number, '
-  //       'repairEquipment.category, '
-  //       'repairEquipment.dislocationOld, '
-  //       'repairEquipment.status, '
-  //       'repairEquipment.complaint, '
-  //       'repairEquipment.dateDeparture, '
-  //       'repairEquipment.serviceDislocation, '
-  //       'repairEquipment.dateTransferInService, '
-  //       'repairEquipment.dateDepartureFromService, '
-  //       'repairEquipment.worksPerformed, '
-  //       'repairEquipment.costService, '
-  //       'repairEquipment.diagnosisService, '
-  //       'repairEquipment.recommendationsNotes, '
-  //       'repairEquipment.newStatus, '
-  //       'repairEquipment.newDislocation, '
-  //       'repairEquipment.dateReceipt, '
-  //       'repairEquipment.idTestDrive '
-  //       'FROM repairEquipment WHERE id > ?', [id]);
-  //
-  //   var list = repairListFromMap(result);
-  //   var reversedList = List.from(list.reversed);
-  //   return reversedList;
-  // }
+
   //
   // Future<Repair?> getRepair(int id) async {
   //   Repair? repair = null;
@@ -374,17 +328,7 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //   return reversedList;
   // }
   //
-  // Future<List> getRangeGreaterOnIDTrouble(int id) async{
-  //   var result = await _connDB!.query('SELECT '
-  //       'id, Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, '
-  //       'ДатаУстрСотр, СотрПодтверУстр, '
-  //       'ДатаУстрИнженер, ИнженерПодтверУстр, Фотография '
-  //       'FROM Неисправности WHERE id > ?', [id]);
-  //
-  //   var list = troubleListFromMap(result);
-  //   var reversedList = List.from(list.reversed);
-  //   return reversedList;
-  // }
+
   //
   // Future<Trouble?> getTrouble(int id) async {
   //   var result = await _connDB!.query('SELECT * FROM Неисправности WHERE id = ?', [id]);
@@ -419,12 +363,7 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //   return reversedList;
   // }
   //
-  // Future<List> getRangeGreaterOnIDHistory(int id) async{
-  //   var result = await _connDB!.query('SELECT * FROM history WHERE id > ?', [id]);
-  //   var list = historyListFromMap(result);
-  //   var reversedList = List.from(list.reversed);
-  //   return reversedList;
-  // }
+
   //
   // List historyListFromMap(var result) {
   //   List list = [];
@@ -438,9 +377,9 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //   return list;
   // }
   //
-  // String getDateFormatted(String date){
-  //   return DateFormat('yyyy.MM.dd').format(DateTime.parse(date));
-  // }
+  String getDateFormatted(String date){
+    return DateFormat('yyyy.MM.dd').format(DateTime.parse(date));
+  }
   //
   // Future<int> insertTechnicInDB(Technic technic) async{
   //   await ConnectDbMySQL.connDB.connDatabase();
@@ -747,17 +686,6 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //   return list;
   // }
   //
-  // Future<Map<String, List>> getLoginPassword() async{
-  //   var result = await _connDB!.query(
-  //       'SELECT * FROM loginPassword');
-  //
-  //   Map<String, List> map = {};
-  //   for (var row in result) {
-  //     map[row[2]] = [row[1], row[3]];
-  //   }
-  //   return map;
-  // }
-  //
   // Future<List<String>> getPhotosalons() async{
   //   var result = await _connDB!.query('SELECT '
   //       'Фотосалоны.id, '
@@ -771,53 +699,53 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //   }
   //   return list;
   // }
-  //
-  // Future<List<String>> getStatusForEquipment() async{
-  //   var result = await _connDB!.query('SELECT '
-  //       'statusForEquipment.id, '
-  //       'statusForEquipment.status '
-  //       'FROM statusForEquipment');
-  //
-  //   List<String> list = [];
-  //   for (var row in result) {
-  //     list.add(row[1].toString());
-  //   }
-  //   return list;
-  // }
-  //
-  // Future<List<String>> getService() async{
-  //   var result = await _connDB!.query('SELECT '
-  //       'service.id, '
-  //       'service.repairmen '
-  //       'FROM service');
-  //
-  //   List<String> list = [];
-  //   for (var row in result) {
-  //     list.add(row[1].toString());
-  //   }
-  //   return list;
-  // }
-  //
-  // Future<List<String>> getNameEquipment() async{
-  //   var result = await _connDB!.query('SELECT '
-  //       'nameEquipment.id, '
-  //       'nameEquipment.name '
-  //       'FROM nameEquipment');
-  //
-  //   List<String> list = [];
-  //   for (var row in result) {
-  //     list.add(row[1].toString());
-  //   }
-  //   return list;
-  // }
-  //
-  // Future<Map<String, int>> getColorForEquipment() async{
-  //   var result = await _connDB!.query('SELECT * FROM colorsForPhotosalons');
-  //
-  //   Map<String, int> map = {};
-  //   for (var row in result) {
-  //     map[row[1]] = int.parse(row[2]);
-  //   }
-  //   return map;
-  // }
+
+  Future<List<String>> fetchStatusForEquipment() async{
+    var result = await _connDB!.query('SELECT '
+        'statusForEquipment.id, '
+        'statusForEquipment.status '
+        'FROM statusForEquipment');
+
+    List<String> list = [];
+    for (var row in result) {
+      list.add(row[1].toString());
+    }
+    return list;
+  }
+
+  Future<List<String>> fetchServices() async{
+    var result = await _connDB!.query('SELECT '
+        'service.id, '
+        'service.repairmen '
+        'FROM service');
+
+    List<String> list = [];
+    for (var row in result) {
+      list.add(row[1].toString());
+    }
+    return list;
+  }
+
+  Future<List<String>> fetchNameEquipment() async{
+    var result = await _connDB!.query('SELECT '
+        'nameEquipment.id, '
+        'nameEquipment.name '
+        'FROM nameEquipment');
+
+    List<String> list = [];
+    for (var row in result) {
+      list.add(row[1].toString());
+    }
+    return list;
+  }
+
+  Future<Map<String, int>> fetchColorsForEquipment() async{
+    var result = await _connDB!.query('SELECT * FROM colorsForPhotosalons');
+
+    Map<String, int> map = {};
+    for (var row in result) {
+      map[row[1]] = int.parse(row[2]);
+    }
+    return map;
+  }
 }
