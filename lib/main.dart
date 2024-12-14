@@ -282,13 +282,18 @@ class _MyBottomAppBarState extends State<MyBottomAppBar> {
     return Scaffold(
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
+          // color: Colors.yellow
           gradient: LinearGradient(
               begin: Alignment.bottomLeft,
               end: Alignment.topRight,
-              colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
+              colors: [Colors.lightBlueAccent, Colors.purpleAccent],
+              stops: [0.0, 0.8],
+              tileMode: TileMode.clamp,
+          ),
         ),
         child: NavigationBar(
-          backgroundColor: Colors.blueAccent,
+          // backgroundColor: Colors.blueAccent,
+
           onDestinationSelected: (int index) {
             setState(() {
               currentPageIndex = index;
@@ -299,7 +304,7 @@ class _MyBottomAppBarState extends State<MyBottomAppBar> {
           destinations: const <Widget>[
             NavigationDestination(
               selectedIcon: Icon(Icons.home),
-              icon: Icon(Icons.home_outlined),
+              icon: Icon(Icons.home_outlined, color: Colors.deepPurple,),
               label: 'Главная',
             ),
             NavigationDestination(
