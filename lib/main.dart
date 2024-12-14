@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
 import 'package:technical_support_artphoto/core/utils/utils.dart';
+import 'package:technical_support_artphoto/features/photosalons/photosolons_list.dart';
 import 'package:technical_support_artphoto/features/start_screens/authorization.dart';
 import 'package:technical_support_artphoto/features/start_screens/splash_screen.dart';
 import 'package:technical_support_artphoto/features/technics/technics_list.dart';
@@ -28,7 +29,7 @@ class SplashScreenArtphoto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        // localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+      // localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
         initialRoute: '/SplashScreen',
         routes: {
           '/SplashScreen': (context) => const SplashScreen(),
@@ -73,21 +74,22 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     ColorAppBar colorAppBar = ColorAppBar();
-    return DefaultTabController(
-        length: 1,
-        child: Scaffold(
-          appBar: AppBar(
-              flexibleSpace: colorAppBar.color(),
-              title: buildTitleAppBar(providerModel.user.keys.first),
-              bottom: TabBar(controller: _tabController, tabs: const [
-                Tab(icon: Icon(Icons.add_a_photo_outlined), text: "Главная"),
-                // Tab(icon: Icon(Icons.settings), text: "Ремонт"),
-                // Tab(icon: Icon(Icons.assignment_turned_in), text: "Неисп-ти"),
-                // Tab(icon: Icon(Icons.history), text: "История")
-              ])),
-          body: TabBarView(controller: _tabController, children: const [Technicslist()]),
-          // bottomNavigationBar: ,
-        ));
+      return MyBottomAppBar();
+    // return DefaultTabController(
+    //     length: 1,
+    //     child: Scaffold(
+    //       appBar: AppBar(
+    //           flexibleSpace: colorAppBar.color(),
+    //           title: buildTitleAppBar(providerModel.user.keys.first),
+    //           bottom: TabBar(controller: _tabController, tabs: const [
+    //             Tab(icon: Icon(Icons.add_a_photo_outlined), text: "Главная"),
+    //             // Tab(icon: Icon(Icons.settings), text: "Ремонт"),
+    //             // Tab(icon: Icon(Icons.assignment_turned_in), text: "Неисп-ти"),
+    //             // Tab(icon: Icon(Icons.history), text: "История")
+    //           ])),
+    //       body: TabBarView(controller: _tabController, children: const [Technicslist()]),
+    //       // bottomNavigationBar: ,
+    //     ));
   }
 
   Row buildTitleAppBar(String nameUser) {
@@ -96,34 +98,34 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
       _selectedIndex == 3
           ? const SizedBox()
           : Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shadowColor: Colors.transparent,
-                  backgroundColor: Colors.black.withOpacity(0.4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  padding: const EdgeInsets.all(12),
-                ),
-                child: const Row(
-                  children: [Icon(Icons.search), Text('Поиск и сортировка')],
-                ),
-                onPressed: () {
-                  switch (_selectedIndex) {
-                    case 0:
-                      // Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTechnic()));
-                      break;
-                    case 1:
-                      // Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedRepairs()));
-                      break;
-                    case 2:
-                      // Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTrouble()));
-                      break;
-                  }
-                },
-              ),
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shadowColor: Colors.transparent,
+            backgroundColor: Colors.black.withOpacity(0.4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
             ),
+            padding: const EdgeInsets.all(12),
+          ),
+          child: const Row(
+            children: [Icon(Icons.search), Text('Поиск и сортировка')],
+          ),
+          onPressed: () {
+            switch (_selectedIndex) {
+              case 0:
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTechnic()));
+                break;
+              case 1:
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedRepairs()));
+                break;
+              case 2:
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTrouble()));
+                break;
+            }
+          },
+        ),
+      ),
       // Expanded(child: Container(alignment: Alignment.centerRight, child: myAppBarIconNotifications())),
     ]);
   }
@@ -264,26 +266,133 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
 // }
 }
 
-class MyBottomAppBar extends StatelessWidget {
+class MyBottomAppBar extends StatefulWidget {
   const MyBottomAppBar({super.key});
+
+  @override
+  State<MyBottomAppBar> createState() => _MyBottomAppBarState();
+}
+
+class _MyBottomAppBarState extends State<MyBottomAppBar> {
+  int currentPageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     ColorAppBar colorAppBar = ColorAppBar();
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-            begin: Alignment.bottomLeft,
-            end: Alignment.topRight,
-            colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
+    return Scaffold(
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
+              colors: [Colors.lightBlueAccent, Colors.purpleAccent]),
+        ),
+        child: NavigationBar(
+          backgroundColor: Colors.blueAccent,
+          onDestinationSelected: (int index) {
+            setState(() {
+              currentPageIndex = index;
+            });
+          },
+          indicatorColor: Colors.amber,
+          selectedIndex: currentPageIndex,
+          destinations: const <Widget>[
+            NavigationDestination(
+              selectedIcon: Icon(Icons.home),
+              icon: Icon(Icons.home_outlined),
+              label: 'Главная',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.settings),
+              label: 'Ремонт',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.assignment_turned_in),
+              label: 'Неисп-ти',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.history),
+              label: 'История',
+            ),
+          ],
+        ),
       ),
-      child: Scaffold(bottomNavigationBar: ,)
-      // child: BottomNavigationBar(
-      //   items: const <BottomNavigationBarItem>[
-      //     BottomNavigationBarItem(icon: Icon(Icons.add_a_photo_outlined), label: 'Главная'),
-      //   ],
-      //   selectedItemColor: Colors.blueAccent,
-      // ),
+      body: <Widget>[
+
+        /// Home page
+        PhotosolonsList(),
+
+        Card(
+          shadowColor: Colors.transparent,
+          margin: const EdgeInsets.all(8.0),
+          child: SizedBox.expand(
+            child: Center(
+              child: Text(
+                'Home page',
+              ),
+            ),
+          ),
+        ),
+
+        /// Notifications page
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+            children: <Widget>[
+              Card(
+                child: ListTile(
+                  leading: Icon(Icons.notifications_sharp),
+                  title: Text('Notification 1'),
+                  subtitle: Text('This is a notification'),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  leading: Icon(Icons.notifications_sharp),
+                  title: Text('Notification 2'),
+                  subtitle: Text('This is a notification'),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        /// Messages page
+        ListView.builder(
+          reverse: true,
+          itemCount: 2,
+          itemBuilder: (BuildContext context, int index) {
+            if (index == 0) {
+              return Align(
+                alignment: Alignment.centerRight,
+                child: Container(
+                  margin: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Text(
+                    'Hello',
+                  ),
+                ),
+              );
+            }
+            return Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Text(
+                  'Hi!',
+                ),
+              ),
+            );
+          },
+        ),
+      ][currentPageIndex],
     );
   }
 }
