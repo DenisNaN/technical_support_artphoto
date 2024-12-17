@@ -16,6 +16,10 @@ class ProviderModel with ChangeNotifier {
   late final Map<String, int> _colorsForEquipment;
 
   final Map<String, String> user = {'user': 'not access'};
+  int currentPageIndexMainBottomAppBar = 0;
+  final Color colorPhotosalons = Colors.blue.shade200;
+  final Color colorStorages = Colors.white70;
+  final Color colorRepairs = Colors.yellow.shade200;
 
   Map<String, Photosalon> get photosolons => _photosolons;
 
@@ -76,6 +80,11 @@ class ProviderModel with ChangeNotifier {
 
   void removeTechnicInStorage(String name, Technic technic) {
     _storages[name]!.technicals.remove(technic);
+    notifyListeners();
+  }
+
+  void changeCurrentPageMainBottomAppBar(int index){
+    currentPageIndexMainBottomAppBar = index;
     notifyListeners();
   }
 }

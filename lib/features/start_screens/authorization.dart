@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/data/connect_db_my_sql.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
 import 'package:technical_support_artphoto/core/utils/draggable_logo.dart';
+import 'package:technical_support_artphoto/features/navigation/create_route.dart';
 import 'package:technical_support_artphoto/main.dart';
 import '../../core/domain/models/user.dart';
 import '../../core/utils/utils.dart';
@@ -57,8 +58,7 @@ class _AuthorizationState extends State<Authorization> {
                 padding: const EdgeInsets.only(top: 50, bottom: 30),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 300,
-                  // child: Hero(tag: 'logo_hero', child: Image.asset('assets/logo/logo.png'))
+                  height: 200,
                   child: DraggableLogo(
                       child: Hero(
                           tag: 'logo_hero',
@@ -88,7 +88,7 @@ class _AuthorizationState extends State<Authorization> {
                             inputFormatters: [numberFormatter],
                             obscureText: _hideText,
                             obscuringCharacter: '*',
-                            // autofocus: true,
+                            autofocus: true,
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide.none,
@@ -122,8 +122,7 @@ class _AuthorizationState extends State<Authorization> {
                                   if (user.name != 'user') {
                                     providerModel.user[user.name] = user.access;
                                     providerModel.user.remove('user');
-                                    await Navigator.of(context)
-                                        .pushReplacement(MaterialPageRoute(builder: (_) => const ArtphotoTech()));
+                                    await Navigator.pushReplacement(context, createRouteScaleTransition(const ArtphotoTech()));
                                   } else {
                                     passwordController.clear();
                                     _showDialogNotValidationUser();

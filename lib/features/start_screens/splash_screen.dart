@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
+import 'package:technical_support_artphoto/features/navigation/create_route.dart';
 import 'package:technical_support_artphoto/features/start_screens/authorization.dart';
 import '../../core/utils/download_start_data.dart';
 
@@ -45,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 snapshot.data!['statusForEquipment'],
                 snapshot.data!['colorsForEquipment']);
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.pushReplacement(context, _createRoute());
+              Navigator.pushReplacement(context, createRouteScaleTransition(const Authorization()));
             });
           }
           return Scaffold(
@@ -75,26 +76,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           );
         });
   }
-}
-
-Route _createRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => const Authorization(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return ScaleTransition(
-        scale: Tween<double>(
-          begin: 0.0,
-          end: 1.0,
-        ).animate(
-          CurvedAnimation(
-            parent: animation,
-            curve: Curves.fastOutSlowIn,
-          ),
-        ),
-        child: child,
-      );
-    },
-  );
 }
 
 class DialogDontConnectDB extends StatelessWidget {

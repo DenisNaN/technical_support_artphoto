@@ -1,15 +1,11 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
-import 'package:technical_support_artphoto/core/utils/utils.dart';
-import 'package:technical_support_artphoto/features/photosalons/photosolons_list.dart';
+import 'package:technical_support_artphoto/features/navigation/main_bottom_app_bar.dart';
+import 'package:technical_support_artphoto/features/pages/home_page.dart';
 import 'package:technical_support_artphoto/features/start_screens/authorization.dart';
 import 'package:technical_support_artphoto/features/start_screens/splash_screen.dart';
-import 'package:technical_support_artphoto/features/technics/technics_list.dart';
 import 'package:technical_support_artphoto/core/utils/utils.dart' as utils;
 
 void main() {
@@ -19,7 +15,6 @@ void main() {
     utils.packageInfo = packageInfo;
     runApp(ChangeNotifierProvider(create: (_) => ProviderModel(), child: const SplashScreenArtphoto()));
   }
-
   startMeUp();
 }
 
@@ -50,52 +45,97 @@ class ArtphotoTech extends StatefulWidget {
 }
 
 class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  int _selectedIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(vsync: this, length: 1);
-    _tabController.addListener(() {
-      setState(() {
-        _selectedIndex = _tabController.index;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _tabController.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    ColorAppBar colorAppBar = ColorAppBar();
-      return MyBottomAppBar();
-    // return DefaultTabController(
-    //     length: 1,
-    //     child: Scaffold(
-    //       appBar: AppBar(
-    //           flexibleSpace: colorAppBar.color(),
-    //           title: buildTitleAppBar(providerModel.user.keys.first),
-    //           bottom: TabBar(controller: _tabController, tabs: const [
-    //             Tab(icon: Icon(Icons.add_a_photo_outlined), text: "Главная"),
-    //             // Tab(icon: Icon(Icons.settings), text: "Ремонт"),
-    //             // Tab(icon: Icon(Icons.assignment_turned_in), text: "Неисп-ти"),
-    //             // Tab(icon: Icon(Icons.history), text: "История")
-    //           ])),
-    //       body: TabBarView(controller: _tabController, children: const [Technicslist()]),
-    //       // bottomNavigationBar: ,
-    //     ));
+      return Scaffold(
+        appBar: AppBar(
+          title: _buildTitleAppBar(providerModel.user.keys.first, providerModel),
+        ),
+        bottomNavigationBar: MainBottomAppBar(),
+        body: <Widget>[
+          /// Home page
+          HomePage(),
+
+          Card(
+            shadowColor: Colors.transparent,
+            margin: const EdgeInsets.all(8.0),
+            child: SizedBox.expand(
+              child: Center(
+                child: Text(
+                  'Home page',
+                ),
+              ),
+            ),
+          ),
+
+          /// Notifications page
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Column(
+              children: <Widget>[
+                Card(
+                  child: ListTile(
+                    leading: Icon(Icons.notifications_sharp),
+                    title: Text('Notification 1'),
+                    subtitle: Text('This is a notification'),
+                  ),
+                ),
+                Card(
+                  child: ListTile(
+                    leading: Icon(Icons.notifications_sharp),
+                    title: Text('Notification 2'),
+                    subtitle: Text('This is a notification'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          /// Messages page
+          ListView.builder(
+            reverse: true,
+            itemCount: 2,
+            itemBuilder: (BuildContext context, int index) {
+              if (index == 0) {
+                return Align(
+                  alignment: Alignment.centerRight,
+                  child: Container(
+                    margin: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Text(
+                      'Hello',
+                    ),
+                  ),
+                );
+              }
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  margin: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Text(
+                    'Hi!',
+                  ),
+                ),
+              );
+            },
+          ),
+        ][providerModel.currentPageIndexMainBottomAppBar],
+      );
   }
 
-  Row buildTitleAppBar(String nameUser) {
+  Row _buildTitleAppBar(String nameUser, ProviderModel providerModel) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text(nameUser),
-      _selectedIndex == 3
+        providerModel.currentPageIndexMainBottomAppBar == 3
           ? const SizedBox()
           : Padding(
         padding: const EdgeInsets.all(8.0),
@@ -112,7 +152,7 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
             children: [Icon(Icons.search), Text('Поиск и сортировка')],
           ),
           onPressed: () {
-            switch (_selectedIndex) {
+            switch (providerModel.currentPageIndexMainBottomAppBar) {
               case 0:
               // Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTechnic()));
                 break;
@@ -264,140 +304,4 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
 //         );
 //       });
 // }
-}
-
-class MyBottomAppBar extends StatefulWidget {
-  const MyBottomAppBar({super.key});
-
-  @override
-  State<MyBottomAppBar> createState() => _MyBottomAppBarState();
-}
-
-class _MyBottomAppBarState extends State<MyBottomAppBar> {
-  int currentPageIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    ColorAppBar colorAppBar = ColorAppBar();
-    return Scaffold(
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          // color: Colors.yellow
-          gradient: LinearGradient(
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-              colors: [Colors.lightBlueAccent, Colors.purpleAccent],
-              stops: [0.0, 0.8],
-              tileMode: TileMode.clamp,
-          ),
-        ),
-        child: NavigationBar(
-          // backgroundColor: Colors.blueAccent,
-
-          onDestinationSelected: (int index) {
-            setState(() {
-              currentPageIndex = index;
-            });
-          },
-          indicatorColor: Colors.amber,
-          selectedIndex: currentPageIndex,
-          destinations: const <Widget>[
-            NavigationDestination(
-              selectedIcon: Icon(Icons.home),
-              icon: Icon(Icons.home_outlined, color: Colors.deepPurple,),
-              label: 'Главная',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.settings),
-              label: 'Ремонт',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.assignment_turned_in),
-              label: 'Неисп-ти',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.history),
-              label: 'История',
-            ),
-          ],
-        ),
-      ),
-      body: <Widget>[
-
-        /// Home page
-        PhotosolonsList(),
-
-        Card(
-          shadowColor: Colors.transparent,
-          margin: const EdgeInsets.all(8.0),
-          child: SizedBox.expand(
-            child: Center(
-              child: Text(
-                'Home page',
-              ),
-            ),
-          ),
-        ),
-
-        /// Notifications page
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Column(
-            children: <Widget>[
-              Card(
-                child: ListTile(
-                  leading: Icon(Icons.notifications_sharp),
-                  title: Text('Notification 1'),
-                  subtitle: Text('This is a notification'),
-                ),
-              ),
-              Card(
-                child: ListTile(
-                  leading: Icon(Icons.notifications_sharp),
-                  title: Text('Notification 2'),
-                  subtitle: Text('This is a notification'),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        /// Messages page
-        ListView.builder(
-          reverse: true,
-          itemCount: 2,
-          itemBuilder: (BuildContext context, int index) {
-            if (index == 0) {
-              return Align(
-                alignment: Alignment.centerRight,
-                child: Container(
-                  margin: const EdgeInsets.all(8.0),
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Text(
-                    'Hello',
-                  ),
-                ),
-              );
-            }
-            return Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                margin: const EdgeInsets.all(8.0),
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Text(
-                  'Hi!',
-                ),
-              ),
-            );
-          },
-        ),
-      ][currentPageIndex],
-    );
-  }
 }
