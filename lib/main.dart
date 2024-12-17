@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
+import 'package:technical_support_artphoto/features/grid_view/grid_view_technics.dart';
 import 'package:technical_support_artphoto/features/navigation/main_bottom_app_bar.dart';
 import 'package:technical_support_artphoto/features/pages/home_page.dart';
 import 'package:technical_support_artphoto/features/start_screens/authorization.dart';
@@ -30,9 +32,18 @@ class SplashScreenArtphoto extends StatelessWidget {
           '/SplashScreen': (context) => const SplashScreen(),
           '/Authorization': (context) => const Authorization(),
           '/ArtphotoTech': (context) => const ArtphotoTech(),
+          '/GridViewTechnics': (context) => const GridViewTechnics(),
         },
         theme: ThemeData(
           useMaterial3: false,
+          textTheme: TextTheme(
+            titleMedium: GoogleFonts.philosopher(
+              fontSize: 21,
+              color: Colors.black54,
+              fontWeight: FontWeight.w700,
+              fontStyle: FontStyle.italic,
+            )
+          ),
         ));
   }
 }
@@ -51,7 +62,7 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
     final providerModel = Provider.of<ProviderModel>(context);
       return Scaffold(
         appBar: AppBar(
-          title: _buildTitleAppBar(providerModel.user.keys.first, providerModel),
+          title: Center(child: Text(providerModel.user.keys.first)),
         ),
         bottomNavigationBar: MainBottomAppBar(),
         body: <Widget>[
@@ -132,43 +143,43 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
       );
   }
 
-  Row _buildTitleAppBar(String nameUser, ProviderModel providerModel) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(nameUser),
-        providerModel.currentPageIndexMainBottomAppBar == 3
-          ? const SizedBox()
-          : Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            shadowColor: Colors.transparent,
-            backgroundColor: Colors.black.withOpacity(0.4),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            padding: const EdgeInsets.all(12),
-          ),
-          child: const Row(
-            children: [Icon(Icons.search), Text('Поиск и сортировка')],
-          ),
-          onPressed: () {
-            switch (providerModel.currentPageIndexMainBottomAppBar) {
-              case 0:
-              // Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTechnic()));
-                break;
-              case 1:
-              // Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedRepairs()));
-                break;
-              case 2:
-              // Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTrouble()));
-                break;
-            }
-          },
-        ),
-      ),
-      // Expanded(child: Container(alignment: Alignment.centerRight, child: myAppBarIconNotifications())),
-    ]);
-  }
+  // Row _buildTitleAppBar(String nameUser, ProviderModel providerModel) {
+  //   return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+  //     Text(nameUser),
+  //       providerModel.currentPageIndexMainBottomAppBar == 3
+  //         ? const SizedBox()
+  //         : Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child: ElevatedButton(
+  //         style: ElevatedButton.styleFrom(
+  //           shadowColor: Colors.transparent,
+  //           backgroundColor: Colors.black.withOpacity(0.4),
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(30),
+  //           ),
+  //           padding: const EdgeInsets.all(12),
+  //         ),
+  //         child: const Row(
+  //           children: [Icon(Icons.search), Text('Поиск и сортировка')],
+  //         ),
+  //         onPressed: () {
+  //           switch (providerModel.currentPageIndexMainBottomAppBar) {
+  //             case 0:
+  //             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTechnic()));
+  //               break;
+  //             case 1:
+  //             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedRepairs()));
+  //               break;
+  //             case 2:
+  //             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTrouble()));
+  //               break;
+  //           }
+  //         },
+  //       ),
+  //     ),
+  //     Expanded(child: Container(alignment: Alignment.centerRight, child: myAppBarIconNotifications())),
+  //   ]);
+  // }
 
 // Widget myAppBarIconNotifications() {
 //   return GestureDetector(

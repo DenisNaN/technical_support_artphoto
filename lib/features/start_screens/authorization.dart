@@ -122,7 +122,7 @@ class _AuthorizationState extends State<Authorization> {
                                   if (user.name != 'user') {
                                     providerModel.user[user.name] = user.access;
                                     providerModel.user.remove('user');
-                                    await Navigator.pushReplacement(context, createRouteScaleTransition(const ArtphotoTech()));
+                                    await Navigator.pushReplacement(context, createRouteSlideTransition(const ArtphotoTech()));
                                   } else {
                                     passwordController.clear();
                                     _showDialogNotValidationUser();

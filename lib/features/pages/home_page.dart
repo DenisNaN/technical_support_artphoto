@@ -12,9 +12,9 @@ class HomePage extends StatelessWidget {
     return CustomScrollView(
       physics: BouncingScrollPhysics(),
       slivers: [
-        gridViewHomePage(providerModel.photosolons, providerModel.colorPhotosalons),
-        gridViewHomePage(providerModel.storages, providerModel.colorStorages),
-        gridViewHomePage(providerModel.repairs, providerModel.colorRepairs),
+        GridViewHomePage(location: providerModel.photosolons, color: providerModel.colorPhotosalons),
+        GridViewHomePage(location: providerModel.storages, color:  providerModel.colorStorages),
+        GridViewHomePage(location: providerModel.repairs, color:  providerModel.colorRepairs),
       ],
     );
   }

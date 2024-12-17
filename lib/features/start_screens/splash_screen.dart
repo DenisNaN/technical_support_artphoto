@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 snapshot.data!['statusForEquipment'],
                 snapshot.data!['colorsForEquipment']);
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.pushReplacement(context, createRouteScaleTransition(const Authorization()));
+              Navigator.pushReplacement(context, createRouteSlideTransition(const Authorization()));
             });
           }
           return Scaffold(
