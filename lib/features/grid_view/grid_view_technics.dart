@@ -1,84 +1,133 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
-import 'package:technical_support_artphoto/core/domain/models/repair.dart';
+import 'package:technical_support_artphoto/core/domain/models/technic.dart';
+import 'dart:math';
 
 class GridViewTechnics extends StatelessWidget {
-  const GridViewTechnics({super.key});
+  final dynamic location;
+  const GridViewTechnics({super.key, required this.location});
 
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    final location = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final List<Technic> technics = location.technics;
+
     return Scaffold(
-      appBar: AppBar(
-        // title: Hero(
-          // tag: 'namePhotosalon',
-          // child: Text(location.keys.first, style: Theme.of(context).textTheme.titleMedium),
-          title: Text(location.keys.first, style: Theme.of(context).textTheme.titleMedium),
-        // ),
-      ),
-    );
-  }
-}
-
-SliverPadding gridViewTechnic(Map<String, dynamic> location, Color color) {
-  return SliverPadding(
-    padding: const EdgeInsets.all(14.0),
-    sliver: SliverGrid.builder(
-        itemCount: location.keys.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
+        appBar: AppBar(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(location.name, style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Кол-во: ${location.technics.length}',
+                style: Theme.of(context).textTheme.titleMedium,
+              )
+            ],
+          ),
         ),
-        itemBuilder: (_, int index) {
-          String nameLocation = location.keys.toList()[index];
-          int countTechnics = location[nameLocation].technicals.length;
-          bool isHeader = location[nameLocation] is Repair && countTechnics > 0 ? true : false;
+        body: CustomScrollView(
+          physics: BouncingScrollPhysics(),
+          primary: false,
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.all(14.0),
+              sliver: SliverGrid.builder(
+                  itemCount: technics.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemBuilder: (_, int index) {
+                    Technic technic = technics[index];
 
-          // if(nameLocation == 'Рамиль'){
-          //   location[nameLocation].technicals.add(Technic(111111, 234234, 'category', 'name', 'status', 'dislocation'));
-          // }
-
-          return GridTile(
-            header: isHeader
-                ? Padding(
-                    padding: const EdgeInsets.all(7.0),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: CircleAvatar(
-                        radius: 12,
-                        backgroundColor: Colors.red.shade400,
-                        child: Text(countTechnics.toString()),
+                    return GridTile(
+                      header: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 2),
+                              child: Text(
+                                technic.category,
+                                style: Theme.of(context).textTheme.titleSmall,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black54, width: 1),
+                                  borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Text(technic.number.toString()),
+                              )),
+                        ],
                       ),
-                    ),
-                  )
-                : SizedBox(),
-            child: Container(
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 4,
-                      offset: Offset(0, 3), // changes position of shadow
-                    ),
-                  ],
-                ),
-                child: Center(
-                    child: Text(location.keys.toList()[index],
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.philosopher(
-                          fontSize: 21,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w700,
-                          fontStyle: FontStyle.italic,
-                        )))),
-          );
-        }),
-  );
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 1,
+                              blurRadius: 3,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Expanded(
+                                child: Stack(children: [
+                              technic.category == 'Телевизор' ? Image.asset(_randomScreenForTV()) : SizedBox(),
+                              Image.asset(_switchIconTechnic(technic.category))
+                            ])),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4, right: 2),
+                              child: Text(
+                                technic.name == '' ? 'Модель не указана' : technic.name,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+            ),
+          ],
+        ));
+  }
+
+  String _switchIconTechnic(String category) {
+    switch (category) {
+      case 'Принтер':
+        return 'assets/icons_gridview_technical/printer.png';
+      case 'Копир':
+        return 'assets/icons_gridview_technical/copier.png';
+      case 'Фотоаппарат':
+        return 'assets/icons_gridview_technical/camera.png';
+      case 'Вспышка':
+        return 'assets/icons_gridview_technical/flash.png';
+      case 'Ламинатор':
+        return 'assets/icons_gridview_technical/laminator.png';
+      case 'Сканер':
+        return 'assets/icons_gridview_technical/scanner.png';
+      case 'Телевизор':
+        return 'assets/icons_gridview_technical/television.png';
+      default:
+        return '';
+    }
+  }
+
+  String _randomScreenForTV() {
+    return 'assets/icons_gridview_technical/screens_tv/screentv-${Random().nextInt(33) + 1}.png';
+  }
 }

@@ -50,19 +50,21 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
 
     for(var namePhotosalon in namesPhotosalons){
       Photosalon photosalon = Photosalon(namePhotosalon);
-      String query = 'SELECT '
-          'equipment.id, '
+      String query =
+          'SELECT equipment.id, '
           'equipment.number, '
           'equipment.category, '
           'equipment.name, '
-          'statusEquipment.status, '
-          'statusEquipment.dislocation '
-          'FROM equipment JOIN statusEquipment '
-          'ON equipment.id = statusEquipment.idEquipment WHERE statusEquipment.dislocation = "$namePhotosalon"';
+          's.status, '
+          's.dislocation '
+          'FROM equipment '
+          'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
+          'WHERE s.dislocation = "$namePhotosalon" '
+          'ORDER BY equipment.number ASC';
       var result = await _connDB!.query(query);
       for (var row in result) {
         Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5]);
-        photosalon.technicals.add(technic);
+        photosalon.technics.add(technic);
       }
       photosalons[namePhotosalon] = photosalon;
     }
@@ -76,19 +78,21 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
 
     for(var nameRepair in namesRepairs){
       Repair repair = Repair(nameRepair);
-      String query = 'SELECT '
-          'equipment.id, '
+      String query =
+          'SELECT equipment.id, '
           'equipment.number, '
           'equipment.category, '
           'equipment.name, '
-          'statusEquipment.status, '
-          'statusEquipment.dislocation '
-          'FROM equipment JOIN statusEquipment '
-          'ON equipment.id = statusEquipment.idEquipment WHERE statusEquipment.dislocation = "$nameRepair"';
+          's.status, '
+          's.dislocation '
+          'FROM equipment '
+          'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
+          'WHERE s.dislocation = "$nameRepair" '
+          'ORDER BY equipment.number ASC';
       var result = await _connDB!.query(query);
       for (var row in result) {
         Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5]);
-        repair.technicals.add(technic);
+        repair.technics.add(technic);
       }
       repairs[nameRepair] = repair;
     }
@@ -102,19 +106,21 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
 
     for(var nameStorage in namesStorages){
       Storage storage = Storage(nameStorage);
-      String query = 'SELECT '
-          'equipment.id, '
+      String query =
+          'SELECT equipment.id, '
           'equipment.number, '
           'equipment.category, '
           'equipment.name, '
-          'statusEquipment.status, '
-          'statusEquipment.dislocation '
-          'FROM equipment JOIN statusEquipment '
-          'ON equipment.id = statusEquipment.idEquipment WHERE statusEquipment.dislocation = "$nameStorage"';
+          's.status, '
+          's.dislocation '
+          'FROM equipment '
+          'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
+          'WHERE s.dislocation = "$nameStorage" '
+          'ORDER BY equipment.number ASC';
       var result = await _connDB!.query(query);
       for (var row in result) {
         Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5]);
-        storage.technicals.add(technic);
+        storage.technics.add(technic);
       }
       storages[nameStorage] = storage;
     }

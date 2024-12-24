@@ -39,6 +39,7 @@ dependencies:
   package_info_plus: ^8.1.1
   provider: ^6.1.2
   google_fonts: ^6.2.1
+  animations: ^2.0.11
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -69,6 +70,46 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/logo/logo.png
+    - assets/icons_gridview_technical/camera.png
+    - assets/icons_gridview_technical/copier.png
+    - assets/icons_gridview_technical/flash.png
+    - assets/icons_gridview_technical/laminator.png
+    - assets/icons_gridview_technical/printer.png
+    - assets/icons_gridview_technical/scanner.png
+    - assets/icons_gridview_technical/television.png
+    - assets/icons_gridview_technical/screens_tv/screentv-1.png
+    - assets/icons_gridview_technical/screens_tv/screentv-2.png
+    - assets/icons_gridview_technical/screens_tv/screentv-3.png
+    - assets/icons_gridview_technical/screens_tv/screentv-4.png
+    - assets/icons_gridview_technical/screens_tv/screentv-5.png
+    - assets/icons_gridview_technical/screens_tv/screentv-6.png
+    - assets/icons_gridview_technical/screens_tv/screentv-7.png
+    - assets/icons_gridview_technical/screens_tv/screentv-8.png
+    - assets/icons_gridview_technical/screens_tv/screentv-9.png
+    - assets/icons_gridview_technical/screens_tv/screentv-10.png
+    - assets/icons_gridview_technical/screens_tv/screentv-11.png
+    - assets/icons_gridview_technical/screens_tv/screentv-12.png
+    - assets/icons_gridview_technical/screens_tv/screentv-13.png
+    - assets/icons_gridview_technical/screens_tv/screentv-14.png
+    - assets/icons_gridview_technical/screens_tv/screentv-15.png
+    - assets/icons_gridview_technical/screens_tv/screentv-16.png
+    - assets/icons_gridview_technical/screens_tv/screentv-17.png
+    - assets/icons_gridview_technical/screens_tv/screentv-18.png
+    - assets/icons_gridview_technical/screens_tv/screentv-19.png
+    - assets/icons_gridview_technical/screens_tv/screentv-20.png
+    - assets/icons_gridview_technical/screens_tv/screentv-21.png
+    - assets/icons_gridview_technical/screens_tv/screentv-22.png
+    - assets/icons_gridview_technical/screens_tv/screentv-23.png
+    - assets/icons_gridview_technical/screens_tv/screentv-24.png
+    - assets/icons_gridview_technical/screens_tv/screentv-25.png
+    - assets/icons_gridview_technical/screens_tv/screentv-26.png
+    - assets/icons_gridview_technical/screens_tv/screentv-27.png
+    - assets/icons_gridview_technical/screens_tv/screentv-28.png
+    - assets/icons_gridview_technical/screens_tv/screentv-29.png
+    - assets/icons_gridview_technical/screens_tv/screentv-30.png
+    - assets/icons_gridview_technical/screens_tv/screentv-31.png
+    - assets/icons_gridview_technical/screens_tv/screentv-32.png
+    - assets/icons_gridview_technical/screens_tv/screentv-33.png
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

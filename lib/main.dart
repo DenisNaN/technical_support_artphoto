@@ -3,19 +3,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
-import 'package:technical_support_artphoto/features/grid_view/grid_view_technics.dart';
 import 'package:technical_support_artphoto/features/navigation/main_bottom_app_bar.dart';
 import 'package:technical_support_artphoto/features/pages/home_page.dart';
-import 'package:technical_support_artphoto/features/start_screens/authorization.dart';
-import 'package:technical_support_artphoto/features/start_screens/splash_screen.dart';
 import 'package:technical_support_artphoto/core/utils/utils.dart' as utils;
+import 'package:technical_support_artphoto/features/start_screens/splash_screen.dart';
 
 void main() {
   startMeUp() async {
     WidgetsFlutterBinding.ensureInitialized();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     utils.packageInfo = packageInfo;
-    runApp(ChangeNotifierProvider(create: (_) => ProviderModel(), child: const SplashScreenArtphoto()));
+    runApp(ChangeNotifierProvider(create: (_) => ProviderModel(), child: SplashScreenArtphoto()));
   }
   startMeUp();
 }
@@ -26,14 +24,7 @@ class SplashScreenArtphoto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
-        initialRoute: '/SplashScreen',
-        routes: {
-          '/SplashScreen': (context) => const SplashScreen(),
-          '/Authorization': (context) => const Authorization(),
-          '/ArtphotoTech': (context) => const ArtphotoTech(),
-          '/GridViewTechnics': (context) => const GridViewTechnics(),
-        },
+        home: const SplashScreen(),
         theme: ThemeData(
           useMaterial3: false,
           textTheme: TextTheme(
@@ -42,7 +33,12 @@ class SplashScreenArtphoto extends StatelessWidget {
               color: Colors.black54,
               fontWeight: FontWeight.w700,
               fontStyle: FontStyle.italic,
-            )
+            ),
+            titleSmall: GoogleFonts.philosopher(
+              fontSize: 15,
+              color: Colors.black,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ));
   }

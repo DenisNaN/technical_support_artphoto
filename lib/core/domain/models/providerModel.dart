@@ -54,32 +54,32 @@ class ProviderModel with ChangeNotifier {
   }
 
   void addTechnicInPhotosalon(String name, Technic technic) {
-    _photosolons[name]!.technicals.add(technic);
+    _photosolons[name]!.technics.add(technic);
     notifyListeners();
   }
 
   void addTechnicInRepair(String name, Technic technic) {
-    _repairs[name]!.technicals.add(technic);
+    _repairs[name]!.technics.add(technic);
     notifyListeners();
   }
 
   void addTechnicInStorage(String name, Technic technic) {
-    _storages[name]!.technicals.add(technic);
+    _storages[name]!.technics.add(technic);
     notifyListeners();
   }
 
   void removeTechnicInPhotosalon(String name, Technic technic) {
-    _photosolons[name]!.technicals.remove(technic);
+    _photosolons[name]!.technics.remove(technic);
     notifyListeners();
   }
 
   void removeTechnicInRepair(String name, Technic technic) {
-    _repairs[name]!.technicals.remove(technic);
+    _repairs[name]!.technics.remove(technic);
     notifyListeners();
   }
 
   void removeTechnicInStorage(String name, Technic technic) {
-    _storages[name]!.technicals.remove(technic);
+    _storages[name]!.technics.remove(technic);
     notifyListeners();
   }
 
