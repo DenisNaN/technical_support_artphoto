@@ -8,4 +8,5 @@ abstract interface class TechnicalSupportRepository {
   Future<Map<String, Repair>> fetchRepairs();
   Future<Map<String, Storage>> fetchStorages();
   Future<User> fetchAccessLevel(String password);
+  Future<bool> checkNumberTechnic(String number);
 }

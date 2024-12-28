@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
+import 'package:technical_support_artphoto/features/history/HistoryList.dart';
 import 'package:technical_support_artphoto/features/navigation/main_bottom_app_bar.dart';
-import 'package:technical_support_artphoto/features/pages/home_page.dart';
 import 'package:technical_support_artphoto/core/utils/utils.dart' as utils;
+import 'package:technical_support_artphoto/features/presentation/home_page.dart';
 import 'package:technical_support_artphoto/features/start_screens/splash_screen.dart';
 
 void main() {
@@ -24,11 +26,14 @@ class SplashScreenArtphoto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate
+        ],
         home: const SplashScreen(),
         theme: ThemeData(
           useMaterial3: false,
           textTheme: TextTheme(
-            titleMedium: GoogleFonts.philosopher(
+            headlineMedium: GoogleFonts.philosopher(
               fontSize: 21,
               color: Colors.black54,
               fontWeight: FontWeight.w700,
@@ -57,14 +62,12 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
       return Scaffold(
-        appBar: AppBar(
-          title: Center(child: Text(providerModel.user.keys.first)),
-        ),
         bottomNavigationBar: MainBottomAppBar(),
         body: <Widget>[
           /// Home page
           HomePage(),
 
+          /// Repair
           Card(
             shadowColor: Colors.transparent,
             margin: const EdgeInsets.all(8.0),
@@ -77,7 +80,7 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
             ),
           ),
 
-          /// Notifications page
+          /// Troubles
           const Padding(
             padding: EdgeInsets.all(8.0),
             child: Column(
@@ -100,41 +103,8 @@ class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderSt
             ),
           ),
 
-          /// Messages page
-          ListView.builder(
-            reverse: true,
-            itemCount: 2,
-            itemBuilder: (BuildContext context, int index) {
-              if (index == 0) {
-                return Align(
-                  alignment: Alignment.centerRight,
-                  child: Container(
-                    margin: const EdgeInsets.all(8.0),
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Text(
-                      'Hello',
-                    ),
-                  ),
-                );
-              }
-              return Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  margin: const EdgeInsets.all(8.0),
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Text(
-                    'Hi!',
-                  ),
-                ),
-              );
-            },
-          ),
+          /// History
+          HistoryList(),
         ][providerModel.currentPageIndexMainBottomAppBar],
       );
   }

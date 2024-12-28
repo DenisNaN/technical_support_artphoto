@@ -5,10 +5,12 @@ import 'package:technical_support_artphoto/core/domain/models/repair.dart';
 import 'package:technical_support_artphoto/core/domain/models/storage.dart';
 import 'package:technical_support_artphoto/core/domain/models/user.dart';
 import 'package:technical_support_artphoto/core/domain/technical_support_repository.dart';
+import 'package:technical_support_artphoto/features/history/History.dart';
+import 'package:technical_support_artphoto/features/technics_entity/technic_entity.dart';
 import '../domain/models/technic.dart';
 import 'package:intl/intl.dart';
 
-class ConnectDbMySQL implements TechnicalSupportRepository{
+class ConnectDbMySQL implements TechnicalSupportRepository {
   ConnectDbMySQL._();
 
   static final ConnectDbMySQL connDB = ConnectDbMySQL._();
@@ -18,24 +20,27 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
     _connDB ??= await _init();
   }
 
-  void dispose(){
+  void dispose() {
     dispose();
   }
 
   Future<MySqlConnection> _init() async {
     MySqlConnection connDB = await MySqlConnection.connect(ConnectionSettings(
-        host: ApiConstants.host, port: ApiConstants.port, user: ApiConstants.user, password: ApiConstants.password, db: ApiConstants.db));
-        return connDB;
+        host: ApiConstants.host,
+        port: ApiConstants.port,
+        user: ApiConstants.user,
+        password: ApiConstants.password,
+        db: ApiConstants.db));
+    return connDB;
   }
 
   @override
-  Future<User> fetchAccessLevel(String password) async{
-    var result = await _connDB!.query(
-        'SELECT login, access FROM loginPassword WHERE password = $password');
+  Future<User> fetchAccessLevel(String password) async {
+    var result = await _connDB!.query('SELECT login, access FROM loginPassword WHERE password = $password');
 
     User user = User('user', 'no access');
 
-    if(result.isNotEmpty){
+    if (result.isNotEmpty) {
       for (var row in result) {
         user = User(row[0], row[1]);
       }
@@ -44,14 +49,13 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   }
 
   @override
-  Future<Map<String, Photosalon>> fetchPhotosalons() async{
+  Future<Map<String, Photosalon>> fetchPhotosalons() async {
     Map<String, Photosalon> photosalons = {};
     List<String> namesPhotosalons = await fetchNamePhotosalons();
 
-    for(var namePhotosalon in namesPhotosalons){
+    for (var namePhotosalon in namesPhotosalons) {
       Photosalon photosalon = Photosalon(namePhotosalon);
-      String query =
-          'SELECT equipment.id, '
+      String query = 'SELECT equipment.id, '
           'equipment.number, '
           'equipment.category, '
           'equipment.name, '
@@ -72,14 +76,13 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   }
 
   @override
-  Future<Map<String, Repair>> fetchRepairs() async{
+  Future<Map<String, Repair>> fetchRepairs() async {
     Map<String, Repair> repairs = {};
     List<String> namesRepairs = await fetchNameRepairs();
 
-    for(var nameRepair in namesRepairs){
+    for (var nameRepair in namesRepairs) {
       Repair repair = Repair(nameRepair);
-      String query =
-          'SELECT equipment.id, '
+      String query = 'SELECT equipment.id, '
           'equipment.number, '
           'equipment.category, '
           'equipment.name, '
@@ -100,14 +103,13 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   }
 
   @override
-  Future<Map<String, Storage>> fetchStorages() async{
+  Future<Map<String, Storage>> fetchStorages() async {
     Map<String, Storage> storages = {};
     List<String> namesStorages = await fetchNameStorages();
 
-    for(var nameStorage in namesStorages){
+    for (var nameStorage in namesStorages) {
       Storage storage = Storage(nameStorage);
-      String query =
-          'SELECT equipment.id, '
+      String query = 'SELECT equipment.id, '
           'equipment.number, '
           'equipment.category, '
           'equipment.name, '
@@ -127,22 +129,20 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
     return storages;
   }
 
-  Future<List<String>> fetchNamePhotosalons() async{
-    var result = await _connDB!.query(
-        'SELECT Фотосалон FROM Фотосалоны');
+  Future<List<String>> fetchNamePhotosalons() async {
+    var result = await _connDB!.query('SELECT Фотосалон FROM Фотосалоны');
 
     List<String> photosalons = [];
     for (var row in result) {
-      if(row[0] != 'Склад' && row[0] != 'Офис'){
+      if (row[0] != 'Склад' && row[0] != 'Офис') {
         photosalons.add(row[0]);
       }
     }
     return photosalons;
   }
 
-  Future<List<String>> fetchNameRepairs() async{
-    var result = await _connDB!.query(
-        'SELECT repairmen FROM service');
+  Future<List<String>> fetchNameRepairs() async {
+    var result = await _connDB!.query('SELECT repairmen FROM service');
 
     List<String> repairs = [];
     for (var row in result) {
@@ -151,15 +151,20 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
     return repairs;
   }
 
-  Future<List<String>> fetchNameStorages() async{
-    var result = await _connDB!.query(
-        'SELECT storage FROM storages');
+  Future<List<String>> fetchNameStorages() async {
+    var result = await _connDB!.query('SELECT storage FROM storages');
 
     List<String> storages = [];
     for (var row in result) {
       storages.add(row[0]);
     }
     return storages;
+  }
+
+  @override
+  Future<bool> checkNumberTechnic(String number) async{
+    var result = await _connDB!.query('SELECT 1 FROM equipment WHERE number = $number');
+    return result.isNotEmpty;
   }
 
   // Future<List> getAllTechnics() async{
@@ -184,9 +189,9 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //       'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
   //       'ORDER BY equipment.id');
 
-    // var list = technicListFromMap(result);
-    // var reversedList = List.from(list.reversed);
-    // return reversedList;
+  // var list = technicListFromMap(result);
+  // var reversedList = List.from(list.reversed);
+  // return reversedList;
   //   return [];
   // }
   //
@@ -383,49 +388,59 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //   return list;
   // }
   //
-  String getDateFormatted(String date){
+  String getDateFormatted(String date) {
     return DateFormat('yyyy.MM.dd').format(DateTime.parse(date));
   }
-  //
-  // Future<int> insertTechnicInDB(Technic technic) async{
-  //   await ConnectDbMySQL.connDB.connDatabase();
-  //   var result = await _connDB!.query(
-  //       'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) VALUES (?, ?, ?, ?, ?, ?, ?)',
-  //       [technic.internalID,  technic.category, technic.name, technic.dateBuyTechnic, technic.cost, technic.comment,
-  //       LoginPassword.login]);
-  //
-  //   int id = result.insertId!;
-  //   await insertStatusInDB(id, technic.status, technic.dislocation);
-  //
-  //   if(technic.dateStartTestDrive != '') {
-  //     await insertTestDriveInDB(technic);
-  //   }
-  //   return result.insertId!;
-  // }
-  //
-  // Future insertTestDriveInDB(Technic technic) async{
-  //   await ConnectDbMySQL.connDB.connDatabase();
-  //   await _connDB!.query(
-  //       'INSERT INTO testDrive (idEquipment, category, testDriveDislocation, dateStart, dateFinish, result, '
-  //           'checkEquipment, user) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-  //       [
-  //         technic.id,
-  //         technic.category,
-  //         technic.testDriveDislocation,
-  //         technic.dateStartTestDrive,
-  //         technic.dateFinishTestDrive,
-  //         technic.resultTestDrive,
-  //         technic.checkboxTestDrive,
-  //         LoginPassword.login
-  //       ]);
-  //
-  //   int idLastTestDrive = await findIDLastTestDriveTechnic(technic);
-  //   int idLastRepair = await findLastRepair(technic);
-  //   await _connDB!.query(
-  //       'UPDATE repairEquipment SET idTestDrive = ? WHERE id = ?',
-  //       [idLastTestDrive, idLastRepair]);
-  // }
-  //
+
+  Future<int> insertTechnicInDB(TechnicEntity technic, String nameUser) async {
+    var result = await _connDB!.query(
+        'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) VALUES (?, ?, ?, ?, ?, ?, ?)', [
+      technic.internalID,
+      technic.category,
+      technic.name,
+      technic.dateBuyTechnic,
+      technic.cost,
+      technic.comment,
+      nameUser
+    ]);
+
+    int id = result.insertId!;
+    await insertStatusInDB(id, technic.status, technic.dislocation, nameUser);
+
+    if (technic.dateStartTestDrive != '') {
+      await insertTestDriveInDB(technic, nameUser);
+    }
+    return result.insertId!;
+  }
+
+  Future insertStatusInDB(int id, String status, String dislocation, String nameUser) async {
+    await ConnectDbMySQL.connDB.connDatabase();
+    await _connDB!.query(
+        'INSERT INTO statusEquipment (idEquipment, status, dislocation, date, user) VALUES (?, ?, ?, ?, ?)',
+        [id, status, dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now()), nameUser]);
+  }
+
+  Future insertTestDriveInDB(TechnicEntity technic, String nameUser) async {
+    await ConnectDbMySQL.connDB.connDatabase();
+    await _connDB!.query(
+        'INSERT INTO testDrive (idEquipment, category, testDriveDislocation, dateStart, dateFinish, result, '
+        'checkEquipment, user) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [
+          technic.id,
+          technic.category,
+          technic.testDriveDislocation,
+          technic.dateStartTestDrive,
+          technic.dateFinishTestDrive,
+          technic.resultTestDrive,
+          technic.checkboxTestDrive,
+          nameUser
+        ]);
+
+    int idLastTestDrive = await findIDLastTestDriveTechnic(technic);
+    int idLastRepair = await findLastRepair(technic);
+    await _connDB!.query('UPDATE repairEquipment SET idTestDrive = ? WHERE id = ?', [idLastTestDrive, idLastRepair]);
+  }
+
   // Future updateTestDriveInDB(Technic technic) async{
   //   int checkBox = 0;
   //   if(technic.checkboxTestDrive) checkBox = 1;
@@ -444,46 +459,37 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //         id
   //       ]);
   // }
-  //
-  // Future<int> findIDLastTestDriveTechnic(Technic technic) async {
-  //   await ConnectDbMySQL.connDB.connDatabase();
-  //   var result = await _connDB!.query(
-  //       'SELECT id FROM testDrive WHERE idEquipment = ? ORDER BY id DESC LIMIT 1',
-  //       [
-  //         technic.id
-  //       ]);
-  //   int id = lastTectDriveListFromMap(result);
-  //   return id;
-  // }
-  //
-  // int lastTectDriveListFromMap(var result) {
-  //   int id = -1;
-  //   for (var row in result) {
-  //     id = row[0];
-  //   }
-  //   return id;
-  // }
-  //
-  // Future<int> findLastRepair(Technic technic) async {
-  //   await ConnectDbMySQL.connDB.connDatabase();
-  //   var result = await _connDB!.query(
-  //       'SELECT id FROM repairEquipment WHERE number = ? ORDER BY id DESC LIMIT 1',
-  //       [
-  //         technic.internalID
-  //       ]);
-  //   int id = lastTectDriveListFromMap(result);
-  //   return id;
-  // }
-  //
-  // Future insertStatusInDB(int id, String status, String dislocation) async{
-  //   await ConnectDbMySQL.connDB.connDatabase();
-  //   await _connDB!.query(
-  //       'INSERT INTO statusEquipment (idEquipment, status, dislocation, date, user) '
-  //           'VALUES (?, ?, ?, ?, ?)',
-  //       [id, status, dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now()),
-  //         LoginPassword.login]);
-  // }
-  //
+
+  Future<int> findIDLastTestDriveTechnic(TechnicEntity technic) async {
+    await ConnectDbMySQL.connDB.connDatabase();
+    var result = await _connDB!.query(
+        'SELECT id FROM testDrive WHERE idEquipment = ? ORDER BY id DESC LIMIT 1',
+        [
+          technic.id
+        ]);
+    int id = lastTectDriveListFromMap(result);
+    return id;
+  }
+
+  int lastTectDriveListFromMap(var result) {
+    int id = -1;
+    for (var row in result) {
+      id = row[0];
+    }
+    return id;
+  }
+
+  Future<int> findLastRepair(TechnicEntity technic) async {
+    await ConnectDbMySQL.connDB.connDatabase();
+    var result = await _connDB!.query(
+        'SELECT id FROM repairEquipment WHERE number = ? ORDER BY id DESC LIMIT 1',
+        [
+          technic.internalID
+        ]);
+    int id = lastTectDriveListFromMap(result);
+    return id;
+  }
+
   // Future updateTechnicInDB(Technic technic) async{
   //   await ConnectDbMySQL.connDB.connDatabase();
   //   await _connDB!.query(
@@ -609,21 +615,21 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //         trouble.id
   //       ]);
   // }
-  //
-  // Future insertHistory(History history) async{
-  //   await ConnectDbMySQL.connDB.connDatabase();
-  //   await _connDB!.query('INSERT INTO history ('
-  //       'section, idSection, typeOperation, description, login, date) '
-  //       'VALUES (?, ?, ?, ?, ?, ?)', [
-  //       history.section,
-  //       history.idSection,
-  //       history.typeOperation,
-  //       history.description,
-  //       history.login,
-  //       history.date,
-  //     ]);
-  // }
-  //
+
+  Future insertHistory(History history) async{
+    await ConnectDbMySQL.connDB.connDatabase();
+    await _connDB!.query('INSERT INTO history ('
+        'section, idSection, typeOperation, description, login, date) '
+        'VALUES (?, ?, ?, ?, ?, ?)', [
+        history.section,
+        history.idSection,
+        history.typeOperation,
+        history.description,
+        history.login,
+        history.date,
+      ]);
+  }
+
   // Future<List> getLastIdList() async{
   //   var resultTechnics = await _connDB!.query(
   //       'SELECT id FROM equipment ORDER BY id DESC LIMIT 1');
@@ -706,7 +712,7 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
   //   return list;
   // }
 
-  Future<List<String>> fetchStatusForEquipment() async{
+  Future<List<String>> fetchStatusForEquipment() async {
     var result = await _connDB!.query('SELECT '
         'statusForEquipment.id, '
         'statusForEquipment.status '
@@ -719,7 +725,7 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
     return list;
   }
 
-  Future<List<String>> fetchServices() async{
+  Future<List<String>> fetchServices() async {
     var result = await _connDB!.query('SELECT '
         'service.id, '
         'service.repairmen '
@@ -732,7 +738,7 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
     return list;
   }
 
-  Future<List<String>> fetchNameEquipment() async{
+  Future<List<String>> fetchNameEquipment() async {
     var result = await _connDB!.query('SELECT '
         'nameEquipment.id, '
         'nameEquipment.name '
@@ -745,7 +751,7 @@ class ConnectDbMySQL implements TechnicalSupportRepository{
     return list;
   }
 
-  Future<Map<String, int>> fetchColorsForEquipment() async{
+  Future<Map<String, int>> fetchColorsForEquipment() async {
     var result = await _connDB!.query('SELECT * FROM colorsForPhotosalons');
 
     Map<String, int> map = {};

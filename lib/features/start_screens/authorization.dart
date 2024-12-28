@@ -33,8 +33,10 @@ class _AuthorizationState extends State<Authorization> {
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    ColorAppBar colorAppBar = ColorAppBar();
+    MyColor myColor = MyColor();
     String? version = utils.packageInfo?.version;
+    double width = MediaQuery.sizeOf(context).width;
+    double height = MediaQuery.sizeOf(context).height;
 
     return Container(
       decoration: const BoxDecoration(
@@ -43,7 +45,7 @@ class _AuthorizationState extends State<Authorization> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          flexibleSpace: colorAppBar.color(),
+          flexibleSpace: myColor.appBar(),
           title: Row(children: [
             Text('v. $version', style: const TextStyle(fontSize: 12, color: Colors.white)),
             const Expanded(
@@ -53,21 +55,24 @@ class _AuthorizationState extends State<Authorization> {
         ),
         body: SingleChildScrollView(
           child: Column(
+            // alignment: AlignmentDirectional.center,
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 50, bottom: 30),
                 child: SizedBox(
-                  width: double.infinity,
-                  height: 200,
-                  child: DraggableLogo(
-                      child: Hero(
+                    width: double.infinity,
+                    height: 200,
+                    child: DraggableLogo(
+                      child1: Image.asset('assets/logo/girl/girl2.png'),
+                      child2: Hero(
                           tag: 'logo_hero',
                           child: Image.asset(
                             'assets/logo/logo.png',
                             height: 200,
                             width: 200,
-                          ))),
-                ),
+                          )),
+                      child3: Image.asset('assets/logo/girl/girl1.png'),
+                    )),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -122,7 +127,8 @@ class _AuthorizationState extends State<Authorization> {
                                   if (user.name != 'user') {
                                     providerModel.user[user.name] = user.access;
                                     providerModel.user.remove('user');
-                                    await Navigator.pushReplacement(context, createRouteSlideTransition(const ArtphotoTech()));
+                                    await Navigator.pushReplacement(
+                                        context, createRouteSlideTransition(const ArtphotoTech()));
                                   } else {
                                     passwordController.clear();
                                     _showDialogNotValidationUser();
@@ -160,12 +166,14 @@ class _AuthorizationState extends State<Authorization> {
           content: SingleChildScrollView(
             child: ListBody(
               children: const <Widget>[
-                Text('Введите пароль еще раз', textAlign: TextAlign.center,),
+                Text(
+                  'Введите пароль еще раз',
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           ),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(30))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30))),
           actions: <Widget>[
             TextButton(
               child: const Text('Закрыть'),

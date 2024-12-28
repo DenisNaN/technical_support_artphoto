@@ -5,8 +5,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 Directory? docsDir;
 PackageInfo? packageInfo;
 
-class ColorAppBar{
-  Container color(){
+class MyColor{
+  Container appBar(){
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(

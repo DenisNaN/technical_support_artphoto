@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
 class DraggableLogo extends StatefulWidget {
-  const DraggableLogo({required this.child, super.key});
+  const DraggableLogo({super.key, required this.child1, required this.child2, required this.child3});
 
-  final Widget child;
+  final Widget child1;
+  final Widget child2;
+  final Widget child3;
 
   @override
   State<DraggableLogo> createState() => _DraggableLogoState();
@@ -69,7 +71,8 @@ class _DraggableLogoState extends State<DraggableLogo>
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    // final size = MediaQuery.of(context).size;
+    final size = Size(200, 200);
     return GestureDetector(
       onPanDown: (details) {
         _controller.stop();
@@ -87,7 +90,18 @@ class _DraggableLogoState extends State<DraggableLogo>
       },
       child: Align(
         alignment: _dragAlignment,
-        child: widget.child,
+        // child: widget.child,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned(
+            left: -270,
+              child: widget.child1),
+            widget.child2,
+            Positioned(
+                right: -240,
+                child: widget.child3),
+          ],),
       ),
     );
   }
