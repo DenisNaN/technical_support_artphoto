@@ -1,8 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-import 'technic_entity.dart';
-import 'TechnicTotalSumRepairs.dart';
 
 // class TechnicViewAndChange extends StatefulWidget {
 //   final TechnicEntity technic;

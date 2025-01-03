@@ -157,7 +157,7 @@ class _TechnicAddState extends State<TechnicAdd> {
         controller: _innerNumberTechnic,
         validator: (value) {
           List listInternalID = [];
-          TechnicEntity.technicList.forEach((element) {listInternalID.add(element.internalID.toString());});
+          for (var element in TechnicEntity.technicList) {listInternalID.add(element.internalID.toString());}
           if (listInternalID.contains(value)) {
             return 'Техника с таким номером уже есть';
           }
@@ -602,7 +602,7 @@ class _TechnicAddState extends State<TechnicAdd> {
     if(countEmptyFields > 0){
       tmpResult = tmpResult.trim().replaceFirst(',', '', tmpResult.length-5);
       result = getFieldAddition(countEmptyFields);
-      result += '${tmpResult}.';
+      result += '$tmpResult.';
     }
     return result;
   }

@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'technic_entity.dart';
-import 'technic_add.dart';
-import 'TechnicViewAndChange.dart';
-import 'package:intl/intl.dart';
 
 class Technicslist extends StatelessWidget {
   const Technicslist({super.key});
