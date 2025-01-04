@@ -32,7 +32,8 @@ class _TechnicAddState extends State<TechnicAdd> {
   bool _checkboxTestDrive = false;
   bool _isCategoryPhotocamera = false;
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formInnerNumberKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formCategoryTechnicKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
@@ -59,13 +60,13 @@ class _TechnicAddState extends State<TechnicAdd> {
     return Scaffold(
         appBar: AppBar(
           flexibleSpace: MyColor().appBar(),
-          title: const Text('Добавление техники'),
+          title: Center(child: const Text('Добавить новую технику')),
         ),
         bottomNavigationBar: Padding(
             padding: MediaQuery.of(context).viewInsets,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-              child:Row(
+              child: Row(
                 children: [
                   TextButton(
                       onPressed: () {
@@ -74,63 +75,65 @@ class _TechnicAddState extends State<TechnicAdd> {
                       child: const Text("Отмена")),
                   const Spacer(),
                   TextButton(
-                      onPressed: () async{
+                      onPressed: () async {
                         // checking the unique number of the equipment
-                        if (_formKey.currentState!.validate()) {
-                          String validationEmptyFields = validateEmptyFields();
-                          if (validationEmptyFields != '') {
-                                _viewSnackBar(validationEmptyFields);
-                          } else {
-                            List tmpListTechnic = TechnicEntity.technicList;
-                            tmpListTechnic.sort((technic1, technic2) => technic1.id.compareTo(technic2.id));
-                            TechnicEntity technicLast = TechnicEntity.technicList.last;
-
-                            TechnicEntity technic = TechnicEntity(
-                                technicLast.id! + 1,
-                                int.parse(_innerNumberTechnic.text),
-                                _nameTechnic.text,
-                                _selectedDropdownCategory!,
-                                int.parse(_costTechnic.text.replaceAll(",", "")),
-                                _dateBuyTechnic,
-                                _selectedDropdownStatus!,
-                                _selectedDropdownDislocation!,
-                                DateFormat('yyyy.MM.dd').format(DateTime.now()),
-                                _comment.text,
-                                _selectedDropdownTestDriveDislocation ??= '',
-                                _dateStartTestDrive,
-                                _dateFinishTestDrive,
-                                _resultTestDrive.text,
-                                _checkboxTestDrive
-                            );
-
-                            String result = await save(technic, nameUser);
-                            _viewSnackBar(' $result');
-                            // TechnicEntity.technicList.sort();
-                            Navigator.pop(context);
-                          }
+                        if (_formInnerNumberKey.currentState!.validate()) {
+                          // String validationEmptyFields = validateEmptyFields();
+                          // if (validationEmptyFields != '') {
+                          //   _viewSnackBar(validationEmptyFields);
+                          // } else {
+                          //   List tmpListTechnic = TechnicEntity.technicList;
+                          //   tmpListTechnic.sort((technic1, technic2) =>
+                          //       technic1.id.compareTo(technic2.id));
+                          //   TechnicEntity technicLast = TechnicEntity.technicList.last;
+                          //
+                          //   TechnicEntity technic = TechnicEntity(
+                          //       technicLast.id! + 1,
+                          //       int.parse(_innerNumberTechnic.text),
+                          //       _nameTechnic.text,
+                          //       _selectedDropdownCategory!,
+                          //       int.parse(_costTechnic.text.replaceAll(",", "")),
+                          //       _dateBuyTechnic,
+                          //       _selectedDropdownStatus!,
+                          //       _selectedDropdownDislocation!,
+                          //       DateFormat('yyyy.MM.dd').format(DateTime.now()),
+                          //       _comment.text,
+                          //       _selectedDropdownTestDriveDislocation ??= '',
+                          //       _dateStartTestDrive,
+                          //       _dateFinishTestDrive,
+                          //       _resultTestDrive.text,
+                          //       _checkboxTestDrive);
+                          //
+                          //   String result = await save(technic, nameUser);
+                          //   _viewSnackBar(' $result');
+                          //   // TechnicEntity.technicList.sort();
+                          //   Navigator.pop(context);
+                          // }
                         }
                       },
                       child: const Text("Сохранить"))
                 ],
               ),
-            )
-        ),
+            )),
         body: Form(
-          key: _formKey,
-          child:
-            ListView(
+            key: _formInnerNumberKey,
+            child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                SizedBox(height: 20,),
-                Row(
-                  children: [
-                    Expanded(child: _buildInternalID()),
-                    _buildButtonChenckNumberTechnic()
-                  ],
-                ),
-                _buildNameCategory(providerModel),
-                _buildNameTechnic(),
+                SizedBox(height: 20),
+                _buildInternalID(),
+                SizedBox(height: 20),
+                Column(children: [
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Категория техники:', style: Theme.of(context).textTheme.headlineMedium,)),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 40, right: 40),
+                    child: _buildCategoryTechnic(providerModel),
+                  ),
+                ],),
                 _buildCostTechnic(),
+                _buildNameTechnic(),
                 _buildDateBuyTechnic(),
                 _buildStatus(providerModel),
                 _buildDislocation(providerModel),
@@ -138,44 +141,61 @@ class _TechnicAddState extends State<TechnicAdd> {
                 _buildSwitchTestDrive(),
                 _buildTestDrive(providerModel)
               ],
-            )
-        )
-    );
+            )));
   }
 
   final numberFormatter = FilteringTextInputFormatter.allow(
     RegExp(r'[0-9]'),
   );
 
-  ListTile _buildInternalID() {
-    return ListTile(
-      // leading: const Icon(Icons.fiber_new),
-      title: TextFormField(
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-            labelText: 'Номер техники'),
-        controller: _innerNumberTechnic,
-        validator: (value) {
-          List listInternalID = [];
-          for (var element in TechnicEntity.technicList) {listInternalID.add(element.internalID.toString());}
-          if (listInternalID.contains(value)) {
-            return 'Техника с таким номером уже есть';
-          }
-          return null;
-        },
-        inputFormatters: [numberFormatter],
-        keyboardType: TextInputType.number,
-      ),
+  Row _buildInternalID() {
+    return Row(
+      children: [
+        Expanded(
+          child: ListTile(
+            title: TextFormField(
+                decoration: InputDecoration(
+                    filled: true,
+                    fillColor: WidgetStateColor.fromMap(<WidgetStatesConstraint, Color>{
+                      WidgetState.focused: Colors.white,
+                      WidgetState.any: Colors.blue.shade50,
+                    }),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(15)),
+                    // border: InputBorder.none,
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue, width: 2),
+                        borderRadius: BorderRadius.circular(15)),
+                    errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red, width: 2),
+                        borderRadius: BorderRadius.circular(15)),
+                    labelText: 'Номер техники'),
+                controller: _innerNumberTechnic,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Обязательное поле';
+                  }
+                  return null;
+                },
+                inputFormatters: [numberFormatter],
+                keyboardType: TextInputType.number,
+              ),
+          ),
+        ),
+        _buildButtonChenckNumberTechnic(),
+      ],
     );
   }
 
-  Padding _buildButtonChenckNumberTechnic(){
+  Padding _buildButtonChenckNumberTechnic() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 30),
       child: ElevatedButton(
-          onPressed: () async{
-            if(_innerNumberTechnic.text != ''){
-              bool b = await ConnectDbMySQL.connDB.checkNumberTechnic(_innerNumberTechnic.text);
+          onPressed: () async {
+            if (_innerNumberTechnic.text != '') {
+              bool b = await ConnectDbMySQL.connDB
+                  .checkNumberTechnic(_innerNumberTechnic.text);
               _viewSnackBar(b ? 'Техника с таким номером есть.' : 'Номер свободен');
             }
           },
@@ -183,40 +203,63 @@ class _TechnicAddState extends State<TechnicAdd> {
     );
   }
 
-  ListTile _buildNameCategory(ProviderModel providerModel) {
+  ListTile _buildCategoryTechnic(ProviderModel providerModel) {
     return ListTile(
-      leading: const Icon(Icons.print),
-      title: DropdownButton<String>(
+      // tileColor: Colors.orange,
+      // leading: const Icon(Icons.print),
+      title: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue.shade50, width: 2),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.white, width: 2),
+              borderRadius: BorderRadius.circular(15)),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue.shade50, width: 2),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          filled: true,
+          fillColor: Colors.blue.shade50,
+        ),
+        validator: (value) => value == null ? "Обязательное поле" : null,
+        dropdownColor: Colors.blue.shade50,
         borderRadius: BorderRadius.circular(10.0),
         padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-        isExpanded: true,
-        hint: const Text('Наименование техники'),
-        icon: _selectedDropdownCategory != null ? IconButton(
-            icon: const Icon(Icons.clear, color: Colors.grey),
-            onPressed: (){
-              setState(() {
-                _selectedDropdownCategory = null;
-              });}) : null,
+        // isExpanded: true,
+        hint: const Text('Техника'),
+        // icon: _selectedDropdownCategory != null
+        //     ? IconButton(
+        //         icon: const Icon(Icons.clear, color: Colors.grey),
+        //         onPressed: () {
+        //           setState(() {
+        //             _selectedDropdownCategory = null;
+        //           });
+        //         })
+        //     : null,
         value: _selectedDropdownCategory,
-        items: providerModel.namesEquipments.map<DropdownMenuItem<String>>((String value) {
+        items:
+            providerModel.namesEquipments.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value),
           );
         }).toList(),
-        onChanged: (String? value){
+        onChanged: (String? value) {
           setState(() {
             _selectedDropdownCategory = value!;
-            if(value == 'Фотоаппарат') {
-              _isCategoryPhotocamera = true;
-            }
-            else {
-              _isCategoryPhotocamera = false;
-              if(_dateFinishTestDrive == '' && _dateStartTestDrive != ''){
-                DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDrive).add(const Duration(days: 14));
-                _dateFinishTestDrive = DateFormat('yyyy.MM.dd').format(finishTestDrive);
-              }
-            }
+            // if (value == 'Фотоаппарат') {
+            //   _isCategoryPhotocamera = true;
+            // } else {
+            //   _isCategoryPhotocamera = false;
+            //   if (_dateFinishTestDrive == '' && _dateStartTestDrive != '') {
+            //     DateTime finishTestDrive = DateFormat('yyyy.MM.dd')
+            //         .parse(_dateStartTestDrive)
+            //         .add(const Duration(days: 14));
+            //     _dateFinishTestDrive = DateFormat('yyyy.MM.dd').format(finishTestDrive);
+            //   }
+            // }
           });
         },
       ),
@@ -235,16 +278,14 @@ class _TechnicAddState extends State<TechnicAdd> {
 
   ListTile _buildCostTechnic() {
     return ListTile(
-      leading: const Icon(Icons.shopify),
-      title: TextFormField(
-        decoration: const InputDecoration(
-            hintText: "Стоимость техники",
-            prefix: Text('₽ ')),
-        controller: _costTechnic,
-        inputFormatters: [IntegerCurrencyInputFormatter()],
-        keyboardType: TextInputType.number,
-      )
-    );
+        leading: const Icon(Icons.shopify),
+        title: TextFormField(
+          decoration:
+              const InputDecoration(hintText: "Стоимость техники", prefix: Text('₽ ')),
+          controller: _costTechnic,
+          inputFormatters: [IntegerCurrencyInputFormatter()],
+          keyboardType: TextInputType.number,
+        ));
   }
 
   ListTile _buildDateBuyTechnic() {
@@ -259,23 +300,22 @@ class _TechnicAddState extends State<TechnicAdd> {
               icon: const Icon(Icons.edit),
               onPressed: () {
                 showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2099),
-                    locale: const Locale("ru", "RU")
-                ).then((date) {
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2099),
+                        locale: const Locale("ru", "RU"))
+                    .then((date) {
                   setState(() {
-                    if(date != null) {
+                    if (date != null) {
                       _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(date);
                     }
                   });
                 });
               },
-              color: Colors.blue
-          ),
+              color: Colors.blue),
           IconButton(
-              onPressed: (){
+              onPressed: () {
                 setState(() {
                   _dateBuyTechnic = '';
                 });
@@ -294,20 +334,24 @@ class _TechnicAddState extends State<TechnicAdd> {
         padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
         isExpanded: true,
         hint: const Text('Статус техники'),
-        icon: _selectedDropdownStatus != null ? IconButton(
-            icon: const Icon(Icons.clear, color: Colors.grey),
-            onPressed: (){
-              setState(() {
-                _selectedDropdownStatus = null;
-              });}) : null,
+        icon: _selectedDropdownStatus != null
+            ? IconButton(
+                icon: const Icon(Icons.clear, color: Colors.grey),
+                onPressed: () {
+                  setState(() {
+                    _selectedDropdownStatus = null;
+                  });
+                })
+            : null,
         value: _selectedDropdownStatus,
-        items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+        items: providerModel.statusForEquipment
+            .map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value),
           );
         }).toList(),
-        onChanged: (String? value){
+        onChanged: (String? value) {
           setState(() {
             _selectedDropdownStatus = value!;
           });
@@ -324,20 +368,24 @@ class _TechnicAddState extends State<TechnicAdd> {
         padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
         isExpanded: true,
         hint: const Text('Дислокация техники'),
-        icon: _selectedDropdownDislocation != null ? IconButton(
-            icon: const Icon(Icons.clear, color: Colors.grey),
-            onPressed: (){
-              setState(() {
-                _selectedDropdownDislocation = null;
-              });}) : null,
+        icon: _selectedDropdownDislocation != null
+            ? IconButton(
+                icon: const Icon(Icons.clear, color: Colors.grey),
+                onPressed: () {
+                  setState(() {
+                    _selectedDropdownDislocation = null;
+                  });
+                })
+            : null,
         value: _selectedDropdownDislocation,
-        items: providerModel.namesPhotosalons.map<DropdownMenuItem<String>>((String value) {
+        items:
+            providerModel.namesPhotosalons.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value),
           );
         }).toList(),
-        onChanged: (String? value){
+        onChanged: (String? value) {
           setState(() {
             _selectedDropdownDislocation = value!;
           });
@@ -358,42 +406,46 @@ class _TechnicAddState extends State<TechnicAdd> {
 
   ListTile _buildSwitchTestDrive() {
     return ListTile(
-      title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _switchTestDrive ? const Text('Выключить тест-драйв ') : const Text('Включить тест-драйв '),
-            Switch(
-                value: _switchTestDrive,
-                onChanged: (value){
-                  setState(() {
-                    _switchTestDrive = value;
-                    if(!_switchTestDrive){
-                      _dateStartTestDrive = '';
-                      _dateFinishTestDrive = '';
-                      _resultTestDrive.text = '';
-                      _checkboxTestDrive = false;
-                    } else{
-                      _dateStartTestDrive = DateFormat('yyyy.MM.dd').format(DateTime.now());
-                    }
-                    if(_switchTestDrive && !_checkboxTestDrive && _dateFinishTestDrive == '' && !_isCategoryPhotocamera){
-                      DateTime finishTestDrive = DateFormat('yyyy.MM.dd').parse(_dateStartTestDrive).add(const Duration(days: 14));
-                      _dateFinishTestDrive = DateFormat('yyyy.MM.dd').format(finishTestDrive);
-                    }
-                  });
+      title: Row(mainAxisSize: MainAxisSize.min, children: [
+        _switchTestDrive
+            ? const Text('Выключить тест-драйв ')
+            : const Text('Включить тест-драйв '),
+        Switch(
+            value: _switchTestDrive,
+            onChanged: (value) {
+              setState(() {
+                _switchTestDrive = value;
+                if (!_switchTestDrive) {
+                  _dateStartTestDrive = '';
+                  _dateFinishTestDrive = '';
+                  _resultTestDrive.text = '';
+                  _checkboxTestDrive = false;
+                } else {
+                  _dateStartTestDrive = DateFormat('yyyy.MM.dd').format(DateTime.now());
                 }
-            ),
-          ]
-      ),
+                if (_switchTestDrive &&
+                    !_checkboxTestDrive &&
+                    _dateFinishTestDrive == '' &&
+                    !_isCategoryPhotocamera) {
+                  DateTime finishTestDrive = DateFormat('yyyy.MM.dd')
+                      .parse(_dateStartTestDrive)
+                      .add(const Duration(days: 14));
+                  _dateFinishTestDrive = DateFormat('yyyy.MM.dd').format(finishTestDrive);
+                }
+              });
+            }),
+      ]),
     );
   }
 
   ListTile _buildTestDrive(ProviderModel providerModel) {
-   return ListTile(title:
-  _switchTestDrive ? _buildTestDriveListTile(providerModel) : const Text('Тест-драйв не проводился')
-  );
+    return ListTile(
+        title: _switchTestDrive
+            ? _buildTestDriveListTile(providerModel)
+            : const Text('Тест-драйв не проводился'));
   }
 
-  Padding _buildTestDriveListTile(ProviderModel providerModel){
+  Padding _buildTestDriveListTile(ProviderModel providerModel) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: Container(
@@ -408,112 +460,118 @@ class _TechnicAddState extends State<TechnicAdd> {
               ),
             ]),
         child: ListTile(
-          title: Column(children: [
-            ListTile(
-              contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-              leading: const Icon(Icons.airport_shuttle),
-              title: DropdownButton<String>(
-                isExpanded: true,
-                hint: const Text('Место тест-драйва'),
-                icon: _selectedDropdownTestDriveDislocation != null ? IconButton(
-                    icon: const Icon(Icons.clear, color: Colors.grey),
-                    onPressed: (){
-                      setState(() {
-                        _selectedDropdownTestDriveDislocation = null;
-                      }
-                      );
-                    }) : null,
-                value: _selectedDropdownTestDriveDislocation,
-                items: providerModel.namesPhotosalons.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? value){
-                  setState(() {
-                    _selectedDropdownTestDriveDislocation = value!;
-                  });
-                },
-              ),
-            ),
-          ListTile(
-            contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-            leading: const Icon(Icons.today),
-            title: const Text("Дата начала тест-драйва"),
-            subtitle: Text(_dateStartTestDrive),
-            trailing: IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () {
-                  showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2099),
-                      locale: const Locale("ru", "RU")
-                  ).then((date) {
+          title: Column(
+            children: [
+              ListTile(
+                contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+                leading: const Icon(Icons.airport_shuttle),
+                title: DropdownButton<String>(
+                  isExpanded: true,
+                  hint: const Text('Место тест-драйва'),
+                  icon: _selectedDropdownTestDriveDislocation != null
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, color: Colors.grey),
+                          onPressed: () {
+                            setState(() {
+                              _selectedDropdownTestDriveDislocation = null;
+                            });
+                          })
+                      : null,
+                  value: _selectedDropdownTestDriveDislocation,
+                  items: providerModel.namesPhotosalons
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? value) {
                     setState(() {
-                      if(date != null) {
-                        _dateStartTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                      }
-                    });
-                  });
-                },
-                color: Colors.blue
-                ),
-              ),
-            !_isCategoryPhotocamera ? ListTile(
-              contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-              leading: const Icon(Icons.today),
-              title: const Text("Дата конца тест-драйва"),
-              subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(_dateFinishTestDrive.replaceAll('.', '-')))),
-              trailing: IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () {
-                    showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2099),
-                        locale: const Locale("ru", "RU")
-                    ).then((date) {
-                      setState(() {
-                        if(date != null) {
-                          _dateFinishTestDrive = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-                        }
-                      });
+                      _selectedDropdownTestDriveDislocation = value!;
                     });
                   },
-                  color: Colors.blue
+                ),
               ),
-            ) : const SizedBox.shrink(),
-            ListTile(
-              contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-              leading: const Icon(Icons.create),
-              title: TextFormField(
-                decoration: const InputDecoration(hintText: "Результат проверки-тестирования"),
-                controller: _resultTestDrive,
+              ListTile(
+                contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+                leading: const Icon(Icons.today),
+                title: const Text("Дата начала тест-драйва"),
+                subtitle: Text(_dateStartTestDrive),
+                trailing: IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2099),
+                              locale: const Locale("ru", "RU"))
+                          .then((date) {
+                        setState(() {
+                          if (date != null) {
+                            _dateStartTestDrive =
+                                DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                          }
+                        });
+                      });
+                    },
+                    color: Colors.blue),
               ),
-            ),
-            CheckboxListTile(
-              contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-              title: const Text('Тест-драйв выполнен'),
-              secondary: const Icon(Icons.check),
-              value: _checkboxTestDrive,
-              onChanged: (bool? value) {
-                setState(() {
-                  _checkboxTestDrive = value!;
-                });
-              }
-            )
-          ],
+              !_isCategoryPhotocamera
+                  ? ListTile(
+                      contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+                      leading: const Icon(Icons.today),
+                      title: const Text("Дата конца тест-драйва"),
+                      subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(
+                          DateTime.parse(_dateFinishTestDrive.replaceAll('.', '-')))),
+                      trailing: IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+                            showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(2000),
+                                    lastDate: DateTime(2099),
+                                    locale: const Locale("ru", "RU"))
+                                .then((date) {
+                              setState(() {
+                                if (date != null) {
+                                  _dateFinishTestDrive =
+                                      DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                                }
+                              });
+                            });
+                          },
+                          color: Colors.blue),
+                    )
+                  : const SizedBox.shrink(),
+              ListTile(
+                contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+                leading: const Icon(Icons.create),
+                title: TextFormField(
+                  decoration:
+                      const InputDecoration(hintText: "Результат проверки-тестирования"),
+                  controller: _resultTestDrive,
+                ),
+              ),
+              CheckboxListTile(
+                  contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
+                  title: const Text('Тест-драйв выполнен'),
+                  secondary: const Icon(Icons.check),
+                  value: _checkboxTestDrive,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _checkboxTestDrive = value!;
+                    });
+                  })
+            ],
           ),
         ),
       ),
     );
   }
 
-  Future save(TechnicEntity technic, String nameUser) async{
+  Future save(TechnicEntity technic, String nameUser) async {
     int id = -1;
     id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
     technic.id = id;
@@ -521,7 +579,7 @@ class _TechnicAddState extends State<TechnicAdd> {
     return result;
   }
 
-  Future addHistory(TechnicEntity technic, String nameUser) async{
+  Future addHistory(TechnicEntity technic, String nameUser) async {
     String descForHistory = descriptionForHistory(technic);
     History history = History(
         History.historyList.last.id + 1,
@@ -530,14 +588,13 @@ class _TechnicAddState extends State<TechnicAdd> {
         'create',
         descForHistory,
         nameUser,
-        DateFormat('yyyy.MM.dd').format(DateTime.now())
-    );
+        DateFormat('yyyy.MM.dd').format(DateTime.now()));
 
     ConnectDbMySQL.connDB.insertHistory(history);
     History.historyList.insert(0, history);
   }
 
-  String descriptionForHistory(TechnicEntity technic){
+  String descriptionForHistory(TechnicEntity technic) {
     String internalID = technic.internalID == -1 ? 'БН' : '№${technic.internalID}';
     String result = 'Новая техника $internalID добавленна';
 
@@ -545,7 +602,8 @@ class _TechnicAddState extends State<TechnicAdd> {
   }
 
   String getDateFormat(String date) {
-    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
+    return DateFormat("d MMMM yyyy", "ru_RU")
+        .format(DateTime.parse(date.replaceAll('.', '-')));
   }
 
   void _viewSnackBar(String text) {
@@ -564,43 +622,42 @@ class _TechnicAddState extends State<TechnicAdd> {
     );
   }
 
-  String validateEmptyFields(){
+  String validateEmptyFields() {
     String result = '';
     String tmpResult = '';
     int countEmptyFields = 0;
 
-    if(_innerNumberTechnic.text == ""){
+    if (_innerNumberTechnic.text == "") {
       tmpResult += 'Номер техники, ';
       countEmptyFields++;
     }
-    if(_selectedDropdownCategory == null){
+    if (_selectedDropdownCategory == null) {
       tmpResult += 'Наименование техники, ';
       countEmptyFields++;
     }
-    if(_costTechnic.text == ""){
+    if (_costTechnic.text == "") {
       tmpResult += 'Стоимость техники, ';
       countEmptyFields++;
     }
-    if(_dateBuyTechnic == ""){
+    if (_dateBuyTechnic == "") {
       tmpResult += 'Дата покупки техники, ';
       countEmptyFields++;
     }
-    if(_selectedDropdownStatus == null){
+    if (_selectedDropdownStatus == null) {
       tmpResult += 'Статус техники, ';
       countEmptyFields++;
     }
-    if(_selectedDropdownDislocation == null){
+    if (_selectedDropdownDislocation == null) {
       tmpResult += 'Дислокация техники, ';
       countEmptyFields++;
     }
-    if(_switchTestDrive &&
-        _selectedDropdownTestDriveDislocation == null){
+    if (_switchTestDrive && _selectedDropdownTestDriveDislocation == null) {
       tmpResult += 'Место тест-драйва, ';
       countEmptyFields++;
     }
 
-    if(countEmptyFields > 0){
-      tmpResult = tmpResult.trim().replaceFirst(',', '', tmpResult.length-5);
+    if (countEmptyFields > 0) {
+      tmpResult = tmpResult.trim().replaceFirst(',', '', tmpResult.length - 5);
       result = getFieldAddition(countEmptyFields);
       result += '$tmpResult.';
     }
@@ -626,16 +683,13 @@ class _TechnicAddState extends State<TechnicAdd> {
 }
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {
-
   final validationRegex = RegExp(r'^[\d,]*$');
   final replaceRegex = RegExp(r'[^\d]+');
   static const thousandSeparator = ',';
 
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue
-      ) {
+      TextEditingValue oldValue, TextEditingValue newValue) {
     if (!validationRegex.hasMatch(newValue.text)) {
       return oldValue;
     }
@@ -651,9 +705,9 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
       index -= 3;
 
       if (index > 0) {
-        formattedText = formattedText.substring(0, index)
-            + thousandSeparator
-            + formattedText.substring(index, formattedText.length);
+        formattedText = formattedText.substring(0, index) +
+            thousandSeparator +
+            formattedText.substring(index, formattedText.length);
       }
     }
 
@@ -663,17 +717,17 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
     }
 
     /// Handle moving cursor.
-    final initialNumberOfPrecedingSeparators = oldValue.text.characters
-        .where((e) => e == thousandSeparator)
-        .length;
-    final newNumberOfPrecedingSeparators = formattedText.characters
-        .where((e) => e == thousandSeparator)
-        .length;
-    final additionalOffset = newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
+    final initialNumberOfPrecedingSeparators =
+        oldValue.text.characters.where((e) => e == thousandSeparator).length;
+    final newNumberOfPrecedingSeparators =
+        formattedText.characters.where((e) => e == thousandSeparator).length;
+    final additionalOffset =
+        newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
 
     return newValue.copyWith(
       text: formattedText,
-      selection: TextSelection.collapsed(offset: newValue.selection.baseOffset + additionalOffset),
+      selection: TextSelection.collapsed(
+          offset: newValue.selection.baseOffset + additionalOffset),
     );
   }
 }

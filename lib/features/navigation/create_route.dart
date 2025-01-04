@@ -28,7 +28,7 @@ Route createRouteSlideTransition(Widget page) {
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 1.0);
       const end = Offset.zero;
-      const curve = Curves.easeInOutBack;
+      const curve = Curves.easeInOutCubic;
 
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 

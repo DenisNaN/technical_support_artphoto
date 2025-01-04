@@ -41,15 +41,21 @@ class _AuthorizationState extends State<Authorization> {
     return Container(
       decoration: const BoxDecoration(
           gradient: LinearGradient(
-              colors: [Colors.blue, Colors.purple], begin: Alignment.topRight, end: Alignment.bottomLeft)),
+              colors: [Colors.blue, Colors.purple],
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft)),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           flexibleSpace: myColor.appBar(),
           title: Row(children: [
-            Text('v. $version', style: const TextStyle(fontSize: 12, color: Colors.white)),
+            Text('v. $version',
+                style: const TextStyle(fontSize: 12, color: Colors.white)),
             const Expanded(
-                child: Center(child: Padding(padding: EdgeInsets.only(right: 45), child: Text('Авторизация')))),
+                child: Center(
+                    child: Padding(
+                        padding: EdgeInsets.only(right: 45),
+                        child: Text('Авторизация')))),
           ]),
           centerTitle: true,
         ),
@@ -81,7 +87,10 @@ class _AuthorizationState extends State<Authorization> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         color: Colors.grey.shade50,
-                        boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black54, offset: Offset(0, 6))]),
+                        boxShadow: const [
+                          BoxShadow(
+                              blurRadius: 10, color: Colors.black54, offset: Offset(0, 6))
+                        ]),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -122,13 +131,14 @@ class _AuthorizationState extends State<Authorization> {
                                 String password = passwordController.text;
 
                                 if (password.isNotEmpty) {
-                                  User user = await ConnectDbMySQL.connDB.fetchAccessLevel(password);
+                                  User user = await ConnectDbMySQL.connDB
+                                      .fetchAccessLevel(password);
 
                                   if (user.name != 'user') {
                                     providerModel.user[user.name] = user.access;
                                     providerModel.user.remove('user');
-                                    await Navigator.pushReplacement(
-                                        context, createRouteSlideTransition(const ArtphotoTech()));
+                                    await Navigator.pushReplacement(context,
+                                        createRouteSlideTransition(const ArtphotoTech()));
                                   } else {
                                     passwordController.clear();
                                     _showDialogNotValidationUser();
@@ -173,7 +183,8 @@ class _AuthorizationState extends State<Authorization> {
               ],
             ),
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30))),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30))),
           actions: <Widget>[
             TextButton(
               child: const Text('Закрыть'),

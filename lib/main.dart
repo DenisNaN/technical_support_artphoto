@@ -49,7 +49,7 @@ class SplashScreenArtphoto extends StatelessWidget {
   }
 }
 
-/// ER
+/// AABBBC
 class ArtphotoTech extends StatefulWidget {
   const ArtphotoTech({super.key});
 

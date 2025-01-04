@@ -16,4 +16,12 @@ class MyColor{
       ),
     );
   }
+
+  LinearGradient getMyGradient(){
+    return LinearGradient(
+        begin: Alignment.bottomLeft,
+        end: Alignment.topRight,
+        colors: [Colors.lightBlueAccent, Colors.purpleAccent]);
+  }
 }
+
