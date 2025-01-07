@@ -6,6 +6,7 @@ import 'package:technical_support_artphoto/core/data/connect_db_my_sql.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
 import 'package:technical_support_artphoto/core/utils/utils.dart';
 import 'package:technical_support_artphoto/features/history/History.dart';
+import 'package:technical_support_artphoto/features/input_decoration/input_deroration.dart';
 import 'technic_entity.dart';
 
 class TechnicAdd extends StatefulWidget {
@@ -123,23 +124,22 @@ class _TechnicAddState extends State<TechnicAdd> {
                 SizedBox(height: 20),
                 _buildInternalID(),
                 SizedBox(height: 20),
-                Column(children: [
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('Категория техники:', style: Theme.of(context).textTheme.headlineMedium,)),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 40, right: 40),
-                    child: _buildCategoryTechnic(providerModel),
-                  ),
-                ],),
+                _buildCategoryTechnic(providerModel),
+                SizedBox(height: 20),
                 _buildCostTechnic(),
+                SizedBox(height: 20),
                 _buildNameTechnic(),
+                SizedBox(height: 20),
                 _buildDateBuyTechnic(),
+                SizedBox(height: 20),
                 _buildStatus(providerModel),
+                SizedBox(height: 20),
                 _buildDislocation(providerModel),
+                SizedBox(height: 20),
                 _buildComment(),
-                _buildSwitchTestDrive(),
-                _buildTestDrive(providerModel)
+                // SizedBox(height: 20),
+                // _buildSwitchTestDrive(),
+                // _buildTestDrive(providerModel)
               ],
             )));
   }
@@ -154,33 +154,17 @@ class _TechnicAddState extends State<TechnicAdd> {
         Expanded(
           child: ListTile(
             title: TextFormField(
-                decoration: InputDecoration(
-                    filled: true,
-                    fillColor: WidgetStateColor.fromMap(<WidgetStatesConstraint, Color>{
-                      WidgetState.focused: Colors.white,
-                      WidgetState.any: Colors.blue.shade50,
-                    }),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(15)),
-                    // border: InputBorder.none,
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue, width: 2),
-                        borderRadius: BorderRadius.circular(15)),
-                    errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red, width: 2),
-                        borderRadius: BorderRadius.circular(15)),
-                    labelText: 'Номер техники'),
-                controller: _innerNumberTechnic,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Обязательное поле';
-                  }
-                  return null;
-                },
-                inputFormatters: [numberFormatter],
-                keyboardType: TextInputType.number,
-              ),
+              decoration: myDecorationTextFormField('Номер техники'),
+              controller: _innerNumberTechnic,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Обязательное поле';
+                }
+                return null;
+              },
+              inputFormatters: [numberFormatter],
+              keyboardType: TextInputType.number,
+            ),
           ),
         ),
         _buildButtonChenckNumberTechnic(),
@@ -203,66 +187,94 @@ class _TechnicAddState extends State<TechnicAdd> {
     );
   }
 
-  ListTile _buildCategoryTechnic(ProviderModel providerModel) {
-    return ListTile(
-      // tileColor: Colors.orange,
-      // leading: const Icon(Icons.print),
-      title: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue.shade50, width: 2),
-            borderRadius: BorderRadius.circular(20),
+  Column _buildCategoryTechnic(ProviderModel providerModel) {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: Text(
+              'Категория техники',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
           ),
-          focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.white, width: 2),
-              borderRadius: BorderRadius.circular(15)),
-          border: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue.shade50, width: 2),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          filled: true,
-          fillColor: Colors.blue.shade50,
         ),
-        validator: (value) => value == null ? "Обязательное поле" : null,
-        dropdownColor: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(10.0),
-        padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-        // isExpanded: true,
-        hint: const Text('Техника'),
-        // icon: _selectedDropdownCategory != null
-        //     ? IconButton(
-        //         icon: const Icon(Icons.clear, color: Colors.grey),
-        //         onPressed: () {
-        //           setState(() {
-        //             _selectedDropdownCategory = null;
-        //           });
-        //         })
-        //     : null,
-        value: _selectedDropdownCategory,
-        items:
-            providerModel.namesEquipments.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-        onChanged: (String? value) {
-          setState(() {
-            _selectedDropdownCategory = value!;
-            // if (value == 'Фотоаппарат') {
-            //   _isCategoryPhotocamera = true;
-            // } else {
-            //   _isCategoryPhotocamera = false;
-            //   if (_dateFinishTestDrive == '' && _dateStartTestDrive != '') {
-            //     DateTime finishTestDrive = DateFormat('yyyy.MM.dd')
-            //         .parse(_dateStartTestDrive)
-            //         .add(const Duration(days: 14));
-            //     _dateFinishTestDrive = DateFormat('yyyy.MM.dd').format(finishTestDrive);
-            //   }
-            // }
-          });
-        },
-      ),
+        Padding(
+          padding: const EdgeInsets.only(left: 40, right: 40),
+          child: ListTile(
+            // tileColor: Colors.orange,
+            // leading: const Icon(Icons.print),
+            title: DropdownButtonFormField<String>(
+              decoration: myDecorationDropdown(),
+              validator: (value) => value == null ? "Обязательное поле" : null,
+              dropdownColor: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(10.0),
+              padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+              // isExpanded: true,
+              hint: const Text('Техника'),
+              value: _selectedDropdownCategory,
+              items: providerModel.namesEquipments
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? value) {
+                setState(() {
+                  _selectedDropdownCategory = value!;
+                  // if (value == 'Фотоаппарат') {
+                  //   _isCategoryPhotocamera = true;
+                  // } else {
+                  //   _isCategoryPhotocamera = false;
+                  //   if (_dateFinishTestDrive == '' && _dateStartTestDrive != '') {
+                  //     DateTime finishTestDrive = DateFormat('yyyy.MM.dd')
+                  //         .parse(_dateStartTestDrive)
+                  //         .add(const Duration(days: 14));
+                  //     _dateFinishTestDrive = DateFormat('yyyy.MM.dd').format(finishTestDrive);
+                  //   }
+                  // }
+                });
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Column _buildCostTechnic() {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: Text(
+              'Стоимость техники',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 40, right: 40),
+          child: ListTile(
+              // leading: const Icon(Icons.shopify),
+              title: TextFormField(
+                decoration: myDecorationTextFormField(null, 'Цена', '₽ '),
+                controller: _costTechnic,
+                inputFormatters: [IntegerCurrencyInputFormatter()],
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Обязательное поле';
+                  }
+                  return null;
+                },
+              )),
+        ),
+      ],
     );
   }
 
@@ -274,18 +286,6 @@ class _TechnicAddState extends State<TechnicAdd> {
         controller: _nameTechnic,
       ),
     );
-  }
-
-  ListTile _buildCostTechnic() {
-    return ListTile(
-        leading: const Icon(Icons.shopify),
-        title: TextFormField(
-          decoration:
-              const InputDecoration(hintText: "Стоимость техники", prefix: Text('₽ ')),
-          controller: _costTechnic,
-          inputFormatters: [IntegerCurrencyInputFormatter()],
-          keyboardType: TextInputType.number,
-        ));
   }
 
   ListTile _buildDateBuyTechnic() {
