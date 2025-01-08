@@ -1,7 +1,6 @@
-
-class TechnicEntity implements Comparable{
-  static List technicList = [];
-  static List testDriveList = [];
+class TechnicEntity implements Comparable {
+  // static List technicList = [];
+  // static List testDriveList = [];
 
   int? id;
   int? internalID;
@@ -21,14 +20,44 @@ class TechnicEntity implements Comparable{
   String userTestDrive = '';
   int? idTestDrive;
 
-  TechnicEntity(this.id, this.internalID, this.name, this.category, this.cost,
-      this.dateBuyTechnic, this.status, this.dislocation, this.dateChangeStatus,
-      this.comment, this.testDriveDislocation, this.dateStartTestDrive,
-      this.dateFinishTestDrive, this.resultTestDrive, this.checkboxTestDrive);
+  TechnicEntity(
+      this.id,
+      this.internalID,
+      this.name,
+      this.category,
+      this.cost,
+      this.dateBuyTechnic,
+      this.status,
+      this.dislocation,
+      this.dateChangeStatus,
+      this.comment,
+      this.testDriveDislocation,
+      this.dateStartTestDrive,
+      this.dateFinishTestDrive,
+      this.resultTestDrive,
+      this.checkboxTestDrive);
 
-  TechnicEntity.testDrive(this.internalID, this.category, this.testDriveDislocation,
-      this.dateStartTestDrive, this.dateFinishTestDrive, this.resultTestDrive,
-      this.checkboxTestDrive, this.userTestDrive);
+  TechnicEntity.withoutTestDrive(
+      this.id,
+      this.internalID,
+      this.name,
+      this.category,
+      this.cost,
+      this.dateBuyTechnic,
+      this.status,
+      this.dislocation,
+      this.dateChangeStatus,
+      this.comment);
+
+  TechnicEntity.testDrive(
+      this.internalID,
+      this.category,
+      this.testDriveDislocation,
+      this.dateStartTestDrive,
+      this.dateFinishTestDrive,
+      this.resultTestDrive,
+      this.checkboxTestDrive,
+      this.userTestDrive);
 
   @override
   String toString() {
@@ -38,6 +67,8 @@ class TechnicEntity implements Comparable{
   @override
   int compareTo(other) {
     int dislocationDiference = dislocation.compareTo(other.dislocation);
-    return dislocationDiference != 0 ? dislocationDiference : category.compareTo(other.category);
+    return dislocationDiference != 0
+        ? dislocationDiference
+        : category.compareTo(other.category);
   }
 }

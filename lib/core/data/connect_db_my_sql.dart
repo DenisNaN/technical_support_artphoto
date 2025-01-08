@@ -5,7 +5,7 @@ import 'package:technical_support_artphoto/core/domain/models/repair.dart';
 import 'package:technical_support_artphoto/core/domain/models/storage.dart';
 import 'package:technical_support_artphoto/core/domain/models/user.dart';
 import 'package:technical_support_artphoto/core/domain/technical_support_repository.dart';
-import 'package:technical_support_artphoto/features/history/History.dart';
+import 'package:technical_support_artphoto/features/history/history.dart';
 import 'package:technical_support_artphoto/features/technics_entity/technic_entity.dart';
 import '../domain/models/technic.dart';
 import 'package:intl/intl.dart';
@@ -407,9 +407,9 @@ class ConnectDbMySQL implements TechnicalSupportRepository {
     int id = result.insertId!;
     await insertStatusInDB(id, technic.status, technic.dislocation, nameUser);
 
-    if (technic.dateStartTestDrive != '') {
-      await insertTestDriveInDB(technic, nameUser);
-    }
+    // if (technic.dateStartTestDrive != '') {
+    //   await insertTestDriveInDB(technic, nameUser);
+    // }
     return result.insertId!;
   }
 

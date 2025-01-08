@@ -37,15 +37,19 @@ class ProviderModel with ChangeNotifier {
 
   List<String> get namesEquipments => _namesEquipments;
 
-  void downloadAllElements(
-      Map<String, Photosalon> photosalons, Map<String, Repair> repairs, Map<String, Storage> storages) {
+  void downloadAllElements(Map<String, Photosalon> photosalons,
+      Map<String, Repair> repairs, Map<String, Storage> storages) {
     _photosolons = photosalons;
     _repairs = repairs;
     _storages = storages;
   }
 
-  void downloadAllCategoryDropDown(List<String> namesEquipments, List<String> namePhotosalons, List<String> services,
-      List<String> statusForEquipment, Map<String, int> colorsForEquipment) {
+  void downloadAllCategoryDropDown(
+      List<String> namesEquipments,
+      List<String> namePhotosalons,
+      List<String> services,
+      List<String> statusForEquipment,
+      Map<String, int> colorsForEquipment) {
     _namesEquipments = namesEquipments;
     _namesPhotosalons = namePhotosalons;
     _services = services;
@@ -83,7 +87,7 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void changeCurrentPageMainBottomAppBar(int index){
+  void changeCurrentPageMainBottomAppBar(int index) {
     currentPageIndexMainBottomAppBar = index;
     notifyListeners();
   }

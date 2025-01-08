@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:technical_support_artphoto/features/history/History.dart';
+import 'package:technical_support_artphoto/features/history/history.dart';
 
 class HistoryList extends StatefulWidget {
   const HistoryList({super.key});
