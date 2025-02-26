@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
 import 'package:technical_support_artphoto/features/navigation/create_route.dart';
 import 'package:technical_support_artphoto/features/start_screens/authorization.dart';
-import '../../core/utils/download_start_data.dart';
+import '../../core/data/download_data.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     final providerModel = Provider.of<ProviderModel>(context);
 
     return FutureBuilder(
-        future: DownloadStartData.downloadStartData.getStartData(),
+        future: DownloadData.downloadData.getStartData(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const DialogDontConnectDB();
@@ -45,7 +45,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 snapshot.data!['services'],
                 snapshot.data!['statusForEquipment'],
                 snapshot.data!['colorsForEquipment']);
-
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.pushReplacement(context, createRouteSlideTransition(const Authorization()));

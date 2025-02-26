@@ -3,10 +3,10 @@ import 'package:technical_support_artphoto/core/domain/models/photosalon.dart';
 import 'package:technical_support_artphoto/core/domain/models/repair.dart';
 import 'package:technical_support_artphoto/core/domain/models/storage.dart';
 
-class DownloadStartData {
-  DownloadStartData._();
+class DownloadData {
+  DownloadData._();
 
-  static final DownloadStartData downloadStartData = DownloadStartData._();
+  static final DownloadData downloadData = DownloadData._();
 
   Future<Map<String, dynamic>> getStartData() async {
     Map<String, dynamic> result = {};
@@ -44,6 +44,20 @@ class DownloadStartData {
     result['services'] = services;
     result['statusForEquipment'] = statusForEquipment;
     result['colorsForEquipment'] = colorsForEquipment;
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> refreshData() async {
+    Map<String, dynamic> result = {};
+
+    Map<String, Photosalon> photosalons = await ConnectDbMySQL.connDB.fetchPhotosalons();
+    Map<String, Repair> repairs = await ConnectDbMySQL.connDB.fetchRepairs();
+    Map<String, Storage> storages = await ConnectDbMySQL.connDB.fetchStorages();
+
+    result['Photosalons'] = photosalons;
+    result['Repairs'] = repairs;
+    result['Storages'] = storages;
 
     return result;
   }

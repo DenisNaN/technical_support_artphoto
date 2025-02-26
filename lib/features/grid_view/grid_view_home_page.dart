@@ -25,10 +25,6 @@ class GridViewHomePage extends StatelessWidget {
             int countTechnics = locations[nameLocation].technics.length;
             bool isHeader = locations[nameLocation] is Repair && countTechnics > 0 ? true : false;
 
-            // if(nameLocation == 'Рамиль'){
-            //   location[nameLocation].technicals.add(Technic(111111, 234234, 'category', 'name', 'status', 'dislocation'));
-            // }
-
             return Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),

@@ -41,6 +41,7 @@ class GridViewTechnics extends StatelessWidget {
                   ),
                   itemBuilder: (_, int index) {
                     Technic technic = technics[index];
+                    String screenImage = technic.category == 'Телевизор' ? _randomScreenForTV() : '';
 
                     return GridTile(
                       header: Row(
@@ -86,7 +87,7 @@ class GridViewTechnics extends StatelessWidget {
                             ),
                             Expanded(
                                 child: Stack(children: [
-                              technic.category == 'Телевизор' ? Image.asset(_randomScreenForTV()) : SizedBox(),
+                              technic.category == 'Телевизор' ? Image.asset(screenImage) : SizedBox(),
                               Image.asset(_switchIconTechnic(technic.category))
                             ])),
                             Padding(
