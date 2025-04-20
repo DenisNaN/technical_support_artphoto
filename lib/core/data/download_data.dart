@@ -45,11 +45,14 @@ class DownloadData {
     result['statusForEquipment'] = statusForEquipment;
     result['colorsForEquipment'] = colorsForEquipment;
 
+    ConnectDbMySQL.connDB.dispose();
     return result;
   }
 
   Future<Map<String, dynamic>> refreshData() async {
     Map<String, dynamic> result = {};
+
+    await ConnectDbMySQL.connDB.connDatabase();
 
     Map<String, Photosalon> photosalons = await ConnectDbMySQL.connDB.fetchPhotosalons();
     Map<String, Repair> repairs = await ConnectDbMySQL.connDB.fetchRepairs();
@@ -59,6 +62,7 @@ class DownloadData {
     result['Repairs'] = repairs;
     result['Storages'] = storages;
 
+    ConnectDbMySQL.connDB.dispose();
     return result;
   }
 

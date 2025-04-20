@@ -131,9 +131,10 @@ class _AuthorizationState extends State<Authorization> {
                                 String password = passwordController.text;
 
                                 if (password.isNotEmpty) {
+                                  ConnectDbMySQL.connDB.connDatabase();
                                   User user = await ConnectDbMySQL.connDB
                                       .fetchAccessLevel(password);
-
+                                  ConnectDbMySQL.connDB.dispose();
                                   if (user.name != 'user') {
                                     providerModel.user[user.name] = user.access;
                                     providerModel.user.remove('user');

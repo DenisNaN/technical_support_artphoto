@@ -21,18 +21,30 @@ class HomePage extends StatelessWidget {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () async{
-          List<String, dynamic> list = await DownloadData.downloadData.refreshData();
-          providerModel.downloadAllElements(photosalons, repairs, storages);
+        onRefresh: () async {
+          Map<String, dynamic> refrechData =
+              await DownloadData.downloadData.refreshData();
+          providerModel.downloadAllElements(refrechData['Photosalons'],
+              refrechData['Repairs'], refrechData['Storages']);
         },
         child: CustomScrollView(
           physics: BouncingScrollPhysics(),
           slivers: [
-            GridViewHomePage(locations: providerModel.photosolons, color: providerModel.colorPhotosalons),
-            GridViewHomePage(locations: providerModel.storages, color: providerModel.colorStorages),
-            GridViewHomePage(locations: providerModel.repairs, color: providerModel.colorRepairs),
-            GridViewHomePage(locations: providerModel.repairs, color: providerModel.colorRepairs),
-            GridViewHomePage(locations: providerModel.repairs, color: providerModel.colorRepairs),
+            GridViewHomePage(
+                locations: providerModel.photosolons,
+                color: providerModel.colorPhotosalons),
+            GridViewHomePage(
+                locations: providerModel.storages,
+                color: providerModel.colorStorages),
+            GridViewHomePage(
+                locations: providerModel.repairs,
+                color: providerModel.colorRepairs),
+            GridViewHomePage(
+                locations: providerModel.repairs,
+                color: providerModel.colorRepairs),
+            GridViewHomePage(
+                locations: providerModel.repairs,
+                color: providerModel.colorRepairs),
           ],
         ),
       ),

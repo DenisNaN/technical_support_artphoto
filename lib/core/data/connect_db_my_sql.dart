@@ -1,5 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mysql1/mysql1.dart';
-import 'package:technical_support_artphoto/core/domain/api_constants.dart';
 import 'package:technical_support_artphoto/core/domain/models/photosalon.dart';
 import 'package:technical_support_artphoto/core/domain/models/repair.dart';
 import 'package:technical_support_artphoto/core/domain/models/storage.dart';
@@ -21,16 +21,16 @@ class ConnectDbMySQL implements TechnicalSupportRepository {
   }
 
   void dispose() {
-    dispose();
+    _connDB?.close();
   }
 
   Future<MySqlConnection> _init() async {
     MySqlConnection connDB = await MySqlConnection.connect(ConnectionSettings(
-        host: ApiConstants.host,
-        port: ApiConstants.port,
-        user: ApiConstants.user,
-        password: ApiConstants.password,
-        db: ApiConstants.db));
+        host: dotenv.env['HOST'] ?? '',
+        port: int.tryParse(dotenv.env['PORT'] ?? '0') ?? 0,
+        user: dotenv.env['USER'],
+        password: dotenv.env['PASSWORD'],
+        db: dotenv.env['DB']));
     return connDB;
   }
 
