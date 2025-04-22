@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/api/provider/providerModel.dart';
 import 'package:technical_support_artphoto/core/di/init_dependencies.dart';
-import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
+import 'package:technical_support_artphoto/core/navigation/main_bottom_app_bar.dart';
 import 'package:technical_support_artphoto/features/history/history_list.dart';
-import 'package:technical_support_artphoto/features/navigation/main_bottom_app_bar.dart';
-import 'package:technical_support_artphoto/features/presentation/home_page.dart';
-import 'package:technical_support_artphoto/features/start_screens/splash_screen.dart';
+import 'package:technical_support_artphoto/features/home/presentation/page/home_page.dart';
+import 'package:technical_support_artphoto/features/splash_screen/presentation/page/splash_screen.dart';
 
 void main() {
   runZonedGuarded<Future<void>>(
@@ -55,7 +55,7 @@ class SplashScreenArtphoto extends StatelessWidget {
   }
 }
 
-/// AABBBC
+///
 class ArtphotoTech extends StatefulWidget {
   const ArtphotoTech({super.key});
 
@@ -72,7 +72,7 @@ class _ArtphotoTechState extends State<ArtphotoTech>
       bottomNavigationBar: MainBottomAppBar(),
       body: <Widget>[
         /// Home page
-        HomePage(),
+        const HomePage(),
 
         /// Repair
         Card(
