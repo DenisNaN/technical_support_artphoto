@@ -5,7 +5,7 @@ import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/providerModel.dart';
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
-import 'package:technical_support_artphoto/core/navigation/create_route.dart';
+import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/logo_animate/draggable_logo.dart';
 import 'package:technical_support_artphoto/main.dart';
 import '../../../../core/utils/utils.dart';
@@ -127,7 +127,7 @@ class _AuthorizationState extends State<Authorization> {
                                       providerModel.user[user.name] = user.access;
                                       providerModel.user.remove('user');
                                       Navigator.pushReplacement(
-                                          context, createRouteSlideTransition(const ArtphotoTech()));
+                                          context, animationRouteFadeTransition(const ArtphotoTech()));
                                     } else {
                                       passwordController.clear();
                                       _showDialogNotValidationUser();

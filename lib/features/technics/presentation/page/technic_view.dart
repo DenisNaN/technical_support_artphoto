@@ -6,19 +6,23 @@ import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/providerModel.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
+import 'package:technical_support_artphoto/core/shared/app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/shared/input_decoration/input_deroration.dart';
-import 'package:technical_support_artphoto/core/utils/utils.dart';
 import 'package:technical_support_artphoto/features/history/history.dart';
+import '../../../../core/shared/technic_image/technic_image.dart';
 import '../../data/models/technic_model.dart';
 
-class TechnicAdd extends StatefulWidget {
-  const TechnicAdd({super.key});
+class TechnicView extends StatefulWidget {
+  const TechnicView({super.key, required this.location, required this.technic});
+
+  final dynamic location;
+  final Technic technic;
 
   @override
-  State<TechnicAdd> createState() => _TechnicAddState();
+  State<TechnicView> createState() => _TechnicViewState();
 }
 
-class _TechnicAddState extends State<TechnicAdd> {
+class _TechnicViewState extends State<TechnicView> {
   final _innerNumberTechnic = TextEditingController();
   final _nameTechnic = TextEditingController();
   final _costTechnic = TextEditingController();
@@ -62,15 +66,17 @@ class _TechnicAddState extends State<TechnicAdd> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     return Scaffold(
-        appBar: AppBar(
-          flexibleSpace: MyColor().appBar(),
-          title: Center(child: const Text('Добавить новую технику')),
+        appBar: CustomAppBar(
+          location: widget.location,
+          isLength: false,
         ),
         body: Form(
             key: _formInnerNumberKey,
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
+                SizedBox(height: 20),
+                _buildCardTechnic(),
                 SizedBox(height: 20),
                 _buildInternalID(),
                 SizedBox(height: 20),
@@ -95,26 +101,24 @@ class _TechnicAddState extends State<TechnicAdd> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      style: ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                      style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
                       child: Text("Отмена"),
                     ),
                     ElevatedButton(
                         onPressed: () async {
                           if (_formInnerNumberKey.currentState!.validate()) {
-                            Technic technic = Technic(
-                                0,
-                                !isBN ? int.parse(_innerNumberTechnic.text) : 0,
-                                _selectedDropdownCategory!,
-                                _nameTechnic.text,
-                                _selectedDropdownStatus!,
-                                _selectedDropdownDislocation!,
-                                DateTime.parse(_dateBuyTechnic),
-                                int.parse(_costTechnic.text.replaceAll(",", "")),
-                                // DateFormat('yyyy.MM.dd').format(DateTime.now()),
-                                _comment.text
-                            );
-
+                            // Technic technic = Technic(
+                            //     0,
+                            //     !isBN ? int.parse(_innerNumberTechnic.text) : 0,
+                            //     _nameTechnic.text,
+                            //     _selectedDropdownCategory!,
+                            //     int.parse(_costTechnic.text.replaceAll(",", "")),
+                            //     _dateBuyTechnic,
+                            //     _selectedDropdownStatus!,
+                            //     _selectedDropdownDislocation!,
+                            //     DateFormat('yyyy.MM.dd').format(DateTime.now()),
+                            //     _comment.text);
+                            //
                             // String result = await _save(technic, providerModel);
                             // _viewSnackBar(' $result');
                             Navigator.pop(context);
@@ -134,6 +138,47 @@ class _TechnicAddState extends State<TechnicAdd> {
     RegExp(r'[0-9]'),
   );
 
+  Padding _buildCardTechnic() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.blue.shade100,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withValues(alpha: 0.5),
+              spreadRadius: 2,
+              blurRadius: 10,
+              offset: Offset(0, 5), // changes position of shadow
+            )
+          ],
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+                child: Column(
+              children: [
+                Text.rich(TextSpan(text: '${widget.technic.category}\n', children: [
+                  TextSpan(
+                    text: widget.technic.name,
+                    style: TextStyle(fontSize: 25),
+                  ),
+                ])),
+                Text(widget.technic.number.toString())
+              ],
+            )),
+            Expanded(
+                child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: TechnicImage(category: widget.technic.category),
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+
   Column _buildInternalID() {
     return Column(
       children: [
@@ -147,10 +192,10 @@ class _TechnicAddState extends State<TechnicAdd> {
                 scale: 1.2,
                 child: Switch(
                     value: isBN,
-                    onChanged: (value){
+                    onChanged: (value) {
                       setState(() {
                         isBN = value;
-                        if(value == true) _innerNumberTechnic.text = '';
+                        if (value == true) _innerNumberTechnic.text = '';
                       });
                     }),
               ),
@@ -187,12 +232,12 @@ class _TechnicAddState extends State<TechnicAdd> {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 30),
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: !isBN ? Colors.blue : Colors.grey,
-        ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: !isBN ? Colors.blue : Colors.grey,
+          ),
           onPressed: () async {
             if (_innerNumberTechnic.text != '' && !isBN) {
-              TechnicalSupportRepoImpl.downloadData.checkNumberTechnic(_innerNumberTechnic.text).then((result){
+              TechnicalSupportRepoImpl.downloadData.checkNumberTechnic(_innerNumberTechnic.text).then((result) {
                 _viewSnackBar(result ? 'Техника с таким номером есть.' : 'Номер свободен');
               });
             }
@@ -210,10 +255,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Категория техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -227,8 +269,7 @@ class _TechnicAddState extends State<TechnicAdd> {
               borderRadius: BorderRadius.circular(10.0),
               hint: const Text('Техника'),
               value: _selectedDropdownCategory,
-              items: providerModel.namesEquipments
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.namesEquipments.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -266,10 +307,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Стоимость техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -277,17 +315,17 @@ class _TechnicAddState extends State<TechnicAdd> {
           padding: const EdgeInsets.only(left: 40, right: 40),
           child: ListTile(
               title: TextFormField(
-                decoration: myDecorationTextFormField(null, 'Цена', '₽ '),
-                controller: _costTechnic,
-                inputFormatters: [IntegerCurrencyInputFormatter()],
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Обязательное поле';
-                  }
-                  return null;
-                },
-              )),
+            decoration: myDecorationTextFormField(null, 'Цена', '₽ '),
+            controller: _costTechnic,
+            inputFormatters: [IntegerCurrencyInputFormatter()],
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Обязательное поле';
+              }
+              return null;
+            },
+          )),
         ),
       ],
     );
@@ -302,10 +340,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Модель техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -337,10 +372,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Дата покупки техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -357,11 +389,11 @@ class _TechnicAddState extends State<TechnicAdd> {
             ),
             onTap: () {
               showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2099),
-                  locale: const Locale("ru", "RU"))
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2099),
+                      locale: const Locale("ru", "RU"))
                   .then((date) {
                 setState(() {
                   if (date != null) {
@@ -385,10 +417,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Статус техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -402,8 +431,7 @@ class _TechnicAddState extends State<TechnicAdd> {
               validator: (value) => value == null ? "Обязательное поле" : null,
               dropdownColor: Colors.blue.shade50,
               value: _selectedDropdownStatus,
-              items: providerModel.statusForEquipment
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -430,10 +458,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Дислокация техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -446,8 +471,7 @@ class _TechnicAddState extends State<TechnicAdd> {
               hint: const Text('Дислокация'),
               value: _selectedDropdownDislocation,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: providerModel.namesPhotosalons
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.namesPhotosalons.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -474,10 +498,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Комментарий',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -661,37 +682,31 @@ class _TechnicAddState extends State<TechnicAdd> {
   //   );
   // }
 
-  // Future _save(Technic technic, ProviderModel providerModel) async {
+  // Future _save(Technic technicModel, ProviderModel providerModel) async {
   //   String nameUser = providerModel.user.keys.first;
-  //   int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
-  //   technic.id = id;
-  //   await addHistory(technic, nameUser);
+  //   int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technicModel, nameUser);
+  //   technicModel.id = id;
+  //   await addHistory(technicModel, nameUser);
   //
   //   Technic technic = Technic(
-  //       technic.id, technicModel.category,
-  //       technic.name, technic.status, technic.dislocation);
+  //       technicModel.id, technicModel.number, technicModel.category,
+  //       technicModel.name, technicModel.status, technicModel.dislocation);
   //   addTechnicInProviderModel(technic, providerModel);
   // }
 
   void addTechnicInProviderModel(Technic technic, ProviderModel providerModel) {
     String dislocation = technic.dislocation;
-    if(providerModel.namesPhotosalons.any((element) => element == dislocation)){
+    if (providerModel.namesPhotosalons.any((element) => element == dislocation)) {
       providerModel.addTechnicInPhotosalon(dislocation, technic);
-    }else{
+    } else {
       providerModel.addTechnicInStorage(dislocation, technic);
     }
   }
 
   Future addHistory(Technic technic, String nameUser) async {
     String descForHistory = descriptionForHistory(technic);
-    History history = History(
-        History.historyList.last.id + 1,
-        'Technic',
-        technic.id,
-        'create',
-        descForHistory,
-        nameUser,
-        DateFormat('yyyy.MM.dd').format(DateTime.now()));
+    History history = History(History.historyList.last.id + 1, 'Technic', technic.id!, 'create', descForHistory,
+        nameUser, DateFormat('yyyy.MM.dd').format(DateTime.now()));
 
     ConnectDbMySQL.connDB.insertHistory(history);
     History.historyList.insert(0, history);
@@ -705,8 +720,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   }
 
   String getDateFormat(String date) {
-    return DateFormat("d MMMM yyyy", "ru_RU")
-        .format(DateTime.parse(date.replaceAll('.', '-')));
+    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 
   void _viewSnackBar(String text) {
@@ -792,8 +806,7 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
   static const thousandSeparator = ',';
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue,
-      TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     if (!validationRegex.hasMatch(newValue.text)) {
       return oldValue;
     }
@@ -821,21 +834,13 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
     }
 
     /// Handle moving cursor.
-    final initialNumberOfPrecedingSeparators =
-        oldValue.text.characters
-            .where((e) => e == thousandSeparator)
-            .length;
-    final newNumberOfPrecedingSeparators =
-        formattedText.characters
-            .where((e) => e == thousandSeparator)
-            .length;
-    final additionalOffset =
-        newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
+    final initialNumberOfPrecedingSeparators = oldValue.text.characters.where((e) => e == thousandSeparator).length;
+    final newNumberOfPrecedingSeparators = formattedText.characters.where((e) => e == thousandSeparator).length;
+    final additionalOffset = newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
 
     return newValue.copyWith(
       text: formattedText,
-      selection: TextSelection.collapsed(
-          offset: newValue.selection.baseOffset + additionalOffset),
+      selection: TextSelection.collapsed(offset: newValue.selection.baseOffset + additionalOffset),
     );
   }
 }

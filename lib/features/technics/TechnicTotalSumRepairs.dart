@@ -16,7 +16,7 @@
 //     List listTotalSumRepair = _getListTotalSumRepairs(widget.internalId);
 //
 //     return Scaffold(
-//       appBar: AppBar(title: Text('Ремонты техники №${widget.internalId}')),
+//       appBar: app_bar(title: Text('Ремонты техники №${widget.internalId}')),
 //       body: ListView.builder(
 //           itemCount: listTotalSumRepair.length,
 //           itemBuilder: (context, index){

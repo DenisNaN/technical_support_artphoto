@@ -50,14 +50,17 @@ class ConnectDbMySQL {
           'equipment.category, '
           'equipment.name, '
           's.status, '
-          's.dislocation '
+          's.dislocation, '
+          'equipment.dateBuy, '
+          'equipment.cost, '
+          'equipment.comment '
           'FROM equipment '
           'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
           'WHERE s.dislocation = "$namePhotosalon" '
           'ORDER BY equipment.number ASC';
       var result = await _connDB!.query(query);
       for (var row in result) {
-        Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5]);
+        Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
         photosalon.technics.add(technic);
       }
       photosalons[namePhotosalon] = photosalon;
@@ -76,14 +79,17 @@ class ConnectDbMySQL {
           'equipment.category, '
           'equipment.name, '
           's.status, '
-          's.dislocation '
+          's.dislocation, '
+          'equipment.dateBuy, '
+          'equipment.cost, '
+          'equipment.comment '
           'FROM equipment '
           'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
           'WHERE s.dislocation = "$nameRepair" '
           'ORDER BY equipment.number ASC';
       var result = await _connDB!.query(query);
       for (var row in result) {
-        Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5]);
+        Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
         repair.technics.add(technic);
       }
       repairs[nameRepair] = repair;
@@ -102,14 +108,17 @@ class ConnectDbMySQL {
           'equipment.category, '
           'equipment.name, '
           's.status, '
-          's.dislocation '
+          's.dislocation, '
+          'equipment.dateBuy, '
+          'equipment.cost, '
+          'equipment.comment '
           'FROM equipment '
           'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
           'WHERE s.dislocation = "$nameStorage" '
           'ORDER BY equipment.number ASC';
       var result = await _connDB!.query(query);
       for (var row in result) {
-        Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5]);
+        Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
         storage.technics.add(technic);
       }
       storages[nameStorage] = storage;
@@ -158,10 +167,10 @@ class ConnectDbMySQL {
     return DateFormat('yyyy.MM.dd').format(DateTime.parse(date));
   }
 
-  Future<int> insertTechnicInDB(TechnicModel technic, String nameUser) async {
+  Future<int> insertTechnicInDB(Technic technic, String nameUser) async {
     var result = await _connDB!.query(
         'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) VALUES (?, ?, ?, ?, ?, ?, ?)', [
-      technic.internalID,
+      technic.id,
       technic.category,
       technic.name,
       technic.dateBuyTechnic,
@@ -182,50 +191,50 @@ class ConnectDbMySQL {
         [id, status, dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now()), nameUser]);
   }
 
-  Future insertTestDriveInDB(TechnicModel technic, String nameUser) async {
-    await ConnectDbMySQL.connDB.connDatabase();
-    await _connDB!.query(
-        'INSERT INTO testDrive (idEquipment, category, testDriveDislocation, dateStart, dateFinish, result, '
-        'checkEquipment, user) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [
-          technic.id,
-          technic.category,
-          technic.testDriveDislocation,
-          technic.dateStartTestDrive,
-          technic.dateFinishTestDrive,
-          technic.resultTestDrive,
-          technic.checkboxTestDrive,
-          nameUser
-        ]);
+  // Future insertTestDriveInDB(Technic technic, String nameUser) async {
+  //   await ConnectDbMySQL.connDB.connDatabase();
+  //   await _connDB!.query(
+  //       'INSERT INTO testDrive (idEquipment, category, testDriveDislocation, dateStart, dateFinish, result, '
+  //       'checkEquipment, user) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+  //       [
+  //         technic.id,
+  //         technic.category,
+  //         technic.testDriveDislocation,
+  //         technic.dateStartTestDrive,
+  //         technic.dateFinishTestDrive,
+  //         technic.resultTestDrive,
+  //         technic.checkboxTestDrive,
+  //         nameUser
+  //       ]);
+  //
+  //   int idLastTestDrive = await findIDLastTestDriveTechnic(technic);
+  //   int idLastRepair = await findLastRepair(technic);
+  //   await _connDB!.query('UPDATE repairEquipment SET idTestDrive = ? WHERE id = ?', [idLastTestDrive, idLastRepair]);
+  // }
 
-    int idLastTestDrive = await findIDLastTestDriveTechnic(technic);
-    int idLastRepair = await findLastRepair(technic);
-    await _connDB!.query('UPDATE repairEquipment SET idTestDrive = ? WHERE id = ?', [idLastTestDrive, idLastRepair]);
-  }
+  // Future<int> findIDLastTestDriveTechnic(TechnicModel technic) async {
+  //   await ConnectDbMySQL.connDB.connDatabase();
+  //   var result =
+  //       await _connDB!.query('SELECT id FROM testDrive WHERE idEquipment = ? ORDER BY id DESC LIMIT 1', [technic.id]);
+  //   int id = lastTectDriveListFromMap(result);
+  //   return id;
+  // }
 
-  Future<int> findIDLastTestDriveTechnic(TechnicModel technic) async {
-    await ConnectDbMySQL.connDB.connDatabase();
-    var result =
-        await _connDB!.query('SELECT id FROM testDrive WHERE idEquipment = ? ORDER BY id DESC LIMIT 1', [technic.id]);
-    int id = lastTectDriveListFromMap(result);
-    return id;
-  }
+  // int lastTectDriveListFromMap(var result) {
+  //   int id = -1;
+  //   for (var row in result) {
+  //     id = row[0];
+  //   }
+  //   return id;
+  // }
 
-  int lastTectDriveListFromMap(var result) {
-    int id = -1;
-    for (var row in result) {
-      id = row[0];
-    }
-    return id;
-  }
-
-  Future<int> findLastRepair(TechnicModel technic) async {
-    await ConnectDbMySQL.connDB.connDatabase();
-    var result = await _connDB!
-        .query('SELECT id FROM repairEquipment WHERE number = ? ORDER BY id DESC LIMIT 1', [technic.internalID]);
-    int id = lastTectDriveListFromMap(result);
-    return id;
-  }
+  // Future<int> findLastRepair(Technic technic) async {
+  //   await ConnectDbMySQL.connDB.connDatabase();
+  //   var result = await _connDB!
+  //       .query('SELECT id FROM repairEquipment WHERE number = ? ORDER BY id DESC LIMIT 1', [technic.internalID]);
+  //   int id = lastTectDriveListFromMap(result);
+  //   return id;
+  // }
 
   Future insertHistory(History history) async {
     await ConnectDbMySQL.connDB.connDatabase();

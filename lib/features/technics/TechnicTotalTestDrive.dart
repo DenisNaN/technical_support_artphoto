@@ -13,7 +13,7 @@
 //   Widget build(BuildContext context) {
 //     List listTotalTestDrive = getListTotalTestDrive(widget.technicId);
 //     return Scaffold(
-//       appBar: AppBar(
+//       appBar: app_bar(
 //           title: Text('Тест-драйв техники №${widget.technicInternalID}')),
 //       body: ListView.builder(
 //           itemCount: listTotalTestDrive.length,

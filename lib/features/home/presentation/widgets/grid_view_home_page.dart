@@ -1,7 +1,7 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/widgets/grid_view_technics.dart';
-import 'package:animations/src/open_container.dart';
 
 class GridViewHomePage extends StatelessWidget {
   final Map<String, dynamic> locations;
@@ -46,8 +46,6 @@ class GridViewHomePage extends StatelessWidget {
                   return GestureDetector(
                     onTap: () {
                       openContainer();
-                      // Navigator.push(context,
-                      //     createRouteScaleTransition(GridViewTechnics(location: locations[nameLocation])));
                     },
                     child: GridTile(
                       header: isHeader

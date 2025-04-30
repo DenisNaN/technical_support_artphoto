@@ -102,7 +102,7 @@
 //     ColorAppBar colorAppBar = ColorAppBar();
 //     _isEdit = validateButtonSaveView();
 //     return Scaffold(
-//         appBar: AppBar(
+//         appBar: app_bar(
 //           flexibleSpace: colorAppBar.color(),
 //           title: const Text('Внесение изменений в технику'),
 //         ),
