@@ -542,20 +542,20 @@ class ConnectDbMySQL {
 //       ]);
 // }
 
-// Future updateTechnicInDB(Technic technic) async{
-//   await ConnectDbMySQL.connDB.connDatabase();
-//   await _connDB!.query(
-//       'UPDATE equipment SET category = ?, name = ?, dateBuy = ?, cost = ?, comment = ? WHERE id = ?',
-//       [
-//         technic.category,
-//         technic.name,
-//         technic.dateBuyTechnic,
-//         technic.cost,
-//         technic.comment,
-//         technic.id
-//       ]);
-// }
-//
+Future<void> updateTechnicInDB(Technic technic) async{
+  await ConnectDbMySQL.connDB.connDatabase();
+  await _connDB!.query(
+      'UPDATE equipment SET category = ?, name = ?, dateBuy = ?, cost = ?, comment = ? WHERE id = ?',
+      [
+        technic.category,
+        technic.name,
+        technic.dateBuyTechnic,
+        technic.cost,
+        technic.comment,
+        technic.id
+      ]);
+}
+
 // Future insertRepairInDB(Repair repair) async{
 //   await ConnectDbMySQL.connDB.connDatabase();
 //   await _connDB!.query('INSERT INTO repairEquipment ('

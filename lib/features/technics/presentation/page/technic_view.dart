@@ -65,6 +65,7 @@ class _TechnicViewState extends State<TechnicView> {
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
+    double widthScreen = MediaQuery.sizeOf(context).width;
     return Scaffold(
         appBar: CustomAppBar(
           location: widget.location,
@@ -76,24 +77,16 @@ class _TechnicViewState extends State<TechnicView> {
               padding: EdgeInsets.zero,
               children: [
                 SizedBox(height: 20),
-                _buildCardTechnic(),
+                _buildCardTechnic(widthScreen, providerModel),
                 SizedBox(height: 20),
-                _buildInternalID(),
-                SizedBox(height: 20),
-                _buildCategoryTechnic(providerModel),
-                SizedBox(height: 20),
-                _buildCostTechnic(),
-                SizedBox(height: 20),
-                _buildNameTechnic(),
-                SizedBox(height: 20),
-                _buildDateBuyTechnic(),
-                SizedBox(height: 20),
+                widget.technic.comment != null && widget.technic.comment != ''
+                    ? _buildComment()
+                    : SizedBox(),
+                SizedBox(height: 10),
                 _buildStatus(providerModel),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 _buildDislocation(providerModel),
-                SizedBox(height: 20),
-                _buildComment(),
-                SizedBox(height: 15),
+                SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -101,7 +94,8 @@ class _TechnicViewState extends State<TechnicView> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                      style: ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(Colors.grey)),
                       child: Text("Отмена"),
                     ),
                     ElevatedButton(
@@ -138,42 +132,78 @@ class _TechnicViewState extends State<TechnicView> {
     RegExp(r'[0-9]'),
   );
 
-  Padding _buildCardTechnic() {
+  Padding _buildCardTechnic(double widthScreen, ProviderModel provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.blue.shade100,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.5),
-              spreadRadius: 2,
-              blurRadius: 10,
-              offset: Offset(0, 5), // changes position of shadow
-            )
-          ],
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-                child: Column(
-              children: [
-                Text.rich(TextSpan(text: '${widget.technic.category}\n', children: [
-                  TextSpan(
-                    text: widget.technic.name,
-                    style: TextStyle(fontSize: 25),
+      child: InkWell(
+        onTap: (){
+          showDialog(
+              context: context,
+              builder: (_){
+                return AlertDialog(
+                  actions: [
+                    Center(child: ElevatedButton(
+                        onPressed: (){
+                          Technic technic = widget.technic;
+                          technic.name = _nameTechnic.text;
+                          provider.updateTechnicInPhotosalon(technic);
+                        }, child: Text('Сохранить')))
+                  ],
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                  title: Text('Редактировать'),
+                  titleTextStyle: Theme.of(context).textTheme.headlineMedium,
+                  content: TextFormField(
+                    decoration: myDecorationTextFormField(null, 'Модель'),
+                    controller: _nameTechnic..text = widget.technic.name,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Обязательное поле';
+                      }
+                      return null;
+                    },
                   ),
-                ])),
-                Text(widget.technic.number.toString())
+                );
+              });
+        },
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          color: Colors.blue[100],
+          elevation: 8.0,
+          child: SizedBox(
+            height: widthScreen / 3 + 16,
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(widget.technic.category),
+                      Text(widget.technic.name, style: TextStyle(fontSize: 25)),
+                    ],
+                  ),
+                ),
+                Positioned(
+                    bottom: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: CircleAvatar(
+                          child: Text(widget.technic.number.toString())),
+                    )),
+                Positioned(
+                  right: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                        height: widthScreen / 3,
+                        child: TechnicImage(category: widget.technic.category)),
+                  ),
+                ),
               ],
-            )),
-            Expanded(
-                child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: TechnicImage(category: widget.technic.category),
-            )),
-          ],
+            ),
+          ),
         ),
       ),
     );
@@ -208,7 +238,8 @@ class _TechnicViewState extends State<TechnicView> {
               child: ListTile(
                 title: TextFormField(
                   enabled: !isBN,
-                  decoration: myDecorationTextFormField(!isBN ? 'Номер техники' : 'Без номера'),
+                  decoration: myDecorationTextFormField(
+                      !isBN ? 'Номер техники' : 'Без номера'),
                   controller: _innerNumberTechnic,
                   validator: (value) {
                     if (value!.isEmpty && !isBN) {
@@ -237,8 +268,12 @@ class _TechnicViewState extends State<TechnicView> {
           ),
           onPressed: () async {
             if (_innerNumberTechnic.text != '' && !isBN) {
-              TechnicalSupportRepoImpl.downloadData.checkNumberTechnic(_innerNumberTechnic.text).then((result) {
-                _viewSnackBar(result ? 'Техника с таким номером есть.' : 'Номер свободен');
+              TechnicalSupportRepoImpl.downloadData
+                  .checkNumberTechnic(_innerNumberTechnic.text)
+                  .then((result) {
+                _viewSnackBar(result
+                    ? 'Техника с таким номером есть.'
+                    : 'Номер свободен');
               });
             }
           },
@@ -269,7 +304,8 @@ class _TechnicViewState extends State<TechnicView> {
               borderRadius: BorderRadius.circular(10.0),
               hint: const Text('Техника'),
               value: _selectedDropdownCategory,
-              items: providerModel.namesEquipments.map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.namesEquipments
+                  .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -315,17 +351,17 @@ class _TechnicViewState extends State<TechnicView> {
           padding: const EdgeInsets.only(left: 40, right: 40),
           child: ListTile(
               title: TextFormField(
-            decoration: myDecorationTextFormField(null, 'Цена', '₽ '),
-            controller: _costTechnic,
-            inputFormatters: [IntegerCurrencyInputFormatter()],
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Обязательное поле';
-              }
-              return null;
-            },
-          )),
+                decoration: myDecorationTextFormField(null, 'Цена', '₽ '),
+                controller: _costTechnic,
+                inputFormatters: [IntegerCurrencyInputFormatter()],
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Обязательное поле';
+                  }
+                  return null;
+                },
+              )),
         ),
       ],
     );
@@ -389,15 +425,16 @@ class _TechnicViewState extends State<TechnicView> {
             ),
             onTap: () {
               showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2099),
-                      locale: const Locale("ru", "RU"))
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2099),
+                  locale: const Locale("ru", "RU"))
                   .then((date) {
                 setState(() {
                   if (date != null) {
-                    _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    _dateBuyTechnic =
+                        DateFormat('d MMMM yyyy', "ru_RU").format(date);
                   }
                 });
               });
@@ -430,8 +467,9 @@ class _TechnicViewState extends State<TechnicView> {
               hint: const Text('Статус техники'),
               validator: (value) => value == null ? "Обязательное поле" : null,
               dropdownColor: Colors.blue.shade50,
-              value: _selectedDropdownStatus,
-              items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+              value: _selectedDropdownStatus == null ? widget.technic.status : null,
+              items: providerModel.statusForEquipment
+                  .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -457,7 +495,7 @@ class _TechnicViewState extends State<TechnicView> {
           child: Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
-              'Дислокация техники',
+              'Местонахождение техники',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
@@ -469,9 +507,10 @@ class _TechnicViewState extends State<TechnicView> {
               decoration: myDecorationDropdown(),
               borderRadius: BorderRadius.circular(10.0),
               hint: const Text('Дислокация'),
-              value: _selectedDropdownDislocation,
+              value: _selectedDropdownDislocation == null ? widget.technic.dislocation : null,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: providerModel.namesPhotosalons.map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.namesPhotosalons
+                  .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -504,11 +543,13 @@ class _TechnicViewState extends State<TechnicView> {
         ),
         ListTile(
           title: Padding(
-            padding: const EdgeInsets.only(left: 40, right: 40),
-            child: TextFormField(
-              decoration: myDecorationTextFormField(null, "Комментарий (необязательно)"),
-              controller: _comment,
-            ),
+            padding: const EdgeInsets.only(left: 20, right: 20),
+            child: Container(
+                padding: EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: Colors.blue.shade50),
+                child: Text(widget.technic.comment!)),
           ),
         ),
       ],
@@ -696,7 +737,8 @@ class _TechnicViewState extends State<TechnicView> {
 
   void addTechnicInProviderModel(Technic technic, ProviderModel providerModel) {
     String dislocation = technic.dislocation;
-    if (providerModel.namesPhotosalons.any((element) => element == dislocation)) {
+    if (providerModel.namesPhotosalons
+        .any((element) => element == dislocation)) {
       providerModel.addTechnicInPhotosalon(dislocation, technic);
     } else {
       providerModel.addTechnicInStorage(dislocation, technic);
@@ -705,8 +747,14 @@ class _TechnicViewState extends State<TechnicView> {
 
   Future addHistory(Technic technic, String nameUser) async {
     String descForHistory = descriptionForHistory(technic);
-    History history = History(History.historyList.last.id + 1, 'Technic', technic.id!, 'create', descForHistory,
-        nameUser, DateFormat('yyyy.MM.dd').format(DateTime.now()));
+    History history = History(
+        History.historyList.last.id + 1,
+        'Technic',
+        technic.id!,
+        'create',
+        descForHistory,
+        nameUser,
+        DateFormat('yyyy.MM.dd').format(DateTime.now()));
 
     ConnectDbMySQL.connDB.insertHistory(history);
     History.historyList.insert(0, history);
@@ -720,7 +768,8 @@ class _TechnicViewState extends State<TechnicView> {
   }
 
   String getDateFormat(String date) {
-    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
+    return DateFormat("d MMMM yyyy", "ru_RU")
+        .format(DateTime.parse(date.replaceAll('.', '-')));
   }
 
   void _viewSnackBar(String text) {
@@ -730,7 +779,9 @@ class _TechnicViewState extends State<TechnicView> {
         content: Row(
           mainAxisSize: MainAxisSize.max,
           children: [
-            Icon(Icons.bolt, size: 40, color: text == 'Номер свободен' ? Colors.green : Colors.red),
+            Icon(Icons.bolt,
+                size: 40,
+                color: text == 'Номер свободен' ? Colors.green : Colors.red),
             Flexible(child: Text(text)),
           ],
         ),
@@ -806,7 +857,8 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
   static const thousandSeparator = ',';
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     if (!validationRegex.hasMatch(newValue.text)) {
       return oldValue;
     }
@@ -834,13 +886,17 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
     }
 
     /// Handle moving cursor.
-    final initialNumberOfPrecedingSeparators = oldValue.text.characters.where((e) => e == thousandSeparator).length;
-    final newNumberOfPrecedingSeparators = formattedText.characters.where((e) => e == thousandSeparator).length;
-    final additionalOffset = newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
+    final initialNumberOfPrecedingSeparators =
+        oldValue.text.characters.where((e) => e == thousandSeparator).length;
+    final newNumberOfPrecedingSeparators =
+        formattedText.characters.where((e) => e == thousandSeparator).length;
+    final additionalOffset =
+        newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
 
     return newValue.copyWith(
       text: formattedText,
-      selection: TextSelection.collapsed(offset: newValue.selection.baseOffset + additionalOffset),
+      selection: TextSelection.collapsed(
+          offset: newValue.selection.baseOffset + additionalOffset),
     );
   }
 }
