@@ -1,6 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:technical_support_artphoto/core/api/data/models/repair.dart';
+import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/widgets/grid_view_technics.dart';
 
 class GridViewHomePage extends StatelessWidget {
@@ -23,7 +23,7 @@ class GridViewHomePage extends StatelessWidget {
           itemBuilder: (_, int index) {
             String nameLocation = locations.keys.toList()[index];
             int countTechnics = locations[nameLocation].technics.length;
-            bool isHeader = locations[nameLocation] is Repair && countTechnics > 0 ? true : false;
+            bool isHeader = locations[nameLocation] is RepairLocation && countTechnics > 0 ? true : false;
 
             return Container(
               decoration: BoxDecoration(

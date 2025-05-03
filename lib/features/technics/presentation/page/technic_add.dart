@@ -4,12 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_my_sql.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
-import 'package:technical_support_artphoto/core/api/provider/providerModel.dart';
+import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
 import 'package:technical_support_artphoto/core/shared/input_decoration/input_deroration.dart';
 import 'package:technical_support_artphoto/core/utils/utils.dart';
 import 'package:technical_support_artphoto/features/history/history.dart';
-import '../../data/models/technic_model.dart';
 
 class TechnicAdd extends StatefulWidget {
   const TechnicAdd({super.key});

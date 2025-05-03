@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/core/api/provider/providerModel.dart';
+import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/di/init_dependencies.dart';
 import 'package:technical_support_artphoto/core/navigation/main_bottom_app_bar.dart';
 import 'package:technical_support_artphoto/features/history/history_list.dart';

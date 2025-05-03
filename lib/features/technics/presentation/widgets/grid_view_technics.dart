@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/core/api/provider/providerModel.dart';
+import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
-import 'dart:math';
-
 import 'package:technical_support_artphoto/core/shared/app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/shared/technic_image/technic_image.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_view.dart';
-
 import '../../../../core/navigation/animation_navigation.dart';
 
 class GridViewTechnics extends StatelessWidget {

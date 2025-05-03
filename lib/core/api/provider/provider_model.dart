@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:technical_support_artphoto/core/api/data/models/photosalon.dart';
-import 'package:technical_support_artphoto/core/api/data/models/repair.dart';
-import 'package:technical_support_artphoto/core/api/data/models/storage.dart';
+import 'package:technical_support_artphoto/core/api/data/models/location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
 
 class ProviderModel with ChangeNotifier {
-  late final Map<String, Photosalon> _photosolons;
-  late final Map<String, Repair> _repairs;
-  late final Map<String, Storage> _storages;
+  late final Map<String, PhotosalonLocation> _photosolons;
+  late final Map<String, RepairLocation> _repairs;
+  late final Map<String, StorageLocation> _storages;
 
   late final List<String> _namesEquipments;
   late final List<String> _namesPhotosalons;
@@ -21,11 +22,11 @@ class ProviderModel with ChangeNotifier {
   final Color colorStorages = Colors.white70;
   final Color colorRepairs = Colors.yellow.shade200;
 
-  Map<String, Photosalon> get photosolons => _photosolons;
+  Map<String, PhotosalonLocation> get photosolons => _photosolons;
 
-  Map<String, Repair> get repairs => _repairs;
+  Map<String, RepairLocation> get repairs => _repairs;
 
-  Map<String, Storage> get storages => _storages;
+  Map<String, StorageLocation> get storages => _storages;
 
   List<String> get namesPhotosalons => _namesPhotosalons;
 
@@ -37,8 +38,8 @@ class ProviderModel with ChangeNotifier {
 
   List<String> get namesEquipments => _namesEquipments;
 
-  void downloadAllElements(Map<String, Photosalon> photosalons,
-      Map<String, Repair> repairs, Map<String, Storage> storages) {
+  void downloadAllElements(Map<String, PhotosalonLocation> photosalons,
+      Map<String, RepairLocation> repairs, Map<String, StorageLocation> storages) {
     _photosolons = photosalons;
     _repairs = repairs;
     _storages = storages;
@@ -62,18 +63,42 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTechnicInPhotosalon(Technic technic) {
-    print(technic.dislocation);
-    _photosolons[technic.dislocation]!.technics.map((element){
-      if(technic.id == element.id){
-        element.name = technic.name;
-        element.dislocation = technic.dislocation;
-        element.status = technic.status;
-        element.comment = technic.comment;
-        element.cost = technic.cost;
-        element.dateBuyTechnic = technic.dateBuyTechnic;
-      }
-    });
+  void updateTechnicInProvider(dynamic location, Technic technic) {
+    switch(Location){
+      case const (PhotosalonLocation):
+        _photosolons[technic.dislocation]!.technics.map((element){
+          if(technic.id == element.id){
+            element.name = technic.name;
+            element.dislocation = technic.dislocation;
+            element.status = technic.status;
+            element.comment = technic.comment;
+            element.cost = technic.cost;
+            element.dateBuyTechnic = technic.dateBuyTechnic;
+          }
+        });
+      case const (RepairLocation):
+        _repairs[technic.dislocation]!.technics.map((element){
+          if(technic.id == element.id){
+            element.name = technic.name;
+            element.dislocation = technic.dislocation;
+            element.status = technic.status;
+            element.comment = technic.comment;
+            element.cost = technic.cost;
+            element.dateBuyTechnic = technic.dateBuyTechnic;
+          }
+        });
+      case const(StorageLocation):
+        _storages[technic.dislocation]!.technics.map((element){
+          if(technic.id == element.id){
+            element.name = technic.name;
+            element.dislocation = technic.dislocation;
+            element.status = technic.status;
+            element.comment = technic.comment;
+            element.cost = technic.cost;
+            element.dateBuyTechnic = technic.dateBuyTechnic;
+          }
+        });
+    }
     notifyListeners();
   }
 
@@ -108,9 +133,9 @@ class ProviderModel with ChangeNotifier {
   }
 
   void refreshAllElement(
-      Map<String, Photosalon> photosalons,
-      Map<String, Repair> repairs,
-      Map<String, Storage> storages,
+      Map<String, PhotosalonLocation> photosalons,
+      Map<String, RepairLocation> repairs,
+      Map<String, StorageLocation> storages,
       ) {
     _photosolons.clear();
     _repairs.clear();
@@ -118,5 +143,6 @@ class ProviderModel with ChangeNotifier {
     _photosolons.addAll(photosalons);
     _repairs.addAll(repairs);
     _storages.addAll(storages);
+    notifyListeners();
   }
 }
