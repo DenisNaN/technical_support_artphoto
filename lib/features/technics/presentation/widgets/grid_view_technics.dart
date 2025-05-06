@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
-import 'package:technical_support_artphoto/core/shared/app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/core/shared/technic_image/technic_image.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_view.dart';
 import '../../../../core/navigation/animation_navigation.dart';
@@ -17,7 +18,7 @@ class GridViewTechnics extends StatelessWidget {
     final List<Technic> technics = location.technics;
 
     return Scaffold(
-        appBar: CustomAppBar(location: location),
+        appBar: CustomAppBar(typePage: TypePage.listTechnics, location: location, technic: null),
         body: CustomScrollView(
           physics: BouncingScrollPhysics(),
           primary: false,

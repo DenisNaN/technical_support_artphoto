@@ -6,8 +6,9 @@ import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
+import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/shared/input_decoration/input_deroration.dart';
-import 'package:technical_support_artphoto/core/utils/utils.dart';
+import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/features/history/history.dart';
 
 class TechnicAdd extends StatefulWidget {
@@ -61,16 +62,13 @@ class _TechnicAddState extends State<TechnicAdd> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     return Scaffold(
-        appBar: AppBar(
-          flexibleSpace: MyColor().appBar(),
-          title: Center(child: const Text('Добавить новую технику')),
-        ),
+        appBar: CustomAppBar(typePage: TypePage.add, location: null, technic: null),
         body: Form(
             key: _formInnerNumberKey,
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                SizedBox(height: 20),
+                // SizedBox(height: 20),
                 _buildInternalID(),
                 SizedBox(height: 20),
                 _buildCategoryTechnic(providerModel),

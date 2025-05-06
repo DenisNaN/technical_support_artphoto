@@ -1,6 +1,6 @@
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
-import 'package:technical_support_artphoto/features/repairs/models/summs_repair.dart';
+import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 
 abstract interface class TechnicalSupportRepo {
   Future<Map<String, dynamic>> getStartData();

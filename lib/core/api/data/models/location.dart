@@ -1,1 +1,2 @@
-abstract interface class Location{}
+abstract interface class Location{
+}

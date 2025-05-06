@@ -36,6 +36,7 @@ class _MatrixTransitionLogoState extends State<MatrixTransitionLogo>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Center(
         child: MatrixTransition(
           animation: _animation,

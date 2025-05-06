@@ -6,10 +6,13 @@ import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
-import 'package:technical_support_artphoto/core/shared/app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
+import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/core/shared/input_decoration/input_deroration.dart';
 import 'package:technical_support_artphoto/features/history/history.dart';
-import 'package:technical_support_artphoto/features/repairs/models/summs_repair.dart';
+import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
+import 'package:technical_support_artphoto/features/technics/presentation/page/repairs_technic_page.dart';
 import '../../../../core/shared/technic_image/technic_image.dart';
 
 class TechnicView extends StatefulWidget {
@@ -77,10 +80,7 @@ class _TechnicViewState extends State<TechnicView> {
     final providerModel = Provider.of<ProviderModel>(context);
     double widthScreen = MediaQuery.sizeOf(context).width;
     return Scaffold(
-        appBar: CustomAppBar(
-          location: widget.location,
-          isLength: false,
-        ),
+        appBar: CustomAppBar(typePage: TypePage.view, location: widget.location, technic: widget.technic),
         body: Form(
             key: _formInnerNumberKey,
             child: ListView(
@@ -94,7 +94,7 @@ class _TechnicViewState extends State<TechnicView> {
                 _buildStatus(providerModel),
                 SizedBox(height: 10),
                 _buildDislocation(providerModel),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 _buildCostAndTotalSumRepairs(providerModel),
                 SizedBox(height: 30),
                 Row(
@@ -109,6 +109,7 @@ class _TechnicViewState extends State<TechnicView> {
                     ),
                     ElevatedButton(
                         onPressed: () async {
+                          TechnicalSupportRepoImpl.downloadData.fetchHistoryTechnic('230');
                           if (_formInnerNumberKey.currentState!.validate()) {
                             // Technic technic = Technic(
                             //     0,
@@ -336,7 +337,9 @@ class _TechnicViewState extends State<TechnicView> {
             Text(
               'Дата покупки техники: ${DateFormat('d MMMM yyyy', "ru_RU").format(widget.technic.dateBuyTechnic)}',
             ),
-            SizedBox(width: 10,),
+            SizedBox(
+              width: 10,
+            ),
             Icon(
               Icons.edit,
               color: Colors.grey,
@@ -458,7 +461,7 @@ class _TechnicViewState extends State<TechnicView> {
                     titleTextStyle: Theme.of(context).textTheme.headlineMedium,
                     content: TextFormField(
                       decoration: myDecorationTextFormField(null, 'Стоимость техники'),
-                      controller: _costTechnic..text = widget.technic.cost.toString() ?? '',
+                      controller: _costTechnic..text = widget.technic.cost.toString(),
                       validator: (value) {
                         if (value!.isEmpty) {
                           return 'Обязательное поле';
@@ -472,7 +475,7 @@ class _TechnicViewState extends State<TechnicView> {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: const EdgeInsets.only(left: 20.0),
+              padding: const EdgeInsets.only(left: 20.0, bottom: 5),
               child: Row(
                 children: [
                   Text(
@@ -493,19 +496,29 @@ class _TechnicViewState extends State<TechnicView> {
         ),
         isListEmpty
             ? SizedBox()
-            : Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.blue.shade50),
-                  child: ListTile(
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Количество ремонтов: ${summsRepairs.length}'),
-                        Text('Общая стоимость ремонтов: ${NumberFormat('#,###', 'fr').format(totalSumm)} р.')
-                      ],
+            : InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      animationRouteSlideTransition(RepairsTechnicPage(
+                        summsRepairs: summsRepairs,
+                        technic: widget.technic,
+                      )));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                  child: Container(
+                    padding: EdgeInsets.only(left: 10, top: 5, bottom: 5),
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.blue.shade50),
+                    child: ListTile(
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Количество ремонтов: ${summsRepairs.length}'),
+                          Text('Cтоимость ремонтов: ${NumberFormat('#,###', 'fr').format(totalSumm)} р.')
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -695,7 +708,7 @@ class _TechnicViewState extends State<TechnicView> {
 
   Future addHistory(Technic technic, String nameUser) async {
     String descForHistory = descriptionForHistory(technic);
-    History history = History(History.historyList.last.id + 1, 'Technic', technic.id!, 'create', descForHistory,
+    History history = History(History.historyList.last.id + 1, 'Technic', technic.id, 'create', descForHistory,
         nameUser, DateFormat('yyyy.MM.dd').format(DateTime.now()));
 
     ConnectDbMySQL.connDB.insertHistory(history);

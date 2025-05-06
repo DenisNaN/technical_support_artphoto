@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_my_sql.dart';
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
@@ -6,7 +5,8 @@ import 'package:technical_support_artphoto/core/api/data/models/repair_location.
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/domain/repositories/technical_support_repo.dart';
-import 'package:technical_support_artphoto/features/repairs/models/summs_repair.dart';
+import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
+import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
 
 import '../models/technic.dart';
 
@@ -115,6 +115,17 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     Map<int, List<SummRepair>> summsRepairs = await ConnectDbMySQL.connDB.getSummsRepairs(numberTechnic);
     await ConnectDbMySQL.connDB.dispose();
     return summsRepairs;
+  }
+
+  Future<List<HistoryTechnic>> fetchHistoryTechnic(String? numberTechnic) async{
+    if(numberTechnic != null){
+      await ConnectDbMySQL.connDB.connDatabase();
+      List<HistoryTechnic> historyList =  await ConnectDbMySQL.connDB.fetchHistoryTechnic(numberTechnic);
+      await ConnectDbMySQL.connDB.dispose();
+      return historyList;
+    }else{
+      return [];
+    }
   }
 
 

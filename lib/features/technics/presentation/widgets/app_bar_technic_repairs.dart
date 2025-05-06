@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
 
-class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
-  const CustomAppBar({super.key, this.isLength = true, required this.location});
+class AppBarTechnicRepairs extends StatefulWidget implements PreferredSizeWidget {
+  const AppBarTechnicRepairs({super.key, required this.technic});
 
-  final dynamic location;
-  final bool isLength;
+  final Technic technic;
 
   @override
-  State<CustomAppBar> createState() => _CustomAppBarState();
+  State<AppBarTechnicRepairs> createState() => _AppBarTechnicRepairsState();
 
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }
 
-class _CustomAppBarState extends State<CustomAppBar> {
+class _AppBarTechnicRepairsState extends State<AppBarTechnicRepairs> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -42,22 +42,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
             child: Icon(Icons.arrow_back_ios, color: Colors.white, size: 30,),
           ),),
       ),
-      title: Row(
-        mainAxisAlignment: widget.isLength ? MainAxisAlignment.spaceBetween : MainAxisAlignment.spaceAround,
-        children: [
-          Text(widget.location.name, style: Theme
-              .of(context)
-              .textTheme
-              .titleLarge, ),
-          widget.isLength ? Text(
-            'Кол-во: ${widget.location.technics.length}',
-            style: Theme
-                .of(context)
-                .textTheme
-                .titleMedium,
-          ) : SizedBox()
-        ],
-      ),
+      title: Text(widget.technic.name, style: Theme
+          .of(context)
+          .textTheme
+          .titleLarge, ),
+      centerTitle: true,
     );
   }
 }
