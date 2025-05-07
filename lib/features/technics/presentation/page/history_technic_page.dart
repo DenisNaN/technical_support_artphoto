@@ -157,7 +157,7 @@ class HistoryTechnicPage extends StatelessWidget {
               bottom: 2,
               child: Container(
                 padding: EdgeInsets.only(left: 5, right: 5),
-                color: Colors.white,
+                color: Colors.grey.shade50,
                 child: Text(
                   '${currentHistoryTechnic.costService} р.',
                   style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
@@ -202,7 +202,7 @@ class HistoryTechnicPage extends StatelessWidget {
                 top: 12,
                 child: Container(
                   padding: EdgeInsets.only(left: 5, right: 5),
-                  color: Colors.white,
+                  color: Colors.grey.shade50,
                   child: Text(
                     '${troubles[i].employee}',
                     style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
