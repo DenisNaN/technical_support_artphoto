@@ -52,8 +52,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
         TypePage.listTechnics => _listTechnics(),
         TypePage.add => _addTechnic(),
         TypePage.view => _viewTechnic(),
-        TypePage.repair => _repairTechnic(),
+        TypePage.repair => _repair(widget.location.toString()),
+        TypePage.technicRepair => _repairTechnic(),
         TypePage.history => _historyTechnic(),
+        TypePage.error => _error(widget.location.toString()),
       }
     );
   }
@@ -112,5 +114,13 @@ class _CustomAppBarState extends State<CustomAppBar> {
         ),
       ],
     );
+  }
+
+  Widget _error(String message) {
+    return Text(message, style: TextStyle(color: Colors.black),);
+  }
+
+  _repair(String message) {
+    return Text(message, style: TextStyle(color: Colors.black),);
   }
 }

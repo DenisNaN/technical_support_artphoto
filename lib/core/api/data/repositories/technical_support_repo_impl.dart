@@ -8,6 +8,7 @@ import 'package:technical_support_artphoto/core/api/domain/repositories/technica
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
 
+import '../../../../features/repairs/models/repair.dart';
 import '../models/technic.dart';
 
 class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
@@ -19,9 +20,11 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   Future<Map<String, dynamic>> getStartData() async {
     Map<String, dynamic> result = {};
 
-    Map<String, PhotosalonLocation> photosalons = {};
-    Map<String, RepairLocation> repairs = {};
-    Map<String, StorageLocation> storages = {};
+    Map<String, PhotosalonLocation> technicsInPhotosalons = {};
+    Map<String, RepairLocation> technicsInRepairs = {};
+    Map<String, StorageLocation> technicsInStorages = {};
+
+    List<Repair> repairs = [];
 
     /// CategoryDropDown
     List<String> namePhotosalons;
@@ -32,9 +35,11 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 
     await ConnectDbMySQL.connDB.connDatabase();
 
-    photosalons = await ConnectDbMySQL.connDB.fetchPhotosalons();
-    repairs = await ConnectDbMySQL.connDB.fetchRepairsNow();
-    storages = await ConnectDbMySQL.connDB.fetchStorages();
+    technicsInPhotosalons = await ConnectDbMySQL.connDB.fetchPhotosalons();
+    technicsInRepairs = await ConnectDbMySQL.connDB.fetchRepairsNow();
+    technicsInStorages = await ConnectDbMySQL.connDB.fetchStorages();
+
+    repairs = await ConnectDbMySQL.connDB.fetchAllRepairs();
 
     namePhotosalons = await ConnectDbMySQL.connDB.fetchNamePhotosalons();
     namePhotosalons.addAll(await ConnectDbMySQL.connDB.fetchNameStorages());
@@ -43,9 +48,11 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     statusForEquipment = await ConnectDbMySQL.connDB.fetchStatusForEquipment();
     colorsForEquipment = await ConnectDbMySQL.connDB.fetchColorsForEquipment();
 
-    result['Photosalons'] = photosalons;
-    result['Repairs'] = repairs;
-    result['Storages'] = storages;
+    result['Photosalons'] = technicsInPhotosalons;
+    result['Repairs'] = technicsInRepairs;
+    result['Storages'] = technicsInStorages;
+
+    result['AllRepairs'] = repairs;
 
     result['namePhotosalons'] = namePhotosalons;
     result['nameEquipment'] = nameEquipment;

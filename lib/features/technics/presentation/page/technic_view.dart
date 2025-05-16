@@ -29,7 +29,6 @@ class _TechnicViewState extends State<TechnicView> {
   final _innerNumberTechnic = TextEditingController();
   final _nameTechnic = TextEditingController();
   final _costTechnic = TextEditingController();
-  String _dateBuyTechnic = '';
   final _comment = TextEditingController();
   final List<SummRepair> summsRepairs = [];
   late final int totalSumm;
@@ -37,7 +36,6 @@ class _TechnicViewState extends State<TechnicView> {
   // late final String _dateStartTestDrive;
   // String _dateFinishTestDrive = '';
   final _resultTestDrive = TextEditingController();
-  String? _selectedDropdownCategory;
   String? _selectedDropdownDislocation;
   String? _selectedDropdownStatus;
   bool isBN = false;
@@ -63,7 +61,6 @@ class _TechnicViewState extends State<TechnicView> {
   void initState() {
     super.initState();
     _nameTechnic.text = '';
-    _dateBuyTechnic = DateFormat('d MMMM yyyy', 'ru_RU').format(DateTime.now());
     TechnicalSupportRepoImpl.downloadData.getSummsRepairs(widget.technic.number.toString()).then((value) {
       if (value.isNotEmpty) {
         setState(() {
@@ -326,7 +323,6 @@ class _TechnicViewState extends State<TechnicView> {
               _viewSnackBar(value ? Icons.date_range : Icons.dangerous_outlined, value,
                   value ? 'Изменения приняты' : 'Изменения не сохранились');
             });
-            _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(date);
           }
         });
       },

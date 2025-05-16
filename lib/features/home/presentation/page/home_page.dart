@@ -21,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     String userName = providerModel.user.keys.first;
+    final double height = MediaQuery.sizeOf(context).height;
     return Scaffold(
       appBar: AppBar(
         title: Text(userName),
@@ -36,22 +37,23 @@ class _HomePageState extends State<HomePage> {
                       resultData['Photosalons'], resultData['Repairs'], resultData['Storages']);
                 }),
             child: CustomScrollView(
-          physics: BouncingScrollPhysics(),
+          physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
           slivers: [
-            GridViewHomePage(locations: providerModel.photosolons, color: providerModel.colorPhotosalons),
-            GridViewHomePage(locations: providerModel.storages, color: providerModel.colorStorages),
-            GridViewHomePage(locations: providerModel.repairs, color: providerModel.colorRepairs),
-            GridViewHomePage(locations: providerModel.repairs, color: providerModel.colorRepairs),
-            GridViewHomePage(locations: providerModel.repairs, color: providerModel.colorRepairs),
+            GridViewHomePage(locations: providerModel.technicsInPhotosalons, color: providerModel.colorPhotosalons),
+            GridViewHomePage(locations: providerModel.technicsInStorages, color: providerModel.colorStorages),
+            GridViewHomePage(locations: providerModel.technicsInRepairs, color: providerModel.colorRepairs),
           ],
         )),
         ),
-      floatingActionButton: FloatingActionButton.extended(
-          icon: Icon(Icons.add),
-          label: Text('Добавить технику'),
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const TechnicAdd()));
-          }),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: height / 11),
+        child: FloatingActionButton.extended(
+            icon: Icon(Icons.add),
+            label: Text('Добавить технику'),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const TechnicAdd()));
+            }),
+      ),
     );
   }
 

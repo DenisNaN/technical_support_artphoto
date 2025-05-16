@@ -22,7 +22,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   final _innerNumberTechnic = TextEditingController();
   final _nameTechnic = TextEditingController();
   final _costTechnic = TextEditingController();
-  String _dateBuyTechnic = '';
+  DateTime? _dateBuyTechnic;
   final _comment = TextEditingController();
 
   // late final String _dateStartTestDrive;
@@ -32,6 +32,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   String? _selectedDropdownDislocation;
   String? _selectedDropdownStatus;
   bool isBN = false;
+  bool isExistNumber = false;
 
   // String? _selectedDropdownTestDriveDislocation;
   // bool _switchTestDrive = false;
@@ -54,7 +55,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   void initState() {
     super.initState();
     _nameTechnic.text = '';
-    _dateBuyTechnic = DateFormat('d MMMM yyyy', 'ru_RU').format(DateTime.now());
+    _dateBuyTechnic = DateTime.now();
     // _dateStartTestDrive = DateFormat('d MMMM yyyy', 'ru_RU').format(DateTime.now());
   }
 
@@ -92,12 +93,11 @@ class _TechnicAddState extends State<TechnicAdd> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      style: ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                      style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
                       child: Text("Отмена"),
                     ),
                     ElevatedButton(
-                        onPressed: () async {
+                        onPressed: () {
                           if (_formInnerNumberKey.currentState!.validate()) {
                             Technic technic = Technic(
                                 0,
@@ -106,14 +106,13 @@ class _TechnicAddState extends State<TechnicAdd> {
                                 _nameTechnic.text,
                                 _selectedDropdownStatus!,
                                 _selectedDropdownDislocation!,
-                                DateTime.parse(_dateBuyTechnic),
+                                _dateBuyTechnic ?? DateTime.now(),
                                 int.parse(_costTechnic.text.replaceAll(",", "")),
-                                // DateFormat('yyyy.MM.dd').format(DateTime.now()),
-                                _comment.text
-                            );
+                                _comment.text);
 
-                            // String result = await _save(technic, providerModel);
-                            // _viewSnackBar(' $result');
+                            _save(technic, providerModel).then((_) {
+                              _viewSnackBar(Icons.save, true, 'Техника сохранена');
+                            });
                             Navigator.pop(context);
                           }
                         },
@@ -137,17 +136,16 @@ class _TechnicAddState extends State<TechnicAdd> {
         Padding(
           padding: const EdgeInsets.only(left: 20.0),
           child: Row(
-            // mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(isBN ? 'Включить номер' : 'Выключить номер'),
               Transform.scale(
                 scale: 1.2,
                 child: Switch(
                     value: isBN,
-                    onChanged: (value){
+                    onChanged: (value) {
                       setState(() {
                         isBN = value;
-                        if(value == true) _innerNumberTechnic.text = '';
+                        if (value == true) _innerNumberTechnic.text = '';
                       });
                     }),
               ),
@@ -162,9 +160,18 @@ class _TechnicAddState extends State<TechnicAdd> {
                   enabled: !isBN,
                   decoration: myDecorationTextFormField(!isBN ? 'Номер техники' : 'Без номера'),
                   controller: _innerNumberTechnic,
+                  onChanged: (text) async{
+                    if(text.isNotEmpty){
+                      final check = await TechnicalSupportRepoImpl.downloadData.checkNumberTechnic(text);
+                      setState(() => isExistNumber = check);
+                    }
+                  },
                   validator: (value) {
                     if (value!.isEmpty && !isBN) {
                       return 'Обязательное поле';
+                    }
+                    if (isExistNumber) {
+                      return 'Номер занят';
                     }
                     return null;
                   },
@@ -184,13 +191,13 @@ class _TechnicAddState extends State<TechnicAdd> {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 30),
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: !isBN ? Colors.blue : Colors.grey,
-        ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: !isBN ? Colors.blue : Colors.grey,
+          ),
           onPressed: () async {
             if (_innerNumberTechnic.text != '' && !isBN) {
-              TechnicalSupportRepoImpl.downloadData.checkNumberTechnic(_innerNumberTechnic.text).then((result){
-                _viewSnackBar(result ? 'Техника с таким номером есть.' : 'Номер свободен');
+              TechnicalSupportRepoImpl.downloadData.checkNumberTechnic(_innerNumberTechnic.text).then((result) {
+                _viewSnackBarCheckEmptyNumberTechnic(result ? 'Техника с таким номером есть.' : 'Номер свободен');
               });
             }
           },
@@ -207,10 +214,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Категория техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -224,8 +228,7 @@ class _TechnicAddState extends State<TechnicAdd> {
               borderRadius: BorderRadius.circular(10.0),
               hint: const Text('Техника'),
               value: _selectedDropdownCategory,
-              items: providerModel.namesEquipments
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.namesEquipments.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -234,17 +237,6 @@ class _TechnicAddState extends State<TechnicAdd> {
               onChanged: (String? value) {
                 setState(() {
                   _selectedDropdownCategory = value!;
-                  // if (value == 'Фотоаппарат') {
-                  //   _isCategoryPhotocamera = true;
-                  // } else {
-                  //   _isCategoryPhotocamera = false;
-                  //   if (_dateFinishTestDrive == '' && _dateStartTestDrive != '') {
-                  //     DateTime finishTestDrive = DateFormat('yyyy.MM.dd')
-                  //         .parse(_dateStartTestDrive)
-                  //         .add(const Duration(days: 14));
-                  //     _dateFinishTestDrive = DateFormat('yyyy.MM.dd').format(finishTestDrive);
-                  //   }
-                  // }
                 });
               },
             ),
@@ -263,10 +255,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Стоимость техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -274,17 +263,17 @@ class _TechnicAddState extends State<TechnicAdd> {
           padding: const EdgeInsets.only(left: 40, right: 40),
           child: ListTile(
               title: TextFormField(
-                decoration: myDecorationTextFormField(null, 'Цена', '₽ '),
-                controller: _costTechnic,
-                inputFormatters: [IntegerCurrencyInputFormatter()],
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Обязательное поле';
-                  }
-                  return null;
-                },
-              )),
+            decoration: myDecorationTextFormField(null, 'Цена', '₽ '),
+            controller: _costTechnic,
+            inputFormatters: [IntegerCurrencyInputFormatter()],
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Обязательное поле';
+              }
+              return null;
+            },
+          )),
         ),
       ],
     );
@@ -299,10 +288,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Модель техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -334,10 +320,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Дата покупки техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -345,7 +328,7 @@ class _TechnicAddState extends State<TechnicAdd> {
           padding: const EdgeInsets.only(left: 55, right: 55, top: 6),
           child: ListTile(
             title: Text(
-              _dateBuyTechnic,
+              DateFormat('d MMMM yyyy', 'ru_RU').format(_dateBuyTechnic ?? DateTime.now()),
               style: TextStyle(color: Colors.black54),
             ),
             tileColor: Colors.blue.shade50,
@@ -354,15 +337,15 @@ class _TechnicAddState extends State<TechnicAdd> {
             ),
             onTap: () {
               showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2099),
-                  locale: const Locale("ru", "RU"))
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2099),
+                      locale: const Locale("ru", "RU"))
                   .then((date) {
                 setState(() {
                   if (date != null) {
-                    _dateBuyTechnic = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+                    _dateBuyTechnic = date;
                   }
                 });
               });
@@ -382,10 +365,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Статус техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -399,8 +379,7 @@ class _TechnicAddState extends State<TechnicAdd> {
               validator: (value) => value == null ? "Обязательное поле" : null,
               dropdownColor: Colors.blue.shade50,
               value: _selectedDropdownStatus,
-              items: providerModel.statusForEquipment
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -427,10 +406,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Дислокация техники',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -443,8 +419,7 @@ class _TechnicAddState extends State<TechnicAdd> {
               hint: const Text('Дислокация'),
               value: _selectedDropdownDislocation,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: providerModel.namesPhotosalons
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.namesPhotosalons.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -471,10 +446,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Комментарий',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
@@ -658,37 +630,29 @@ class _TechnicAddState extends State<TechnicAdd> {
   //   );
   // }
 
-  // Future _save(Technic technic, ProviderModel providerModel) async {
-  //   String nameUser = providerModel.user.keys.first;
-  //   int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
-  //   technic.id = id;
-  //   await addHistory(technic, nameUser);
-  //
-  //   Technic technic = Technic(
-  //       technic.id, technicModel.category,
-  //       technic.name, technic.status, technic.dislocation);
-  //   addTechnicInProviderModel(technic, providerModel);
-  // }
+  Future _save(Technic technic, ProviderModel providerModel) async {
+    String nameUser = providerModel.user.keys.first;
+    await ConnectDbMySQL.connDB.connDatabase();
+    int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
+    await ConnectDbMySQL.connDB.dispose();
+    technic.id = id;
+    // await addHistory(technic, nameUser);
+    addTechnicInProviderModel(technic, providerModel);
+  }
 
   void addTechnicInProviderModel(Technic technic, ProviderModel providerModel) {
     String dislocation = technic.dislocation;
-    if(providerModel.namesPhotosalons.any((element) => element == dislocation)){
+    if (providerModel.technicsInPhotosalons.keys.any((element) => element == dislocation)) {
       providerModel.addTechnicInPhotosalon(dislocation, technic);
-    }else{
+    } else {
       providerModel.addTechnicInStorage(dislocation, technic);
     }
   }
 
   Future addHistory(Technic technic, String nameUser) async {
     String descForHistory = descriptionForHistory(technic);
-    History history = History(
-        History.historyList.last.id + 1,
-        'Technic',
-        technic.id,
-        'create',
-        descForHistory,
-        nameUser,
-        DateFormat('yyyy.MM.dd').format(DateTime.now()));
+    History history = History(History.historyList.last.id + 1, 'Technic', technic.id, 'create', descForHistory,
+        nameUser, DateFormat('yyyy.MM.dd').format(DateTime.now()));
 
     ConnectDbMySQL.connDB.insertHistory(history);
     History.historyList.insert(0, history);
@@ -702,11 +666,30 @@ class _TechnicAddState extends State<TechnicAdd> {
   }
 
   String getDateFormat(String date) {
-    return DateFormat("d MMMM yyyy", "ru_RU")
-        .format(DateTime.parse(date.replaceAll('.', '-')));
+    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 
-  void _viewSnackBar(String text) {
+  void _viewSnackBar(IconData icon, bool isSuccessful, String text) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+            SizedBox(
+              width: 20,
+            ),
+            Flexible(child: Text(text)),
+          ],
+        ),
+        duration: const Duration(seconds: 5),
+        showCloseIcon: true,
+      ),
+    );
+  }
+
+  void _viewSnackBarCheckEmptyNumberTechnic(String text) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -722,65 +705,6 @@ class _TechnicAddState extends State<TechnicAdd> {
       ),
     );
   }
-
-// String validateEmptyFields() {
-//   String result = '';
-//   String tmpResult = '';
-//   int countEmptyFields = 0;
-//
-//   if (_innerNumberTechnic.text == "") {
-//     tmpResult += 'Номер техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_selectedDropdownCategory == null) {
-//     tmpResult += 'Наименование техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_costTechnic.text == "") {
-//     tmpResult += 'Стоимость техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_dateBuyTechnic == "") {
-//     tmpResult += 'Дата покупки техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_selectedDropdownStatus == null) {
-//     tmpResult += 'Статус техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_selectedDropdownDislocation == null) {
-//     tmpResult += 'Дислокация техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_switchTestDrive && _selectedDropdownTestDriveDislocation == null) {
-//     tmpResult += 'Место тест-драйва, ';
-//     countEmptyFields++;
-//   }
-//
-//   if (countEmptyFields > 0) {
-//     tmpResult = tmpResult.trim().replaceFirst(',', '', tmpResult.length - 5);
-//     result = getFieldAddition(countEmptyFields);
-//     result += '$tmpResult.';
-//   }
-//   return result;
-// }
-
-//   String getFieldAddition(int num) {
-//     double preLastDigit = num % 100 / 10;
-//     if (preLastDigit.round() == 1) {
-//       return "Не заполнено $num полей: ";
-//     }
-//     switch (num % 10) {
-//       case 1:
-//         return "Не заполнено $num поле: ";
-//       case 2:
-//       case 3:
-//       case 4:
-//         return "Не заполнены $num поля: ";
-//       default:
-//         return "Не заполнено $num полей: ";
-//     }
-//   }
 }
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {
@@ -789,8 +713,7 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
   static const thousandSeparator = ',';
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue,
-      TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     if (!validationRegex.hasMatch(newValue.text)) {
       return oldValue;
     }
@@ -818,21 +741,13 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
     }
 
     /// Handle moving cursor.
-    final initialNumberOfPrecedingSeparators =
-        oldValue.text.characters
-            .where((e) => e == thousandSeparator)
-            .length;
-    final newNumberOfPrecedingSeparators =
-        formattedText.characters
-            .where((e) => e == thousandSeparator)
-            .length;
-    final additionalOffset =
-        newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
+    final initialNumberOfPrecedingSeparators = oldValue.text.characters.where((e) => e == thousandSeparator).length;
+    final newNumberOfPrecedingSeparators = formattedText.characters.where((e) => e == thousandSeparator).length;
+    final additionalOffset = newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
 
     return newValue.copyWith(
       text: formattedText,
-      selection: TextSelection.collapsed(
-          offset: newValue.selection.baseOffset + additionalOffset),
+      selection: TextSelection.collapsed(offset: newValue.selection.baseOffset + additionalOffset),
     );
   }
 }

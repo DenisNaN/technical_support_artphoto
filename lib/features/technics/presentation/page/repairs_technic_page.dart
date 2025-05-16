@@ -20,7 +20,7 @@ class _RepairsTechnicPageState extends State<RepairsTechnicPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(typePage: TypePage.repair, technic: widget.technic, location: null,),
+      appBar: CustomAppBar(typePage: TypePage.technicRepair, technic: widget.technic, location: null,),
       body: ListView.builder(
           itemCount: widget.summsRepairs.length,
           itemBuilder: (context, index) {

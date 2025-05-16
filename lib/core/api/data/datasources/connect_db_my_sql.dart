@@ -3,6 +3,7 @@ import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
+import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/history/history.dart';
 import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
@@ -170,8 +171,15 @@ class ConnectDbMySQL {
 
   Future<int> insertTechnicInDB(Technic technic, String nameUser) async {
     var result = await _connDB!.query(
-        'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [technic.id, technic.category, technic.name, technic.dateBuyTechnic, technic.cost, technic.comment, nameUser]);
+        'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) VALUES (?, ?, ?, ?, ?, ?, ?)', [
+      technic.number,
+      technic.category,
+      technic.name,
+      technic.dateBuyTechnic.dateFormattedForSQL(),
+      technic.cost,
+      technic.comment,
+      nameUser
+    ]);
 
     int id = result.insertId!;
     await insertStatusInDB(id, technic.status, technic.dislocation, nameUser);
@@ -295,36 +303,6 @@ class ConnectDbMySQL {
     return map;
   }
 
-// Future<List> getAllTechnics() async{
-//   var result = await _connDB!.query('SELECT '
-//       'equipment.id, '
-//       'equipment.number, '
-//       'equipment.name, '
-//       'equipment.category, '
-//       'equipment.cost, '
-//       'equipment.dateBuy, '
-//       's.status, '
-//       's.dislocation, '
-//       's.date, '
-//       'equipment.comment, '
-//       't.testDriveDislocation, '
-//       't.dateStart, '
-//       't.dateFinish, '
-//       't.result, '
-//       't.checkEquipment '
-//       'FROM equipment '
-//       'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
-//       'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
-//       'ORDER BY equipment.id');
-
-// var list = technicListFromMap(result);
-// var reversedList = List.from(list.reversed);
-// return reversedList;
-//   return [];
-// }
-//
-
-//
 // Future<Technic?> getTechnic(int id) async {
 //   Technic? technic = null;
 //   var result = await _connDB!.query('SELECT '
@@ -353,30 +331,7 @@ class ConnectDbMySQL {
 //   return technic;
 // }
 //
-// List technicListFromMap(var result){
-//   List list = [];
-//   for (var row in result) {
-//     // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4],
-//     // dateBuy-row[5], status-row[6], dislocation-row[7], dateChangeStatus-row[8], comment-row[9], testDriveDislocation-row[10],
-//     // dateStart-row[11], dateFinish-row[12], resultTestDrive-row[13], checkTestDrive-row[14]
-//
-//     String dateChangeStatus = '';
-//     if(row[8] != null && row[8].toString() != "-0001-11-30 00:00:00.000Z") dateChangeStatus = getDateFormatted(row[8].toString());
-//     String dateStartTestDrive = '';
-//     if(row[11] != null && row[11].toString() != "-0001-11-30 00:00:00.000Z") dateStartTestDrive = getDateFormatted(row[11].toString());
-//     String dateFinishTestDrive = '';
-//     if(row[12] != null && row[12].toString() != "-0001-11-30 00:00:00.000Z") dateFinishTestDrive = getDateFormatted(row[12].toString());
-//     bool checkTestDrive = false;
-//     if(row[14] != null && row[14] == 1) checkTestDrive = true;
-//
-//     Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
-//         getDateFormatted(row[5].toString()), row[6] ?? '', row[7] ?? '', dateChangeStatus,
-//         row[9] ?? '', row[10] ?? '', dateStartTestDrive, dateFinishTestDrive, row[13] ?? '', checkTestDrive);
-//     list.add(technic);
-//   }
-//   return list;
-// }
-//
+
 // Future<List> getAllTestDrive() async {
 //   List list = [];
 //   var result = await _connDB!.query('SELECT * FROM testDrive');
@@ -399,7 +354,7 @@ class ConnectDbMySQL {
 //   return list;
 // }
 
-  Future<List> getAllRepair() async {
+  Future<List<Repair>> fetchAllRepairs() async {
     var result = await _connDB!.query('SELECT '
         'repairEquipment.id, '
         'repairEquipment.number, '
@@ -421,8 +376,8 @@ class ConnectDbMySQL {
         'repairEquipment.idTestDrive '
         'FROM repairEquipment');
 
-    var list = repairListFromMap(result);
-    var reversedList = List.from(list.reversed);
+    final List<Repair> list = repairListFromMap(result);
+    final List<Repair> reversedList = List.from(list.reversed);
     return reversedList;
   }
 
@@ -436,8 +391,8 @@ class ConnectDbMySQL {
 //   return repair;
 // }
 
-  List repairListFromMap(var result) {
-    List list = [];
+  List<Repair> repairListFromMap(var result) {
+    List<Repair> list = [];
     for (var row in result) {
       // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
       // dateTransferInService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
@@ -521,7 +476,7 @@ class ConnectDbMySQL {
       troubleTechnicOnPeriod.employee = row[3];
       troubleTechnicOnPeriod.trouble = row[4].toString();
       for (int i = 1; i < historyTechnics.length; i++) {
-        if(i == 1){
+        if (i == 1) {
           if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i - 1].date)) {
             historyTechnics[i - 1].listTrouble.add(troubleTechnicOnPeriod);
           }

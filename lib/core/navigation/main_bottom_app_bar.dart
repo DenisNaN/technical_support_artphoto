@@ -15,6 +15,7 @@ class _MainBottomAppBarState extends State<MainBottomAppBar> {
     final providerModel = Provider.of<ProviderModel>(context);
 
     return Container(
+      clipBehavior: Clip.hardEdge,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
         gradient: LinearGradient(
@@ -37,7 +38,13 @@ class _MainBottomAppBarState extends State<MainBottomAppBar> {
           backgroundColor: Colors.transparent,
           onDestinationSelected: (int index) {
             setState(() {
+              if(providerModel.currentPageIndexMainBottomAppBar < index){
+                providerModel.changeLeftSwipeValue(true);
+              } else{
+                providerModel.changeLeftSwipeValue(false);
+              }
               providerModel.changeCurrentPageMainBottomAppBar(index);
+
             });
           },
           indicatorColor: Colors.white,

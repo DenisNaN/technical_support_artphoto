@@ -34,9 +34,26 @@ class HistoryTechnicPage extends StatelessWidget {
                   }),
             );
           } else if (snapshot.hasError) {
-            return Text('Данные не загрузились');
+            return Scaffold(
+                appBar: CustomAppBar(typePage: TypePage.error, location: 'Произошел сбой', technic: null),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.wifi_off, size: 150, color: Colors.blue, shadows: [
+                        BoxShadow(
+                          color: Colors.grey.withValues(alpha: 0.5),
+                          spreadRadius: 3,
+                          blurRadius: 4,
+                          offset: Offset(0, 4), // changes position of shadow
+                        ),
+                      ],),
+                      Text('Данные не загрузились.\nПроверьте подключение к сети', style: TextStyle(fontSize: 20),textAlign: TextAlign.center,),
+                    ],
+                  ),
+                ));
           } else {
-            return MatrixTransitionLogo();
+            return SizedBox(height: 200, child: Center(child: MatrixTransitionLogo()));
           }
         });
   }
@@ -87,7 +104,7 @@ class HistoryTechnicPage extends StatelessWidget {
                   ? Text('${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)} - по настоящее время',
                       style: TextStyle(fontSize: 18))
                   : Text(
-                      '${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)} - ${DateFormat('dd MMMM yyyy', 'ru').format(finishDate)}',
+                      '${DateFormat('dd MMMM yyyy', 'ru').format(finishDate)} - ${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)}',
                       style: TextStyle(fontSize: 18))
             ],
           ),
