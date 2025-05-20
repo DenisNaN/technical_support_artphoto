@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
@@ -14,7 +12,6 @@ class GridViewTechnics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final providerModel = Provider.of<ProviderModel>(context);
     final List<Technic> technics = location.technics;
 
     return Scaffold(
@@ -70,7 +67,7 @@ class GridViewTechnics extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
+                                color: Colors.grey.shade500,
                                 spreadRadius: 1,
                                 blurRadius: 3,
                                 offset: Offset(0, 2),

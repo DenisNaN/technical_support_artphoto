@@ -2,8 +2,6 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/api/provider/provider_model.dart';
-import '../../../../core/shared/custom_app_bar/custom_app_bar.dart';
-import '../../../../core/utils/enums.dart';
 import '../../models/repair.dart';
 
 class RepairsPage extends StatefulWidget {
@@ -74,7 +72,7 @@ class _RepairsPageState extends State<RepairsPage> {
 
   Text _buildTextTitle(BuildContext context, Repair repair){
     String repairComplaint = 'Не внесли данные.';
-    if(repair.complaint != '' && repair.complaint != null){
+    if(repair.complaint != ''){
       repairComplaint = '${repair.complaint}.';
     }
 
