@@ -34,8 +34,6 @@ class _AuthorizationState extends State<Authorization> {
     final providerModel = Provider.of<ProviderModel>(context);
     MyColor myColor = MyColor();
     String? version = utils.packageInfo?.version;
-    double width = MediaQuery.sizeOf(context).width;
-    double height = MediaQuery.sizeOf(context).height;
 
     return Container(
       decoration: const BoxDecoration(

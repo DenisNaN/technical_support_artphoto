@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -7,14 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/di/init_dependencies.dart';
-import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
-import 'package:technical_support_artphoto/core/navigation/main_bottom_body_flip_animation.dart';
-import 'package:technical_support_artphoto/features/history/history_list.dart';
-import 'package:technical_support_artphoto/features/home/presentation/page/home_page.dart';
+import 'package:technical_support_artphoto/core/navigation/main_bottom_page_view.dart';
 import 'package:technical_support_artphoto/features/splash_screen/presentation/page/splash_screen.dart';
-
 import 'core/navigation/main_bottom_app_bar.dart';
-import 'features/repairs/presentation/page/repairs_page.dart';
 
 void main() {
   runZonedGuarded<Future<void>>(
@@ -69,12 +63,26 @@ class ArtphotoTech extends StatefulWidget {
 }
 
 class _ArtphotoTechState extends State<ArtphotoTech>{
+  late PageController pageViewController;
+
+  @override
+  void initState() {
+    super.initState();
+    pageViewController = PageController();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    pageViewController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         extendBody: true,
-        bottomNavigationBar: MainBottomAppBar(),
-        body: MainBottomBodyFlipAnimation()
+        bottomNavigationBar: MainBottomAppBar(pageController: pageViewController),
+        body: MainBottomPageView(pageController: pageViewController)
     );
   }
 
