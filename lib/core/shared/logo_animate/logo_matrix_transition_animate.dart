@@ -40,7 +40,7 @@ class _MatrixTransitionLogoState extends State<MatrixTransitionLogo>
       body: Center(
         child: MatrixTransition(
           animation: _animation,
-          child: Image.asset('assets/logo_animation.PNG'),
+          child: Image.asset('assets/logo/logo.png'),
           onTransform: (double value) {
             return Matrix4.identity()
               ..setEntry(3, 2, 0.004)

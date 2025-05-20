@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_my_sql.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
-import 'package:technical_support_artphoto/core/api/provider/providerModel.dart';
-import 'package:technical_support_artphoto/core/api/data/models/user.dart';
+import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/logo_animate/draggable_logo.dart';
 import 'package:technical_support_artphoto/main.dart';
@@ -126,8 +124,7 @@ class _AuthorizationState extends State<Authorization> {
                                     if (user != null) {
                                       providerModel.user[user.name] = user.access;
                                       providerModel.user.remove('user');
-                                      Navigator.pushReplacement(
-                                          context, animationRouteFadeTransition(const ArtphotoTech()));
+                                      _navigationForNextPage();
                                     } else {
                                       passwordController.clear();
                                       _showDialogNotValidationUser();
@@ -185,5 +182,10 @@ class _AuthorizationState extends State<Authorization> {
         );
       },
     );
+  }
+
+  void _navigationForNextPage(){
+    Navigator.pushReplacement(
+        context, animationRouteSlideTransition(const ArtphotoTech()));
   }
 }

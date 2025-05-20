@@ -1,12 +1,14 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mysql1/mysql1.dart';
-import 'package:technical_support_artphoto/core/api/data/models/photosalon.dart';
-import 'package:technical_support_artphoto/core/api/data/models/repair.dart';
-import 'package:technical_support_artphoto/core/api/data/models/storage.dart';
-import 'package:technical_support_artphoto/core/api/data/models/user.dart';
-import 'package:technical_support_artphoto/core/api/domain/repositories/technical_support_repo.dart';
+import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
+import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/history/history.dart';
-import 'package:technical_support_artphoto/features/technics/data/models/technic_model.dart';
+import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
+import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
+import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
+import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
 import '../models/technic.dart';
 import 'package:intl/intl.dart';
 
@@ -38,12 +40,12 @@ class ConnectDbMySQL {
     return await _connDB!.query('SELECT login, access FROM loginPassword WHERE password = $password');
   }
 
-  Future<Map<String, Photosalon>> fetchPhotosalons() async {
-    Map<String, Photosalon> photosalons = {};
+  Future<Map<String, PhotosalonLocation>> fetchPhotosalons() async {
+    Map<String, PhotosalonLocation> photosalons = {};
     List<String> namesPhotosalons = await fetchNamePhotosalons();
 
     for (var namePhotosalon in namesPhotosalons) {
-      Photosalon photosalon = Photosalon(namePhotosalon);
+      PhotosalonLocation photosalon = PhotosalonLocation(namePhotosalon);
       String query = 'SELECT '
           'equipment.id, '
           'equipment.number, '
@@ -68,12 +70,12 @@ class ConnectDbMySQL {
     return photosalons;
   }
 
-  Future<Map<String, Repair>> fetchRepairs() async {
-    Map<String, Repair> repairs = {};
+  Future<Map<String, RepairLocation>> fetchRepairsNow() async {
+    Map<String, RepairLocation> repairs = {};
     List<String> namesRepairs = await fetchNameRepairs();
 
     for (var nameRepair in namesRepairs) {
-      Repair repair = Repair(nameRepair);
+      RepairLocation repair = RepairLocation(nameRepair);
       String query = 'SELECT equipment.id, '
           'equipment.number, '
           'equipment.category, '
@@ -97,12 +99,12 @@ class ConnectDbMySQL {
     return repairs;
   }
 
-  Future<Map<String, Storage>> fetchStorages() async {
-    Map<String, Storage> storages = {};
+  Future<Map<String, StorageLocation>> fetchStorages() async {
+    Map<String, StorageLocation> storages = {};
     List<String> namesStorages = await fetchNameStorages();
 
     for (var nameStorage in namesStorages) {
-      Storage storage = Storage(nameStorage);
+      StorageLocation storage = StorageLocation(nameStorage);
       String query = 'SELECT equipment.id, '
           'equipment.number, '
           'equipment.category, '
@@ -170,10 +172,10 @@ class ConnectDbMySQL {
   Future<int> insertTechnicInDB(Technic technic, String nameUser) async {
     var result = await _connDB!.query(
         'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) VALUES (?, ?, ?, ?, ?, ?, ?)', [
-      technic.id,
+      technic.number,
       technic.category,
       technic.name,
-      technic.dateBuyTechnic,
+      technic.dateBuyTechnic.dateFormattedForSQL(),
       technic.cost,
       technic.comment,
       nameUser
@@ -301,36 +303,6 @@ class ConnectDbMySQL {
     return map;
   }
 
-// Future<List> getAllTechnics() async{
-//   var result = await _connDB!.query('SELECT '
-//       'equipment.id, '
-//       'equipment.number, '
-//       'equipment.name, '
-//       'equipment.category, '
-//       'equipment.cost, '
-//       'equipment.dateBuy, '
-//       's.status, '
-//       's.dislocation, '
-//       's.date, '
-//       'equipment.comment, '
-//       't.testDriveDislocation, '
-//       't.dateStart, '
-//       't.dateFinish, '
-//       't.result, '
-//       't.checkEquipment '
-//       'FROM equipment '
-//       'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
-//       'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
-//       'ORDER BY equipment.id');
-
-// var list = technicListFromMap(result);
-// var reversedList = List.from(list.reversed);
-// return reversedList;
-//   return [];
-// }
-//
-
-//
 // Future<Technic?> getTechnic(int id) async {
 //   Technic? technic = null;
 //   var result = await _connDB!.query('SELECT '
@@ -359,30 +331,7 @@ class ConnectDbMySQL {
 //   return technic;
 // }
 //
-// List technicListFromMap(var result){
-//   List list = [];
-//   for (var row in result) {
-//     // id-row[0], number-row[1],  name-row[2],  category-row[3], cost-row[4],
-//     // dateBuy-row[5], status-row[6], dislocation-row[7], dateChangeStatus-row[8], comment-row[9], testDriveDislocation-row[10],
-//     // dateStart-row[11], dateFinish-row[12], resultTestDrive-row[13], checkTestDrive-row[14]
-//
-//     String dateChangeStatus = '';
-//     if(row[8] != null && row[8].toString() != "-0001-11-30 00:00:00.000Z") dateChangeStatus = getDateFormatted(row[8].toString());
-//     String dateStartTestDrive = '';
-//     if(row[11] != null && row[11].toString() != "-0001-11-30 00:00:00.000Z") dateStartTestDrive = getDateFormatted(row[11].toString());
-//     String dateFinishTestDrive = '';
-//     if(row[12] != null && row[12].toString() != "-0001-11-30 00:00:00.000Z") dateFinishTestDrive = getDateFormatted(row[12].toString());
-//     bool checkTestDrive = false;
-//     if(row[14] != null && row[14] == 1) checkTestDrive = true;
-//
-//     Technic technic = Technic(row[0], row[1],  row[2],  row[3], row[4],
-//         getDateFormatted(row[5].toString()), row[6] ?? '', row[7] ?? '', dateChangeStatus,
-//         row[9] ?? '', row[10] ?? '', dateStartTestDrive, dateFinishTestDrive, row[13] ?? '', checkTestDrive);
-//     list.add(technic);
-//   }
-//   return list;
-// }
-//
+
 // Future<List> getAllTestDrive() async {
 //   List list = [];
 //   var result = await _connDB!.query('SELECT * FROM testDrive');
@@ -404,34 +353,33 @@ class ConnectDbMySQL {
 //   }
 //   return list;
 // }
-//
-// Future<List> getAllRepair() async{
-//   var result = await _connDB!.query('SELECT '
-//       'repairEquipment.id, '
-//       'repairEquipment.number, '
-//       'repairEquipment.category, '
-//       'repairEquipment.dislocationOld, '
-//       'repairEquipment.status, '
-//       'repairEquipment.complaint, '
-//       'repairEquipment.dateDeparture, '
-//       'repairEquipment.serviceDislocation, '
-//       'repairEquipment.dateTransferInService, '
-//       'repairEquipment.dateDepartureFromService, '
-//       'repairEquipment.worksPerformed, '
-//       'repairEquipment.costService, '
-//       'repairEquipment.diagnosisService, '
-//       'repairEquipment.recommendationsNotes, '
-//       'repairEquipment.newStatus, '
-//       'repairEquipment.newDislocation, '
-//       'repairEquipment.dateReceipt, '
-//       'repairEquipment.idTestDrive '
-//       'FROM repairEquipment');
-//
-//   var list = repairListFromMap(result);
-//   var reversedList = List.from(list.reversed);
-//   return reversedList;
-// }
-//
+
+  Future<List<Repair>> fetchAllRepairs() async {
+    var result = await _connDB!.query('SELECT '
+        'repairEquipment.id, '
+        'repairEquipment.number, '
+        'repairEquipment.category, '
+        'repairEquipment.dislocationOld, '
+        'repairEquipment.status, '
+        'repairEquipment.complaint, '
+        'repairEquipment.dateDeparture, '
+        'repairEquipment.serviceDislocation, '
+        'repairEquipment.dateTransferInService, '
+        'repairEquipment.dateDepartureFromService, '
+        'repairEquipment.worksPerformed, '
+        'repairEquipment.costService, '
+        'repairEquipment.diagnosisService, '
+        'repairEquipment.recommendationsNotes, '
+        'repairEquipment.newStatus, '
+        'repairEquipment.newDislocation, '
+        'repairEquipment.dateReceipt, '
+        'repairEquipment.idTestDrive '
+        'FROM repairEquipment');
+
+    final List<Repair> list = repairListFromMap(result);
+    final List<Repair> reversedList = List.from(list.reversed);
+    return reversedList;
+  }
 
 //
 // Future<Repair?> getRepair(int id) async {
@@ -442,25 +390,122 @@ class ConnectDbMySQL {
 //   }
 //   return repair;
 // }
-//
-// List repairListFromMap(var result){
-//   List list = [];
-//   for (var row in result) {
-//     // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
-//     // dateTransferInService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
-//     // recommendationsNotes-row[13], newStatus-row[14],  newDislocation-row[15], dateReceipt-row[16], idTestDrive-row[17]
-//     String dateDeparture = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
-//     String dateTransferInService = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
-//     String dateDepartureFromService = row[9].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[9].toString());
-//     String dateReceipt = row[16].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[16].toString());
-//
-//     Repair repair = Repair(row[0], row[1],  row[2],  row[3], row[4], row[5], dateDeparture, row[7], dateTransferInService,
-//         dateDepartureFromService, row[10],  row[11],  row[12], row[13], row[14], row[15], dateReceipt, row[17]);
-//     list.add(repair);
-//   }
-//   return list;
-// }
-//
+
+  List<Repair> repairListFromMap(var result) {
+    List<Repair> list = [];
+    for (var row in result) {
+      // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
+      // dateTransferInService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
+      // recommendationsNotes-row[13], newStatus-row[14],  newDislocation-row[15], dateReceipt-row[16], idTestDrive-row[17]
+      String dateDeparture =
+          row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
+      String dateTransferInService =
+          row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
+      String dateDepartureFromService =
+          row[9].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[9].toString());
+      String dateReceipt =
+          row[16].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[16].toString());
+
+      Repair repair = Repair(
+          row[0],
+          row[1],
+          row[2],
+          row[3],
+          row[4],
+          row[5],
+          dateDeparture,
+          row[7],
+          dateTransferInService,
+          dateDepartureFromService,
+          row[10],
+          row[11],
+          row[12],
+          row[13],
+          row[14],
+          row[15],
+          dateReceipt,
+          row[17]);
+      list.add(repair);
+    }
+    return list;
+  }
+
+  Future<Map<int, List<SummRepair>>> getSummsRepairs(String numberTechnic) async {
+    var result = await _connDB!.query(
+        'SELECT '
+        'id, serviceDislocation, costService, complaint, worksPerformed, dateTransferInService, dateReceipt '
+        'FROM repairEquipment WHERE number = ?',
+        [numberTechnic]);
+    List<SummRepair> listSummsRepairs = [];
+    int totalSumm = 0;
+    for (var row in result) {
+      SummRepair summRepair = SummRepair(
+          idRepar: row[0],
+          repairmen: row[1],
+          summRepair: row[2],
+          complaint: row[3],
+          worksPerformed: row[4],
+          dateTransferInService: row[5],
+          dateReceipt: row[6]);
+      listSummsRepairs.add(summRepair);
+      totalSumm += summRepair.summRepair;
+    }
+    List<SummRepair> reversedList = List.from(listSummsRepairs.reversed);
+    Map<int, List<SummRepair>> mapResult = {};
+    mapResult[totalSumm] = reversedList;
+    return mapResult;
+  }
+
+  Future<List<HistoryTechnic>> fetchHistoryTechnic(String idTechnic) async {
+    List<HistoryTechnic> historyTechnics = [];
+    String query1 = 'SELECT id, date, dislocation FROM statusEquipment '
+        'WHERE idEquipment = (SELECT id FROM equipment WHERE number = $idTechnic)';
+    var result1 = await _connDB!.query(query1);
+    for (var row in result1) {
+      HistoryTechnic historyTechnic = HistoryTechnic(id: row[0], date: row[1], location: PhotosalonLocation(row[2]));
+      historyTechnics.add(historyTechnic);
+    }
+    historyTechnics.sort();
+
+    String query3 = 'SELECT id, ДатаНеисправности, Фотосалон, Сотрудник, Неисправность FROM Неисправности '
+        'WHERE НомерТехники = $idTechnic ';
+    var result3 = await _connDB!.query(query3);
+    for (var row in result3) {
+      TroubleTechnicOnPeriod troubleTechnicOnPeriod =
+          TroubleTechnicOnPeriod(id: row[0], date: row[1], location: PhotosalonLocation(row[2]));
+      troubleTechnicOnPeriod.employee = row[3];
+      troubleTechnicOnPeriod.trouble = row[4].toString();
+      for (int i = 1; i < historyTechnics.length; i++) {
+        if (i == 1) {
+          if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i - 1].date)) {
+            historyTechnics[i - 1].listTrouble.add(troubleTechnicOnPeriod);
+          }
+        }
+        if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i].date) &&
+            troubleTechnicOnPeriod.date.isBefore(historyTechnics[i - 1].date)) {
+          historyTechnics[i].listTrouble.add(troubleTechnicOnPeriod);
+          continue;
+        }
+        historyTechnics[i].listTrouble.sort();
+      }
+    }
+
+    String query2 = 'SELECT id, dateTransferInService, serviceDislocation, '
+        'dateDepartureFromService, worksPerformed, '
+        'costService FROM repairEquipment '
+        'WHERE number = $idTechnic';
+    var result2 = await _connDB!.query(query2);
+    for (var row in result2) {
+      HistoryTechnic historyTechnic = HistoryTechnic(id: row[0], date: row[1], location: RepairLocation(row[2]));
+      historyTechnic.dateDepartureFromService = row[3];
+      historyTechnic.worksPerformed = row[4];
+      historyTechnic.costService = row[5];
+      historyTechnics.add(historyTechnic);
+    }
+    historyTechnics.sort();
+    return historyTechnics;
+  }
+
 // Future<List> getAllTrouble() async{
 //   var result = await _connDB!.query('SELECT '
 //       'id, Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, '
@@ -542,19 +587,18 @@ class ConnectDbMySQL {
 //       ]);
 // }
 
-Future<void> updateTechnicInDB(Technic technic) async{
-  await ConnectDbMySQL.connDB.connDatabase();
-  await _connDB!.query(
-      'UPDATE equipment SET category = ?, name = ?, dateBuy = ?, cost = ?, comment = ? WHERE id = ?',
-      [
-        technic.category,
-        technic.name,
-        technic.dateBuyTechnic,
-        technic.cost,
-        technic.comment,
-        technic.id
-      ]);
-}
+  Future<void> updateTechnicInDB(Technic technic) async {
+    await ConnectDbMySQL.connDB.connDatabase();
+    await _connDB!
+        .query('UPDATE equipment SET category = ?, name = ?, dateBuy = ?, cost = ?, comment = ? WHERE id = ?', [
+      technic.category,
+      technic.name,
+      DateFormat('yyyy.MM.dd').format(technic.dateBuyTechnic),
+      technic.cost,
+      technic.comment,
+      technic.id
+    ]);
+  }
 
 // Future insertRepairInDB(Repair repair) async{
 //   await ConnectDbMySQL.connDB.connDatabase();

@@ -1,15 +1,20 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/core/api/provider/providerModel.dart';
+import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/di/init_dependencies.dart';
-import 'package:technical_support_artphoto/core/navigation/main_bottom_app_bar.dart';
+import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
+import 'package:technical_support_artphoto/core/navigation/main_bottom_body_flip_animation.dart';
 import 'package:technical_support_artphoto/features/history/history_list.dart';
 import 'package:technical_support_artphoto/features/home/presentation/page/home_page.dart';
 import 'package:technical_support_artphoto/features/splash_screen/presentation/page/splash_screen.dart';
+
+import 'core/navigation/main_bottom_app_bar.dart';
+import 'features/repairs/presentation/page/repairs_page.dart';
 
 void main() {
   runZonedGuarded<Future<void>>(
@@ -63,56 +68,13 @@ class ArtphotoTech extends StatefulWidget {
   State<ArtphotoTech> createState() => _ArtphotoTechState();
 }
 
-class _ArtphotoTechState extends State<ArtphotoTech>
-    with SingleTickerProviderStateMixin {
+class _ArtphotoTechState extends State<ArtphotoTech>{
   @override
   Widget build(BuildContext context) {
-    final providerModel = Provider.of<ProviderModel>(context);
     return Scaffold(
-      bottomNavigationBar: MainBottomAppBar(),
-      body: <Widget>[
-        /// Home page
-        const HomePage(),
-
-        /// Repair
-        Card(
-          shadowColor: Colors.transparent,
-          margin: const EdgeInsets.all(8.0),
-          child: SizedBox.expand(
-            child: Center(
-              child: Text(
-                'Home page',
-              ),
-            ),
-          ),
-        ),
-
-        /// Troubles
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Column(
-            children: <Widget>[
-              Card(
-                child: ListTile(
-                  leading: Icon(Icons.notifications_sharp),
-                  title: Text('Notification 1'),
-                  subtitle: Text('This is a notification'),
-                ),
-              ),
-              Card(
-                child: ListTile(
-                  leading: Icon(Icons.notifications_sharp),
-                  title: Text('Notification 2'),
-                  subtitle: Text('This is a notification'),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        /// History
-        HistoryList(),
-      ][providerModel.currentPageIndexMainBottomAppBar],
+        extendBody: true,
+        bottomNavigationBar: MainBottomAppBar(),
+        body: MainBottomBodyFlipAnimation()
     );
   }
 

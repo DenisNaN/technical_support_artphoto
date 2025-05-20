@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/core/api/provider/providerModel.dart';
+import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/features/auth/presentation/page/authorization.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -45,9 +45,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 snapshot.data!['services'],
                 snapshot.data!['statusForEquipment'],
                 snapshot.data!['colorsForEquipment']);
+            providerModel.downloadRepairs(snapshot.data!['AllRepairs']);
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.pushReplacement(context, animationRouteSlideTransition(const Authorization()));
+              Navigator.pushReplacement(context, animationRouteFadeTransition(const Authorization()));
             });
           }
           return Scaffold(

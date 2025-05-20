@@ -1,10 +1,15 @@
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_my_sql.dart';
-import 'package:technical_support_artphoto/core/api/data/models/photosalon.dart';
-import 'package:technical_support_artphoto/core/api/data/models/repair.dart';
-import 'package:technical_support_artphoto/core/api/data/models/storage.dart';
+import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/domain/repositories/technical_support_repo.dart';
+import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
+import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
+
+import '../../../../features/repairs/models/repair.dart';
+import '../models/technic.dart';
 
 class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   TechnicalSupportRepoImpl._();
@@ -15,9 +20,11 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   Future<Map<String, dynamic>> getStartData() async {
     Map<String, dynamic> result = {};
 
-    Map<String, Photosalon> photosalons = {};
-    Map<String, Repair> repairs = {};
-    Map<String, Storage> storages = {};
+    Map<String, PhotosalonLocation> technicsInPhotosalons = {};
+    Map<String, RepairLocation> technicsInRepairs = {};
+    Map<String, StorageLocation> technicsInStorages = {};
+
+    List<Repair> repairs = [];
 
     /// CategoryDropDown
     List<String> namePhotosalons;
@@ -28,9 +35,11 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 
     await ConnectDbMySQL.connDB.connDatabase();
 
-    photosalons = await ConnectDbMySQL.connDB.fetchPhotosalons();
-    repairs = await ConnectDbMySQL.connDB.fetchRepairs();
-    storages = await ConnectDbMySQL.connDB.fetchStorages();
+    technicsInPhotosalons = await ConnectDbMySQL.connDB.fetchPhotosalons();
+    technicsInRepairs = await ConnectDbMySQL.connDB.fetchRepairsNow();
+    technicsInStorages = await ConnectDbMySQL.connDB.fetchStorages();
+
+    repairs = await ConnectDbMySQL.connDB.fetchAllRepairs();
 
     namePhotosalons = await ConnectDbMySQL.connDB.fetchNamePhotosalons();
     namePhotosalons.addAll(await ConnectDbMySQL.connDB.fetchNameStorages());
@@ -39,9 +48,11 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     statusForEquipment = await ConnectDbMySQL.connDB.fetchStatusForEquipment();
     colorsForEquipment = await ConnectDbMySQL.connDB.fetchColorsForEquipment();
 
-    result['Photosalons'] = photosalons;
-    result['Repairs'] = repairs;
-    result['Storages'] = storages;
+    result['Photosalons'] = technicsInPhotosalons;
+    result['Repairs'] = technicsInRepairs;
+    result['Storages'] = technicsInStorages;
+
+    result['AllRepairs'] = repairs;
 
     result['namePhotosalons'] = namePhotosalons;
     result['nameEquipment'] = nameEquipment;
@@ -59,9 +70,9 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 
     await ConnectDbMySQL.connDB.connDatabase();
 
-    Map<String, Photosalon> photosalons = await ConnectDbMySQL.connDB.fetchPhotosalons();
-    Map<String, Repair> repairs = await ConnectDbMySQL.connDB.fetchRepairs();
-    Map<String, Storage> storages = await ConnectDbMySQL.connDB.fetchStorages();
+    Map<String, PhotosalonLocation> photosalons = await ConnectDbMySQL.connDB.fetchPhotosalons();
+    Map<String, RepairLocation> repairs = await ConnectDbMySQL.connDB.fetchRepairsNow();
+    Map<String, StorageLocation> storages = await ConnectDbMySQL.connDB.fetchStorages();
 
     result['Photosalons'] = photosalons;
     result['Repairs'] = repairs;
@@ -91,6 +102,37 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     bool result = await ConnectDbMySQL.connDB.checkNumberTechnic(number);
     await ConnectDbMySQL.connDB.dispose();
     return result;
+  }
+
+  @override
+  Future<bool> updateTechnic(Technic technic) async {
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.updateTechnicInDB(technic);
+      await ConnectDbMySQL.connDB.dispose();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Future<Map<int, List<SummRepair>>> getSummsRepairs(String numberTechnic) async{
+    await ConnectDbMySQL.connDB.connDatabase();
+    Map<int, List<SummRepair>> summsRepairs = await ConnectDbMySQL.connDB.getSummsRepairs(numberTechnic);
+    await ConnectDbMySQL.connDB.dispose();
+    return summsRepairs;
+  }
+
+  Future<List<HistoryTechnic>> fetchHistoryTechnic(String? numberTechnic) async{
+    if(numberTechnic != null){
+      await ConnectDbMySQL.connDB.connDatabase();
+      List<HistoryTechnic> historyList =  await ConnectDbMySQL.connDB.fetchHistoryTechnic(numberTechnic);
+      await ConnectDbMySQL.connDB.dispose();
+      return historyList;
+    }else{
+      return [];
+    }
   }
 
 
