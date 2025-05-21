@@ -42,6 +42,7 @@ dependencies:
   animations: ^2.0.11
   flutter_dotenv: ^5.2.1
   custom_refresh_indicator: ^4.0.1
+  shared_preferences: ^2.5.3
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -75,6 +76,7 @@ flutter:
   assets:
     - .env
     - assets/logo/logo.png
+    - assets/avatar/anon_avatar.jpg
     - assets/logo/girl/girl1.png
     - assets/logo/girl/girl2.png
     - assets/icons_gridview_technical/camera.png

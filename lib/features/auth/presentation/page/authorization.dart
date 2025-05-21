@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/api/data/datasources/save_local_services.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/logo_animate/draggable_logo.dart';
 import 'package:technical_support_artphoto/main.dart';
+import '../../../../core/api/data/models/user.dart';
 import '../../../../core/utils/utils.dart';
 import '../../../../core/utils/utils.dart' as utils;
 
@@ -17,11 +19,13 @@ class Authorization extends StatefulWidget {
 }
 
 class _AuthorizationState extends State<Authorization> {
+  SaveLocalServices services = SaveLocalServices();
   final passwordController = TextEditingController();
   final numberFormatter = FilteringTextInputFormatter.allow(
     RegExp(r'[0-9]'),
   );
   bool _hideText = true;
+  bool isSavePassword = false;
 
   @override
   void dispose() {
@@ -34,6 +38,7 @@ class _AuthorizationState extends State<Authorization> {
     final providerModel = Provider.of<ProviderModel>(context);
     MyColor myColor = MyColor();
     String? version = utils.packageInfo?.version;
+    SaveLocalServices localServices = SaveLocalServices();
 
     return Container(
       decoration: const BoxDecoration(
@@ -83,7 +88,7 @@ class _AuthorizationState extends State<Authorization> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+                          padding: EdgeInsets.only(left: 10, right: 10, top: 30, bottom: 10),
                           child: TextField(
                             controller: passwordController,
                             keyboardType: TextInputType.number,
@@ -110,7 +115,23 @@ class _AuthorizationState extends State<Authorization> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(28.0),
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: Row(children: [
+                            Checkbox(
+                                side: BorderSide(color: Colors.blue, width: 1),
+                                splashRadius: 10,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                value: isSavePassword,
+                                onChanged: (bool? value){
+                                  setState(() {
+                                    isSavePassword = value!;
+                                  });
+                                }),
+                            Text('Сохранить пароль'),
+                          ],),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(28),
                           child: SizedBox(
                             width: MediaQuery.of(context).size.width,
                             height: 50,
@@ -120,8 +141,9 @@ class _AuthorizationState extends State<Authorization> {
                                 if (password.isNotEmpty) {
                                   TechnicalSupportRepoImpl.downloadData.getUser(password).then((user){
                                     if (user != null) {
-                                      providerModel.user[user.name] = user.access;
-                                      providerModel.user.remove('user');
+                                      String? imagePath = localServices.getUser()?.imagePath;
+                                      User userModel = User(user.name, user.access, isSavePassword, imagePath);
+                                      providerModel.updateUser(userModel);
                                       _navigationForNextPage();
                                     } else {
                                       passwordController.clear();

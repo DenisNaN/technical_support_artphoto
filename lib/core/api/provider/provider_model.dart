@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:technical_support_artphoto/core/api/data/datasources/save_local_services.dart';
 import 'package:technical_support_artphoto/core/api/data/models/location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
 import '../../../features/repairs/models/repair.dart';
+import '../data/models/user.dart';
 
 class ProviderModel with ChangeNotifier {
   late final Map<String, PhotosalonLocation> _technicsInPhotosalons;
@@ -19,13 +21,12 @@ class ProviderModel with ChangeNotifier {
   late final List<String> _statusForEquipment;
   late final Map<String, int> _colorsForEquipment;
 
-  final Map<String, String> user = {'user': 'not access'};
+  late User _user = User('user', 'access');
+
   int currentPageIndexMainBottomAppBar = 0;
   final Color colorPhotosalons = Colors.blue.shade200;
   final Color colorStorages = Colors.white70;
   final Color colorRepairs = Colors.yellow.shade200;
-
-  bool _isLeftSwipe = false;
 
   Map<String, PhotosalonLocation> get technicsInPhotosalons => _technicsInPhotosalons;
 
@@ -45,13 +46,17 @@ class ProviderModel with ChangeNotifier {
 
   List<String> get namesEquipments => _namesEquipments;
 
-  bool get leftSwipeValue => _isLeftSwipe;
+  User get user => _user;
 
   void downloadAllElements(Map<String, PhotosalonLocation> photosalons,
       Map<String, RepairLocation> repairs, Map<String, StorageLocation> storages) {
     _technicsInPhotosalons = photosalons;
     _technicsInRepairs = repairs;
     _technicsInStorages = storages;
+  }
+
+  void initUser(User initUser){
+    _user = initUser;
   }
 
   void downloadRepairs(List<Repair> repairs){
@@ -139,6 +144,11 @@ class ProviderModel with ChangeNotifier {
     });
   }
 
+  void updateUser(User newUser){
+    _user = newUser;
+    notifyListeners();
+  }
+
   void addTechnicInRepair(String name, Technic technic) {
     _technicsInRepairs[name]!.technics.add(technic);
     notifyListeners();
@@ -173,12 +183,6 @@ class ProviderModel with ChangeNotifier {
     currentPageIndexMainBottomAppBar = index;
     notifyListeners();
   }
-
-  void changeLeftSwipeValue(bool value) {
-    _isLeftSwipe = value;
-    notifyListeners();
-  }
-
 
   void refreshAllElement(
       Map<String, PhotosalonLocation> photosalons,

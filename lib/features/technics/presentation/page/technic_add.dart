@@ -631,7 +631,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   // }
 
   Future _save(Technic technic, ProviderModel providerModel) async {
-    String nameUser = providerModel.user.keys.first;
+    String nameUser = providerModel.user.name;
     await ConnectDbMySQL.connDB.connDatabase();
     int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
     await ConnectDbMySQL.connDB.dispose();
