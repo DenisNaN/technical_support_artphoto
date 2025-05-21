@@ -4,7 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/features/auth/presentation/page/authorization.dart';
+import '../../../../core/api/data/datasources/save_local_services.dart';
+import '../../../../core/api/data/models/user.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
+import '../../../../main.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -29,6 +32,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
+    SaveLocalServices localServices = SaveLocalServices();
 
     return FutureBuilder(
         future: TechnicalSupportRepoImpl.downloadData.getStartData(),
@@ -48,7 +52,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             providerModel.downloadRepairs(snapshot.data!['AllRepairs']);
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.pushReplacement(context, animationRouteFadeTransition(const Authorization()));
+              User? user = localServices.getUser();
+              if(user != null){
+                providerModel.initUser(user);
+              }
+              if (user != null && (user.isAutocomplete ?? false)) {
+                Navigator.pushReplacement(context, animationRouteSlideTransition(const ArtphotoTech()));
+              } else {
+                Navigator.pushReplacement(context, animationRouteFadeTransition(const Authorization()));
+              }
             });
           }
           return Scaffold(
