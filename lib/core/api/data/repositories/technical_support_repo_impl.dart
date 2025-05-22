@@ -1,5 +1,6 @@
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_my_sql.dart';
+import 'package:technical_support_artphoto/core/api/data/models/decommissioned.dart';
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
@@ -35,9 +36,9 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 
     await ConnectDbMySQL.connDB.connDatabase();
 
-    technicsInPhotosalons = await ConnectDbMySQL.connDB.fetchPhotosalons();
-    technicsInRepairs = await ConnectDbMySQL.connDB.fetchRepairsNow();
-    technicsInStorages = await ConnectDbMySQL.connDB.fetchStorages();
+    technicsInPhotosalons = await ConnectDbMySQL.connDB.fetchTechnicsInPhotosalons();
+    technicsInRepairs = await ConnectDbMySQL.connDB.fetchTechnicsInRepairs();
+    technicsInStorages = await ConnectDbMySQL.connDB.fetchTechnicsInStorages();
 
     repairs = await ConnectDbMySQL.connDB.fetchAllRepairs();
 
@@ -70,9 +71,9 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 
     await ConnectDbMySQL.connDB.connDatabase();
 
-    Map<String, PhotosalonLocation> photosalons = await ConnectDbMySQL.connDB.fetchPhotosalons();
-    Map<String, RepairLocation> repairs = await ConnectDbMySQL.connDB.fetchRepairsNow();
-    Map<String, StorageLocation> storages = await ConnectDbMySQL.connDB.fetchStorages();
+    Map<String, PhotosalonLocation> photosalons = await ConnectDbMySQL.connDB.fetchTechnicsInPhotosalons();
+    Map<String, RepairLocation> repairs = await ConnectDbMySQL.connDB.fetchTechnicsInRepairs();
+    Map<String, StorageLocation> storages = await ConnectDbMySQL.connDB.fetchTechnicsInStorages();
 
     result['Photosalons'] = photosalons;
     result['Repairs'] = repairs;
@@ -117,6 +118,17 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
+  Future<bool> updateStatusAndDislocationTechnic(Technic technic, String userName) async {
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.insertStatusInDB(technic.id, technic.status, technic.dislocation, userName);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
   Future<Map<int, List<SummRepair>>> getSummsRepairs(String numberTechnic) async{
     await ConnectDbMySQL.connDB.connDatabase();
     Map<int, List<SummRepair>> summsRepairs = await ConnectDbMySQL.connDB.getSummsRepairs(numberTechnic);
@@ -133,6 +145,15 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     }else{
       return [];
     }
+  }
+
+  @override
+  Future<DecommissionedLocation> getTechnicsDecommissioned() async{
+    DecommissionedLocation decommissioned;
+    await ConnectDbMySQL.connDB.connDatabase();
+    decommissioned =  await ConnectDbMySQL.connDB.fetchTechnicsDecommissioned();
+    await ConnectDbMySQL.connDB.dispose();
+    return decommissioned;
   }
 
 
