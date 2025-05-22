@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_my_sql.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
@@ -10,10 +9,10 @@ import 'package:technical_support_artphoto/core/navigation/animation_navigation.
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/core/shared/input_decoration/input_deroration.dart';
-import 'package:technical_support_artphoto/features/history/history.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/repairs_technic_page.dart';
 import '../../../../core/shared/technic_image/technic_image.dart';
+import '../../../../main.dart';
 
 class TechnicView extends StatefulWidget {
   const TechnicView({super.key, required this.location, required this.technic});
@@ -105,24 +104,25 @@ class _TechnicViewState extends State<TechnicView> {
                       child: Text("Отмена"),
                     ),
                     ElevatedButton(
-                        onPressed: () async {
-                          TechnicalSupportRepoImpl.downloadData.fetchHistoryTechnic('230');
+                        onPressed: () {
                           if (_formInnerNumberKey.currentState!.validate()) {
-                            // Technic technic = Technic(
-                            //     0,
-                            //     !isBN ? int.parse(_innerNumberTechnic.text) : 0,
-                            //     _nameTechnic.text,
-                            //     _selectedDropdownCategory!,
-                            //     int.parse(_costTechnic.text.replaceAll(",", "")),
-                            //     _dateBuyTechnic,
-                            //     _selectedDropdownStatus!,
-                            //     _selectedDropdownDislocation!,
-                            //     DateFormat('yyyy.MM.dd').format(DateTime.now()),
-                            //     _comment.text);
-                            //
-                            // String result = await _save(technic, providerModel);
-                            // _viewSnackBar(' $result');
-                            Navigator.pop(context);
+                            Technic technic = Technic(
+                                widget.technic.id,
+                                widget.technic.number,
+                                widget.technic.category,
+                                widget.technic.name,
+                                _selectedDropdownStatus ?? widget.technic.status,
+                                _selectedDropdownDislocation ?? widget.technic.dislocation,
+                                widget.technic.dateBuyTechnic,
+                                widget.technic.cost,
+                                widget.technic.comment);
+
+                            _save(technic, providerModel).then((value){
+                              _viewSnackBar(value ? Icons.save : Icons.dangerous_outlined, value,
+                                  value ? 'Изменения приняты' : 'Изменения не сохранились');
+                            });
+                            Navigator.pushReplacement(
+                                context, animationRouteSlideTransition(const ArtphotoTech()));
                           }
                         },
                         child: const Text("Сохранить")),
@@ -376,9 +376,7 @@ class _TechnicViewState extends State<TechnicView> {
                 );
               }).toList(),
               onChanged: (String? value) {
-                setState(() {
                   _selectedDropdownStatus = value!;
-                });
               },
             ),
           ),
@@ -416,9 +414,7 @@ class _TechnicViewState extends State<TechnicView> {
                 );
               }).toList(),
               onChanged: (String? value) {
-                setState(() {
                   _selectedDropdownDislocation = value!;
-                });
               },
             ),
           ),
@@ -690,37 +686,33 @@ class _TechnicViewState extends State<TechnicView> {
   //   );
   // }
 
-  // Future _save(Technic technicModel, ProviderModel providerModel) async {
-  //   String nameUser = providerModel.user.keys.first;
-  //   int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technicModel, nameUser);
-  //   technicModel.id = id;
-  //   await addHistory(technicModel, nameUser);
+  Future<bool> _save(Technic technicModel, ProviderModel providerModel) async{
+    bool isSuccess = false;
+    isSuccess = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technicModel, providerModel.user.name);
+    Map<String, dynamic> result = await TechnicalSupportRepoImpl.downloadData.refreshData();
+    providerModel.refreshAllElement(result['Photosalons'], result['Repairs'], result['Storages']);
+    return isSuccess;
+  }
+
+  // Future addHistory(Technic technic, String nameUser) async {
+  //   String descForHistory = descriptionForHistory(technic);
+  //   History history = History(History.historyList.last.id + 1, 'Technic', technic.id, 'create', descForHistory,
+  //       nameUser, DateFormat('yyyy.MM.dd').format(DateTime.now()));
   //
-  //   Technic technic = Technic(
-  //       technicModel.id, technicModel.number, technicModel.category,
-  //       technicModel.name, technicModel.status, technicModel.dislocation);
-  //   addTechnicInProviderModel(technic, providerModel);
+  //   ConnectDbMySQL.connDB.insertHistory(history);
+  //   History.historyList.insert(0, history);
+  // }
+  //
+  // String descriptionForHistory(Technic technic) {
+  //   String internalID = technic.number == -1 ? 'БН' : '№${technic.number}';
+  //   String result = 'Новая техника $internalID добавленна';
+  //
+  //   return result;
   // }
 
-  Future addHistory(Technic technic, String nameUser) async {
-    String descForHistory = descriptionForHistory(technic);
-    History history = History(History.historyList.last.id + 1, 'Technic', technic.id, 'create', descForHistory,
-        nameUser, DateFormat('yyyy.MM.dd').format(DateTime.now()));
-
-    ConnectDbMySQL.connDB.insertHistory(history);
-    History.historyList.insert(0, history);
-  }
-
-  String descriptionForHistory(Technic technic) {
-    String internalID = technic.number == -1 ? 'БН' : '№${technic.number}';
-    String result = 'Новая техника $internalID добавленна';
-
-    return result;
-  }
-
-  String getDateFormat(String date) {
-    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
-  }
+  // String getDateFormat(String date) {
+  //   return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
+  // }
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String text) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -783,23 +775,6 @@ class _TechnicViewState extends State<TechnicView> {
 //   }
 //   return result;
 // }
-
-//   String getFieldAddition(int num) {
-//     double preLastDigit = num % 100 / 10;
-//     if (preLastDigit.round() == 1) {
-//       return "Не заполнено $num полей: ";
-//     }
-//     switch (num % 10) {
-//       case 1:
-//         return "Не заполнено $num поле: ";
-//       case 2:
-//       case 3:
-//       case 4:
-//         return "Не заполнены $num поля: ";
-//       default:
-//         return "Не заполнено $num полей: ";
-//     }
-//   }
 }
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/datasources/save_local_services.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
+import 'package:technical_support_artphoto/features/home/presentation/widgets/grid_view_basket_decommissioned.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/grid_view_home_page.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/my_custom_refresh_indicator.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_add.dart';
@@ -95,6 +96,7 @@ class _HomePageState extends State<HomePage> {
                 GridViewHomePage(locations: providerModel.technicsInPhotosalons, color: providerModel.colorPhotosalons),
                 GridViewHomePage(locations: providerModel.technicsInStorages, color: providerModel.colorStorages),
                 GridViewHomePage(locations: providerModel.technicsInRepairs, color: providerModel.colorRepairs),
+                GridViewBasketDecommissioned(),
               ],
             )),
       ),

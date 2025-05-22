@@ -9,6 +9,7 @@ import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
+import '../models/decommissioned.dart';
 import '../models/technic.dart';
 import 'package:intl/intl.dart';
 
@@ -40,7 +41,7 @@ class ConnectDbMySQL {
     return await _connDB!.query('SELECT login, access FROM loginPassword WHERE password = $password');
   }
 
-  Future<Map<String, PhotosalonLocation>> fetchPhotosalons() async {
+  Future<Map<String, PhotosalonLocation>> fetchTechnicsInPhotosalons() async {
     Map<String, PhotosalonLocation> photosalons = {};
     List<String> namesPhotosalons = await fetchNamePhotosalons();
 
@@ -58,7 +59,7 @@ class ConnectDbMySQL {
           'equipment.comment '
           'FROM equipment '
           'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
-          'WHERE s.dislocation = "$namePhotosalon" '
+          'WHERE s.dislocation = "$namePhotosalon" AND s.status <> "Списана" '
           'ORDER BY equipment.number ASC';
       var result = await _connDB!.query(query);
       for (var row in result) {
@@ -70,7 +71,7 @@ class ConnectDbMySQL {
     return photosalons;
   }
 
-  Future<Map<String, RepairLocation>> fetchRepairsNow() async {
+  Future<Map<String, RepairLocation>> fetchTechnicsInRepairs() async {
     Map<String, RepairLocation> repairs = {};
     List<String> namesRepairs = await fetchNameRepairs();
 
@@ -99,7 +100,7 @@ class ConnectDbMySQL {
     return repairs;
   }
 
-  Future<Map<String, StorageLocation>> fetchStorages() async {
+  Future<Map<String, StorageLocation>> fetchTechnicsInStorages() async {
     Map<String, StorageLocation> storages = {};
     List<String> namesStorages = await fetchNameStorages();
 
@@ -116,7 +117,7 @@ class ConnectDbMySQL {
           'equipment.comment '
           'FROM equipment '
           'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
-          'WHERE s.dislocation = "$nameStorage" '
+          'WHERE s.dislocation = "$nameStorage" AND s.status <> "Списана" '
           'ORDER BY equipment.number ASC';
       var result = await _connDB!.query(query);
       for (var row in result) {
@@ -126,6 +127,29 @@ class ConnectDbMySQL {
       storages[nameStorage] = storage;
     }
     return storages;
+  }
+
+  Future<DecommissionedLocation> fetchTechnicsDecommissioned () async {
+    DecommissionedLocation decommissionedTechnics = DecommissionedLocation('Списанная техника');
+    String query = 'SELECT equipment.id, '
+        'equipment.number, '
+        'equipment.category, '
+        'equipment.name, '
+        's.status, '
+        's.dislocation, '
+        'equipment.dateBuy, '
+        'equipment.cost, '
+        'equipment.comment '
+        'FROM equipment '
+        'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
+        'WHERE s.status = "Списана" '
+        'ORDER BY equipment.number ASC';
+    var result = await _connDB!.query(query);
+    for (var row in result) {
+      Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
+      decommissionedTechnics.technics.add(technic);
+    }
+    return decommissionedTechnics;
   }
 
   Future<List<String>> fetchNamePhotosalons() async {
@@ -187,7 +211,6 @@ class ConnectDbMySQL {
   }
 
   Future insertStatusInDB(int id, String status, String dislocation, String nameUser) async {
-    await ConnectDbMySQL.connDB.connDatabase();
     await _connDB!.query(
         'INSERT INTO statusEquipment (idEquipment, status, dislocation, date, user) VALUES (?, ?, ?, ?, ?)',
         [id, status, dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now()), nameUser]);
@@ -588,10 +611,8 @@ class ConnectDbMySQL {
 // }
 
   Future<void> updateTechnicInDB(Technic technic) async {
-    await ConnectDbMySQL.connDB.connDatabase();
     await _connDB!
-        .query('UPDATE equipment SET category = ?, name = ?, dateBuy = ?, cost = ?, comment = ? WHERE id = ?', [
-      technic.category,
+        .query('UPDATE equipment SET name = ?, dateBuy = ?, cost = ?, comment = ? WHERE id = ?', [
       technic.name,
       DateFormat('yyyy.MM.dd').format(technic.dateBuyTechnic),
       technic.cost,
@@ -710,87 +731,5 @@ class ConnectDbMySQL {
 //         trouble.engineerCheckFixTrouble,
 //         trouble.id
 //       ]);
-// }
-
-// Future<List> getLastIdList() async{
-//   var resultTechnics = await _connDB!.query(
-//       'SELECT id FROM equipment ORDER BY id DESC LIMIT 1');
-//   var resultRepair = await _connDB!.query(
-//       'SELECT id FROM repairEquipment ORDER BY id DESC LIMIT 1');
-//   var resultTrouble = await _connDB!.query(
-//       'SELECT id FROM Неисправности ORDER BY id DESC LIMIT 1');
-//   var resultHistory = await _connDB!.query(
-//       'SELECT id FROM history ORDER BY id DESC LIMIT 1');
-//   var resultService = await _connDB!.query(
-//       'SELECT id FROM service ORDER BY id DESC LIMIT 1');
-//   var resultStatusForEquipment = await _connDB!.query(
-//       'SELECT id FROM statusForEquipment ORDER BY id DESC LIMIT 1');
-//   var resultNameEquipment = await _connDB!.query(
-//       'SELECT id FROM nameEquipment ORDER BY id DESC LIMIT 1');
-//   var resultPhotosalons = await _connDB!.query(
-//       'SELECT id FROM Фотосалоны ORDER BY id DESC LIMIT 1');
-//   var resultColorsForPhotosalons = await _connDB!.query(
-//       'SELECT id FROM colorsForPhotosalons ORDER BY id DESC LIMIT 1');
-//
-//   List list = [];
-//   list.add(resultTechnics.last);
-//   list.add(resultRepair.last);
-//   list.add(resultTrouble.last);
-//   list.add(resultHistory.last);
-//   list.add(resultService.last);
-//   list.add(resultStatusForEquipment.last);
-//   list.add(resultNameEquipment.last);
-//   list.add(resultPhotosalons.last);
-//   list.add(resultColorsForPhotosalons.last);
-//
-//   return list;
-// }
-//
-// Future<List> getCountList() async{
-//   var resultTechnics = await _connDB!.query(
-//       'SELECT COUNT(*) AS countEquipment FROM equipment');
-//   var resultRepair = await _connDB!.query(
-//       'SELECT COUNT(*) AS countRepair FROM repairEquipment');
-//   var resultTrouble = await _connDB!.query(
-//       'SELECT COUNT(*) AS countTrouble FROM Неисправности');
-//   var resultHistory = await _connDB!.query(
-//       'SELECT COUNT(*) AS countTrouble FROM history');
-//   var resultNameEquipment = await _connDB!.query(
-//       'SELECT COUNT(*) AS countName FROM nameEquipment');
-//   var resultPhotosalons = await _connDB!.query(
-//       'SELECT COUNT(*) AS countPhotosalons FROM Фотосалоны');
-//   var resultService = await _connDB!.query(
-//       'SELECT COUNT(*) AS countService FROM service');
-//   var resultStatusForEquipment = await _connDB!.query(
-//       'SELECT COUNT(*) AS countStatus FROM statusForEquipment');
-//   var resultColorsForPhotosalons = await _connDB!.query(
-//       'SELECT COUNT(*) AS countColorsForPhotosalons FROM colorsForPhotosalons');
-//
-//   List list = [];
-//   list.add(resultTechnics.last);
-//   list.add(resultRepair.last);
-//   list.add(resultTrouble.last);
-//   list.add(resultHistory.last);
-//   list.add(resultNameEquipment.last);
-//   list.add(resultPhotosalons.last);
-//   list.add(resultService.last);
-//   list.add(resultStatusForEquipment.last);
-//   list.add(resultColorsForPhotosalons.last);
-//
-//   return list;
-// }
-//
-// Future<List<String>> getPhotosalons() async{
-//   var result = await _connDB!.query('SELECT '
-//       'Фотосалоны.id, '
-//       'Фотосалоны.Фотосалон '
-//       'FROM Фотосалоны');
-//
-//   List<String> list = [];
-//
-//   for (var row in result) {
-//     list.add(row[1].toString());
-//   }
-//   return list;
 // }
 }
