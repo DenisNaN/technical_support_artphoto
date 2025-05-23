@@ -68,7 +68,7 @@ class HistoryTechnicPage extends StatelessWidget {
     }
     if (currentHistoryTechnic.location is PhotosalonLocation) {
       if (historyList.length > 1) {
-        finishDate = _findDateFinishPhotosalon(historyList, index + 1);
+        finishDate = _findDateFinishPhotosalon(historyList, index);
       }
       return _buildListTilePhotosalon(currentHistoryTechnic, isStartIndex, finishDate);
     } else if (currentHistoryTechnic.location is RepairLocation) {
@@ -104,7 +104,7 @@ class HistoryTechnicPage extends StatelessWidget {
                   ? Text('${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)} - по настоящее время',
                       style: TextStyle(fontSize: 18))
                   : Text(
-                      '${DateFormat('dd MMMM yyyy', 'ru').format(finishDate)} - ${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)}',
+                      '${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)} - ${DateFormat('dd MMMM yyyy', 'ru').format(finishDate)}',
                       style: TextStyle(fontSize: 18))
             ],
           ),
@@ -234,7 +234,7 @@ class HistoryTechnicPage extends StatelessWidget {
 
   DateTime? _findDateFinishPhotosalon(List<HistoryTechnic> historyList, int index) {
     for (int i = index; i >= 0; i--) {
-      if (historyList[i].location is PhotosalonLocation) return historyList[i].date;
+      if (historyList[i].location is PhotosalonLocation) return historyList[i - 1].date;
     }
     return null;
   }

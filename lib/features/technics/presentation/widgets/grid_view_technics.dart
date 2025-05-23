@@ -12,7 +12,10 @@ class GridViewTechnics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Technic> technics = location.technics;
+    final List<List<Technic>> filterTechnics = filteredTechnics(location.technics);
+    final List<Technic> technicsNotDonors = filterTechnics[0];
+    final List<Technic> technicsDonors = filterTechnics[1];
+    bool isTechnicsDonorsZero = technicsDonors.isNotEmpty;
 
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.listTechnics, location: location, technic: null),
@@ -21,16 +24,101 @@ class GridViewTechnics extends StatelessWidget {
           primary: false,
           slivers: [
             SliverPadding(
-              padding: const EdgeInsets.all(14.0),
+              padding: EdgeInsets.all(14),
               sliver: SliverGrid.builder(
-                  itemCount: technics.length,
+                  itemCount: technicsNotDonors.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                   ),
                   itemBuilder: (_, int index) {
-                    Technic technic = technics[index];
+                    Technic technic = technicsNotDonors[index];
+                    bool technicBroken = technic.status == 'Неисправна';
+                    return GridTile(
+                      header: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 2),
+                              child: Text(
+                                technic.category,
+                                style: Theme.of(context).textTheme.titleSmall,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black54, width: 1),
+                                  borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Text(technic.number.toString()),
+                              )),
+                        ],
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(context,
+                              animationRouteSlideTransition(TechnicView(location: location, technic: technic)));
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: technicBroken ? Colors.red.shade50 : Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.shade500,
+                                spreadRadius: 1,
+                                blurRadius: 3,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Expanded(child: TechnicImage(category: technic.category)),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4, right: 2),
+                                child: Text(
+                                  technic.name == '' ? 'Модель не указана' : technic.name,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+            ),
+            SliverAppBar(
+              backgroundColor: Colors.grey.shade50,
+              automaticallyImplyLeading: false,
+                title: isTechnicsDonorsZero ? Column(
+                  children: [
+                    Container(width: double.infinity, height: 2, decoration: BoxDecoration(color: Colors.black),),
+                    SizedBox(height: 5,),
+                    const Text('Доноры:', style: TextStyle(color: Colors.blueAccent),),
+                  ],
+                ) : SizedBox(),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 14.0, left: 14, right: 14),
+              sliver: SliverGrid.builder(
+                  itemCount: technicsDonors.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemBuilder: (_, int index) {
+                    Technic technic = technicsDonors[index];
 
                     return GridTile(
                       header: Row(
@@ -57,9 +145,9 @@ class GridViewTechnics extends StatelessWidget {
                         ],
                       ),
                       child: InkWell(
-                        onTap: (){
-                          Navigator.push(
-                              context, animationRouteSlideTransition(TechnicView(location: location, technic: technic)));
+                        onTap: () {
+                          Navigator.push(context,
+                              animationRouteSlideTransition(TechnicView(location: location, technic: technic)));
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -79,8 +167,7 @@ class GridViewTechnics extends StatelessWidget {
                               SizedBox(
                                 height: 20,
                               ),
-                              Expanded(
-                                  child: TechnicImage(category: technic.category)),
+                              Expanded(child: TechnicImage(category: technic.category)),
                               Padding(
                                 padding: const EdgeInsets.only(left: 4, right: 2),
                                 child: Text(
@@ -97,5 +184,22 @@ class GridViewTechnics extends StatelessWidget {
             ),
           ],
         ));
+  }
+
+  List<List<Technic>> filteredTechnics(List<Technic> list) {
+    List<List<Technic>> lists = [];
+    List<Technic> listNotDonors = [];
+    List<Technic> listDonors = [];
+
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].status != 'Донор') {
+        listNotDonors.add(list[i]);
+      } else {
+        listDonors.add(list[i]);
+      }
+    }
+    lists.add(listNotDonors);
+    lists.add(listDonors);
+    return lists;
   }
 }
