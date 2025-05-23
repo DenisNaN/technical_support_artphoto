@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/widgets/grid_view_technics.dart';
 
@@ -40,6 +41,10 @@ class GridViewHomePage extends StatelessWidget {
               child: OpenContainer(
                 transitionDuration: Duration(milliseconds: 600),
                 openBuilder: (context, openContainer) {
+                  bool isPhotosalon = false;
+                  if(locations[nameLocation] is PhotosalonLocation){
+                    isPhotosalon = true;
+                  }
                   return GridViewTechnics(location: locations[nameLocation]);
                 },
                 closedBuilder: (context, openContainer) {
