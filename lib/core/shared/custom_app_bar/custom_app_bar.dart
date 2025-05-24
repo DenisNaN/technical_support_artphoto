@@ -50,18 +50,23 @@ class _CustomAppBarState extends State<CustomAppBar> {
       centerTitle: true,
       title: switch(widget.typePage){
         TypePage.listTechnics => _listTechnics(),
-        TypePage.add => _addTechnic(),
+        TypePage.addTechnic => _addTechnic(),
         TypePage.view => _viewTechnic(),
         TypePage.repair => _repair(widget.location.toString()),
         TypePage.technicRepair => _repairTechnic(),
         TypePage.history => _historyTechnic(),
         TypePage.error => _error(widget.location.toString()),
+        TypePage.addRepair => _addRepair(),
       }
     );
   }
 
   Widget _addTechnic(){
     return const Text('Добавить новую технику', style: TextStyle(color: Colors.black));
+  }
+
+  Widget _addRepair(){
+    return const Text('Новая заявка на ремонт', style: TextStyle(color: Colors.black));
   }
 
   Widget _listTechnics(){

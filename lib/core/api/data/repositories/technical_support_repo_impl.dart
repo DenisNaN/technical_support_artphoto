@@ -106,6 +106,14 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
+  Future<Technic?> getTechnic(String number) async{
+    await ConnectDbMySQL.connDB.connDatabase();
+    Technic? technic = await ConnectDbMySQL.connDB.getTechnic(int.parse(number));
+    await ConnectDbMySQL.connDB.dispose();
+    return technic;
+  }
+
+  @override
   Future<bool> updateTechnic(Technic technic) async {
     try {
       await ConnectDbMySQL.connDB.connDatabase();
@@ -155,7 +163,6 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     await ConnectDbMySQL.connDB.dispose();
     return decommissioned;
   }
-
 
 //   List getNotifications() {
 //     List notifications = [];

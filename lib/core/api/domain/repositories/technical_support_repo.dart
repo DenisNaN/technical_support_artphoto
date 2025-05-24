@@ -9,6 +9,7 @@ abstract interface class TechnicalSupportRepo {
   Future<Map<String, dynamic>> refreshData();
   Future<User?> getUser(String password);
   Future<bool> checkNumberTechnic(String number);
+  Future<Technic?> getTechnic(String number);
   Future<bool> updateTechnic(Technic technic);
   Future<bool> updateStatusAndDislocationTechnic(Technic technic, String userName);
   Future<Map<int, List<SummRepair>>> getSummsRepairs(String numberTechnic);

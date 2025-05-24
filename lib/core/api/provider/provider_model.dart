@@ -35,7 +35,7 @@ class ProviderModel with ChangeNotifier {
 
   List<Repair> get getAllRepairs => _repairs;
 
-  List<String> get namesPhotosalons => _namesDislocations;
+  List<String> get namesDislocation => _namesDislocations;
 
   List<String> get services => _services;
 

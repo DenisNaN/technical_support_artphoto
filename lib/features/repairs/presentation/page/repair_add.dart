@@ -1,0 +1,837 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+
+import '../../../../core/api/data/models/technic.dart';
+import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
+import '../../../../core/api/provider/provider_model.dart';
+import '../../../../core/shared/input_decoration/input_deroration.dart';
+import '../../../../core/utils/enums.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../models/repair.dart';
+
+class RepairAdd extends StatefulWidget {
+  const RepairAdd({super.key}) ;
+
+  @override
+  State<RepairAdd> createState() => _RepairAddState();
+}
+
+class _RepairAddState extends State<RepairAdd> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final _innerNumberTechnic = TextEditingController();
+  final String _innerNumberTechnicBN = "БН";
+  String _category = "";
+  final _nameTechnicController = TextEditingController();
+  final _lastDislocationController = TextEditingController();
+  final _complaint = TextEditingController();
+  DateTime? _dateDeparture;
+  String _dateTransferInService = "";
+  String _dateDepartureFromService = "";
+  final _worksPerformed = TextEditingController();
+  final _costService = TextEditingController();
+  final _diagnosisService = TextEditingController();
+  final _recommendationsNotes = TextEditingController();
+  String _dateReceipt = "";
+  String? _selectedDropdownDislocationOld;
+  String? _selectedDropdownStatusOld = 'Неисправна';
+  String? _selectedDropdownService;
+  String? _selectedDropdownStatusNew;
+  String? _selectedDropdownDislocationNew;
+  bool isBN = false;
+  bool isExistNumber = false;
+
+  Technic? technicFind;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _dateDeparture = DateTime.now();
+  }
+
+  @override
+  void dispose() {
+    _innerNumberTechnic.dispose();
+    _complaint.dispose();
+    _worksPerformed.dispose();
+    _costService.dispose();
+    _diagnosisService.dispose();
+    _recommendationsNotes.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final providerModel = Provider.of<ProviderModel>(context);
+    return Scaffold(
+      appBar: CustomAppBar(typePage: TypePage.addRepair, location: null, technic: null),
+        bottomNavigationBar: Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+              child:Row(
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Отмена")),
+                  const Spacer(),
+                  TextButton(
+                      onPressed: () {
+                        if(!_isValidateToSave()){
+                          viewSnackBar('Остались не заполненые поля');
+                        }else{
+                          _save();
+                        }
+                      },
+                      child: const Text("Сохранить"))
+                ],
+              ),
+            )
+        ),
+        body: Form(
+          key: _formKey,
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children:[
+                _buildInternalID(),
+                SizedBox(height: 20),
+                _buildNameTechnic(),
+                SizedBox(height: 20),
+                _buildLastDislocation(providerModel),
+                SizedBox(height: 20),
+                _buildStatus(providerModel),
+                SizedBox(height: 20),
+                _buildComplaint(),
+                SizedBox(height: 20),
+                _buildDateDeparture(),
+                // _buildCategoryListTile(),
+                // _buildDislocationOldListTile(),
+                // _buildStatusListTile(),
+                // _buildComplaintListTile(),
+                // _buildDateDepartureListTile(),
+                // _buildServiceDislocationListTile(),
+                // _buildDateTransferInServiceListTile(),
+                // _buildDateDepartureFromServiceListTile(),
+                // _buildWorksPerformedListTile(),
+                // _buildCostServiceListTile(),
+                // _buildDiagnosisServiceListTile(),
+                // _buildRecommendationsNotesListTile(),
+                // _buildNewStatusListTile(),
+                // _buildNewDislocationListTile(),
+                // _buildDateReceiptListTile(),
+              ],
+          ),
+        )
+    );
+  }
+
+  Column _buildInternalID() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20.0),
+          child: Row(
+            children: [
+              Text(isBN ? 'Включить номер' : 'Выключить номер'),
+              Transform.scale(
+                scale: 1.2,
+                child: Switch(
+                    value: isBN,
+                    onChanged: (value) {
+                      setState(() {
+                        isBN = value;
+                        if (value == true) {
+                          _innerNumberTechnic.text = '';
+                          _nameTechnicController.text = '';
+                          _selectedDropdownDislocationOld = null;
+                          _lastDislocationController.text = '';
+                        }
+                      });
+                    }),
+              ),
+            ],
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: ListTile(
+                title: TextFormField(
+                  enabled: !isBN,
+                  decoration: myDecorationTextFormField(!isBN ? 'Номер техники' : 'Без номера'),
+                  controller: _innerNumberTechnic,
+                  validator: (value) {
+                    if (value!.isEmpty && !isBN) {
+                      return 'Обязательное поле';
+                    }
+                    if (isExistNumber) {
+                      return 'Номер занят';
+                    }
+                    return null;
+                  },
+                  inputFormatters: [numberFormatter],
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+            ),
+            _buildButtonGetTechnic(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Padding _buildButtonGetTechnic() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 30),
+      child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: !isBN ? Colors.blue : Colors.grey,
+          ),
+          onPressed: () async {
+            if (_innerNumberTechnic.text != '' && !isBN) {
+              TechnicalSupportRepoImpl.downloadData.getTechnic(_innerNumberTechnic.text).then((result) {
+                if(result != null) {
+                  setState(() {
+                    _nameTechnicController.text = result.name;
+                    _lastDislocationController.text = result.dislocation;
+                  });
+                } else {
+                  _viewSnackBarGetTechnic('Техники с таким номером нет.');
+                }
+              });
+            }
+          },
+          child: Text('Найти технику')),
+    );
+  }
+
+  void _viewSnackBarGetTechnic(String text) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Icon(Icons.bolt, size: 40, color: Colors.red),
+            Flexible(child: Text(text)),
+          ],
+        ),
+        duration: const Duration(seconds: 5),
+        showCloseIcon: true,
+      ),
+    );
+  }
+
+  Widget _buildNameTechnic(){
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: Text(
+              'Наименование техники',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 40, right: 40),
+          child: ListTile(
+            title: TextFormField(
+              enabled: isBN,
+              decoration: myDecorationTextFormField(null, 'Введите номер техники'),
+              controller: _nameTechnicController,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Обязательное поле';
+                }
+                return null;
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLastDislocation(ProviderModel providerModel){
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: Text(
+              'Откуда забрали:',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 40, right: 40),
+          child: ListTile(
+            title: isBN ? DropdownButtonFormField<String>(
+              decoration: myDecorationDropdown(),
+              validator: (value) => value == null ? "Обязательное поле" : null,
+              dropdownColor: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(10.0),
+              hint: const Text('Последнее местонахождение'),
+              value: _selectedDropdownDislocationOld,
+              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? value) {
+                setState(() {
+                  _selectedDropdownDislocationOld = value!;
+                });
+              },
+            ) : TextFormField(
+              enabled: false,
+              decoration: myDecorationTextFormField(null, 'Введите номер техники'),
+              controller: _lastDislocationController,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatus(ProviderModel providerModel){
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: Text(
+              'Статус техники',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 40, right: 40),
+          child: ListTile(
+            title: DropdownButtonFormField<String>(
+              decoration: myDecorationDropdown(),
+              borderRadius: BorderRadius.circular(10.0),
+              hint: const Text('Статус техники'),
+              validator: (value) => value == null ? "Обязательное поле" : null,
+              dropdownColor: Colors.blue.shade50,
+              value: _selectedDropdownStatusOld,
+              items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? value) {
+                setState(() {
+                  _selectedDropdownStatusOld = value!;
+                });
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildComplaint(){
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: Text(
+              'Жалоба',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+        ),
+        ListTile(
+          title: Padding(
+            padding: const EdgeInsets.only(left: 40, right: 40),
+            child: TextFormField(
+              decoration: myDecorationTextFormField(null, "Жалоба"),
+              controller: _complaint,
+              maxLines: 3,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateDeparture(){
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: Text(
+              'Дата покупки техники',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 55, right: 55, top: 6),
+          child: ListTile(
+            title: Text(
+              DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDeparture ?? DateTime.now()),
+              style: TextStyle(color: Colors.black54),
+            ),
+            tileColor: Colors.blue.shade50,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            onTap: () {
+              showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2099),
+                  locale: const Locale("ru", "RU"))
+                  .then((date) {
+                setState(() {
+                  if (date != null) {
+                    _dateDeparture = date;
+                  }
+                });
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ListTile _buildServiceDislocationListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.miscellaneous_services),
+  //     title: DropdownButton<String>(
+  //       borderRadius: BorderRadius.circular(10.0),
+  //       isExpanded: true,
+  //       hint: const Text('Местонахождение техники'),
+  //       icon: _selectedDropdownService != null ? IconButton(
+  //           icon: const Icon(Icons.clear, color: Colors.grey),
+  //           onPressed: (){
+  //             setState(() {
+  //               _selectedDropdownService = null;
+  //             });}) : null,
+  //       value: _selectedDropdownService,
+  //       items: CategoryDropDownValueModel.service.map<DropdownMenuItem<String>>((String value) {
+  //         return DropdownMenuItem<String>(
+  //           value: value,
+  //           child: Text(value),
+  //         );
+  //       }).toList(),
+  //       onChanged: (String? value){
+  //         setState(() {
+  //           _selectedDropdownService = value!;
+  //         });
+  //       },
+  //     ),
+  //   );
+  // }
+
+  // ListTile _buildDateTransferInServiceListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.today),
+  //     title: const Text("Дата сдачи в ремонт"),
+  //     subtitle: Text(_dateTransferInService == "" ? "Выберите дату" : _dateTransferInService),
+  //     trailing: Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         IconButton(
+  //             icon: const Icon(Icons.edit),
+  //             onPressed: () {
+  //               showDatePicker(
+  //                   context: context,
+  //                   initialDate: DateTime.now(),
+  //                   firstDate: DateTime(2000),
+  //                   lastDate: DateTime(2099),
+  //                   locale: const Locale("ru", "RU")
+  //               ).then((date) {
+  //                 setState(() {
+  //                   if(date != null) {
+  //                     _dateTransferInServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
+  //                     _dateTransferInService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+  //                   }
+  //                 });
+  //               });
+  //             },
+  //             color: Colors.blue
+  //         ),
+  //         IconButton(
+  //             onPressed: (){
+  //               setState(() {
+  //                 _dateTransferInServiceForSQL = '';
+  //                 _dateTransferInService = '';
+  //               });
+  //             },
+  //             icon: const Icon(Icons.clear))
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // ListTile _buildDateDepartureFromServiceListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.today),
+  //     title: const Text("Забрали из ремонта. Дата"),
+  //     subtitle: Text(_dateDepartureFromService == "" ? "Выберите дату" : _dateDepartureFromService),
+  //     trailing: Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         IconButton(
+  //             icon: const Icon(Icons.edit),
+  //             onPressed: () {
+  //               showDatePicker(
+  //                   context: context,
+  //                   initialDate: DateTime.now(),
+  //                   firstDate: DateTime(2000),
+  //                   lastDate: DateTime(2099),
+  //                   locale: const Locale("ru", "RU")
+  //               ).then((date) {
+  //                 setState(() {
+  //                   if(date != null) {
+  //                     _dateDepartureFromServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
+  //                     _dateDepartureFromService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+  //                   }
+  //                 });
+  //               });
+  //             },
+  //             color: Colors.blue
+  //         ),
+  //         IconButton(
+  //             onPressed: (){
+  //               setState(() {
+  //                 _dateDepartureFromServiceForSQL = '';
+  //                 _dateDepartureFromService = '';
+  //               });
+  //             },
+  //             icon: const Icon(Icons.clear))
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  ListTile _buildWorksPerformedListTile(){
+    return ListTile(
+      leading: const Icon(Icons.create),
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: "Произведенные работы"),
+        controller: _worksPerformed,
+      ),
+    );
+  }
+
+  ListTile _buildCostServiceListTile(){
+    return ListTile(
+        leading: const Icon(Icons.shopify),
+        title: TextFormField(
+          decoration: const InputDecoration(
+              hintText: "Стоимость ремонта",
+              prefix: Text('₽ ')),
+          controller: _costService,
+          inputFormatters: [IntegerCurrencyInputFormatter()],
+          keyboardType: TextInputType.number,
+        )
+    );
+  }
+
+  ListTile _buildDiagnosisServiceListTile(){
+    return ListTile(
+      leading: const Icon(Icons.create),
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: "Диагноз мастерской"),
+        controller: _diagnosisService,
+      ),
+    );
+  }
+
+  ListTile _buildRecommendationsNotesListTile(){
+    return ListTile(
+      leading: const Icon(Icons.create),
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: "Рекомендации/примечания (необязательно)"),
+        controller: _recommendationsNotes,
+      ),
+    );
+  }
+
+  // ListTile _buildNewStatusListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.copyright),
+  //     title: DropdownButton<String>(
+  //       borderRadius: BorderRadius.circular(10.0),
+  //       isExpanded: true,
+  //       hint: const Text('Новый статус'),
+  //       icon: _selectedDropdownStatusNew != null ? IconButton(
+  //           icon: const Icon(Icons.clear, color: Colors.grey),
+  //           onPressed: (){
+  //             setState(() {
+  //               _selectedDropdownStatusNew = null;
+  //             });}) : null,
+  //       value: _selectedDropdownStatusNew,
+  //       items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+  //         return DropdownMenuItem<String>(
+  //           value: value,
+  //           child: Text(value),
+  //         );
+  //       }).toList(),
+  //       onChanged: (String? value){
+  //         setState(() {
+  //           _selectedDropdownStatusNew = value!;
+  //         });
+  //       },
+  //     ),
+  //   );
+  // }
+
+  // ListTile _buildNewDislocationListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.local_shipping),
+  //     title: DropdownButton<String>(
+  //       borderRadius: BorderRadius.circular(10.0),
+  //       isExpanded: true,
+  //       hint: const Text('Куда уехал'),
+  //       icon: _selectedDropdownDislocationNew != null ? IconButton(
+  //           icon: const Icon(Icons.clear, color: Colors.grey),
+  //           onPressed: (){
+  //             setState(() {
+  //               _selectedDropdownDislocationNew = null;
+  //             });}) : null,
+  //       value: _selectedDropdownDislocationNew,
+  //       items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+  //         return DropdownMenuItem<String>(
+  //           value: value,
+  //           child: Text(value),
+  //         );
+  //       }).toList(),
+  //       onChanged: (String? value){
+  //         setState(() {
+  //           _selectedDropdownDislocationNew = value!;
+  //         });
+  //       },
+  //     ),
+  //   );
+  // }
+
+  // ListTile _buildDateReceiptListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.today),
+  //     title: const Text("Дата поступления"),
+  //     subtitle: Text(_dateReceipt == "" ? "Выберите дату" : _dateReceipt),
+  //     trailing: Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         IconButton(
+  //             icon: const Icon(Icons.edit),
+  //             onPressed: () {
+  //               showDatePicker(
+  //                   context: context,
+  //                   initialDate: DateTime.now(),
+  //                   firstDate: DateTime(2000),
+  //                   lastDate: DateTime(2099),
+  //                   locale: const Locale("ru", "RU")
+  //               ).then((date) {
+  //                 setState(() {
+  //                   if(date != null) {
+  //                     _dateReceiptForSQL = DateFormat('yyyy.MM.dd').format(date);
+  //                     _dateReceipt = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+  //                   }
+  //                 });
+  //               });
+  //             },
+  //             color: Colors.blue
+  //         ),
+  //         IconButton(
+  //             onPressed: (){
+  //               setState(() {
+  //                 _dateReceiptForSQL = '';
+  //                 _dateReceipt = '';
+  //               });
+  //             },
+  //             icon: const Icon(Icons.clear))
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  bool _isValidateToSave(){
+    bool validate = false;
+    if((!isBN ? _innerNumberTechnic.text != "" : _innerNumberTechnicBN == "БН") &&
+        (!isBN ? _category != "" : _nameTechnicController.text != "") &&
+        (!isBN ? _selectedDropdownDislocationOld != "" : _selectedDropdownDislocationOld != null) &&
+        _selectedDropdownStatusOld != null &&
+        _complaint.text != "" &&
+        _dateDeparture != "" &&
+        _selectedDropdownService != null) {
+      validate = true;
+    }
+    return validate;
+  }
+
+  void _save(){
+    // int costServ;
+    // if(_isBN) _innerNumberTechnic.text = '-1';
+    // String newStatusStr;
+    // String newDislocationStr;
+    // _costService.text != "" ? costServ = int.parse(_costService.text.replaceAll(",", "")) : costServ = 0;
+    // _selectedDropdownStatusNew != null ? newStatusStr = _selectedDropdownStatusNew! : newStatusStr = "";
+    // _selectedDropdownDislocationNew != null ? newDislocationStr = _selectedDropdownDislocationNew! : newDislocationStr = "";
+    //
+    // Repair repairLast = Repair.repairList.first;
+    // Repair repair = Repair(
+    //     repairLast.id! + 1,
+    //     int.parse(_innerNumberTechnic.text),
+    //     _isBN ? _categoryController.text : _category,
+    //     _isBN ? _selectedDropdownDislocationOld! : _dislocationOld,
+    //     _selectedDropdownStatusOld!,
+    //     _complaint.text,
+    //     _dateDepartureForSQL,
+    //     _selectedDropdownService!,
+    //     _dateTransferInServiceForSQL,
+    //     _dateDepartureFromServiceForSQL,
+    //     _worksPerformed.text,
+    //     costServ,
+    //     _diagnosisService.text,
+    //     _recommendationsNotes.text,
+    //     newStatusStr,
+    //     newDislocationStr,
+    //     _dateReceiptForSQL,
+    //     0
+    // );
+    //
+    // ConnectToDBMySQL.connDB.insertRepairInDB(repair);
+    // RepairSQFlite.db.create(repair);
+    // addHistory(repair);
+    //
+    // if(newStatusStr != '' || newDislocationStr != ''){
+    //   int indexTechnic = -1;
+    //   for(int i = 0; i < Technic.technicList.length; i++){
+    //     if(Technic.technicList[i].internalID == int.parse(_innerNumberTechnic.text)){
+    //       indexTechnic = i;
+    //       break;
+    //     }
+    //   }
+    //
+    //   repair.dateReceipt = DateFormat('yyyy.MM.dd').format(DateTime.now());
+    //   ConnectToDBMySQL.connDB.insertStatusInDB(Technic.technicList[indexTechnic].id!, newStatusStr, newDislocationStr);
+    //   TechnicSQFlite.db.updateStatusDislocationTechnic(Technic.technicList[indexTechnic].id, newStatusStr, newDislocationStr);
+    //   Technic.technicList[indexTechnic].status = newStatusStr;
+    //   Technic.technicList[indexTechnic].dislocation = newDislocationStr;
+    // }
+    //
+    // viewSnackBar(' Техника в ремонт добавлена');
+    // Navigator.pop(context, repair);
+  }
+
+  Future addHistory(Repair repair) async{
+    // String descForHistory = descriptionForHistory(repair);
+    // History historyForSQL = History(
+    //     History.historyList.last.id + 1,
+    //     'Repair',
+    //     repair.id!,
+    //     'create',
+    //     descForHistory,
+    //     LoginPassword.login,
+    //     DateFormat('yyyy.MM.dd').format(DateTime.now())
+    // );
+    //
+    // ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
+    // HistorySQFlite.db.insertHistory(historyForSQL);
+    // History.historyList.insert(0, historyForSQL);
+  }
+
+  // String descriptionForHistory(Repair repair){
+  //   String internalID = repair.internalID == -1 ? 'БН' : '№${repair.internalID}';
+  //   String result = 'Заявка на ремонт $internalID добавленна';
+  //
+  //   return result;
+  // }
+
+  void viewSnackBar(String text){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.bolt, size: 40, color: Colors.white),
+            Text(text),
+          ],
+        ),
+        duration: const Duration(seconds: 5),
+        showCloseIcon: true,
+      ),
+    );
+  }
+}
+
+class IntegerCurrencyInputFormatter extends TextInputFormatter {
+
+  final validationRegex = RegExp(r'^[\d,]*$');
+  final replaceRegex = RegExp(r'[^\d]+');
+  static const thousandSeparator = ',';
+
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue
+      ) {
+    if (!validationRegex.hasMatch(newValue.text)) {
+      return oldValue;
+    }
+
+    final newValueNumber = newValue.text.replaceAll(replaceRegex, '');
+
+    var formattedText = newValueNumber;
+
+    /// Add thousand separators.
+    var index = newValueNumber.length;
+
+    while (index > 0) {
+      index -= 3;
+
+      if (index > 0) {
+        formattedText = formattedText.substring(0, index)
+            + thousandSeparator
+            + formattedText.substring(index, formattedText.length);
+      }
+    }
+
+    /// Check whether the text is unmodified.
+    if (oldValue.text == formattedText) {
+      return oldValue;
+    }
+
+    /// Handle moving cursor.
+    final initialNumberOfPrecedingSeparators = oldValue.text.characters
+        .where((e) => e == thousandSeparator)
+        .length;
+    final newNumberOfPrecedingSeparators = formattedText.characters
+        .where((e) => e == thousandSeparator)
+        .length;
+    final additionalOffset = newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
+
+    return newValue.copyWith(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: newValue.selection.baseOffset + additionalOffset),
+    );
+  }
+}

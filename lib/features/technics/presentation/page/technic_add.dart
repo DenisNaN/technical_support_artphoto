@@ -11,6 +11,8 @@ import 'package:technical_support_artphoto/core/shared/input_decoration/input_de
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/features/history/history.dart';
 
+import '../../../../core/utils/formatters.dart';
+
 class TechnicAdd extends StatefulWidget {
   const TechnicAdd({super.key});
 
@@ -63,13 +65,12 @@ class _TechnicAddState extends State<TechnicAdd> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     return Scaffold(
-        appBar: CustomAppBar(typePage: TypePage.add, location: null, technic: null),
+        appBar: CustomAppBar(typePage: TypePage.addTechnic, location: null, technic: null),
         body: Form(
             key: _formInnerNumberKey,
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                // SizedBox(height: 20),
                 _buildInternalID(),
                 SizedBox(height: 20),
                 _buildCategoryTechnic(providerModel),
@@ -126,10 +127,6 @@ class _TechnicAddState extends State<TechnicAdd> {
             )));
   }
 
-  final numberFormatter = FilteringTextInputFormatter.allow(
-    RegExp(r'[0-9]'),
-  );
-
   Column _buildInternalID() {
     return Column(
       children: [
@@ -160,12 +157,6 @@ class _TechnicAddState extends State<TechnicAdd> {
                   enabled: !isBN,
                   decoration: myDecorationTextFormField(!isBN ? 'Номер техники' : 'Без номера'),
                   controller: _innerNumberTechnic,
-                  onChanged: (text) async{
-                    if(text.isNotEmpty){
-                      final check = await TechnicalSupportRepoImpl.downloadData.checkNumberTechnic(text);
-                      setState(() => isExistNumber = check);
-                    }
-                  },
                   validator: (value) {
                     if (value!.isEmpty && !isBN) {
                       return 'Обязательное поле';
@@ -419,7 +410,7 @@ class _TechnicAddState extends State<TechnicAdd> {
               hint: const Text('Дислокация'),
               value: _selectedDropdownDislocation,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: providerModel.namesPhotosalons.map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -456,6 +447,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             child: TextFormField(
               decoration: myDecorationTextFormField(null, "Комментарий (необязательно)"),
               controller: _comment,
+              maxLines: 3,
             ),
           ),
         ),

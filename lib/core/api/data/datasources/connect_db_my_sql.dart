@@ -326,34 +326,28 @@ class ConnectDbMySQL {
     return map;
   }
 
-// Future<Technic?> getTechnic(int id) async {
-//   Technic? technic = null;
-//   var result = await _connDB!.query('SELECT '
-//       'equipment.id, '
-//       'equipment.number, '
-//       'equipment.name, '
-//       'equipment.category, '
-//       'equipment.cost, '
-//       'equipment.dateBuy, '
-//       's.status, '
-//       's.dislocation, '
-//       's.date, '
-//       'equipment.comment, '
-//       't.testDriveDislocation, '
-//       't.dateStart, '
-//       't.dateFinish, '
-//       't.result, '
-//       't.checkEquipment '
-//       'FROM equipment '
-//       'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
-//       'LEFT JOIN (SELECT * FROM testDrive t1 WHERE NOT EXISTS (SELECT 1 FROM testDrive t2 WHERE t2.id > t1.id AND t2.idEquipment = t1.idEquipment)) t ON t.idEquipment = equipment.id '
-//       'WHERE equipment.id = ?', [id]);
-//   if(result.isNotEmpty) {
-//     technic = technicListFromMap(result).first;
-//   }
-//   return technic;
-// }
-//
+Future<Technic?> getTechnic(int number) async {
+  Technic? technic;
+  String query = 'SELECT '
+      'equipment.id, '
+      'equipment.number, '
+      'equipment.category, '
+      'equipment.name, '
+      's.status, '
+      's.dislocation, '
+      'equipment.dateBuy, '
+      'equipment.cost, '
+      'equipment.comment '
+      'FROM equipment '
+      'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
+      'WHERE equipment.number = ? '
+      'ORDER BY equipment.number ASC';
+  var result = await _connDB!.query(query, [number]);
+  for (var row in result) {
+    technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
+  }
+  return technic;
+}
 
 // Future<List> getAllTestDrive() async {
 //   List list = [];

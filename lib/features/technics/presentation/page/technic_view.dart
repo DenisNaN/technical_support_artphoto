@@ -407,7 +407,7 @@ class _TechnicViewState extends State<TechnicView> {
               hint: const Text('Дислокация'),
               value: _selectedDropdownDislocation == null ? widget.technic.dislocation : null,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: providerModel.namesPhotosalons.map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),

@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_add.dart';
 import '../../../../core/api/provider/provider_model.dart';
 import '../../models/repair.dart';
 
@@ -16,18 +17,18 @@ class _RepairsPageState extends State<RepairsPage> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     final List<Repair> repairs = providerModel.getAllRepairs;
+    final double height = MediaQuery.sizeOf(context).height;
     return Scaffold (
         appBar: AppBar(title: Text('Ремонты'),),
-        floatingActionButton: FloatingActionButton(
-            backgroundColor: Colors.blue,
-            onPressed: (){
-              // Navigator.push(context, MaterialPageRoute(builder: (context) => const RepairAdd())).then((value) {
-              //   setState(() {
-              //     if(value != null) Repair.repairList.insert(0, value);
-              //   });
-              // });
-            },
-            child: const Icon(Icons.add, color: Colors.white)),
+        floatingActionButton: Padding(
+          padding: EdgeInsets.only(bottom: height / 11),
+          child: FloatingActionButton.extended(
+              icon: Icon(Icons.add),
+              label: Text('Новая заявка'),
+              onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const RepairAdd()));
+              },),
+        ),
         body: ListView.builder(
           padding: const EdgeInsets.symmetric(vertical: 8),
           itemCount: repairs.length,
