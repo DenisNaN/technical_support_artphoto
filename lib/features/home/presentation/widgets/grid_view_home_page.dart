@@ -1,6 +1,5 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/widgets/grid_view_technics.dart';
 
@@ -24,7 +23,20 @@ class GridViewHomePage extends StatelessWidget {
           itemBuilder: (_, int index) {
             String nameLocation = locations.keys.toList()[index];
             int countTechnics = locations[nameLocation].technics.length;
-            bool isHeader = locations[nameLocation] is RepairLocation && countTechnics > 0 ? true : false;
+            int countBrokenTechnics = 0;
+            bool isHeader = false;
+
+            bool isHeaderRepair = locations[nameLocation] is RepairLocation;
+            if(!isHeaderRepair){
+              locations[nameLocation].technics.forEach((element){
+                if(element.status == 'Неисправна'){
+                  countBrokenTechnics++;
+                }
+              });
+            }
+            if((isHeaderRepair && countTechnics > 0) || (!isHeaderRepair && countBrokenTechnics > 0)){
+              isHeader = true;
+            }
 
             return Container(
               decoration: BoxDecoration(
@@ -41,10 +53,6 @@ class GridViewHomePage extends StatelessWidget {
               child: OpenContainer(
                 transitionDuration: Duration(milliseconds: 600),
                 openBuilder: (context, openContainer) {
-                  bool isPhotosalon = false;
-                  if(locations[nameLocation] is PhotosalonLocation){
-                    isPhotosalon = true;
-                  }
                   return GridViewTechnics(location: locations[nameLocation]);
                 },
                 closedBuilder: (context, openContainer) {
@@ -60,8 +68,8 @@ class GridViewHomePage extends StatelessWidget {
                                 alignment: Alignment.centerRight,
                                 child: CircleAvatar(
                                   radius: 12,
-                                  backgroundColor: Colors.red.shade400,
-                                  child: Text(countTechnics.toString()),
+                                  backgroundColor: isHeaderRepair ? Colors.green.shade400 : Colors.red.shade400,
+                                  child: Text(isHeaderRepair? countTechnics.toString() : countBrokenTechnics.toString()),
                                 ),
                               ),
                             )
