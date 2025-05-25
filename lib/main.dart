@@ -64,6 +64,8 @@ class ArtphotoTech extends StatefulWidget {
 
 class _ArtphotoTechState extends State<ArtphotoTech>{
   late PageController pageViewController;
+  final _mainBottomKey = GlobalKey();
+  Size? _mainBottomSize;
 
   @override
   void initState() {
@@ -77,12 +79,18 @@ class _ArtphotoTechState extends State<ArtphotoTech>{
     pageViewController.dispose();
   }
 
+  void _getSize() {
+    setState(() {
+      _mainBottomSize = _mainBottomKey.currentContext!.size;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         extendBody: true,
         bottomNavigationBar: MainBottomAppBar(pageController: pageViewController),
-        body: MainBottomPageView(pageController: pageViewController)
+        body: MainBottomPageView(key: _mainBottomKey, pageController: pageViewController)
     );
   }
 
