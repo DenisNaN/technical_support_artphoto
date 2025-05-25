@@ -82,6 +82,7 @@ class _ArtphotoTechState extends State<ArtphotoTech>{
   void _getSize() {
     setState(() {
       _mainBottomSize = _mainBottomKey.currentContext!.size;
+      Provider.of<ProviderModel>(context).setSizeMainBottom(_mainBottomSize);
     });
   }
 

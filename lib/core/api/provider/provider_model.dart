@@ -23,6 +23,7 @@ class ProviderModel with ChangeNotifier {
   late User _user = User('user', 'access');
 
   int currentPageIndexMainBottomAppBar = 0;
+  Size? _mainBottomSize;
   final Color colorPhotosalons = Colors.blue.shade200;
   final Color colorStorages = Colors.white70;
   final Color colorRepairs = Colors.yellow.shade200;
@@ -46,6 +47,8 @@ class ProviderModel with ChangeNotifier {
   List<String> get namesEquipments => _namesEquipments;
 
   User get user => _user;
+
+  Size? get mainBottomSize => _mainBottomSize;
 
   void downloadAllElements(Map<String, PhotosalonLocation> photosalons,
       Map<String, RepairLocation> repairs, Map<String, StorageLocation> storages) {
@@ -194,6 +197,11 @@ class ProviderModel with ChangeNotifier {
     _technicsInPhotosalons.addAll(photosalons);
     _technicsInRepairs.addAll(repairs);
     _technicsInStorages.addAll(storages);
+    notifyListeners();
+  }
+
+  void setSizeMainBottom(Size? size){
+    _mainBottomSize = size;
     notifyListeners();
   }
 }
