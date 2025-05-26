@@ -7,6 +7,7 @@ import '../api/provider/provider_model.dart';
 
 class MainBottomPageView extends StatefulWidget {
   final PageController pageController;
+
   const MainBottomPageView({super.key, required this.pageController});
 
   @override
@@ -17,8 +18,10 @@ class _MainBottomPageViewState extends State<MainBottomPageView> with TickerProv
   List<Widget> pages = <Widget>[
     /// Home page
     const HomePage(),
+
     /// Repair
     const RepairsPage(),
+
     /// Troubles
     const Padding(
       padding: EdgeInsets.all(8.0),
@@ -41,6 +44,7 @@ class _MainBottomPageViewState extends State<MainBottomPageView> with TickerProv
         ],
       ),
     ),
+
     /// History
     HistoryList(),
   ];

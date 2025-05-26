@@ -12,13 +12,13 @@ import 'core/navigation/main_bottom_app_bar.dart';
 
 void main() {
   runZonedGuarded<Future<void>>(
-    () async {
+        () async {
       WidgetsFlutterBinding.ensureInitialized();
       await initDependencies();
 
       runApp(const SplashScreenArtphoto());
     },
-    (Object error, StackTrace stack) {
+        (Object error, StackTrace stack) {
       debugPrint('ARTPHOTO [CrashEvent] [DEBUG] $error\n$stack');
     },
   );
@@ -54,7 +54,6 @@ class SplashScreenArtphoto extends StatelessWidget {
   }
 }
 
-///
 class ArtphotoTech extends StatefulWidget {
   const ArtphotoTech({super.key});
 
@@ -62,10 +61,8 @@ class ArtphotoTech extends StatefulWidget {
   State<ArtphotoTech> createState() => _ArtphotoTechState();
 }
 
-class _ArtphotoTechState extends State<ArtphotoTech>{
+class _ArtphotoTechState extends State<ArtphotoTech> {
   late PageController pageViewController;
-  final _mainBottomKey = GlobalKey();
-  Size? _mainBottomSize;
 
   @override
   void initState() {
@@ -79,19 +76,12 @@ class _ArtphotoTechState extends State<ArtphotoTech>{
     pageViewController.dispose();
   }
 
-  void _getSize() {
-    setState(() {
-      _mainBottomSize = _mainBottomKey.currentContext!.size;
-      Provider.of<ProviderModel>(context).setSizeMainBottom(_mainBottomSize);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         extendBody: true,
         bottomNavigationBar: MainBottomAppBar(pageController: pageViewController),
-        body: MainBottomPageView(key: _mainBottomKey, pageController: pageViewController)
+        body: MainBottomPageView(pageController: pageViewController)
     );
   }
 

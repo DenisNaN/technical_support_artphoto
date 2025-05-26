@@ -380,6 +380,7 @@ Future<Technic?> getTechnic(int number) async {
         'repairEquipment.status, '
         'repairEquipment.complaint, '
         'repairEquipment.dateDeparture, '
+        'repairEquipment.whoTook, '
         'repairEquipment.serviceDislocation, '
         'repairEquipment.dateTransferInService, '
         'repairEquipment.dateDepartureFromService, '
@@ -391,7 +392,8 @@ Future<Technic?> getTechnic(int number) async {
         'repairEquipment.newDislocation, '
         'repairEquipment.dateReceipt, '
         'repairEquipment.idTestDrive '
-        'FROM repairEquipment');
+        'FROM repairEquipment '
+        'WHERE repairEquipment.dateReceipt <> "0000-00-00"');
 
     final List<Repair> list = repairListFromMap(result);
     final List<Repair> reversedList = List.from(list.reversed);
@@ -414,34 +416,27 @@ Future<Technic?> getTechnic(int number) async {
       // id-row[0], number-row[1],  category-row[2],  dislocationOld-row[3], status-row[4], complaint-row[5], dateDeparture-row[6], serviceDislocation-row[7],
       // dateTransferInService-row[8], dateDepartureFromService-row[9],  worksPerformed-row[10],  costService-row[11], diagnosisService-row[12],
       // recommendationsNotes-row[13], newStatus-row[14],  newDislocation-row[15], dateReceipt-row[16], idTestDrive-row[17]
-      String dateDeparture =
-          row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
-      String dateTransferInService =
-          row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
-      String dateDepartureFromService =
-          row[9].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[9].toString());
-      String dateReceipt =
-          row[16].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[16].toString());
 
-      Repair repair = Repair(
+      Repair repair = Repair.fullRepair(
           row[0],
           row[1],
           row[2],
           row[3],
           row[4],
           row[5],
-          dateDeparture,
+          row[6],
           row[7],
-          dateTransferInService,
-          dateDepartureFromService,
+          row[8],
+          row[9],
           row[10],
           row[11],
           row[12],
           row[13],
           row[14],
           row[15],
-          dateReceipt,
-          row[17]);
+          row[16],
+          row[17],
+          row[18]);
       list.add(repair);
     }
     return list;
@@ -615,44 +610,29 @@ Future<Technic?> getTechnic(int number) async {
     ]);
   }
 
-// Future insertRepairInDB(Repair repair) async{
-//   await ConnectDbMySQL.connDB.connDatabase();
-//   await _connDB!.query('INSERT INTO repairEquipment ('
-//       'number, '
-//       'category, '
-//       'dislocationOld, '
-//       'status, '
-//       'complaint, '
-//       'dateDeparture, '
-//       'serviceDislocation, '
-//       'dateTransferInService, '
-//       'dateDepartureFromService, '
-//       'worksPerformed, '
-//       'costService, '
-//       'diagnosisService, '
-//       'recommendationsNotes, '
-//       'newStatus, '
-//       'newDislocation, '
-//       'dateReceipt '
-//       ') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-//     repair.internalID,
-//     repair.category,
-//     repair.dislocationOld,
-//     repair.status,
-//     repair.complaint,
-//     repair.dateDeparture,
-//     repair.serviceDislocation,
-//     repair.dateTransferInService,
-//     repair.dateDepartureFromService,
-//     repair.worksPerformed,
-//     repair.costService,
-//     repair.diagnosisService,
-//     repair.recommendationsNotes,
-//     repair.newStatus,
-//     repair.newDislocation,
-//     repair.dateReceipt
-//   ]);
-// }
+Future<int> insertRepairInDB(Repair repair) async{
+  await ConnectDbMySQL.connDB.connDatabase();
+  var result = await _connDB!.query('INSERT INTO repairEquipment ('
+      'number, '
+      'category, '
+      'dislocationOld, '
+      'status, '
+      'complaint, '
+      'dateDeparture, '
+      'whoTook '
+      ') VALUES (?, ?, ?, ?, ?, ?, ?)', [
+    repair.numberTechnic,
+    repair.category,
+    repair.dislocationOld,
+    repair.status,
+    repair.complaint,
+    repair.dateDeparture,
+    repair.whoTook
+  ]);
+
+  int id = result.insertId!;
+  return id;
+}
 //
 // Future updateRepairInDB(Repair repair) async{
 //   await ConnectDbMySQL.connDB.connDatabase();

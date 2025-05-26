@@ -112,7 +112,7 @@ class _TechnicAddState extends State<TechnicAdd> {
                                 _comment.text);
 
                             _save(technic, providerModel).then((_) {
-                              _viewSnackBar(Icons.save, true, 'Техника сохранена');
+                              _viewSnackBar(Icons.save, true, 'Техника сохранена', 'Техника не сохранена');
                             });
                             Navigator.pop(context);
                           }
@@ -622,14 +622,16 @@ class _TechnicAddState extends State<TechnicAdd> {
   //   );
   // }
 
-  Future _save(Technic technic, ProviderModel providerModel) async {
+  Future<bool> _save(Technic technic, ProviderModel providerModel) async {
     String nameUser = providerModel.user.name;
-    await ConnectDbMySQL.connDB.connDatabase();
-    int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
-    await ConnectDbMySQL.connDB.dispose();
-    technic.id = id;
-    // await addHistory(technic, nameUser);
-    addTechnicInProviderModel(technic, providerModel);
+    int? id = await TechnicalSupportRepoImpl.downloadData.saveTechnic(technic, nameUser);
+    if(id != null){
+      technic.id = id;
+      // await addHistory(technic, nameUser);
+      addTechnicInProviderModel(technic, providerModel);
+      return true;
+    }
+    return false;
   }
 
   void addTechnicInProviderModel(Technic technic, ProviderModel providerModel) {
@@ -661,7 +663,7 @@ class _TechnicAddState extends State<TechnicAdd> {
     return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 
-  void _viewSnackBar(IconData icon, bool isSuccessful, String text) {
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -672,7 +674,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             SizedBox(
               width: 20,
             ),
-            Flexible(child: Text(text)),
+            Flexible(child: Text(isSuccessful ? successText : notSuccessText)),
           ],
         ),
         duration: const Duration(seconds: 5),

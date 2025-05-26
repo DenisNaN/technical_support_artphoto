@@ -24,7 +24,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     final double height = MediaQuery.sizeOf(context).height;
-    final Size? sizeMainBottom = providerModel.mainBottomSize;
+    final double width = MediaQuery.sizeOf(context).width;
+    final double aspectRatio = height / width;
+    double paddingBottomFloatingActionButton = aspectRatio > 2 ? height / 11 : height / 9;
     return Scaffold(
       appBar: AppBarHomepage(),
       body: SafeArea(
@@ -45,7 +47,7 @@ class _HomePageState extends State<HomePage> {
             )),
       ),
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: sizeMainBottom == null ? height / 11 : sizeMainBottom.height + 50),
+        padding: EdgeInsets.only(bottom: paddingBottomFloatingActionButton),
         child: FloatingActionButton.extended(
             icon: Icon(Icons.add),
             label: Text('Добавить технику'),

@@ -114,6 +114,19 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
+  Future<int?> saveTechnic(Technic technic, String nameUser) async{
+    int? id;
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
+      await ConnectDbMySQL.connDB.dispose();
+      return id;
+    } catch (e) {
+      return id;
+    }
+  }
+
+  @override
   Future<bool> updateTechnic(Technic technic) async {
     try {
       await ConnectDbMySQL.connDB.connDatabase();
@@ -162,6 +175,19 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     decommissioned =  await ConnectDbMySQL.connDB.fetchTechnicsDecommissioned();
     await ConnectDbMySQL.connDB.dispose();
     return decommissioned;
+  }
+
+  @override
+  Future<int?> saveRepair(Repair repair) async{
+    int? id;
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      int id = await ConnectDbMySQL.connDB.insertRepairInDB(repair);
+      await ConnectDbMySQL.connDB.dispose();
+      return id;
+    } catch (e) {
+      return id;
+    }
   }
 
 //   List getNotifications() {

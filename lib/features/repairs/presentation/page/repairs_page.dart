@@ -1,8 +1,8 @@
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_add.dart';
 import '../../../../core/api/provider/provider_model.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../models/repair.dart';
 
 class RepairsPage extends StatefulWidget {
@@ -18,10 +18,13 @@ class _RepairsPageState extends State<RepairsPage> {
     final providerModel = Provider.of<ProviderModel>(context);
     final List<Repair> repairs = providerModel.getAllRepairs;
     final double height = MediaQuery.sizeOf(context).height;
+    final double width = MediaQuery.sizeOf(context).width;
+    final double aspectRatio = height / width;
+    double paddingBottomFloatingActionButton = aspectRatio > 2 ? height / 11 : height / 9;
     return Scaffold (
         appBar: AppBar(title: Text('Ремонты'),),
         floatingActionButton: Padding(
-          padding: EdgeInsets.only(bottom: height / 11),
+          padding: EdgeInsets.only(bottom: paddingBottomFloatingActionButton),
           child: FloatingActionButton.extended(
               icon: Icon(Icons.add),
               label: Text('Новая заявка'),
@@ -77,9 +80,9 @@ class _RepairsPageState extends State<RepairsPage> {
       repairComplaint = '${repair.complaint}.';
     }
 
-    if(repair.number != -1){
+    if(repair.numberTechnic != -1){
       return Text.rich(TextSpan(children:
-        [TextSpan(text: '№ ${repair.number}. ${repair.category}.\n',
+        [TextSpan(text: '№ ${repair.numberTechnic}. ${repair.category}.\n',
           style: const TextStyle(fontWeight: FontWeight.bold)),
           TextSpan(text: 'Жалоба: $repairComplaint')
         ]
@@ -111,15 +114,13 @@ class _RepairsPageState extends State<RepairsPage> {
         repairDislocation = '${repair.dislocationOld}.';
       }
     }
-    String repairLastDate = 'Даты отсутствуют.';
-    if(repair.dateDeparture != '') {
-      repairLastDate = 'Забрали с точки: ${getDateFormat(repair.dateDeparture)}.';
+    String repairLastDate = 'Забрали с точки: ${getDateFormatForInterface(repair.dateDeparture)}.';
+
+    if(repair.dateTransferInService != null){
+      repairLastDate = 'Сдали в ремонт: ${getDateFormatForInterface(repair.dateTransferInService ?? DateTime.now())}.';
     }
-    if(repair.dateTransferInService != ''){
-      repairLastDate = 'Сдали в ремонт: ${getDateFormat(repair.dateTransferInService)}.';
-    }
-    if(repair.dateDepartureFromService != ''){
-      repairLastDate = 'Забрали из ремонта: ${getDateFormat(repair.dateDepartureFromService)}.';
+    if(repair.dateDepartureFromService != null){
+      repairLastDate = 'Забрали из ремонта: ${getDateFormatForInterface(repair.dateDepartureFromService ?? DateTime.now())}.';
     }
 
     return Text(
@@ -166,10 +167,6 @@ class _RepairsPageState extends State<RepairsPage> {
       return 'red';
     }
     return result;
-  }
-
-  String getDateFormat(String date) {
-    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 }
 

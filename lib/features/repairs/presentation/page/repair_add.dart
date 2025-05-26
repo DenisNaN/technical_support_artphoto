@@ -13,7 +13,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../models/repair.dart';
 
 class RepairAdd extends StatefulWidget {
-  const RepairAdd({super.key}) ;
+  const RepairAdd({super.key});
 
   @override
   State<RepairAdd> createState() => _RepairAddState();
@@ -46,7 +46,6 @@ class _RepairAddState extends State<RepairAdd> {
 
   Technic? technicFind;
 
-
   @override
   void initState() {
     super.initState();
@@ -68,67 +67,76 @@ class _RepairAddState extends State<RepairAdd> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     return Scaffold(
-      appBar: CustomAppBar(typePage: TypePage.addRepair, location: null, technic: null),
-        bottomNavigationBar: Padding(
-            padding: MediaQuery.of(context).viewInsets,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-              child:Row(
-                children: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Отмена")),
-                  const Spacer(),
-                  TextButton(
-                      onPressed: () {
-                        if(!_isValidateToSave()){
-                          viewSnackBar('Остались не заполненые поля');
-                        }else{
-                          _save();
-                        }
-                      },
-                      child: const Text("Сохранить"))
-                ],
-              ),
-            )
-        ),
+        appBar: CustomAppBar(typePage: TypePage.addRepair, location: null, technic: null),
         body: Form(
           key: _formKey,
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children:[
-                _buildInternalID(),
-                SizedBox(height: 20),
-                _buildNameTechnic(),
-                SizedBox(height: 20),
-                _buildLastDislocation(providerModel),
-                SizedBox(height: 20),
-                _buildStatus(providerModel),
-                SizedBox(height: 20),
-                _buildComplaint(),
-                SizedBox(height: 20),
-                _buildDateDeparture(),
-                // _buildCategoryListTile(),
-                // _buildDislocationOldListTile(),
-                // _buildStatusListTile(),
-                // _buildComplaintListTile(),
-                // _buildDateDepartureListTile(),
-                // _buildServiceDislocationListTile(),
-                // _buildDateTransferInServiceListTile(),
-                // _buildDateDepartureFromServiceListTile(),
-                // _buildWorksPerformedListTile(),
-                // _buildCostServiceListTile(),
-                // _buildDiagnosisServiceListTile(),
-                // _buildRecommendationsNotesListTile(),
-                // _buildNewStatusListTile(),
-                // _buildNewDislocationListTile(),
-                // _buildDateReceiptListTile(),
-              ],
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              _buildInternalID(),
+              SizedBox(height: 20),
+              _buildNameTechnic(),
+              SizedBox(height: isBN ? 14 : 25),
+              _buildLastDislocation(providerModel),
+              SizedBox(height: isBN ? 9 : 25),
+              _buildStatus(providerModel),
+              SizedBox(height: 20),
+              _buildComplaint(),
+              SizedBox(height: 20),
+              _buildDateDeparture(),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                    child: Text("Отмена"),
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          Repair repair = Repair(
+                              !isBN ? int.parse(_innerNumberTechnic.text) : 0,
+                              _nameTechnicController.text,
+                              isBN ? _lastDislocationController.text : _selectedDropdownDislocationOld ?? '',
+                              _selectedDropdownStatusOld ?? '',
+                              _complaint.text,
+                              _dateDeparture ?? DateTime.now(),
+                              providerModel.user.name);
+
+                          _save(repair, providerModel).then((_) {
+                            _viewSnackBar(Icons.save, true, 'Техника сохранена', 'Техника не сохранена');
+                          });
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: const Text("Сохранить")),
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              )
+              // _buildCategoryListTile(),
+              // _buildDislocationOldListTile(),
+              // _buildStatusListTile(),
+              // _buildComplaintListTile(),
+              // _buildDateDepartureListTile(),
+              // _buildServiceDislocationListTile(),
+              // _buildDateTransferInServiceListTile(),
+              // _buildDateDepartureFromServiceListTile(),
+              // _buildWorksPerformedListTile(),
+              // _buildCostServiceListTile(),
+              // _buildDiagnosisServiceListTile(),
+              // _buildRecommendationsNotesListTile(),
+              // _buildNewStatusListTile(),
+              // _buildNewDislocationListTile(),
+              // _buildDateReceiptListTile(),
+            ],
           ),
-        )
-    );
+        ));
   }
 
   Column _buildInternalID() {
@@ -197,7 +205,7 @@ class _RepairAddState extends State<RepairAdd> {
           onPressed: () async {
             if (_innerNumberTechnic.text != '' && !isBN) {
               TechnicalSupportRepoImpl.downloadData.getTechnic(_innerNumberTechnic.text).then((result) {
-                if(result != null) {
+                if (result != null) {
                   setState(() {
                     _nameTechnicController.text = result.name;
                     _lastDislocationController.text = result.dislocation;
@@ -212,24 +220,7 @@ class _RepairAddState extends State<RepairAdd> {
     );
   }
 
-  void _viewSnackBarGetTechnic(String text) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(Icons.bolt, size: 40, color: Colors.red),
-            Flexible(child: Text(text)),
-          ],
-        ),
-        duration: const Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
-  }
-
-  Widget _buildNameTechnic(){
+  Widget _buildNameTechnic() {
     return Column(
       children: [
         Align(
@@ -247,7 +238,7 @@ class _RepairAddState extends State<RepairAdd> {
           child: ListTile(
             title: TextFormField(
               enabled: isBN,
-              decoration: myDecorationTextFormField(null, 'Введите номер техники'),
+              decoration: myDecorationTextFormField(null, isBN ? 'Наименование техники' : 'Введите номер техники'),
               controller: _nameTechnicController,
               validator: (value) {
                 if (value!.isEmpty) {
@@ -262,7 +253,7 @@ class _RepairAddState extends State<RepairAdd> {
     );
   }
 
-  Widget _buildLastDislocation(ProviderModel providerModel){
+  Widget _buildLastDislocation(ProviderModel providerModel) {
     return Column(
       children: [
         Align(
@@ -278,36 +269,38 @@ class _RepairAddState extends State<RepairAdd> {
         Padding(
           padding: const EdgeInsets.only(left: 40, right: 40),
           child: ListTile(
-            title: isBN ? DropdownButtonFormField<String>(
-              decoration: myDecorationDropdown(),
-              validator: (value) => value == null ? "Обязательное поле" : null,
-              dropdownColor: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(10.0),
-              hint: const Text('Последнее местонахождение'),
-              value: _selectedDropdownDislocationOld,
-              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? value) {
-                setState(() {
-                  _selectedDropdownDislocationOld = value!;
-                });
-              },
-            ) : TextFormField(
-              enabled: false,
-              decoration: myDecorationTextFormField(null, 'Введите номер техники'),
-              controller: _lastDislocationController,
-            ),
+            title: isBN
+                ? DropdownButtonFormField<String>(
+                    decoration: myDecorationDropdown(),
+                    validator: (value) => value == null ? "Обязательное поле" : null,
+                    dropdownColor: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(10.0),
+                    hint: const Text('Последнее местонахождение'),
+                    value: _selectedDropdownDislocationOld,
+                    items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedDropdownDislocationOld = value!;
+                      });
+                    },
+                  )
+                : TextFormField(
+                    enabled: false,
+                    decoration: myDecorationTextFormField(null, 'Введите номер техники'),
+                    controller: _lastDislocationController,
+                  ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStatus(ProviderModel providerModel){
+  Widget _buildStatus(ProviderModel providerModel) {
     return Column(
       children: [
         Align(
@@ -348,7 +341,7 @@ class _RepairAddState extends State<RepairAdd> {
     );
   }
 
-  Widget _buildComplaint(){
+  Widget _buildComplaint() {
     return Column(
       children: [
         Align(
@@ -368,6 +361,12 @@ class _RepairAddState extends State<RepairAdd> {
               decoration: myDecorationTextFormField(null, "Жалоба"),
               controller: _complaint,
               maxLines: 3,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Обязательное поле';
+                }
+                return null;
+              },
             ),
           ),
         ),
@@ -375,7 +374,7 @@ class _RepairAddState extends State<RepairAdd> {
     );
   }
 
-  Widget _buildDateDeparture(){
+  Widget _buildDateDeparture() {
     return Column(
       children: [
         Align(
@@ -383,7 +382,7 @@ class _RepairAddState extends State<RepairAdd> {
           child: Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
-              'Дата покупки техники',
+              'Дата, когда забрали.',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
@@ -401,11 +400,11 @@ class _RepairAddState extends State<RepairAdd> {
             ),
             onTap: () {
               showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2099),
-                  locale: const Locale("ru", "RU"))
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2099),
+                      locale: const Locale("ru", "RU"))
                   .then((date) {
                 setState(() {
                   if (date != null) {
@@ -417,6 +416,23 @@ class _RepairAddState extends State<RepairAdd> {
           ),
         ),
       ],
+    );
+  }
+
+  void _viewSnackBarGetTechnic(String text) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Icon(Icons.bolt, size: 40, color: Colors.red),
+            Flexible(child: Text(text)),
+          ],
+        ),
+        duration: const Duration(seconds: 5),
+        showCloseIcon: true,
+      ),
     );
   }
 
@@ -531,7 +547,7 @@ class _RepairAddState extends State<RepairAdd> {
   //   );
   // }
 
-  ListTile _buildWorksPerformedListTile(){
+  ListTile _buildWorksPerformedListTile() {
     return ListTile(
       leading: const Icon(Icons.create),
       title: TextFormField(
@@ -541,21 +557,18 @@ class _RepairAddState extends State<RepairAdd> {
     );
   }
 
-  ListTile _buildCostServiceListTile(){
+  ListTile _buildCostServiceListTile() {
     return ListTile(
         leading: const Icon(Icons.shopify),
         title: TextFormField(
-          decoration: const InputDecoration(
-              hintText: "Стоимость ремонта",
-              prefix: Text('₽ ')),
+          decoration: const InputDecoration(hintText: "Стоимость ремонта", prefix: Text('₽ ')),
           controller: _costService,
           inputFormatters: [IntegerCurrencyInputFormatter()],
           keyboardType: TextInputType.number,
-        )
-    );
+        ));
   }
 
-  ListTile _buildDiagnosisServiceListTile(){
+  ListTile _buildDiagnosisServiceListTile() {
     return ListTile(
       leading: const Icon(Icons.create),
       title: TextFormField(
@@ -565,7 +578,7 @@ class _RepairAddState extends State<RepairAdd> {
     );
   }
 
-  ListTile _buildRecommendationsNotesListTile(){
+  ListTile _buildRecommendationsNotesListTile() {
     return ListTile(
       leading: const Icon(Icons.create),
       title: TextFormField(
@@ -674,76 +687,18 @@ class _RepairAddState extends State<RepairAdd> {
   //   );
   // }
 
-  bool _isValidateToSave(){
-    bool validate = false;
-    if((!isBN ? _innerNumberTechnic.text != "" : _innerNumberTechnicBN == "БН") &&
-        (!isBN ? _category != "" : _nameTechnicController.text != "") &&
-        (!isBN ? _selectedDropdownDislocationOld != "" : _selectedDropdownDislocationOld != null) &&
-        _selectedDropdownStatusOld != null &&
-        _complaint.text != "" &&
-        _dateDeparture != "" &&
-        _selectedDropdownService != null) {
-      validate = true;
+  Future<bool> _save(Repair repair, ProviderModel provider) async{
+    int? id = await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
+    if(id != null){
+      repair.id = id;
+      // await addHistory(technic, nameUser);
+      provider.addRepairInRepairs(repair);
+      return true;
     }
-    return validate;
+    return false;
   }
 
-  void _save(){
-    // int costServ;
-    // if(_isBN) _innerNumberTechnic.text = '-1';
-    // String newStatusStr;
-    // String newDislocationStr;
-    // _costService.text != "" ? costServ = int.parse(_costService.text.replaceAll(",", "")) : costServ = 0;
-    // _selectedDropdownStatusNew != null ? newStatusStr = _selectedDropdownStatusNew! : newStatusStr = "";
-    // _selectedDropdownDislocationNew != null ? newDislocationStr = _selectedDropdownDislocationNew! : newDislocationStr = "";
-    //
-    // Repair repairLast = Repair.repairList.first;
-    // Repair repair = Repair(
-    //     repairLast.id! + 1,
-    //     int.parse(_innerNumberTechnic.text),
-    //     _isBN ? _categoryController.text : _category,
-    //     _isBN ? _selectedDropdownDislocationOld! : _dislocationOld,
-    //     _selectedDropdownStatusOld!,
-    //     _complaint.text,
-    //     _dateDepartureForSQL,
-    //     _selectedDropdownService!,
-    //     _dateTransferInServiceForSQL,
-    //     _dateDepartureFromServiceForSQL,
-    //     _worksPerformed.text,
-    //     costServ,
-    //     _diagnosisService.text,
-    //     _recommendationsNotes.text,
-    //     newStatusStr,
-    //     newDislocationStr,
-    //     _dateReceiptForSQL,
-    //     0
-    // );
-    //
-    // ConnectToDBMySQL.connDB.insertRepairInDB(repair);
-    // RepairSQFlite.db.create(repair);
-    // addHistory(repair);
-    //
-    // if(newStatusStr != '' || newDislocationStr != ''){
-    //   int indexTechnic = -1;
-    //   for(int i = 0; i < Technic.technicList.length; i++){
-    //     if(Technic.technicList[i].internalID == int.parse(_innerNumberTechnic.text)){
-    //       indexTechnic = i;
-    //       break;
-    //     }
-    //   }
-    //
-    //   repair.dateReceipt = DateFormat('yyyy.MM.dd').format(DateTime.now());
-    //   ConnectToDBMySQL.connDB.insertStatusInDB(Technic.technicList[indexTechnic].id!, newStatusStr, newDislocationStr);
-    //   TechnicSQFlite.db.updateStatusDislocationTechnic(Technic.technicList[indexTechnic].id, newStatusStr, newDislocationStr);
-    //   Technic.technicList[indexTechnic].status = newStatusStr;
-    //   Technic.technicList[indexTechnic].dislocation = newDislocationStr;
-    // }
-    //
-    // viewSnackBar(' Техника в ремонт добавлена');
-    // Navigator.pop(context, repair);
-  }
-
-  Future addHistory(Repair repair) async{
+  Future addHistory(Repair repair) async {
     // String descForHistory = descriptionForHistory(repair);
     // History historyForSQL = History(
     //     History.historyList.last.id + 1,
@@ -767,13 +722,18 @@ class _RepairAddState extends State<RepairAdd> {
   //   return result;
   // }
 
-  void viewSnackBar(String text){
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
+          mainAxisSize: MainAxisSize.max,
           children: [
-            const Icon(Icons.bolt, size: 40, color: Colors.white),
-            Text(text),
+            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+            SizedBox(
+              width: 20,
+            ),
+            Flexible(child: Text(isSuccessful ? successText : notSuccessText)),
           ],
         ),
         duration: const Duration(seconds: 5),
@@ -784,16 +744,12 @@ class _RepairAddState extends State<RepairAdd> {
 }
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {
-
   final validationRegex = RegExp(r'^[\d,]*$');
   final replaceRegex = RegExp(r'[^\d]+');
   static const thousandSeparator = ',';
 
   @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue
-      ) {
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     if (!validationRegex.hasMatch(newValue.text)) {
       return oldValue;
     }
@@ -809,9 +765,9 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
       index -= 3;
 
       if (index > 0) {
-        formattedText = formattedText.substring(0, index)
-            + thousandSeparator
-            + formattedText.substring(index, formattedText.length);
+        formattedText = formattedText.substring(0, index) +
+            thousandSeparator +
+            formattedText.substring(index, formattedText.length);
       }
     }
 
@@ -821,12 +777,8 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
     }
 
     /// Handle moving cursor.
-    final initialNumberOfPrecedingSeparators = oldValue.text.characters
-        .where((e) => e == thousandSeparator)
-        .length;
-    final newNumberOfPrecedingSeparators = formattedText.characters
-        .where((e) => e == thousandSeparator)
-        .length;
+    final initialNumberOfPrecedingSeparators = oldValue.text.characters.where((e) => e == thousandSeparator).length;
+    final newNumberOfPrecedingSeparators = formattedText.characters.where((e) => e == thousandSeparator).length;
     final additionalOffset = newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
 
     return newValue.copyWith(

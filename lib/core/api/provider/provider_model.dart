@@ -125,7 +125,7 @@ class ProviderModel with ChangeNotifier {
   void updateRepairInProvider(Repair repair) {
     _repairs.map((element){
       if(element.id == repair.id){
-        element.number == repair.number;
+        element.numberTechnic == repair.numberTechnic;
         element.costService == repair.costService;
         element.worksPerformed == repair.worksPerformed;
         element.dateDepartureFromService == repair.dateDepartureFromService;
@@ -202,6 +202,5 @@ class ProviderModel with ChangeNotifier {
 
   void setSizeMainBottom(Size? size){
     _mainBottomSize = size;
-    notifyListeners();
   }
 }

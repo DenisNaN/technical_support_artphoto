@@ -1,31 +1,43 @@
 class Repair {
-  final int id;
-  final int number;
+  int? id;
+  final int numberTechnic;
   final String category;
   final String dislocationOld;
   final String status;
   final String complaint;
-  final String dateDeparture;
-  final String serviceDislocation;
-  final String dateTransferInService;
-  final String dateDepartureFromService;
-  final String worksPerformed;
-  final int costService;
-  final String diagnosisService;
-  final String recommendationsNotes;
-  final String newStatus;
-  final String newDislocation;
-  final String dateReceipt;
-  final int idTestDrive;
+  final DateTime dateDeparture;
+  final String whoTook;
+  String? serviceDislocation;
+  DateTime? dateTransferInService;
+  DateTime? dateDepartureFromService;
+  String? worksPerformed;
+  int? costService;
+  String? diagnosisService;
+  String? recommendationsNotes;
+  String? newStatus;
+  String? newDislocation;
+  DateTime? dateReceipt;
+  int? idTestDrive;
 
   Repair(
-      this.id,
-      this.number,
+      this.numberTechnic,
       this.category,
       this.dislocationOld,
       this.status,
       this.complaint,
       this.dateDeparture,
+      this.whoTook,
+      );
+
+  Repair.fullRepair(
+      this.id,
+      this.numberTechnic,
+      this.category,
+      this.dislocationOld,
+      this.status,
+      this.complaint,
+      this.dateDeparture,
+      this.whoTook,
       this.serviceDislocation,
       this.dateTransferInService,
       this.dateDepartureFromService,
@@ -36,5 +48,6 @@ class Repair {
       this.newStatus,
       this.newDislocation,
       this.dateReceipt,
-      this.idTestDrive);
+      this.idTestDrive,
+      );
 }
