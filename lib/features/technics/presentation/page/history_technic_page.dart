@@ -67,7 +67,7 @@ class HistoryTechnicPage extends StatelessWidget {
       return SizedBox();
     }
     if (currentHistoryTechnic.location is PhotosalonLocation) {
-      if (historyList.length > 1) {
+      if (historyList.length > 1 && index > 0) {
         finishDate = _findDateFinishPhotosalon(historyList, index);
       }
       return _buildListTilePhotosalon(currentHistoryTechnic, isStartIndex, finishDate);

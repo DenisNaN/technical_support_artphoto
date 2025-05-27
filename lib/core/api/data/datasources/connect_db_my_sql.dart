@@ -393,7 +393,7 @@ Future<Technic?> getTechnic(int number) async {
         'repairEquipment.dateReceipt, '
         'repairEquipment.idTestDrive '
         'FROM repairEquipment '
-        'WHERE repairEquipment.dateReceipt <> "0000-00-00"');
+        'WHERE repairEquipment.dateReceipt = "0000-00-00"');
 
     final List<Repair> list = repairListFromMap(result);
     final List<Repair> reversedList = List.from(list.reversed);

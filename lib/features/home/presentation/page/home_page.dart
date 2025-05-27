@@ -23,17 +23,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    final double height = MediaQuery.sizeOf(context).height;
-    final double width = MediaQuery.sizeOf(context).width;
-    final double aspectRatio = height / width;
-    double paddingBottomFloatingActionButton = aspectRatio > 2 ? height / 11 : height / 9;
     return Scaffold(
       appBar: AppBarHomepage(),
       body: SafeArea(
         child: WarpIndicator(
             controller: _controller,
-            onRefresh: () => TechnicalSupportRepoImpl.downloadData.refreshData().then((resultData) {
-                  providerModel.refreshAllElement(
+            onRefresh: () => TechnicalSupportRepoImpl.downloadData.refreshTechnicsData().then((resultData) {
+                  providerModel.refreshTechnics(
                       resultData['Photosalons'], resultData['Repairs'], resultData['Storages']);
                 }),
             child: CustomScrollView(
@@ -46,15 +42,12 @@ class _HomePageState extends State<HomePage> {
               ],
             )),
       ),
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: paddingBottomFloatingActionButton),
-        child: FloatingActionButton.extended(
-            icon: Icon(Icons.add),
-            label: Text('Добавить технику'),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const TechnicAdd()));
-            }),
-      ),
+      floatingActionButton: FloatingActionButton.extended(
+          icon: Icon(Icons.add),
+          label: Text('Добавить технику'),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const TechnicAdd()));
+          }),
     );
   }
 

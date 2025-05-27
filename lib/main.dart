@@ -79,7 +79,6 @@ class _ArtphotoTechState extends State<ArtphotoTech> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        extendBody: true,
         bottomNavigationBar: MainBottomAppBar(pageController: pageViewController),
         body: MainBottomPageView(pageController: pageViewController)
     );

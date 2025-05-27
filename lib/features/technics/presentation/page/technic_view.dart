@@ -689,8 +689,8 @@ class _TechnicViewState extends State<TechnicView> {
   Future<bool> _save(Technic technicModel, ProviderModel providerModel) async{
     bool isSuccess = false;
     isSuccess = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technicModel, providerModel.user.name);
-    Map<String, dynamic> result = await TechnicalSupportRepoImpl.downloadData.refreshData();
-    providerModel.refreshAllElement(result['Photosalons'], result['Repairs'], result['Storages']);
+    Map<String, dynamic> result = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
+    providerModel.refreshTechnics(result['Photosalons'], result['Repairs'], result['Storages']);
     return isSuccess;
   }
 

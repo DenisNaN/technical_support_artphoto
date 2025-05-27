@@ -19,7 +19,6 @@ class _MainBottomAppBarState extends State<MainBottomAppBar> {
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: const BoxDecoration(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
         gradient: LinearGradient(
           begin: Alignment.bottomLeft,
           end: Alignment.topRight,

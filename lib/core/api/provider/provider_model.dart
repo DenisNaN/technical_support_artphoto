@@ -50,27 +50,23 @@ class ProviderModel with ChangeNotifier {
 
   Size? get mainBottomSize => _mainBottomSize;
 
-  void downloadAllElements(Map<String, PhotosalonLocation> photosalons,
-      Map<String, RepairLocation> repairs, Map<String, StorageLocation> storages) {
+  void downloadAllElements(Map<String, PhotosalonLocation> photosalons, Map<String, RepairLocation> repairs,
+      Map<String, StorageLocation> storages) {
     _technicsInPhotosalons = photosalons;
     _technicsInRepairs = repairs;
     _technicsInStorages = storages;
   }
 
-  void initUser(User initUser){
+  void initUser(User initUser) {
     _user = initUser;
   }
 
-  void downloadRepairs(List<Repair> repairs){
+  void downloadRepairs(List<Repair> repairs) {
     _repairs = repairs;
   }
 
-  void downloadAllCategoryDropDown(
-      List<String> namesEquipments,
-      List<String> namePhotosalons,
-      List<String> services,
-      List<String> statusForEquipment,
-      Map<String, int> colorsForEquipment) {
+  void downloadAllCategoryDropDown(List<String> namesEquipments, List<String> namePhotosalons, List<String> services,
+      List<String> statusForEquipment, Map<String, int> colorsForEquipment) {
     _namesEquipments = namesEquipments;
     _namesDislocations = namePhotosalons;
     _services = services;
@@ -84,10 +80,10 @@ class ProviderModel with ChangeNotifier {
   }
 
   void updateTechnicInProvider(dynamic location, Technic technic) {
-    switch(Location){
+    switch (Location) {
       case const (PhotosalonLocation):
-        _technicsInPhotosalons[technic.dislocation]!.technics.map((element){
-          if(technic.id == element.id){
+        _technicsInPhotosalons[technic.dislocation]!.technics.map((element) {
+          if (technic.id == element.id) {
             element.name = technic.name;
             element.dislocation = technic.dislocation;
             element.status = technic.status;
@@ -97,8 +93,8 @@ class ProviderModel with ChangeNotifier {
           }
         });
       case const (RepairLocation):
-        _technicsInRepairs[technic.dislocation]!.technics.map((element){
-          if(technic.id == element.id){
+        _technicsInRepairs[technic.dislocation]!.technics.map((element) {
+          if (technic.id == element.id) {
             element.name = technic.name;
             element.dislocation = technic.dislocation;
             element.status = technic.status;
@@ -107,9 +103,9 @@ class ProviderModel with ChangeNotifier {
             element.dateBuyTechnic = technic.dateBuyTechnic;
           }
         });
-      case const(StorageLocation):
-        _technicsInStorages[technic.dislocation]!.technics.map((element){
-          if(technic.id == element.id){
+      case const (StorageLocation):
+        _technicsInStorages[technic.dislocation]!.technics.map((element) {
+          if (technic.id == element.id) {
             element.name = technic.name;
             element.dislocation = technic.dislocation;
             element.status = technic.status;
@@ -123,8 +119,8 @@ class ProviderModel with ChangeNotifier {
   }
 
   void updateRepairInProvider(Repair repair) {
-    _repairs.map((element){
-      if(element.id == repair.id){
+    _repairs.map((element) {
+      if (element.id == repair.id) {
         element.numberTechnic == repair.numberTechnic;
         element.costService == repair.costService;
         element.worksPerformed == repair.worksPerformed;
@@ -146,7 +142,7 @@ class ProviderModel with ChangeNotifier {
     });
   }
 
-  void updateUser(User newUser){
+  void updateUser(User newUser) {
     _user = newUser;
     notifyListeners();
   }
@@ -186,11 +182,11 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void refreshAllElement(
-      Map<String, PhotosalonLocation> photosalons,
-      Map<String, RepairLocation> repairs,
-      Map<String, StorageLocation> storages,
-      ) {
+  void refreshTechnics(
+    Map<String, PhotosalonLocation> photosalons,
+    Map<String, RepairLocation> repairs,
+    Map<String, StorageLocation> storages,
+  ) {
     _technicsInPhotosalons.clear();
     _technicsInRepairs.clear();
     _technicsInStorages.clear();
@@ -200,7 +196,13 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void setSizeMainBottom(Size? size){
+  void refreshRepairs(List<Repair> repairs) {
+    _repairs.clear();
+    _repairs.addAll(repairs);
+    notifyListeners();
+  }
+
+  void setSizeMainBottom(Size? size) {
     _mainBottomSize = size;
   }
 }

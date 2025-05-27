@@ -66,7 +66,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
-  Future<Map<String, dynamic>> refreshData() async {
+  Future<Map<String, dynamic>> refreshTechnicsData() async {
     Map<String, dynamic> result = {};
 
     await ConnectDbMySQL.connDB.connDatabase();
@@ -81,6 +81,16 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 
     await ConnectDbMySQL.connDB.dispose();
     return result;
+  }
+
+  @override
+  Future<List<Repair>> refreshRepairsData() async{
+    List<Repair> repairs = [];
+    await ConnectDbMySQL.connDB.connDatabase();
+    var result = await ConnectDbMySQL.connDB.fetchAllRepairs();
+    await ConnectDbMySQL.connDB.dispose();
+    repairs.addAll(result);
+    return repairs;
   }
 
   @override

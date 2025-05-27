@@ -7,7 +7,8 @@ import '../../data/models/decommissioned.dart';
 
 abstract interface class TechnicalSupportRepo {
   Future<Map<String, dynamic>> getStartData();
-  Future<Map<String, dynamic>> refreshData();
+  Future<Map<String, dynamic>> refreshTechnicsData();
+  Future<List<Repair>> refreshRepairsData();
   Future<User?> getUser(String password);
   Future<bool> checkNumberTechnic(String number);
   Future<Technic?> getTechnic(String number);
