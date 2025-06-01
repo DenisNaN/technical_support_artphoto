@@ -60,7 +60,7 @@ class _TechnicViewState extends State<TechnicView> {
   void initState() {
     super.initState();
     _nameTechnic.text = '';
-    TechnicalSupportRepoImpl.downloadData.getSummsRepairs(widget.technic.number.toString()).then((value) {
+    TechnicalSupportRepoImpl.downloadData.getSumRepairs(widget.technic.number.toString()).then((value) {
       if (value.isNotEmpty) {
         setState(() {
           summsRepairs.addAll(value.values.first);

@@ -2,6 +2,7 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_add.dart';
+import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_view.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
 import '../../../../core/utils/formatters.dart';
@@ -63,12 +64,8 @@ class _RepairsPageState extends State<RepairsPage> {
                   padding: const EdgeInsets.fromLTRB(3, 3, 3, 3),
                   child: ListTile(
                     onTap: () {
-                      // Navigator.push(context, MaterialPageRoute(
-                      //     builder: (context) => RepairViewAndChange(repair: repair))).then((value) {
-                      //   setState(() {
-                      //     if (value != null) Repair.repairList[index] = value;
-                      //   });
-                      // });
+                      Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => RepairView(repair: repair)));
                     },
                     title: _buildTextTitle(context, repair),
                     subtitle: _buildTextSubtitle(context, repair),

@@ -12,27 +12,36 @@ import '../../../../core/utils/enums.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../models/repair.dart';
 
-class RepairAdd extends StatefulWidget {
-  const RepairAdd({super.key});
+class RepairView extends StatefulWidget {
+  const RepairView({super.key, required this.repair});
+
+  final Repair repair;
 
   @override
-  State<RepairAdd> createState() => _RepairAddState();
+  State<RepairView> createState() => _RepairViewState();
 }
 
-class _RepairAddState extends State<RepairAdd> {
+class _RepairViewState extends State<RepairView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final _innerNumberTechnic = TextEditingController();
   final _nameTechnicController = TextEditingController();
   final _lastDislocationController = TextEditingController();
+  String? _selectedDropdownStatusOld;
   final _complaint = TextEditingController();
   DateTime? _dateDeparture;
+  DateTime? _dateTransferInService;
+  DateTime? _dateDepartureFromService;
   final _worksPerformed = TextEditingController();
   final _costService = TextEditingController();
   final _diagnosisService = TextEditingController();
   final _recommendationsNotes = TextEditingController();
+  DateTime? _dateReceipt;
   String? _selectedDropdownDislocationOld;
-  String? _selectedDropdownStatusOld = 'Неисправна';
+
+  String? _selectedDropdownService;
+  String? _selectedDropdownStatusNew;
+  String? _selectedDropdownDislocationNew;
   bool isBN = false;
   bool isExistNumber = false;
 
@@ -41,6 +50,14 @@ class _RepairAddState extends State<RepairAdd> {
   @override
   void initState() {
     super.initState();
+    _innerNumberTechnic.text = widget.repair.numberTechnic.toString();
+    _nameTechnicController.text = widget.repair.category;
+    _lastDislocationController.text = widget.repair.dislocationOld;
+    _selectedDropdownStatusOld = widget.repair.status;
+    _complaint.text = widget.repair.complaint;
+    _dateDeparture = widget.repair.dateDeparture;
+
+
     _dateDeparture = DateTime.now();
   }
 
@@ -111,6 +128,21 @@ class _RepairAddState extends State<RepairAdd> {
               SizedBox(
                 height: 20,
               )
+              // _buildCategoryListTile(),
+              // _buildDislocationOldListTile(),
+              // _buildStatusListTile(),
+              // _buildComplaintListTile(),
+              // _buildDateDepartureListTile(),
+              // _buildServiceDislocationListTile(),
+              // _buildDateTransferInServiceListTile(),
+              // _buildDateDepartureFromServiceListTile(),
+              // _buildWorksPerformedListTile(),
+              // _buildCostServiceListTile(),
+              // _buildDiagnosisServiceListTile(),
+              // _buildRecommendationsNotesListTile(),
+              // _buildNewStatusListTile(),
+              // _buildNewDislocationListTile(),
+              // _buildDateReceiptListTile(),
             ],
           ),
         ));
@@ -248,29 +280,29 @@ class _RepairAddState extends State<RepairAdd> {
           child: ListTile(
             title: isBN
                 ? DropdownButtonFormField<String>(
-                    decoration: myDecorationDropdown(),
-                    validator: (value) => value == null ? "Обязательное поле" : null,
-                    dropdownColor: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(10.0),
-                    hint: const Text('Последнее местонахождение'),
-                    value: _selectedDropdownDislocationOld,
-                    items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? value) {
-                      setState(() {
-                        _selectedDropdownDislocationOld = value!;
-                      });
-                    },
-                  )
+              decoration: myDecorationDropdown(),
+              validator: (value) => value == null ? "Обязательное поле" : null,
+              dropdownColor: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(10.0),
+              hint: const Text('Последнее местонахождение'),
+              value: _selectedDropdownDislocationOld,
+              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? value) {
+                setState(() {
+                  _selectedDropdownDislocationOld = value!;
+                });
+              },
+            )
                 : TextFormField(
-                    enabled: false,
-                    decoration: myDecorationTextFormField(null, 'Введите номер техники'),
-                    controller: _lastDislocationController,
-                  ),
+              enabled: false,
+              decoration: myDecorationTextFormField(null, 'Введите номер техники'),
+              controller: _lastDislocationController,
+            ),
           ),
         ),
       ],
@@ -377,11 +409,11 @@ class _RepairAddState extends State<RepairAdd> {
             ),
             onTap: () {
               showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2099),
-                      locale: const Locale("ru", "RU"))
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2099),
+                  locale: const Locale("ru", "RU"))
                   .then((date) {
                 setState(() {
                   if (date != null) {
@@ -412,6 +444,257 @@ class _RepairAddState extends State<RepairAdd> {
       ),
     );
   }
+
+  // ListTile _buildServiceDislocationListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.miscellaneous_services),
+  //     title: DropdownButton<String>(
+  //       borderRadius: BorderRadius.circular(10.0),
+  //       isExpanded: true,
+  //       hint: const Text('Местонахождение техники'),
+  //       icon: _selectedDropdownService != null ? IconButton(
+  //           icon: const Icon(Icons.clear, color: Colors.grey),
+  //           onPressed: (){
+  //             setState(() {
+  //               _selectedDropdownService = null;
+  //             });}) : null,
+  //       value: _selectedDropdownService,
+  //       items: CategoryDropDownValueModel.service.map<DropdownMenuItem<String>>((String value) {
+  //         return DropdownMenuItem<String>(
+  //           value: value,
+  //           child: Text(value),
+  //         );
+  //       }).toList(),
+  //       onChanged: (String? value){
+  //         setState(() {
+  //           _selectedDropdownService = value!;
+  //         });
+  //       },
+  //     ),
+  //   );
+  // }
+
+  // ListTile _buildDateTransferInServiceListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.today),
+  //     title: const Text("Дата сдачи в ремонт"),
+  //     subtitle: Text(_dateTransferInService == "" ? "Выберите дату" : _dateTransferInService),
+  //     trailing: Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         IconButton(
+  //             icon: const Icon(Icons.edit),
+  //             onPressed: () {
+  //               showDatePicker(
+  //                   context: context,
+  //                   initialDate: DateTime.now(),
+  //                   firstDate: DateTime(2000),
+  //                   lastDate: DateTime(2099),
+  //                   locale: const Locale("ru", "RU")
+  //               ).then((date) {
+  //                 setState(() {
+  //                   if(date != null) {
+  //                     _dateTransferInServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
+  //                     _dateTransferInService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+  //                   }
+  //                 });
+  //               });
+  //             },
+  //             color: Colors.blue
+  //         ),
+  //         IconButton(
+  //             onPressed: (){
+  //               setState(() {
+  //                 _dateTransferInServiceForSQL = '';
+  //                 _dateTransferInService = '';
+  //               });
+  //             },
+  //             icon: const Icon(Icons.clear))
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // ListTile _buildDateDepartureFromServiceListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.today),
+  //     title: const Text("Забрали из ремонта. Дата"),
+  //     subtitle: Text(_dateDepartureFromService == "" ? "Выберите дату" : _dateDepartureFromService),
+  //     trailing: Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         IconButton(
+  //             icon: const Icon(Icons.edit),
+  //             onPressed: () {
+  //               showDatePicker(
+  //                   context: context,
+  //                   initialDate: DateTime.now(),
+  //                   firstDate: DateTime(2000),
+  //                   lastDate: DateTime(2099),
+  //                   locale: const Locale("ru", "RU")
+  //               ).then((date) {
+  //                 setState(() {
+  //                   if(date != null) {
+  //                     _dateDepartureFromServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
+  //                     _dateDepartureFromService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+  //                   }
+  //                 });
+  //               });
+  //             },
+  //             color: Colors.blue
+  //         ),
+  //         IconButton(
+  //             onPressed: (){
+  //               setState(() {
+  //                 _dateDepartureFromServiceForSQL = '';
+  //                 _dateDepartureFromService = '';
+  //               });
+  //             },
+  //             icon: const Icon(Icons.clear))
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  ListTile _buildWorksPerformedListTile() {
+    return ListTile(
+      leading: const Icon(Icons.create),
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: "Произведенные работы"),
+        controller: _worksPerformed,
+      ),
+    );
+  }
+
+  ListTile _buildCostServiceListTile() {
+    return ListTile(
+        leading: const Icon(Icons.shopify),
+        title: TextFormField(
+          decoration: const InputDecoration(hintText: "Стоимость ремонта", prefix: Text('₽ ')),
+          controller: _costService,
+          inputFormatters: [IntegerCurrencyInputFormatter()],
+          keyboardType: TextInputType.number,
+        ));
+  }
+
+  ListTile _buildDiagnosisServiceListTile() {
+    return ListTile(
+      leading: const Icon(Icons.create),
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: "Диагноз мастерской"),
+        controller: _diagnosisService,
+      ),
+    );
+  }
+
+  ListTile _buildRecommendationsNotesListTile() {
+    return ListTile(
+      leading: const Icon(Icons.create),
+      title: TextFormField(
+        decoration: const InputDecoration(hintText: "Рекомендации/примечания (необязательно)"),
+        controller: _recommendationsNotes,
+      ),
+    );
+  }
+
+  // ListTile _buildNewStatusListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.copyright),
+  //     title: DropdownButton<String>(
+  //       borderRadius: BorderRadius.circular(10.0),
+  //       isExpanded: true,
+  //       hint: const Text('Новый статус'),
+  //       icon: _selectedDropdownStatusNew != null ? IconButton(
+  //           icon: const Icon(Icons.clear, color: Colors.grey),
+  //           onPressed: (){
+  //             setState(() {
+  //               _selectedDropdownStatusNew = null;
+  //             });}) : null,
+  //       value: _selectedDropdownStatusNew,
+  //       items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+  //         return DropdownMenuItem<String>(
+  //           value: value,
+  //           child: Text(value),
+  //         );
+  //       }).toList(),
+  //       onChanged: (String? value){
+  //         setState(() {
+  //           _selectedDropdownStatusNew = value!;
+  //         });
+  //       },
+  //     ),
+  //   );
+  // }
+
+  // ListTile _buildNewDislocationListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.local_shipping),
+  //     title: DropdownButton<String>(
+  //       borderRadius: BorderRadius.circular(10.0),
+  //       isExpanded: true,
+  //       hint: const Text('Куда уехал'),
+  //       icon: _selectedDropdownDislocationNew != null ? IconButton(
+  //           icon: const Icon(Icons.clear, color: Colors.grey),
+  //           onPressed: (){
+  //             setState(() {
+  //               _selectedDropdownDislocationNew = null;
+  //             });}) : null,
+  //       value: _selectedDropdownDislocationNew,
+  //       items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
+  //         return DropdownMenuItem<String>(
+  //           value: value,
+  //           child: Text(value),
+  //         );
+  //       }).toList(),
+  //       onChanged: (String? value){
+  //         setState(() {
+  //           _selectedDropdownDislocationNew = value!;
+  //         });
+  //       },
+  //     ),
+  //   );
+  // }
+
+  // ListTile _buildDateReceiptListTile(){
+  //   return ListTile(
+  //     leading: const Icon(Icons.today),
+  //     title: const Text("Дата поступления"),
+  //     subtitle: Text(_dateReceipt == "" ? "Выберите дату" : _dateReceipt),
+  //     trailing: Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         IconButton(
+  //             icon: const Icon(Icons.edit),
+  //             onPressed: () {
+  //               showDatePicker(
+  //                   context: context,
+  //                   initialDate: DateTime.now(),
+  //                   firstDate: DateTime(2000),
+  //                   lastDate: DateTime(2099),
+  //                   locale: const Locale("ru", "RU")
+  //               ).then((date) {
+  //                 setState(() {
+  //                   if(date != null) {
+  //                     _dateReceiptForSQL = DateFormat('yyyy.MM.dd').format(date);
+  //                     _dateReceipt = DateFormat('d MMMM yyyy', "ru_RU").format(date);
+  //                   }
+  //                 });
+  //               });
+  //             },
+  //             color: Colors.blue
+  //         ),
+  //         IconButton(
+  //             onPressed: (){
+  //               setState(() {
+  //                 _dateReceiptForSQL = '';
+  //                 _dateReceipt = '';
+  //               });
+  //             },
+  //             icon: const Icon(Icons.clear))
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Future<bool> _save(Repair repair, ProviderModel provider) async{
     int? id = await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);

@@ -1,4 +1,4 @@
-class Repair {
+class Repair implements Comparable {
   int? id;
   final int numberTechnic;
   final String category;
@@ -50,4 +50,12 @@ class Repair {
       this.dateReceipt,
       this.idTestDrive,
       );
+
+  @override
+  int compareTo(other) {
+    if(id != null){
+      return id!.compareTo(other.id);
+    }
+    return 0;
+  }
 }

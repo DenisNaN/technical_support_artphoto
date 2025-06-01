@@ -197,8 +197,24 @@ class ProviderModel with ChangeNotifier {
   }
 
   void refreshRepairs(List<Repair> repairs) {
+    List<Repair> filterRepairs = [];
+    List<Repair> tmpRedList = [];
+    List<Repair> tmpYellowList = [];
+
+    for(int i = 0; i < repairs.length; i++){
+      if(repairs[i].serviceDislocation == ''){
+        tmpRedList.add(repairs[i]);
+      }else{
+        tmpYellowList.add(repairs[i]);
+      }
+    }
+    tmpYellowList.sort();
+    tmpRedList.sort();
+    filterRepairs.addAll(tmpYellowList);
+    filterRepairs.addAll(tmpRedList);
+
     _repairs.clear();
-    _repairs.addAll(repairs);
+    _repairs.addAll(filterRepairs);
     notifyListeners();
   }
 

@@ -160,7 +160,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
-  Future<Map<int, List<SummRepair>>> getSummsRepairs(String numberTechnic) async{
+  Future<Map<int, List<SummRepair>>> getSumRepairs(String numberTechnic) async{
     await ConnectDbMySQL.connDB.connDatabase();
     Map<int, List<SummRepair>> summsRepairs = await ConnectDbMySQL.connDB.getSummsRepairs(numberTechnic);
     await ConnectDbMySQL.connDB.dispose();
