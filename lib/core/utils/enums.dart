@@ -7,9 +7,10 @@ enum ColorStageRepair{
 enum TypePage{
   listTechnics,
   addTechnic,
-  view,
+  viewTechnic,
   repair,
   addRepair,
+  viewRepair,
   history,
   technicRepair,
   error,

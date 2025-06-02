@@ -7,9 +7,11 @@ import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app
 import '../../../../core/api/data/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
+import '../../../../core/navigation/animation_navigation.dart';
 import '../../../../core/shared/input_decoration/input_deroration.dart';
 import '../../../../core/utils/enums.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../technics/presentation/page/technic_view.dart';
 import '../../models/repair.dart';
 
 class RepairView extends StatefulWidget {
@@ -27,6 +29,7 @@ class _RepairViewState extends State<RepairView> {
   final _innerNumberTechnic = TextEditingController();
   final _nameTechnicController = TextEditingController();
   final _lastDislocationController = TextEditingController();
+  String? _selectedDropdownDislocationOld;
   String? _selectedDropdownStatusOld;
   final _complaint = TextEditingController();
   DateTime? _dateDeparture;
@@ -37,9 +40,9 @@ class _RepairViewState extends State<RepairView> {
   final _diagnosisService = TextEditingController();
   final _recommendationsNotes = TextEditingController();
   DateTime? _dateReceipt;
-  String? _selectedDropdownDislocationOld;
 
   String? _selectedDropdownService;
+  String? _selectedDropdownWhoTook;
   String? _selectedDropdownStatusNew;
   String? _selectedDropdownDislocationNew;
   bool isBN = false;
@@ -53,12 +56,20 @@ class _RepairViewState extends State<RepairView> {
     _innerNumberTechnic.text = widget.repair.numberTechnic.toString();
     _nameTechnicController.text = widget.repair.category;
     _lastDislocationController.text = widget.repair.dislocationOld;
-    _selectedDropdownStatusOld = widget.repair.status;
+    _selectedDropdownStatusOld = widget.repair.status != '' ? widget.repair.status : null;
     _complaint.text = widget.repair.complaint;
     _dateDeparture = widget.repair.dateDeparture;
-
-
-    _dateDeparture = DateTime.now();
+    _selectedDropdownWhoTook = widget.repair.whoTook != '' ? widget.repair.whoTook : null;
+    _selectedDropdownService = widget.repair.serviceDislocation != '' ? widget.repair.serviceDislocation : null;
+    _dateTransferInService = widget.repair.dateTransferInService;
+    _dateDepartureFromService = widget.repair.dateDepartureFromService;
+    _worksPerformed.text = widget.repair.worksPerformed ?? '';
+    _costService.text = widget.repair.costService.toString();
+    _diagnosisService.text = widget.repair.diagnosisService ?? '';
+    _recommendationsNotes.text = widget.repair.recommendationsNotes ?? '';
+    _selectedDropdownStatusNew = widget.repair.newStatus != '' ? widget.repair.newStatus : null;
+    _selectedDropdownDislocationNew = widget.repair.newDislocation != '' ? widget.repair.newDislocation : null;
+    _dateReceipt = widget.repair.dateReceipt;
   }
 
   @override
@@ -76,13 +87,14 @@ class _RepairViewState extends State<RepairView> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     return Scaffold(
-        appBar: CustomAppBar(typePage: TypePage.addRepair, location: null, technic: null),
+        appBar: CustomAppBar(typePage: TypePage.viewRepair, location: widget.repair, technic: null),
         body: Form(
           key: _formKey,
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
-              _buildInternalID(),
+              SizedBox(height: 10),
+              _headerData(),
               SizedBox(height: 20),
               _buildNameTechnic(),
               SizedBox(height: isBN ? 14 : 25),
@@ -110,7 +122,7 @@ class _RepairViewState extends State<RepairView> {
                           Repair repair = Repair(
                               !isBN ? int.parse(_innerNumberTechnic.text) : 0,
                               _nameTechnicController.text,
-                              isBN ? _lastDislocationController.text : _selectedDropdownDislocationOld ?? '',
+                              _lastDislocationController.text,
                               _selectedDropdownStatusOld ?? '',
                               _complaint.text,
                               _dateDeparture ?? DateTime.now(),
@@ -128,78 +140,152 @@ class _RepairViewState extends State<RepairView> {
               SizedBox(
                 height: 20,
               )
-              // _buildCategoryListTile(),
-              // _buildDislocationOldListTile(),
-              // _buildStatusListTile(),
-              // _buildComplaintListTile(),
-              // _buildDateDepartureListTile(),
-              // _buildServiceDislocationListTile(),
-              // _buildDateTransferInServiceListTile(),
-              // _buildDateDepartureFromServiceListTile(),
-              // _buildWorksPerformedListTile(),
-              // _buildCostServiceListTile(),
-              // _buildDiagnosisServiceListTile(),
-              // _buildRecommendationsNotesListTile(),
-              // _buildNewStatusListTile(),
-              // _buildNewDislocationListTile(),
-              // _buildDateReceiptListTile(),
             ],
           ),
         ));
   }
 
-  Column _buildInternalID() {
+  Column _headerData(ProviderModel provider) {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 20.0),
-          child: Row(
-            children: [
-              Text(isBN ? 'Включить номер' : 'Выключить номер'),
-              Transform.scale(
-                scale: 1.2,
-                child: Switch(
-                    value: isBN,
-                    onChanged: (value) {
-                      setState(() {
-                        isBN = value;
-                        if (value == true) {
-                          _innerNumberTechnic.text = '';
-                          _nameTechnicController.text = '';
-                          _selectedDropdownDislocationOld = null;
-                          _lastDislocationController.text = '';
-                        }
-                      });
-                    }),
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: Container(
+            decoration:
+            BoxDecoration(borderRadius: BorderRadius.circular(10),  boxShadow: const [
+              BoxShadow(
+                color: Colors.grey,
+                blurRadius: 4,
+                offset: Offset(2, 4), // Shadow position
               ),
-            ],
+            ]),
+            child: ExpansionTile(
+              trailing: GestureDetector(
+                onTap: (){
+                  showDialog(
+                      context: context,
+                      builder: (_) {
+                        return AlertDialog(
+                          actions: [
+                            Center(
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      // TechnicalSupportRepoImpl.downloadData.getTechnic(widget.repair.numberTechnic.toString()).then((technicResult){
+                                      //   if(technicResult != null){
+                                      //     Technic technic = technicResult;
+                                      //     technic.name = _nameTechnic.text;
+                                      //     provider.updateTechnicInProvider(widget.location, technic);
+                                      //     TechnicalSupportRepoImpl.downloadData.updateTechnic(technic).then((value) {
+                                      //       _viewSnackBar(value ? Icons.print : Icons.print_disabled, value,
+                                      //           value ? 'Изменения приняты' : 'Изменения не сохранились');
+                                      //     });
+                                      //     Navigator.of(context).pop();
+                                      //   }
+                                      // });
+                                    },
+                                    child: Text('Сохранить')))
+                          ],
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                          title: Text('Редактировать'),
+                          titleTextStyle: Theme.of(context).textTheme.headlineMedium,
+                          content: Column(
+                            children: [
+                              TextFormField(
+                                decoration: myDecorationTextFormField(null, 'Наименование техники'),
+                                controller: _nameTechnic..text = widget.technic.name,
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Обязательное поле';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      });
+                },
+                child: Icon(Icons.edit),
+              ),
+              tilePadding: EdgeInsets.symmetric(horizontal: 20, vertical: 7),
+              collapsedShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              collapsedBackgroundColor: Colors.blue[100],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              backgroundColor: Colors.blue[100],
+              title: _buildTextTitle(),
+              children: <Widget>[
+                ListTile(
+                    title: _buildTextSubtitle()
+                )
+              ],
+            ),
           ),
         ),
-        Row(
-          children: [
-            Expanded(
-              child: ListTile(
-                title: TextFormField(
-                  enabled: !isBN,
-                  decoration: myDecorationTextFormField(!isBN ? 'Номер техники' : 'Без номера'),
-                  controller: _innerNumberTechnic,
-                  validator: (value) {
-                    if (value!.isEmpty && !isBN) {
-                      return 'Обязательное поле';
-                    }
-                    if (isExistNumber) {
-                      return 'Номер занят';
-                    }
-                    return null;
-                  },
-                  inputFormatters: [numberFormatter],
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ),
-            _buildButtonGetTechnic(),
-          ],
+      ],
+    );
+  }
+
+  Widget _buildTextTitle() {
+    return Row(children: [
+      GestureDetector(
+        onTap: () {
+          TechnicalSupportRepoImpl.downloadData.getTechnic(widget.repair.numberTechnic.toString()).then((technic){
+            if(technic != null){
+              _navigationOnTehcnicView(technic);
+            }
+          });
+        },
+        child: CircleAvatar(
+          radius: widget.repair.numberTechnic.toString().length > 4 ? 27 : null,
+          child: Text(widget.repair.numberTechnic.toString(), style: TextStyle(fontWeight: FontWeight.bold),),
         ),
+      ),
+      SizedBox(width: 10,),
+      Text(widget.repair.category, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+    ],);
+  }
+
+  void _navigationOnTehcnicView(Technic technic){
+    Navigator.push(context,
+        animationRouteSlideTransition(TechnicView(location: technic.dislocation, technic: technic)));
+  }
+
+  Widget _buildTextSubtitle() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text.rich(TextSpan(children: [
+          TextSpan(text: 'Жалоба: ', style: TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: widget.repair.complaint != '' ? widget.repair.complaint : 'Данные отсутствуют'),
+          TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
+        ])),
+        Row(children: [
+          Text(widget.repair.dislocationOld != '' ? widget.repair.dislocationOld : 'Неизвестно откуда забрали'),
+          SizedBox(width: 7,),
+          Icon(Icons.delivery_dining, color: Colors.green.shade700,),
+          Icon(Icons.arrow_forward, color: Colors.green.shade700,),
+          SizedBox(width: 5,),
+          widget.repair.whoTook != '' ? Text(widget.repair.whoTook) : Icon(Icons.person_off),
+        ],),
+        Row(children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4.0),
+            child: Text.rich(TextSpan(children: [
+              TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
+              TextSpan(text: 'Статус: '),
+              TextSpan(text: widget.repair.status != '' ? widget.repair.status : 'Отсутствует'),
+            ])),
+          ),
+          SizedBox(width: 8,),
+          Icon(Icons.calendar_month),
+          SizedBox(width: 4,),
+          Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000Z' ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture) : 'Дата отсутствует')
+        ])
       ],
     );
   }

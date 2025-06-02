@@ -5,6 +5,7 @@ import 'package:technical_support_artphoto/features/repairs/presentation/page/re
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_view.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
+import '../../../../core/navigation/animation_navigation.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../home/presentation/widgets/my_custom_refresh_indicator.dart';
 import '../../models/repair.dart';
@@ -64,11 +65,11 @@ class _RepairsPageState extends State<RepairsPage> {
                   padding: const EdgeInsets.fromLTRB(3, 3, 3, 3),
                   child: ListTile(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => RepairView(repair: repair)));
+                      Navigator.push(context,
+                          animationRouteSlideTransition(RepairView(repair: repair)));
                     },
-                    title: _buildTextTitle(context, repair),
-                    subtitle: _buildTextSubtitle(context, repair),
+                    title: _buildTextTitle(repair),
+                    subtitle: _buildTextSubtitle(repair),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -80,7 +81,7 @@ class _RepairsPageState extends State<RepairsPage> {
         ));
   }
 
-  Text _buildTextTitle(BuildContext context, Repair repair) {
+  Text _buildTextTitle(Repair repair) {
     String repairComplaint = 'Не внесли данные.';
     if (repair.complaint != '') {
       repairComplaint = '${repair.complaint}.';
@@ -101,7 +102,7 @@ class _RepairsPageState extends State<RepairsPage> {
     }
   }
 
-  Text _buildTextSubtitle(BuildContext context, Repair repair) {
+  Text _buildTextSubtitle(Repair repair) {
     String repairStatus = 'Отсутствует.';
     if (repair.status != '') {
       if (repair.newStatus != '') {

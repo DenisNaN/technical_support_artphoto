@@ -76,7 +76,7 @@ class _TechnicViewState extends State<TechnicView> {
     final providerModel = Provider.of<ProviderModel>(context);
     double widthScreen = MediaQuery.sizeOf(context).width;
     return Scaffold(
-        appBar: CustomAppBar(typePage: TypePage.view, location: widget.location, technic: widget.technic),
+        appBar: CustomAppBar(typePage: TypePage.viewTechnic, location: widget.location, technic: widget.technic),
         body: Form(
             key: _formInnerNumberKey,
             child: ListView(

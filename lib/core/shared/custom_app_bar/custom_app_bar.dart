@@ -4,6 +4,8 @@ import 'package:technical_support_artphoto/core/navigation/animation_navigation.
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/history_technic_page.dart';
 
+import '../../api/data/models/location.dart';
+
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key, required this.typePage, required this.location, required this.technic});
 
@@ -51,12 +53,13 @@ class _CustomAppBarState extends State<CustomAppBar> {
       title: switch(widget.typePage){
         TypePage.listTechnics => _listTechnics(),
         TypePage.addTechnic => _addTechnic(),
-        TypePage.view => _viewTechnic(),
+        TypePage.viewTechnic => _viewTechnic(),
         TypePage.repair => _repair(widget.location.toString()),
         TypePage.technicRepair => _repairTechnic(),
         TypePage.history => _historyTechnic(),
         TypePage.error => _error(widget.location.toString()),
         TypePage.addRepair => _addRepair(),
+        TypePage.viewRepair => _viewRepair(),
       }
     );
   }
@@ -67,6 +70,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   Widget _addRepair(){
     return const Text('Новая заявка на ремонт', style: TextStyle(color: Colors.black));
+  }
+
+  Widget _viewRepair(){
+    return Text('Заявка на ремонт', style: TextStyle(color: Colors.black));
   }
 
   Widget _listTechnics(){
@@ -102,11 +109,17 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   Widget _viewTechnic(){
+    String locationName = '';
+    if(widget.location is Location){
+      locationName = widget.location.name;
+    }else{
+      locationName = widget.location;
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Expanded(
-          child: Text(widget.location.name, style: Theme
+          child: Text(locationName, style: Theme
               .of(context)
               .textTheme
               .titleLarge, ),

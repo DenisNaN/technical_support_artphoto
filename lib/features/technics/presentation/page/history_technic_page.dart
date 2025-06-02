@@ -71,8 +71,8 @@ class HistoryTechnicPage extends StatelessWidget {
         finishDate = _findDateFinishPhotosalon(historyList, index);
       }
       return _buildListTilePhotosalon(currentHistoryTechnic, isStartIndex, finishDate);
-    } else if (currentHistoryTechnic.location is RepairLocation) {
-      return _buildListTileRepair(currentHistoryTechnic, isStartIndex, finishDate);
+    } else if (currentHistoryTechnic.location is RepairLocation && currentHistoryTechnic.date.toString() != "-0001-11-30 00:00:00.000Z") {
+      return _buildListTileRepair(currentHistoryTechnic, isStartIndex);
     }
     return SizedBox();
   }
@@ -121,7 +121,6 @@ class HistoryTechnicPage extends StatelessWidget {
   Widget _buildListTileRepair(
     HistoryTechnic currentHistoryTechnic,
     bool isStartIndex,
-    DateTime? finishDate,
   ) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
