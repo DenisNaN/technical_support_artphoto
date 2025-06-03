@@ -35,6 +35,7 @@ InputDecoration myDecorationTextFormField([String? labelText, String? hintText, 
           borderSide: BorderSide(color: Colors.red, width: 1),
           borderRadius: BorderRadius.circular(15)),
       labelText: labelText,
+      labelStyle: TextStyle(fontStyle: FontStyle.italic),
       hintText: hintText,
       prefix: prefix != null ? Text(prefix) : null);
 }

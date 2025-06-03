@@ -75,6 +75,7 @@ class _RepairViewState extends State<RepairView> {
   @override
   void dispose() {
     _innerNumberTechnic.dispose();
+    _nameTechnicController.dispose();
     _complaint.dispose();
     _worksPerformed.dispose();
     _costService.dispose();
@@ -94,7 +95,7 @@ class _RepairViewState extends State<RepairView> {
             padding: EdgeInsets.zero,
             children: [
               SizedBox(height: 10),
-              _headerData(),
+              _headerData(providerModel),
               SizedBox(height: 20),
               _buildNameTechnic(),
               SizedBox(height: isBN ? 14 : 25),
@@ -151,8 +152,7 @@ class _RepairViewState extends State<RepairView> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: Container(
-            decoration:
-            BoxDecoration(borderRadius: BorderRadius.circular(10),  boxShadow: const [
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: const [
               BoxShadow(
                 color: Colors.grey,
                 blurRadius: 4,
@@ -161,7 +161,10 @@ class _RepairViewState extends State<RepairView> {
             ]),
             child: ExpansionTile(
               trailing: GestureDetector(
-                onTap: (){
+                onTap: () {
+                  _nameTechnicController.text = widget.repair.category;
+                  _complaint.text = widget.repair.complaint;
+                  print(_complaint.text.length);
                   showDialog(
                       context: context,
                       builder: (_) {
@@ -186,13 +189,13 @@ class _RepairViewState extends State<RepairView> {
                                     child: Text('Сохранить')))
                           ],
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                          title: Text('Редактировать'),
+                          title: Text('Редактировать заявку'),
                           titleTextStyle: Theme.of(context).textTheme.headlineMedium,
                           content: Column(
                             children: [
                               TextFormField(
-                                decoration: myDecorationTextFormField(null, 'Наименование техники'),
-                                controller: _nameTechnic..text = widget.technic.name,
+                                decoration: myDecorationTextFormField('Наименование техники', 'Наименование техники'),
+                                controller: _nameTechnicController,
                                 validator: (value) {
                                   if (value!.isEmpty) {
                                     return 'Обязательное поле';
@@ -200,6 +203,42 @@ class _RepairViewState extends State<RepairView> {
                                   return null;
                                 },
                               ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              TextFormField(
+                                decoration: myDecorationTextFormField('Жалоба', 'Жалоба'),
+                                controller: _complaint,
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Обязательное поле';
+                                  }
+                                  return null;
+                                },
+                                maxLines: _complaint.text.length > 120 ? 4 : 3,
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.blue.shade50, borderRadius: BorderRadius.circular(15)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 100),
+                                    child: Text(DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture)),
+                                  ),
+                                ),
+                                Positioned(
+                                    left: 11,
+                                    top: -7,
+                                    child: Text(
+                                      'Дата, когда забрали',
+                                      style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: Colors.black.withValues(alpha: 0.7)),
+                                    )),
+                              ])
                             ],
                           ),
                         );
@@ -217,11 +256,7 @@ class _RepairViewState extends State<RepairView> {
               ),
               backgroundColor: Colors.blue[100],
               title: _buildTextTitle(),
-              children: <Widget>[
-                ListTile(
-                    title: _buildTextSubtitle()
-                )
-              ],
+              children: <Widget>[ListTile(title: _buildTextSubtitle())],
             ),
           ),
         ),
@@ -230,28 +265,38 @@ class _RepairViewState extends State<RepairView> {
   }
 
   Widget _buildTextTitle() {
-    return Row(children: [
-      GestureDetector(
-        onTap: () {
-          TechnicalSupportRepoImpl.downloadData.getTechnic(widget.repair.numberTechnic.toString()).then((technic){
-            if(technic != null){
-              _navigationOnTehcnicView(technic);
-            }
-          });
-        },
-        child: CircleAvatar(
-          radius: widget.repair.numberTechnic.toString().length > 4 ? 27 : null,
-          child: Text(widget.repair.numberTechnic.toString(), style: TextStyle(fontWeight: FontWeight.bold),),
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: () {
+            TechnicalSupportRepoImpl.downloadData.getTechnic(widget.repair.numberTechnic.toString()).then((technic) {
+              if (technic != null) {
+                _navigationOnTehcnicView(technic);
+              }
+            });
+          },
+          child: CircleAvatar(
+            radius: widget.repair.numberTechnic.toString().length > 4 ? 27 : null,
+            child: Text(
+              widget.repair.numberTechnic.toString(),
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
         ),
-      ),
-      SizedBox(width: 10,),
-      Text(widget.repair.category, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-    ],);
+        SizedBox(
+          width: 10,
+        ),
+        Text(
+          widget.repair.category,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
   }
 
-  void _navigationOnTehcnicView(Technic technic){
-    Navigator.push(context,
-        animationRouteSlideTransition(TechnicView(location: technic.dislocation, technic: technic)));
+  void _navigationOnTehcnicView(Technic technic) {
+    Navigator.push(
+        context, animationRouteSlideTransition(TechnicView(location: technic.dislocation, technic: technic)));
   }
 
   Widget _buildTextSubtitle() {
@@ -264,14 +309,26 @@ class _RepairViewState extends State<RepairView> {
           TextSpan(text: widget.repair.complaint != '' ? widget.repair.complaint : 'Данные отсутствуют'),
           TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
         ])),
-        Row(children: [
-          Text(widget.repair.dislocationOld != '' ? widget.repair.dislocationOld : 'Неизвестно откуда забрали'),
-          SizedBox(width: 7,),
-          Icon(Icons.delivery_dining, color: Colors.green.shade700,),
-          Icon(Icons.arrow_forward, color: Colors.green.shade700,),
-          SizedBox(width: 5,),
-          widget.repair.whoTook != '' ? Text(widget.repair.whoTook) : Icon(Icons.person_off),
-        ],),
+        Row(
+          children: [
+            Text(widget.repair.dislocationOld != '' ? widget.repair.dislocationOld : 'Неизвестно откуда забрали'),
+            SizedBox(
+              width: 7,
+            ),
+            Icon(
+              Icons.delivery_dining,
+              color: Colors.green.shade700,
+            ),
+            Icon(
+              Icons.arrow_forward,
+              color: Colors.green.shade700,
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            widget.repair.whoTook != '' ? Text(widget.repair.whoTook) : Icon(Icons.person_off),
+          ],
+        ),
         Row(children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 4.0),
@@ -281,10 +338,16 @@ class _RepairViewState extends State<RepairView> {
               TextSpan(text: widget.repair.status != '' ? widget.repair.status : 'Отсутствует'),
             ])),
           ),
-          SizedBox(width: 8,),
+          SizedBox(
+            width: 8,
+          ),
           Icon(Icons.calendar_month),
-          SizedBox(width: 4,),
-          Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000Z' ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture) : 'Дата отсутствует')
+          SizedBox(
+            width: 4,
+          ),
+          Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000Z'
+              ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture)
+              : 'Дата отсутствует')
         ])
       ],
     );
@@ -366,29 +429,29 @@ class _RepairViewState extends State<RepairView> {
           child: ListTile(
             title: isBN
                 ? DropdownButtonFormField<String>(
-              decoration: myDecorationDropdown(),
-              validator: (value) => value == null ? "Обязательное поле" : null,
-              dropdownColor: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(10.0),
-              hint: const Text('Последнее местонахождение'),
-              value: _selectedDropdownDislocationOld,
-              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? value) {
-                setState(() {
-                  _selectedDropdownDislocationOld = value!;
-                });
-              },
-            )
+                    decoration: myDecorationDropdown(),
+                    validator: (value) => value == null ? "Обязательное поле" : null,
+                    dropdownColor: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(10.0),
+                    hint: const Text('Последнее местонахождение'),
+                    value: _selectedDropdownDislocationOld,
+                    items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedDropdownDislocationOld = value!;
+                      });
+                    },
+                  )
                 : TextFormField(
-              enabled: false,
-              decoration: myDecorationTextFormField(null, 'Введите номер техники'),
-              controller: _lastDislocationController,
-            ),
+                    enabled: false,
+                    decoration: myDecorationTextFormField(null, 'Введите номер техники'),
+                    controller: _lastDislocationController,
+                  ),
           ),
         ),
       ],
@@ -495,11 +558,11 @@ class _RepairViewState extends State<RepairView> {
             ),
             onTap: () {
               showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2099),
-                  locale: const Locale("ru", "RU"))
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2099),
+                      locale: const Locale("ru", "RU"))
                   .then((date) {
                 setState(() {
                   if (date != null) {
@@ -782,9 +845,9 @@ class _RepairViewState extends State<RepairView> {
   //   );
   // }
 
-  Future<bool> _save(Repair repair, ProviderModel provider) async{
+  Future<bool> _save(Repair repair, ProviderModel provider) async {
     int? id = await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
-    if(id != null){
+    if (id != null) {
       repair.id = id;
       // await addHistory(technic, nameUser);
       provider.addRepairInRepairs(repair);
