@@ -33,6 +33,7 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
     super.initState();
     _innerNumberTechnic.text = widget.repair.numberTechnic.toString();
     _nameTechnicController.text = widget.repair.category;
+    //TODO заявка с принтером 48 прилетает ошибка при попытки редактирования первой части заявки
     _selectedDropdownDislocationOld = widget.repair.dislocationOld != '' ? widget.repair.dislocationOld : null;
     _selectedDropdownStatusOld = widget.repair.status != '' ? widget.repair.status : null;
     _complaint.text = widget.repair.complaint;

@@ -333,7 +333,7 @@ class _RepairAddState extends State<RepairAdd> {
         ),
         ListTile(
           title: Padding(
-            padding: const EdgeInsets.only(left: 40, right: 40),
+            padding: const EdgeInsets.symmetric(horizontal:  40),
             child: TextFormField(
               decoration: myDecorationTextFormField(null, "Жалоба"),
               controller: _complaint,

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -27,13 +28,6 @@ class RepairView extends StatefulWidget {
 class _RepairViewState extends State<RepairView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final _innerNumberTechnic = TextEditingController();
-  final _nameTechnicController = TextEditingController();
-  String? _selectedDropdownDislocationOld;
-  String? _selectedDropdownStatusOld;
-  final _complaint = TextEditingController();
-  final _whoTook = TextEditingController();
-  DateTime? _dateDeparture;
   DateTime? _dateTransferInService;
   DateTime? _dateDepartureFromService;
   final _worksPerformed = TextEditingController();
@@ -52,13 +46,6 @@ class _RepairViewState extends State<RepairView> {
   @override
   void initState() {
     super.initState();
-    _innerNumberTechnic.text = widget.repair.numberTechnic.toString();
-    _nameTechnicController.text = widget.repair.category;
-    _selectedDropdownDislocationOld = widget.repair.dislocationOld != '' ? widget.repair.dislocationOld : null;
-    _selectedDropdownStatusOld = widget.repair.status != '' ? widget.repair.status : null;
-    _complaint.text = widget.repair.complaint;
-    _whoTook.text = widget.repair.whoTook;
-    _dateDeparture = widget.repair.dateDeparture;
     _selectedDropdownWhoTook = widget.repair.whoTook != '' ? widget.repair.whoTook : null;
     _selectedDropdownService = widget.repair.serviceDislocation != '' ? widget.repair.serviceDislocation : null;
     _dateTransferInService = widget.repair.dateTransferInService;
@@ -74,10 +61,6 @@ class _RepairViewState extends State<RepairView> {
 
   @override
   void dispose() {
-    _innerNumberTechnic.dispose();
-    _nameTechnicController.dispose();
-    _complaint.dispose();
-    _whoTook.dispose();
     _worksPerformed.dispose();
     _costService.dispose();
     _diagnosisService.dispose();
@@ -88,25 +71,48 @@ class _RepairViewState extends State<RepairView> {
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
+    Color colorStepTwoRepair = _getColorStepTwoRepair();
+    Color colorStepThreeRepair = _getColorStepThreeRepair();
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.viewRepair, location: widget.repair, technic: null),
         body: Form(
           key: _formKey,
           child: ListView(
-            padding: EdgeInsets.zero,
             children: [
               SizedBox(height: 10),
               _headerData(),
               SizedBox(height: 20),
-              _buildServises(providerModel),
-              _buildDateTransferInService(),
-              SizedBox(height: 20),
-              SizedBox(height: 20),
-              _buildStatus(providerModel),
-              SizedBox(height: 20),
-              _buildComplaint(),
-              SizedBox(height: 20),
-              _buildDateTransferInService(),
+              Center(child: Text('Второй этап заявки',
+                style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),)),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                decoration: BoxDecoration(
+                    color: colorStepTwoRepair,
+                    borderRadius: BorderRadius.circular(30)
+                ),
+                child: Column(children: [
+                  _buildServices(providerModel),
+                  SizedBox(height: 10),
+                  _buildDateTransferInService(),
+                ])),
+              SizedBox(height: 10),
+              Center(child: Column(
+                children: [
+                  Text('Третий этап заявки',
+                    style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),),
+                ],
+              )),
+              Container(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  decoration: BoxDecoration(
+                      color: colorStepThreeRepair,
+                      borderRadius: BorderRadius.circular(30)
+                  ),
+                  child: Column(
+                    children: [
+                      _buildDateDepartureFromService(),
+                    ],
+                  )),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -121,19 +127,19 @@ class _RepairViewState extends State<RepairView> {
                   ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          Repair repair = Repair(
-                              int.parse(_innerNumberTechnic.text),
-                              _nameTechnicController.text,
-                              _selectedDropdownDislocationOld ?? '',
-                              _selectedDropdownStatusOld ?? '',
-                              _complaint.text,
-                              _dateDeparture ?? DateTime.now(),
-                              providerModel.user.name);
-
-                          _save(repair, providerModel).then((_) {
-                            _viewSnackBar(Icons.save, true, 'Заявка создана', 'Заявка не создана');
-                          });
-                          Navigator.pop(context);
+                          // Repair repair = Repair(
+                          //     int.parse(_innerNumberTechnic.text),
+                          //     _nameTechnicController.text,
+                          //     _selectedDropdownDislocationOld ?? '',
+                          //     _selectedDropdownStatusOld ?? '',
+                          //     _complaint.text,
+                          //     _dateDeparture ?? DateTime.now(),
+                          //     providerModel.user.name);
+                          //
+                          // _save(repair, providerModel).then((_) {
+                          //   _viewSnackBar(Icons.save, true, 'Заявка создана', 'Заявка не создана');
+                          // });
+                          // Navigator.pop(context);
                         }
                       },
                       child: const Text("Сохранить")),
@@ -145,6 +151,21 @@ class _RepairViewState extends State<RepairView> {
             ],
           ),
         ));
+  }
+
+  Color _getColorStepTwoRepair(){
+    if(_selectedDropdownService != null &&
+        _dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z"){
+      return Colors.greenAccent.shade100;
+    }
+    return Colors.yellow.shade200;
+  }
+
+  Color _getColorStepThreeRepair(){
+    if(_dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z"){
+      return Colors.greenAccent.shade100;
+    }
+    return Colors.yellow.shade200;
   }
 
   Column _headerData() {
@@ -167,7 +188,7 @@ class _RepairViewState extends State<RepairView> {
     );
   }
 
-  Widget _buildServises(ProviderModel providerModel) {
+  Widget _buildServices(ProviderModel providerModel) {
     return Column(
       children: [
         Align(
@@ -209,280 +230,112 @@ class _RepairViewState extends State<RepairView> {
   }
 
   Widget _buildDateTransferInService() {
-    return GestureDetector(
-      onTap: (){
-        showDatePicker(
-            context: context,
-            initialDate: _dateDeparture,
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2099),
-            locale: const Locale("ru", "RU"))
-            .then((date) {
-          if (date != null) {
-            setState(() {
-              _dateDeparture = date;
-            });
-          }
-        });
-      },
-      child: Container(
-        decoration: BoxDecoration(
-            color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 12, left: 10, right: 0),
-              child: Text(DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDeparture ?? DateTime.now())),
+    return Column(
+      spacing: 5,
+      children: [
+        Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: Text(
+                  'Отвезли мастеру',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+              ),
             ),
-          ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal:  57),
+          child: GestureDetector(
+            onTap: (){
+              showDatePicker(
+                  context: context,
+                  initialDate: _dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z" ? _dateTransferInService : DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2099),
+                  locale: const Locale("ru", "RU"))
+                  .then((date) {
+                if (date != null) {
+                  setState(() {
+                    _dateTransferInService = date;
+                  });
+                }
+              });
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12, bottom: 12, left: 12),
+                    child: Text(
+                        _dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z" ?
+                        DateFormat('d MMMM yyyy', 'ru_RU').format(_dateTransferInService ?? DateTime.now())
+                        : 'Дата отсутствует'
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
-      ),
+      ],
     );
-    // return Column(
-    //   children: [
-    //     Align(
-    //       alignment: Alignment.centerLeft,
-    //       child: Padding(
-    //         padding: const EdgeInsets.only(left: 20.0),
-    //         child: Text(
-    //           'Отвезли мастеру',
-    //           style: Theme.of(context).textTheme.headlineMedium,
-    //         ),
-    //       ),
-    //     ),
-    //     Padding(
-    //       padding: const EdgeInsets.only(left: 55, right: 55, top: 6),
-    //       child: ListTile(
-    //         title: Text(
-    //           DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDeparture ?? DateTime.now()),
-    //           style: TextStyle(color: Colors.black54),
-    //         ),
-    //         tileColor: Colors.blue.shade50,
-    //         shape: RoundedRectangleBorder(
-    //           borderRadius: BorderRadius.circular(15),
-    //         ),
-    //         onTap: () {
-    //           showDatePicker(
-    //               context: context,
-    //               initialDate: DateTime.now(),
-    //               firstDate: DateTime(2000),
-    //               lastDate: DateTime(2099),
-    //               locale: const Locale("ru", "RU"))
-    //               .then((date) {
-    //             setState(() {
-    //               if (date != null) {
-    //                 _dateDeparture = date;
-    //               }
-    //             });
-    //           });
-    //         },
-    //       ),
-    //     ),
-    //   ],
-    // );
   }
 
-  Widget _buildStatus(ProviderModel providerModel) {
+  Widget _buildDateDepartureFromService() {
     return Column(
+      spacing: 5,
       children: [
         Align(
           alignment: Alignment.centerLeft,
           child: Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
-              'Статус техники',
+              'Забрали из сервиса',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(left: 40, right: 40),
-          child: ListTile(
-            title: DropdownButtonFormField<String>(
-              decoration: myDecorationDropdown(),
-              borderRadius: BorderRadius.circular(10.0),
-              hint: const Text('Статус техники'),
-              validator: (value) => value == null ? "Обязательное поле" : null,
-              dropdownColor: Colors.blue.shade50,
-              value: _selectedDropdownStatusOld,
-              items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? value) {
-                setState(() {
-                  _selectedDropdownStatusOld = value!;
-                });
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildComplaint() {
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 20.0),
-            child: Text(
-              'Жалоба',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ),
-        ),
-        ListTile(
-          title: Padding(
-            padding: const EdgeInsets.only(left: 40, right: 40),
-            child: TextFormField(
-              decoration: myDecorationTextFormField(null, "Жалоба"),
-              controller: _complaint,
-              maxLines: 3,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Обязательное поле';
+          padding: const EdgeInsets.symmetric(horizontal:  57),
+          child: GestureDetector(
+            onTap: (){
+              showDatePicker(
+                  context: context,
+                  initialDate: _dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z" ? _dateDepartureFromService : DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2099),
+                  locale: const Locale("ru", "RU"))
+                  .then((date) {
+                if (date != null) {
+                  setState(() {
+                    _dateDepartureFromService = date;
+                  });
                 }
-                return null;
-              },
+              });
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12, bottom: 12, left: 12),
+                    child: Text(
+                        _dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z" ?
+                        DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDepartureFromService ?? DateTime.now())
+                            : 'Дата отсутствует'
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ],
     );
   }
-
-  void _viewSnackBarGetTechnic(String text) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(Icons.bolt, size: 40, color: Colors.red),
-            Flexible(child: Text(text)),
-          ],
-        ),
-        duration: const Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
-  }
-
-  // ListTile _buildServiceDislocationListTile(){
-  //   return ListTile(
-  //     leading: const Icon(Icons.miscellaneous_services),
-  //     title: DropdownButton<String>(
-  //       borderRadius: BorderRadius.circular(10.0),
-  //       isExpanded: true,
-  //       hint: const Text('Местонахождение техники'),
-  //       icon: _selectedDropdownService != null ? IconButton(
-  //           icon: const Icon(Icons.clear, color: Colors.grey),
-  //           onPressed: (){
-  //             setState(() {
-  //               _selectedDropdownService = null;
-  //             });}) : null,
-  //       value: _selectedDropdownService,
-  //       items: CategoryDropDownValueModel.service.map<DropdownMenuItem<String>>((String value) {
-  //         return DropdownMenuItem<String>(
-  //           value: value,
-  //           child: Text(value),
-  //         );
-  //       }).toList(),
-  //       onChanged: (String? value){
-  //         setState(() {
-  //           _selectedDropdownService = value!;
-  //         });
-  //       },
-  //     ),
-  //   );
-  // }
-
-  // ListTile _buildDateTransferInServiceListTile(){
-  //   return ListTile(
-  //     leading: const Icon(Icons.today),
-  //     title: const Text("Дата сдачи в ремонт"),
-  //     subtitle: Text(_dateTransferInService == "" ? "Выберите дату" : _dateTransferInService),
-  //     trailing: Row(
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         IconButton(
-  //             icon: const Icon(Icons.edit),
-  //             onPressed: () {
-  //               showDatePicker(
-  //                   context: context,
-  //                   initialDate: DateTime.now(),
-  //                   firstDate: DateTime(2000),
-  //                   lastDate: DateTime(2099),
-  //                   locale: const Locale("ru", "RU")
-  //               ).then((date) {
-  //                 setState(() {
-  //                   if(date != null) {
-  //                     _dateTransferInServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
-  //                     _dateTransferInService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-  //                   }
-  //                 });
-  //               });
-  //             },
-  //             color: Colors.blue
-  //         ),
-  //         IconButton(
-  //             onPressed: (){
-  //               setState(() {
-  //                 _dateTransferInServiceForSQL = '';
-  //                 _dateTransferInService = '';
-  //               });
-  //             },
-  //             icon: const Icon(Icons.clear))
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  // ListTile _buildDateDepartureFromServiceListTile(){
-  //   return ListTile(
-  //     leading: const Icon(Icons.today),
-  //     title: const Text("Забрали из ремонта. Дата"),
-  //     subtitle: Text(_dateDepartureFromService == "" ? "Выберите дату" : _dateDepartureFromService),
-  //     trailing: Row(
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         IconButton(
-  //             icon: const Icon(Icons.edit),
-  //             onPressed: () {
-  //               showDatePicker(
-  //                   context: context,
-  //                   initialDate: DateTime.now(),
-  //                   firstDate: DateTime(2000),
-  //                   lastDate: DateTime(2099),
-  //                   locale: const Locale("ru", "RU")
-  //               ).then((date) {
-  //                 setState(() {
-  //                   if(date != null) {
-  //                     _dateDepartureFromServiceForSQL = DateFormat('yyyy.MM.dd').format(date);
-  //                     _dateDepartureFromService = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-  //                   }
-  //                 });
-  //               });
-  //             },
-  //             color: Colors.blue
-  //         ),
-  //         IconButton(
-  //             onPressed: (){
-  //               setState(() {
-  //                 _dateDepartureFromServiceForSQL = '';
-  //                 _dateDepartureFromService = '';
-  //               });
-  //             },
-  //             icon: const Icon(Icons.clear))
-  //       ],
-  //     ),
-  //   );
-  // }
 
   ListTile _buildWorksPerformedListTile() {
     return ListTile(
@@ -524,105 +377,6 @@ class _RepairViewState extends State<RepairView> {
       ),
     );
   }
-
-  // ListTile _buildNewStatusListTile(){
-  //   return ListTile(
-  //     leading: const Icon(Icons.copyright),
-  //     title: DropdownButton<String>(
-  //       borderRadius: BorderRadius.circular(10.0),
-  //       isExpanded: true,
-  //       hint: const Text('Новый статус'),
-  //       icon: _selectedDropdownStatusNew != null ? IconButton(
-  //           icon: const Icon(Icons.clear, color: Colors.grey),
-  //           onPressed: (){
-  //             setState(() {
-  //               _selectedDropdownStatusNew = null;
-  //             });}) : null,
-  //       value: _selectedDropdownStatusNew,
-  //       items: CategoryDropDownValueModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
-  //         return DropdownMenuItem<String>(
-  //           value: value,
-  //           child: Text(value),
-  //         );
-  //       }).toList(),
-  //       onChanged: (String? value){
-  //         setState(() {
-  //           _selectedDropdownStatusNew = value!;
-  //         });
-  //       },
-  //     ),
-  //   );
-  // }
-
-  // ListTile _buildNewDislocationListTile(){
-  //   return ListTile(
-  //     leading: const Icon(Icons.local_shipping),
-  //     title: DropdownButton<String>(
-  //       borderRadius: BorderRadius.circular(10.0),
-  //       isExpanded: true,
-  //       hint: const Text('Куда уехал'),
-  //       icon: _selectedDropdownDislocationNew != null ? IconButton(
-  //           icon: const Icon(Icons.clear, color: Colors.grey),
-  //           onPressed: (){
-  //             setState(() {
-  //               _selectedDropdownDislocationNew = null;
-  //             });}) : null,
-  //       value: _selectedDropdownDislocationNew,
-  //       items: CategoryDropDownValueModel.photosalons.map<DropdownMenuItem<String>>((String value) {
-  //         return DropdownMenuItem<String>(
-  //           value: value,
-  //           child: Text(value),
-  //         );
-  //       }).toList(),
-  //       onChanged: (String? value){
-  //         setState(() {
-  //           _selectedDropdownDislocationNew = value!;
-  //         });
-  //       },
-  //     ),
-  //   );
-  // }
-
-  // ListTile _buildDateReceiptListTile(){
-  //   return ListTile(
-  //     leading: const Icon(Icons.today),
-  //     title: const Text("Дата поступления"),
-  //     subtitle: Text(_dateReceipt == "" ? "Выберите дату" : _dateReceipt),
-  //     trailing: Row(
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         IconButton(
-  //             icon: const Icon(Icons.edit),
-  //             onPressed: () {
-  //               showDatePicker(
-  //                   context: context,
-  //                   initialDate: DateTime.now(),
-  //                   firstDate: DateTime(2000),
-  //                   lastDate: DateTime(2099),
-  //                   locale: const Locale("ru", "RU")
-  //               ).then((date) {
-  //                 setState(() {
-  //                   if(date != null) {
-  //                     _dateReceiptForSQL = DateFormat('yyyy.MM.dd').format(date);
-  //                     _dateReceipt = DateFormat('d MMMM yyyy', "ru_RU").format(date);
-  //                   }
-  //                 });
-  //               });
-  //             },
-  //             color: Colors.blue
-  //         ),
-  //         IconButton(
-  //             onPressed: (){
-  //               setState(() {
-  //                 _dateReceiptForSQL = '';
-  //                 _dateReceipt = '';
-  //               });
-  //             },
-  //             icon: const Icon(Icons.clear))
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Future<bool> _save(Repair repair, ProviderModel provider) async {
     int? id = await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
