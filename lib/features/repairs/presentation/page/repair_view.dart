@@ -13,6 +13,7 @@ import '../../../../core/utils/enums.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../technics/presentation/page/technic_view.dart';
 import '../../models/repair.dart';
+import '../widget/first_step_repair_desc.dart';
 
 class RepairView extends StatefulWidget {
   const RepairView({super.key, required this.repair});
@@ -28,10 +29,10 @@ class _RepairViewState extends State<RepairView> {
 
   final _innerNumberTechnic = TextEditingController();
   final _nameTechnicController = TextEditingController();
-  final _lastDislocationController = TextEditingController();
   String? _selectedDropdownDislocationOld;
   String? _selectedDropdownStatusOld;
   final _complaint = TextEditingController();
+  final _whoTook = TextEditingController();
   DateTime? _dateDeparture;
   DateTime? _dateTransferInService;
   DateTime? _dateDepartureFromService;
@@ -45,8 +46,6 @@ class _RepairViewState extends State<RepairView> {
   String? _selectedDropdownWhoTook;
   String? _selectedDropdownStatusNew;
   String? _selectedDropdownDislocationNew;
-  bool isBN = false;
-  bool isExistNumber = false;
 
   Technic? technicFind;
 
@@ -55,9 +54,10 @@ class _RepairViewState extends State<RepairView> {
     super.initState();
     _innerNumberTechnic.text = widget.repair.numberTechnic.toString();
     _nameTechnicController.text = widget.repair.category;
-    _lastDislocationController.text = widget.repair.dislocationOld;
+    _selectedDropdownDislocationOld = widget.repair.dislocationOld != '' ? widget.repair.dislocationOld : null;
     _selectedDropdownStatusOld = widget.repair.status != '' ? widget.repair.status : null;
     _complaint.text = widget.repair.complaint;
+    _whoTook.text = widget.repair.whoTook;
     _dateDeparture = widget.repair.dateDeparture;
     _selectedDropdownWhoTook = widget.repair.whoTook != '' ? widget.repair.whoTook : null;
     _selectedDropdownService = widget.repair.serviceDislocation != '' ? widget.repair.serviceDislocation : null;
@@ -77,6 +77,7 @@ class _RepairViewState extends State<RepairView> {
     _innerNumberTechnic.dispose();
     _nameTechnicController.dispose();
     _complaint.dispose();
+    _whoTook.dispose();
     _worksPerformed.dispose();
     _costService.dispose();
     _diagnosisService.dispose();
@@ -95,17 +96,17 @@ class _RepairViewState extends State<RepairView> {
             padding: EdgeInsets.zero,
             children: [
               SizedBox(height: 10),
-              _headerData(providerModel),
+              _headerData(),
               SizedBox(height: 20),
-              _buildNameTechnic(),
-              SizedBox(height: isBN ? 14 : 25),
-              _buildLastDislocation(providerModel),
-              SizedBox(height: isBN ? 9 : 25),
+              _buildServises(providerModel),
+              _buildDateTransferInService(),
+              SizedBox(height: 20),
+              SizedBox(height: 20),
               _buildStatus(providerModel),
               SizedBox(height: 20),
               _buildComplaint(),
               SizedBox(height: 20),
-              _buildDateDeparture(),
+              _buildDateTransferInService(),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -121,9 +122,9 @@ class _RepairViewState extends State<RepairView> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           Repair repair = Repair(
-                              !isBN ? int.parse(_innerNumberTechnic.text) : 0,
+                              int.parse(_innerNumberTechnic.text),
                               _nameTechnicController.text,
-                              _lastDislocationController.text,
+                              _selectedDropdownDislocationOld ?? '',
                               _selectedDropdownStatusOld ?? '',
                               _complaint.text,
                               _dateDeparture ?? DateTime.now(),
@@ -146,7 +147,7 @@ class _RepairViewState extends State<RepairView> {
         ));
   }
 
-  Column _headerData(ProviderModel provider) {
+  Column _headerData() {
     return Column(
       children: [
         Padding(
@@ -159,226 +160,14 @@ class _RepairViewState extends State<RepairView> {
                 offset: Offset(2, 4), // Shadow position
               ),
             ]),
-            child: ExpansionTile(
-              trailing: GestureDetector(
-                onTap: () {
-                  _nameTechnicController.text = widget.repair.category;
-                  _complaint.text = widget.repair.complaint;
-                  print(_complaint.text.length);
-                  showDialog(
-                      context: context,
-                      builder: (_) {
-                        return AlertDialog(
-                          actions: [
-                            Center(
-                                child: ElevatedButton(
-                                    onPressed: () {
-                                      // TechnicalSupportRepoImpl.downloadData.getTechnic(widget.repair.numberTechnic.toString()).then((technicResult){
-                                      //   if(technicResult != null){
-                                      //     Technic technic = technicResult;
-                                      //     technic.name = _nameTechnic.text;
-                                      //     provider.updateTechnicInProvider(widget.location, technic);
-                                      //     TechnicalSupportRepoImpl.downloadData.updateTechnic(technic).then((value) {
-                                      //       _viewSnackBar(value ? Icons.print : Icons.print_disabled, value,
-                                      //           value ? 'Изменения приняты' : 'Изменения не сохранились');
-                                      //     });
-                                      //     Navigator.of(context).pop();
-                                      //   }
-                                      // });
-                                    },
-                                    child: Text('Сохранить')))
-                          ],
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                          title: Text('Редактировать заявку'),
-                          titleTextStyle: Theme.of(context).textTheme.headlineMedium,
-                          content: Column(
-                            children: [
-                              TextFormField(
-                                decoration: myDecorationTextFormField('Наименование техники', 'Наименование техники'),
-                                controller: _nameTechnicController,
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Обязательное поле';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              TextFormField(
-                                decoration: myDecorationTextFormField('Жалоба', 'Жалоба'),
-                                controller: _complaint,
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Обязательное поле';
-                                  }
-                                  return null;
-                                },
-                                maxLines: _complaint.text.length > 120 ? 4 : 3,
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.blue.shade50, borderRadius: BorderRadius.circular(15)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 100),
-                                    child: Text(DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture)),
-                                  ),
-                                ),
-                                Positioned(
-                                    left: 11,
-                                    top: -7,
-                                    child: Text(
-                                      'Дата, когда забрали',
-                                      style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: Colors.black.withValues(alpha: 0.7)),
-                                    )),
-                              ])
-                            ],
-                          ),
-                        );
-                      });
-                },
-                child: Icon(Icons.edit),
-              ),
-              tilePadding: EdgeInsets.symmetric(horizontal: 20, vertical: 7),
-              collapsedShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              collapsedBackgroundColor: Colors.blue[100],
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              backgroundColor: Colors.blue[100],
-              title: _buildTextTitle(),
-              children: <Widget>[ListTile(title: _buildTextSubtitle())],
-            ),
+            child: FirstStepRepairDesc(repair: widget.repair),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildTextTitle() {
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: () {
-            TechnicalSupportRepoImpl.downloadData.getTechnic(widget.repair.numberTechnic.toString()).then((technic) {
-              if (technic != null) {
-                _navigationOnTehcnicView(technic);
-              }
-            });
-          },
-          child: CircleAvatar(
-            radius: widget.repair.numberTechnic.toString().length > 4 ? 27 : null,
-            child: Text(
-              widget.repair.numberTechnic.toString(),
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Text(
-          widget.repair.category,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
-
-  void _navigationOnTehcnicView(Technic technic) {
-    Navigator.push(
-        context, animationRouteSlideTransition(TechnicView(location: technic.dislocation, technic: technic)));
-  }
-
-  Widget _buildTextSubtitle() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text.rich(TextSpan(children: [
-          TextSpan(text: 'Жалоба: ', style: TextStyle(fontWeight: FontWeight.bold)),
-          TextSpan(text: widget.repair.complaint != '' ? widget.repair.complaint : 'Данные отсутствуют'),
-          TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
-        ])),
-        Row(
-          children: [
-            Text(widget.repair.dislocationOld != '' ? widget.repair.dislocationOld : 'Неизвестно откуда забрали'),
-            SizedBox(
-              width: 7,
-            ),
-            Icon(
-              Icons.delivery_dining,
-              color: Colors.green.shade700,
-            ),
-            Icon(
-              Icons.arrow_forward,
-              color: Colors.green.shade700,
-            ),
-            SizedBox(
-              width: 5,
-            ),
-            widget.repair.whoTook != '' ? Text(widget.repair.whoTook) : Icon(Icons.person_off),
-          ],
-        ),
-        Row(children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4.0),
-            child: Text.rich(TextSpan(children: [
-              TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
-              TextSpan(text: 'Статус: '),
-              TextSpan(text: widget.repair.status != '' ? widget.repair.status : 'Отсутствует'),
-            ])),
-          ),
-          SizedBox(
-            width: 8,
-          ),
-          Icon(Icons.calendar_month),
-          SizedBox(
-            width: 4,
-          ),
-          Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000Z'
-              ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture)
-              : 'Дата отсутствует')
-        ])
-      ],
-    );
-  }
-
-  Padding _buildButtonGetTechnic() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 30),
-      child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: !isBN ? Colors.blue : Colors.grey,
-          ),
-          onPressed: () async {
-            if (_innerNumberTechnic.text != '' && !isBN) {
-              TechnicalSupportRepoImpl.downloadData.getTechnic(_innerNumberTechnic.text).then((result) {
-                if (result != null) {
-                  setState(() {
-                    _nameTechnicController.text = result.name;
-                    _lastDislocationController.text = result.dislocation;
-                  });
-                } else {
-                  _viewSnackBarGetTechnic('Техники с таким номером нет.');
-                }
-              });
-            }
-          },
-          child: Text('Найти технику')),
-    );
-  }
-
-  Widget _buildNameTechnic() {
+  Widget _buildServises(ProviderModel providerModel) {
     return Column(
       children: [
         Align(
@@ -386,7 +175,7 @@ class _RepairViewState extends State<RepairView> {
           child: Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
-              'Наименование техники',
+              'Мастер по ремонту',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
@@ -394,48 +183,14 @@ class _RepairViewState extends State<RepairView> {
         Padding(
           padding: const EdgeInsets.only(left: 40, right: 40),
           child: ListTile(
-            title: TextFormField(
-              enabled: isBN,
-              decoration: myDecorationTextFormField(null, isBN ? 'Наименование техники' : 'Введите номер техники'),
-              controller: _nameTechnicController,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Обязательное поле';
-                }
-                return null;
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLastDislocation(ProviderModel providerModel) {
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 20.0),
-            child: Text(
-              'Откуда забрали:',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 40, right: 40),
-          child: ListTile(
-            title: isBN
-                ? DropdownButtonFormField<String>(
+            title: DropdownButtonFormField<String>(
                     decoration: myDecorationDropdown(),
                     validator: (value) => value == null ? "Обязательное поле" : null,
                     dropdownColor: Colors.blue.shade50,
                     borderRadius: BorderRadius.circular(10.0),
-                    hint: const Text('Последнее местонахождение'),
-                    value: _selectedDropdownDislocationOld,
-                    items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+                    hint: const Text('Мастер по ремонту'),
+                    value: _selectedDropdownService,
+                    items: providerModel.services.map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
@@ -443,19 +198,88 @@ class _RepairViewState extends State<RepairView> {
                     }).toList(),
                     onChanged: (String? value) {
                       setState(() {
-                        _selectedDropdownDislocationOld = value!;
+                        _selectedDropdownService = value!;
                       });
                     },
                   )
-                : TextFormField(
-                    enabled: false,
-                    decoration: myDecorationTextFormField(null, 'Введите номер техники'),
-                    controller: _lastDislocationController,
-                  ),
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildDateTransferInService() {
+    return GestureDetector(
+      onTap: (){
+        showDatePicker(
+            context: context,
+            initialDate: _dateDeparture,
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2099),
+            locale: const Locale("ru", "RU"))
+            .then((date) {
+          if (date != null) {
+            setState(() {
+              _dateDeparture = date;
+            });
+          }
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 12, left: 10, right: 0),
+              child: Text(DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDeparture ?? DateTime.now())),
+            ),
+          ],
+        ),
+      ),
+    );
+    // return Column(
+    //   children: [
+    //     Align(
+    //       alignment: Alignment.centerLeft,
+    //       child: Padding(
+    //         padding: const EdgeInsets.only(left: 20.0),
+    //         child: Text(
+    //           'Отвезли мастеру',
+    //           style: Theme.of(context).textTheme.headlineMedium,
+    //         ),
+    //       ),
+    //     ),
+    //     Padding(
+    //       padding: const EdgeInsets.only(left: 55, right: 55, top: 6),
+    //       child: ListTile(
+    //         title: Text(
+    //           DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDeparture ?? DateTime.now()),
+    //           style: TextStyle(color: Colors.black54),
+    //         ),
+    //         tileColor: Colors.blue.shade50,
+    //         shape: RoundedRectangleBorder(
+    //           borderRadius: BorderRadius.circular(15),
+    //         ),
+    //         onTap: () {
+    //           showDatePicker(
+    //               context: context,
+    //               initialDate: DateTime.now(),
+    //               firstDate: DateTime(2000),
+    //               lastDate: DateTime(2099),
+    //               locale: const Locale("ru", "RU"))
+    //               .then((date) {
+    //             setState(() {
+    //               if (date != null) {
+    //                 _dateDeparture = date;
+    //               }
+    //             });
+    //           });
+    //         },
+    //       ),
+    //     ),
+    //   ],
+    // );
   }
 
   Widget _buildStatus(ProviderModel providerModel) {
@@ -526,51 +350,6 @@ class _RepairViewState extends State<RepairView> {
                 return null;
               },
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDateDeparture() {
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 20.0),
-            child: Text(
-              'Дата, когда забрали.',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 55, right: 55, top: 6),
-          child: ListTile(
-            title: Text(
-              DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDeparture ?? DateTime.now()),
-              style: TextStyle(color: Colors.black54),
-            ),
-            tileColor: Colors.blue.shade50,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            onTap: () {
-              showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2099),
-                      locale: const Locale("ru", "RU"))
-                  .then((date) {
-                setState(() {
-                  if (date != null) {
-                    _dateDeparture = date;
-                  }
-                });
-              });
-            },
           ),
         ),
       ],

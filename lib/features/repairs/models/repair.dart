@@ -7,6 +7,7 @@ class Repair implements Comparable {
   final String complaint;
   final DateTime dateDeparture;
   final String whoTook;
+  int idTrouble = 0;
   String? serviceDislocation;
   DateTime? dateTransferInService;
   DateTime? dateDepartureFromService;

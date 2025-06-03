@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-InputDecoration myDecorationDropdown() {
+InputDecoration myDecorationDropdown([String? labelText]) {
   return InputDecoration(
     enabledBorder: OutlineInputBorder(
       borderSide: BorderSide(color: Colors.blue.shade50, width: 2),
@@ -15,6 +15,7 @@ InputDecoration myDecorationDropdown() {
     ),
     filled: true,
     fillColor: Colors.blue.shade50,
+    labelText: labelText
   );
 }
 
