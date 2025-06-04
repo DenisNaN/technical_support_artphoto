@@ -200,7 +200,7 @@ class ProviderModel with ChangeNotifier {
     List<Repair> filterRepairs = [];
     List<Repair> tmpRedList = [];
     List<Repair> tmpYellowList = [];
-
+    // TODO сделать нормальную сортировку
     for(int i = 0; i < repairs.length; i++){
       if(repairs[i].serviceDislocation == ''){
         tmpRedList.add(repairs[i]);

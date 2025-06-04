@@ -153,6 +153,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       await ConnectDbMySQL.connDB.insertStatusInDB(technic.id, technic.status, technic.dislocation, userName);
+      await ConnectDbMySQL.connDB.dispose();
       return true;
     } catch (e) {
       return false;
@@ -197,6 +198,22 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
       return id;
     } catch (e) {
       return id;
+    }
+  }
+
+  @override
+  Future<bool> updateRepair(Repair repair, bool isStepOne) async{
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      if(isStepOne){
+        await ConnectDbMySQL.connDB.updateRepairInDBStepOne(repair);
+      }else{
+        await ConnectDbMySQL.connDB.updateRepairInDBStepsTwoAndThree(repair);
+      }
+      await ConnectDbMySQL.connDB.dispose();
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 

@@ -49,7 +49,6 @@ class Repair implements Comparable {
       this.newStatus,
       this.newDislocation,
       this.dateReceipt,
-      this.idTestDrive,
       );
 
   @override

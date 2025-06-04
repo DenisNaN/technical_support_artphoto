@@ -397,7 +397,7 @@ Future<Technic?> getTechnic(int number) async {
 
     final List<Repair> list = repairListFromMap(result);
     final List<Repair> reversedList = List.from(list.reversed);
-    return reversedList;
+    return list;
   }
 
 //
@@ -435,8 +435,8 @@ Future<Technic?> getTechnic(int number) async {
           row[14],
           row[15],
           row[16],
-          row[17],
-          row[18]);
+          row[17]);
+      repair.idTestDrive = row[18];
       list.add(repair);
     }
     return list;
@@ -633,41 +633,59 @@ Future<int> insertRepairInDB(Repair repair) async{
   int id = result.insertId!;
   return id;
 }
-//
-// Future updateRepairInDB(Repair repair) async{
-//   await ConnectDbMySQL.connDB.connDatabase();
-//   await _connDB!.query(
-//       'UPDATE repairEquipment SET '
-//           'complaint = ?, '
-//           'dateDeparture = ?, '
-//           'serviceDislocation = ?, '
-//           'dateTransferInService = ?, '
-//           'dateDepartureFromService = ?, '
-//           'worksPerformed = ?, '
-//           'costService = ?, '
-//           'diagnosisService = ?, '
-//           'recommendationsNotes = ?, '
-//           'newStatus = ?, '
-//           'newDislocation = ?, '
-//           'dateReceipt = ? '
-//           'WHERE id = ?',
-//       [
-//         repair.complaint,
-//         repair.dateDeparture,
-//         repair.serviceDislocation,
-//         repair.dateTransferInService,
-//         repair.dateDepartureFromService,
-//         repair.worksPerformed,
-//         repair.costService,
-//         repair.diagnosisService,
-//         repair.recommendationsNotes,
-//         repair.newStatus,
-//         repair.newDislocation,
-//         repair.dateReceipt,
-//         repair.id
-//       ]);
-// }
-//
+
+Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
+  await ConnectDbMySQL.connDB.connDatabase();
+  await _connDB!.query(
+      'UPDATE repairEquipment SET '
+          'serviceDislocation = ?, '
+          'dateTransferInService = ?, '
+          'dateDepartureFromService = ?, '
+          'worksPerformed = ?, '
+          'costService = ?, '
+          'diagnosisService = ?, '
+          'recommendationsNotes = ?, '
+          'newStatus = ?, '
+          'newDislocation = ?, '
+          'dateReceipt = ? '
+          'WHERE id = ?',
+      [
+        repair.serviceDislocation,
+        repair.dateTransferInService,
+        repair.dateDepartureFromService,
+        repair.worksPerformed,
+        repair.costService,
+        repair.diagnosisService,
+        repair.recommendationsNotes,
+        repair.newStatus,
+        repair.newDislocation,
+        repair.dateReceipt,
+        repair.id
+      ]);
+}
+
+  Future updateRepairInDBStepOne(Repair repair) async{
+    await ConnectDbMySQL.connDB.connDatabase();
+    await _connDB!.query(
+        'UPDATE repairEquipment SET '
+            'category = ?, '
+            'dislocationOld = ?, '
+            'status = ?, '
+            'complaint = ?, '
+            'dateDeparture = ?, '
+            'whoTook = ? '
+            'WHERE id = ?',
+        [
+          repair.category,
+          repair.dislocationOld,
+          repair.status,
+          repair.complaint,
+          repair.dateDeparture,
+          repair.whoTook,
+          repair.id
+        ]);
+  }
+
 // Future<int> insertTroubleInDB(Trouble trouble) async{
 //   await ConnectDbMySQL.connDB.connDatabase();
 //   var result = await _connDB!.query('INSERT INTO Неисправности ('

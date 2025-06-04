@@ -33,9 +33,6 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
     super.initState();
     _innerNumberTechnic.text = widget.repair.numberTechnic.toString();
     _nameTechnicController.text = widget.repair.category;
-    //TODO заявка с принтером 48 прилетает ошибка при попытки редактирования первой части заявки
-    _selectedDropdownDislocationOld = widget.repair.dislocationOld != '' ? widget.repair.dislocationOld : null;
-    _selectedDropdownStatusOld = widget.repair.status != '' ? widget.repair.status : null;
     _complaint.text = widget.repair.complaint;
     _whoTook.text = widget.repair.whoTook;
     _dateDeparture = widget.repair.dateDeparture;
@@ -50,6 +47,30 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
     super.dispose();
   }
 
+  String? validateDropdownDislocationOld(ProviderModel providerModel){
+    List<String> nameDislocation = providerModel.namesDislocation;
+    for (var element in nameDislocation) {
+      if(widget.repair.dislocationOld != ''){
+        if(element == widget.repair.dislocationOld){
+          return widget.repair.dislocationOld;
+        }
+      }
+    }
+    return null;
+  }
+
+  String? validateDropdownStatus(ProviderModel providerModel){
+    List<String> nameStatus = providerModel.statusForEquipment;
+    for (var element in nameStatus) {
+      if(widget.repair.status != ''){
+        if(element == widget.repair.status){
+          return widget.repair.status;
+        }
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
@@ -59,8 +80,8 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
           _nameTechnicController.text = widget.repair.category;
           _complaint.text = widget.repair.complaint;
           _dateDeparture = widget.repair.dateDeparture;
-          _selectedDropdownDislocationOld = widget.repair.dislocationOld;
-          _selectedDropdownStatusOld = widget.repair.status;
+          _selectedDropdownDislocationOld = validateDropdownDislocationOld(providerModel);
+          _selectedDropdownStatusOld = validateDropdownStatus(providerModel);
           _whoTook.text = widget.repair.whoTook;
           showDialog(
               context: context,
@@ -72,138 +93,143 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                         Center(
                             child: ElevatedButton(
                                 onPressed: () {
-                                  // TechnicalSupportRepoImpl.downloadData.getTechnic(widget.repair.numberTechnic.toString()).then((technicResult){
-                                  //   if(technicResult != null){
-                                  //     Technic technic = technicResult;
-                                  //     technic.name = _nameTechnic.text;
-                                  //     provider.updateTechnicInProvider(widget.location, technic);
-                                  //     TechnicalSupportRepoImpl.downloadData.updateTechnic(technic).then((value) {
-                                  //       _viewSnackBar(value ? Icons.print : Icons.print_disabled, value,
-                                  //           value ? 'Изменения приняты' : 'Изменения не сохранились');
-                                  //     });
-                                  //     Navigator.of(context).pop();
-                                  //   }
-                                  // });
+                                    Repair repair = Repair(
+                                      widget.repair.numberTechnic,
+                                      _nameTechnicController.text,
+                                      _selectedDropdownDislocationOld ?? '',
+                                      _selectedDropdownStatusOld ?? '',
+                                      _complaint.text = widget.repair.complaint,
+                                      _dateDeparture ?? DateTime.now(),
+                                      widget.repair.whoTook,
+                                    );
+                                    repair.id = widget.repair.id;
+
+                                    _save(repair, providerModel).then((value) {
+                                      _viewSnackBar(Icons.save, value, 'Заявка изменена', 'Заявка не изменена', true);
+                                    });
+                                    Navigator.pop(context);
                                 },
                                 child: Text('Сохранить')))
                       ],
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                       title: Text('Редактировать заявку'),
                       titleTextStyle: Theme.of(context).textTheme.headlineMedium,
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 20,
-                        children: [
-                          TextFormField(
-                            decoration: myDecorationTextFormField('Наименование техники', 'Наименование техники'),
-                            controller: _nameTechnicController,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Обязательное поле';
-                              }
-                              return null;
-                            },
-                          ),
-                          TextFormField(
-                            decoration: myDecorationTextFormField('Жалоба', 'Жалоба'),
-                            controller: _complaint,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Обязательное поле';
-                              }
-                              return null;
-                            },
-                            maxLines: _complaint.text.length > 120 ? 4 : 3,
-                          ),
-                          TextFormField(
-                            decoration: myDecorationTextFormField('Кто увез', 'Кто увез'),
-                            controller: _whoTook,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Обязательное поле';
-                              }
-                              return null;
-                            },
-                          ),
-                          GestureDetector(
-                            onTap: (){
-                              showDatePicker(
-                                  context: context,
-                                  initialDate: _dateDeparture,
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2099),
-                                  locale: const Locale("ru", "RU"))
-                                  .then((date) {
-                                if (date != null) {
-                                  setState(() {
-                                    _dateDeparture = date;
-                                  });
+                      content: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 20,
+                          children: [
+                            TextFormField(
+                              decoration: myDecorationTextFormField('Наименование техники', 'Наименование техники'),
+                              controller: _nameTechnicController,
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Обязательное поле';
                                 }
-                              });
-                            },
-                            child: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
-                                    child: Row(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 12, bottom: 12, left: 10, right: 0),
-                                          child: Text(DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDeparture ?? DateTime.now())),
-                                        ),
-                                      ],
+                                return null;
+                              },
+                            ),
+                            TextFormField(
+                              decoration: myDecorationTextFormField('Жалоба', 'Жалоба'),
+                              controller: _complaint,
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Обязательное поле';
+                                }
+                                return null;
+                              },
+                              maxLines: _complaint.text.length > 120 ? 4 : 3,
+                            ),
+                            TextFormField(
+                              decoration: myDecorationTextFormField('Кто увез', 'Кто увез'),
+                              controller: _whoTook,
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Обязательное поле';
+                                }
+                                return null;
+                              },
+                            ),
+                            GestureDetector(
+                              onTap: (){
+                                showDatePicker(
+                                    context: context,
+                                    initialDate: _dateDeparture,
+                                    firstDate: DateTime(2000),
+                                    lastDate: DateTime(2099),
+                                    locale: const Locale("ru", "RU"))
+                                    .then((date) {
+                                  if (date != null) {
+                                    setState(() {
+                                      _dateDeparture = date;
+                                    });
+                                  }
+                                });
+                              },
+                              child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 12, bottom: 12, left: 10, right: 0),
+                                            child: Text(DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDeparture ?? DateTime.now())),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  Positioned(
-                                      left: 11,
-                                      top: -6.5,
-                                      child: Text(
-                                        'Когда увезли',
-                                        style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: Colors.black.withValues(alpha: 0.6)),
-                                      )),
-                                ]),
-                          ),
-                          DropdownButtonFormField<String>(
-                            decoration: myDecorationDropdown('Откуда увезли'),
-                            validator: (value) => value == null ? "Обязательное поле" : null,
-                            dropdownColor: Colors.blue.shade50,
-                            borderRadius: BorderRadius.circular(10.0),
-                            hint: const Text('Последнее местонахождение'),
-                            value: _selectedDropdownDislocationOld,
-                            items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (String? value) {
-                              setState(() {
-                                _selectedDropdownDislocationOld = value!;
-                              });
-                            },
-                          ),
-                          DropdownButtonFormField<String>(
-                            decoration: myDecorationDropdown('Статус'),
-                            validator: (value) => value == null ? "Обязательное поле" : null,
-                            dropdownColor: Colors.blue.shade50,
-                            borderRadius: BorderRadius.circular(10.0),
-                            hint: const Text('Статус'),
-                            value: _selectedDropdownStatusOld,
-                            items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (String? value) {
-                              setState(() {
-                                _selectedDropdownStatusOld = value!;
-                              });
-                            },
-                          ),
-                        ],
+                                    Positioned(
+                                        left: 11,
+                                        top: -6.5,
+                                        child: Text(
+                                          'Когда увезли',
+                                          style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: Colors.black.withValues(alpha: 0.6)),
+                                        )),
+                                  ]),
+                            ),
+                            DropdownButtonFormField<String>(
+                              decoration: myDecorationDropdown('Откуда увезли'),
+                              validator: (value) => value == null ? "Обязательное поле" : null,
+                              dropdownColor: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(10.0),
+                              hint: const Text('Последнее местонахождение'),
+                              value: _selectedDropdownDislocationOld,
+                              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  _selectedDropdownDislocationOld = value!;
+                                });
+                              },
+                            ),
+                            DropdownButtonFormField<String>(
+                              decoration: myDecorationDropdown('Статус'),
+                              validator: (value) => value == null ? "Обязательное поле" : null,
+                              dropdownColor: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(10.0),
+                              hint: const Text('Статус'),
+                              value: _selectedDropdownStatusOld,
+                              items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  _selectedDropdownStatusOld = value!;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
@@ -234,6 +260,8 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
             TechnicalSupportRepoImpl.downloadData.getTechnic(widget.repair.numberTechnic.toString()).then((technic) {
               if (technic != null) {
                 _navigationOnTehcnicView(technic);
+              }else{
+                _viewSnackBar(Icons.print, false, '', 'Такой техники нет в базе', false);
               }
             });
           },
@@ -312,6 +340,48 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
               : 'Дата отсутствует')
         ])
       ],
+    );
+  }
+
+  Future<bool> _save(Repair repair, ProviderModel provider) async {
+    bool isResult = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, true);
+    if (isResult) {
+      Technic? technic = await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
+      if(technic != null){
+        bool isSaveStatus = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technic, provider.user.name);
+        if(isSaveStatus){
+          return true;
+        }
+        _viewSnackBar(Icons.print_disabled, false, '', 'Статус и дислокацию техники изменить не удалось. Попробуйте вручную в карточке техники', false);
+        return false;
+      }
+      _viewSnackBar(Icons.print_disabled, false, '', 'Техника с таким номером в базе не обнаружена', false);
+      provider.addRepairInRepairs(repair);
+      // await addHistory(technic, nameUser);
+      return true;
+    }
+    return false;
+  }
+
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar) {
+    if(isSkipPrevSnackBar){
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+            SizedBox(
+              width: 20,
+            ),
+            Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
+          ],
+        ),
+        duration: const Duration(seconds: 5),
+        showCloseIcon: true,
+      ),
     );
   }
 }
