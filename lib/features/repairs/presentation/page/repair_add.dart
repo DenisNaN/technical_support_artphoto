@@ -416,9 +416,10 @@ class _RepairAddState extends State<RepairAdd> {
   Future<bool> _save(Repair repair, ProviderModel provider) async{
     int? id = await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
     if(id != null){
-      repair.id = id;
+      if(mounted){
+        await TechnicalSupportRepoImpl.downloadData.refreshRepairsData();
+      }
       // await addHistory(technic, nameUser);
-      provider.addRepairInRepairs(repair);
       return true;
     }
     return false;

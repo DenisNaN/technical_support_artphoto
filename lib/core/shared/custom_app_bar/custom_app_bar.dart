@@ -87,19 +87,25 @@ class _CustomAppBarState extends State<CustomAppBar> {
             onPressed: () {
               showDialog(context: context,
                   builder: (_){
-                    return Text('1111111111111');
+                    return AlertDialog(
+                      title: Text('Подтвердите удаление заявки'),
+                      actions: [
+                        ElevatedButton(onPressed: (){
+                          TechnicalSupportRepoImpl.downloadData.deleteRepair(repair.id.toString()).then((result){
+                            if(result){
+                              providerModel.removeRepairInRepairs(repair);
+                              _viewSnackBar(Icons.delete_forever, result, 'Заявка удаленна', 'Заявка не удаленна', false);
+                            }
+                          });
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        }, child: Text('Удалить')),
+                        ElevatedButton(onPressed: (){
+                          Navigator.of(context).pop();
+                        }, child: Text('Отмена'))
+                      ],
+                    );
                   });
-              // bool isDelete = false;
-              // TechnicalSupportRepoImpl.downloadData.deleteRepair(repair.id.toString()).then((result){
-              //   if(result){
-              //     isDelete = result;
-              //   }
-              // });
-              // if(isDelete){
-              //   providerModel.removeRepairInRepairs(repair);
-              //   Navigator.of(context).pop();
-              // }
-              // _viewSnackBar(Icons.delete_forever, isDelete, 'Заявка удаленна', 'Заявка не удаленна', false);
             },
             icon: Icon(Icons.delete_forever, color: Colors.red.shade600, size: 35,)) : SizedBox()
       ],
