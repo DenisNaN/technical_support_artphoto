@@ -24,7 +24,7 @@ class _RepairAddState extends State<RepairAdd> {
 
   final _innerNumberTechnic = TextEditingController();
   final _nameTechnicController = TextEditingController();
-  final _lastDislocationController = TextEditingController();
+  final _dislocationOldController = TextEditingController();
   final _complaint = TextEditingController();
   DateTime? _dateDeparture;
   final _worksPerformed = TextEditingController();
@@ -93,15 +93,17 @@ class _RepairAddState extends State<RepairAdd> {
                           Repair repair = Repair(
                               !isBN ? int.parse(_innerNumberTechnic.text) : 0,
                               _nameTechnicController.text,
-                              isBN ? _lastDislocationController.text : _selectedDropdownDislocationOld ?? '',
+                              isBN ? _dislocationOldController.text : _selectedDropdownDislocationOld ?? '',
                               _selectedDropdownStatusOld ?? '',
                               _complaint.text,
                               _dateDeparture ?? DateTime.now(),
                               providerModel.user.name);
 
-                          _save(repair, providerModel).then((isSave) {
-                            _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана');
+                          bool isSave = false;
+                          _save(repair, providerModel).then((result) {
+                            isSave = result;
                           });
+                          _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', context);
                           Navigator.pop(context);
                         }
                       },
@@ -135,7 +137,7 @@ class _RepairAddState extends State<RepairAdd> {
                           _innerNumberTechnic.text = '';
                           _nameTechnicController.text = '';
                           _selectedDropdownDislocationOld = null;
-                          _lastDislocationController.text = '';
+                          _dislocationOldController.text = '';
                         }
                       });
                     }),
@@ -185,7 +187,8 @@ class _RepairAddState extends State<RepairAdd> {
                 if (result != null) {
                   setState(() {
                     _nameTechnicController.text = result.name;
-                    _lastDislocationController.text = result.dislocation;
+                    _dislocationOldController.text = result.dislocation;
+                    _selectedDropdownDislocationOld = result.dislocation;
                   });
                 } else {
                   _viewSnackBarGetTechnic('Техники с таким номером нет.');
@@ -269,7 +272,7 @@ class _RepairAddState extends State<RepairAdd> {
                 : TextFormField(
                     enabled: false,
                     decoration: myDecorationTextFormField(null, 'Введите номер техники'),
-                    controller: _lastDislocationController,
+                    controller: _dislocationOldController,
                   ),
           ),
         ),
@@ -413,12 +416,10 @@ class _RepairAddState extends State<RepairAdd> {
     );
   }
 
-  Future<bool> _save(Repair repair, ProviderModel provider) async{
-    int? id = await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
-    if(id != null){
-      if(mounted){
-        await TechnicalSupportRepoImpl.downloadData.refreshRepairsData();
-      }
+  Future<bool> _save(Repair repair, ProviderModel providerModel) async{
+    List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
+    if(resultData != null){
+      providerModel.refreshRepairs(resultData);
       // await addHistory(technic, nameUser);
       return true;
     }
@@ -449,7 +450,7 @@ class _RepairAddState extends State<RepairAdd> {
   //   return result;
   // }
 
-  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText) {
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText, BuildContext context) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
