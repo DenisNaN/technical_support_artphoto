@@ -16,6 +16,7 @@ abstract interface class TechnicalSupportRepo {
   Future<bool> updateTechnic(Technic technic);
   Future<int?> saveRepair(Repair repair);
   Future<bool> updateRepair(Repair repair, bool isStepOne);
+  Future<bool> deleteRepair(String id);
   Future<bool> updateStatusAndDislocationTechnic(Technic technic, String userName);
   Future<Map<int, List<SummRepair>>> getSumRepairs(String numberTechnic);
   Future<DecommissionedLocation> getTechnicsDecommissioned();

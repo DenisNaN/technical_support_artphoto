@@ -217,6 +217,18 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     }
   }
 
+  @override
+  Future<bool> deleteRepair(String id) async{
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.deleteRepairInDB(id);
+      await ConnectDbMySQL.connDB.dispose();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
 //   List getNotifications() {
 //     List notifications = [];
 //     notifications.addAll(getListNotificationsDontTestDriveAfterRepairBetter1Day());

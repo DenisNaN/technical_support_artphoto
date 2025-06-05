@@ -62,6 +62,7 @@ class ProviderModel with ChangeNotifier {
   }
 
   void downloadRepairs(List<Repair> repairs) {
+    _repairs = [];
     sortListRepairs(repairs);
   }
 
@@ -159,6 +160,12 @@ class ProviderModel with ChangeNotifier {
 
   void addRepairInRepairs(Repair repair) {
     _repairs.add(repair);
+    sortListRepairs(_repairs);
+    notifyListeners();
+  }
+
+  void removeRepairInRepairs(Repair repair) {
+    _repairs.remove(repair);
     notifyListeners();
   }
 

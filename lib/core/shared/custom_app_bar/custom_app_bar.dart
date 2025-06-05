@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
+import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/history_technic_page.dart';
 
+import '../../../features/repairs/models/repair.dart';
 import '../../api/data/models/location.dart';
+import '../../api/provider/provider_model.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key, required this.typePage, required this.location, required this.technic});
@@ -23,6 +27,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
+    final providerModel = Provider.of<ProviderModel>(context);
     return AppBar(
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
@@ -59,7 +64,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         TypePage.history => _historyTechnic(),
         TypePage.error => _error(widget.location.toString()),
         TypePage.addRepair => _addRepair(),
-        TypePage.viewRepair => _viewRepair(),
+        TypePage.viewRepair => _viewRepair(providerModel),
       }
     );
   }
@@ -72,14 +77,31 @@ class _CustomAppBarState extends State<CustomAppBar> {
     return const Text('Новая заявка на ремонт', style: TextStyle(color: Colors.black));
   }
 
-  Widget _viewRepair(){
+  Widget _viewRepair(ProviderModel providerModel){
+    Repair repair = widget.location;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text('Заявка на ремонт', style: TextStyle(color: Colors.black)),
-        IconButton(
-            onPressed: (){},
-            icon: Icon(Icons.delete_forever, color: Colors.red.shade600, size: 35,))
+        providerModel.user.access == 'admin' ? IconButton(
+            onPressed: () {
+              showDialog(context: context,
+                  builder: (_){
+                    return Text('1111111111111');
+                  });
+              // bool isDelete = false;
+              // TechnicalSupportRepoImpl.downloadData.deleteRepair(repair.id.toString()).then((result){
+              //   if(result){
+              //     isDelete = result;
+              //   }
+              // });
+              // if(isDelete){
+              //   providerModel.removeRepairInRepairs(repair);
+              //   Navigator.of(context).pop();
+              // }
+              // _viewSnackBar(Icons.delete_forever, isDelete, 'Заявка удаленна', 'Заявка не удаленна', false);
+            },
+            icon: Icon(Icons.delete_forever, color: Colors.red.shade600, size: 35,)) : SizedBox()
       ],
     );
   }
@@ -148,5 +170,27 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   _repair(String message) {
     return Text(message, style: TextStyle(color: Colors.black),);
+  }
+
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar) {
+    if(isSkipPrevSnackBar){
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+            SizedBox(
+              width: 20,
+            ),
+            Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
+          ],
+        ),
+        duration: const Duration(seconds: 5),
+        showCloseIcon: true,
+      ),
+    );
   }
 }

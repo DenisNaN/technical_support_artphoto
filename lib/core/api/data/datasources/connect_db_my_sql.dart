@@ -262,7 +262,6 @@ class ConnectDbMySQL {
   // }
 
   Future insertHistory(History history) async {
-    await ConnectDbMySQL.connDB.connDatabase();
     await _connDB!.query(
         'INSERT INTO history ('
         'section, idSection, typeOperation, description, login, date) '
@@ -610,22 +609,22 @@ Future<Technic?> getTechnic(int number) async {
   }
 
 Future<int> insertRepairInDB(Repair repair) async{
-  await ConnectDbMySQL.connDB.connDatabase();
-  var result = await _connDB!.query('INSERT INTO repairEquipment ('
-      'number, '
-      'category, '
-      'dislocationOld, '
-      'status, '
-      'complaint, '
-      'dateDeparture, '
-      'whoTook '
-      ') VALUES (?, ?, ?, ?, ?, ?, ?)', [
+    String str = 'INSERT INTO repairEquipment '
+        '(number, '
+        'category, '
+        'dislocationOld, '
+        'status, '
+        'complaint, '
+        'dateDeparture, '
+        'whoTook) '
+        'VALUES (?, ?, ?, ?, ?, ?, ?)';
+  var result = await _connDB!.query(str, [
     repair.numberTechnic,
     repair.category,
     repair.dislocationOld,
     repair.status,
     repair.complaint,
-    repair.dateDeparture,
+    repair.dateDeparture.dateFormattedForSQL(),
     repair.whoTook
   ]);
 
@@ -634,7 +633,6 @@ Future<int> insertRepairInDB(Repair repair) async{
 }
 
 Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
-  await ConnectDbMySQL.connDB.connDatabase();
   await _connDB!.query(
       'UPDATE repairEquipment SET '
           'serviceDislocation = ?, '
@@ -664,7 +662,6 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
 }
 
   Future updateRepairInDBStepOne(Repair repair) async{
-    await ConnectDbMySQL.connDB.connDatabase();
     await _connDB!.query(
         'UPDATE repairEquipment SET '
             'category = ?, '
@@ -683,6 +680,10 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
           repair.whoTook,
           repair.id
         ]);
+  }
+
+  Future deleteRepairInDB(String id) async{
+    await _connDB!.query('DELETE FROM repairEquipment WHERE id = ?', [id]);
   }
 
 // Future<int> insertTroubleInDB(Trouble trouble) async{

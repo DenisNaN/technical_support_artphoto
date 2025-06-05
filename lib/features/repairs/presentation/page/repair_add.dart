@@ -99,8 +99,8 @@ class _RepairAddState extends State<RepairAdd> {
                               _dateDeparture ?? DateTime.now(),
                               providerModel.user.name);
 
-                          _save(repair, providerModel).then((_) {
-                            _viewSnackBar(Icons.save, true, 'Заявка создана', 'Заявка не создана');
+                          _save(repair, providerModel).then((isSave) {
+                            _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана');
                           });
                           Navigator.pop(context);
                         }
