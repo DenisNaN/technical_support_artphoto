@@ -73,7 +73,15 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   Widget _viewRepair(){
-    return Text('Заявка на ремонт', style: TextStyle(color: Colors.black));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('Заявка на ремонт', style: TextStyle(color: Colors.black)),
+        IconButton(
+            onPressed: (){},
+            icon: Icon(Icons.delete_forever, color: Colors.red.shade600, size: 35,))
+      ],
+    );
   }
 
   Widget _listTechnics(){

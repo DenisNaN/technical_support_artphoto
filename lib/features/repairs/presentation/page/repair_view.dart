@@ -58,11 +58,24 @@ class _RepairViewState extends State<RepairView> {
     super.dispose();
   }
 
+  String? validateDropdownDislocationNew(ProviderModel providerModel){
+    List<String> nameDislocation = providerModel.namesDislocation;
+    for (var element in nameDislocation) {
+      if(widget.repair.newDislocation != ''){
+        if(element == widget.repair.newDislocation){
+          return widget.repair.newDislocation;
+        }
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     Color colorStepTwoRepair = _getColorStepTwoRepair();
     Color colorStepThreeRepair = _getColorStepThreeRepair();
+    _selectedDropdownDislocationNew = validateDropdownDislocationNew(providerModel);
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.viewRepair, location: widget.repair, technic: null),
         body: Form(

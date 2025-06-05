@@ -141,7 +141,7 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                               maxLines: _complaint.text.length > 120 ? 4 : 3,
                             ),
                             TextFormField(
-                              decoration: myDecorationTextFormField('Кто увез', 'Кто увез'),
+                              decoration: myDecorationTextFormField('Кто забрал', 'Кто забрал'),
                               controller: _whoTook,
                               validator: (value) {
                                 if (value!.isEmpty) {

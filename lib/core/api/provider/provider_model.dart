@@ -62,7 +62,7 @@ class ProviderModel with ChangeNotifier {
   }
 
   void downloadRepairs(List<Repair> repairs) {
-    _repairs = repairs;
+    sortListRepairs(repairs);
   }
 
   void downloadAllCategoryDropDown(List<String> namesEquipments, List<String> namePhotosalons, List<String> services,
@@ -197,10 +197,15 @@ class ProviderModel with ChangeNotifier {
   }
 
   void refreshRepairs(List<Repair> repairs) {
+    sortListRepairs(repairs);
+    notifyListeners();
+  }
+
+  void sortListRepairs(List<Repair> repairs){
     List<Repair> filterRepairs = [];
     List<Repair> tmpRedList = [];
     List<Repair> tmpYellowList = [];
-    // TODO сделать нормальную сортировку
+
     for(int i = 0; i < repairs.length; i++){
       if(repairs[i].serviceDislocation == ''){
         tmpRedList.add(repairs[i]);
@@ -210,12 +215,11 @@ class ProviderModel with ChangeNotifier {
     }
     tmpYellowList.sort();
     tmpRedList.sort();
-    filterRepairs.addAll(tmpYellowList);
     filterRepairs.addAll(tmpRedList);
+    filterRepairs.addAll(tmpYellowList);
 
     _repairs.clear();
     _repairs.addAll(filterRepairs);
-    notifyListeners();
   }
 
   void setSizeMainBottom(Size? size) {
