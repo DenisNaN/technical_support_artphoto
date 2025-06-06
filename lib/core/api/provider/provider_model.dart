@@ -13,6 +13,7 @@ class ProviderModel with ChangeNotifier {
   late final Map<String, StorageLocation> _technicsInStorages;
 
   late final List<Repair> _repairs;
+  bool _isChangeRedAndYellow = false;
 
   late final List<String> _namesEquipments;
   late final List<String> _namesDislocations;
@@ -35,6 +36,8 @@ class ProviderModel with ChangeNotifier {
   Map<String, StorageLocation> get technicsInStorages => _technicsInStorages;
 
   List<Repair> get getAllRepairs => _repairs;
+
+  bool get isChangeRedAndYellow => _isChangeRedAndYellow;
 
   List<String> get namesDislocation => _namesDislocations;
 
@@ -204,17 +207,17 @@ class ProviderModel with ChangeNotifier {
   }
 
   void refreshRepairs(List<Repair> repairs) {
-    sortListRepairs(repairs);
+    sortListRepairs(repairs, _isChangeRedAndYellow);
     notifyListeners();
   }
 
-  void sortListRepairs(List<Repair> repairs){
+  void sortListRepairs(List<Repair> repairs, [bool isChangeRedAndYellow = false]){
     List<Repair> filterRepairs = [];
     List<Repair> tmpRedList = [];
     List<Repair> tmpYellowList = [];
-
     for(int i = 0; i < repairs.length; i++){
-      if(repairs[i].serviceDislocation == ''){
+      if(repairs[i].serviceDislocation == '' || repairs[i].serviceDislocation == null ||
+          repairs[i].dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z"){
         tmpRedList.add(repairs[i]);
       }else{
         tmpYellowList.add(repairs[i]);
@@ -222,11 +225,24 @@ class ProviderModel with ChangeNotifier {
     }
     tmpYellowList.sort();
     tmpRedList.sort();
-    filterRepairs.addAll(tmpRedList);
-    filterRepairs.addAll(tmpYellowList);
+    if(!isChangeRedAndYellow){
+      filterRepairs.addAll(tmpRedList);
+      filterRepairs.addAll(tmpYellowList);
+    }else{
+      filterRepairs.addAll(tmpYellowList);
+      filterRepairs.addAll(tmpRedList);
+    }
 
     _repairs.clear();
     _repairs.addAll(filterRepairs);
+  }
+
+  bool setChangeRedAndYellow(){
+    return _isChangeRedAndYellow = !_isChangeRedAndYellow;
+  }
+
+  void manualNotifyListeners(){
+    notifyListeners();
   }
 
   void setSizeMainBottom(Size? size) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
@@ -21,8 +20,6 @@ class RepairView extends StatefulWidget {
 }
 
 class _RepairViewState extends State<RepairView> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   String? _selectedDropdownService;
   DateTime? _dateTransferInService;
   DateTime? _dateDepartureFromService;
@@ -58,16 +55,16 @@ class _RepairViewState extends State<RepairView> {
     super.dispose();
   }
 
-  String? validateDropdownDislocationNew(ProviderModel providerModel){
+  String? validateDropdownDislocationNew(ProviderModel providerModel) {
     List<String> nameDislocation = providerModel.namesDislocation;
     for (var element in nameDislocation) {
-      if(widget.repair.newDislocation != ''){
-        if(element == widget.repair.newDislocation){
+      if (widget.repair.newDislocation != '') {
+        if (element == widget.repair.newDislocation) {
           return widget.repair.newDislocation;
         }
       }
     }
-    return null;
+    return _selectedDropdownDislocationNew;
   }
 
   @override
@@ -75,48 +72,44 @@ class _RepairViewState extends State<RepairView> {
     final providerModel = Provider.of<ProviderModel>(context);
     Color colorStepTwoRepair = _getColorStepTwoRepair();
     Color colorStepThreeRepair = _getColorStepThreeRepair();
-    _selectedDropdownDislocationNew = validateDropdownDislocationNew(providerModel);
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.viewRepair, location: widget.repair, technic: null),
         body: Form(
-          key: _formKey,
           child: ListView(
             children: [
               SizedBox(height: 10),
               _headerData(),
               SizedBox(height: 20),
-              Center(child: Text('Второй этап заявки',
-                style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),)),
+              Center(
+                  child: Text(
+                'Второй этап заявки',
+                style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+              )),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  decoration: BoxDecoration(
-                      color: colorStepTwoRepair,
-                      borderRadius: BorderRadius.circular(30)
-                  ),
-                  child: Column(
-                      spacing: 10,
-                      children: [
-                    _buildServices(providerModel),
-                    _buildDateTransferInService(),
-                  ])),
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(color: colorStepTwoRepair, borderRadius: BorderRadius.circular(30)),
+                    child: Column(spacing: 10, children: [
+                      _buildServices(providerModel),
+                      _buildDateTransferInService(),
+                    ])),
               ),
               SizedBox(height: 10),
-              Center(child: Column(
+              Center(
+                  child: Column(
                 children: [
-                  Text('Третий этап заявки',
-                    style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),),
+                  Text(
+                    'Третий этап заявки',
+                    style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+                  ),
                 ],
               )),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Container(
                     padding: EdgeInsets.symmetric(vertical: 20),
-                    decoration: BoxDecoration(
-                        color: colorStepThreeRepair,
-                        borderRadius: BorderRadius.circular(30)
-                    ),
+                    decoration: BoxDecoration(color: colorStepThreeRepair, borderRadius: BorderRadius.circular(30)),
                     child: Column(
                       spacing: 10,
                       children: [
@@ -144,33 +137,30 @@ class _RepairViewState extends State<RepairView> {
                   ),
                   ElevatedButton(
                       onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          Repair repair = Repair.fullRepair(
-                              widget.repair.id,
-                              widget.repair.numberTechnic,
-                              widget.repair.category,
-                              widget.repair.dislocationOld,
-                              widget.repair.status,
-                              widget.repair.complaint,
-                              widget.repair.dateDeparture,
-                              widget.repair.whoTook,
-                              _selectedDropdownService,
-                              _dateTransferInService,
-                              _dateDepartureFromService,
-                              _worksPerformed.text,
-                              int.parse(_costService.text),
-                              _diagnosisService.text,
-                              _recommendationsNotes.text,
-                              _selectedDropdownStatusNew,
-                              _selectedDropdownDislocationNew,
-                              _dateReceipt,
-                          );
+                        Repair repair = Repair.fullRepair(
+                          widget.repair.id,
+                          widget.repair.numberTechnic,
+                          widget.repair.category,
+                          widget.repair.dislocationOld,
+                          widget.repair.status,
+                          widget.repair.complaint,
+                          widget.repair.dateDeparture,
+                          widget.repair.whoTook,
+                          _selectedDropdownService,
+                          _dateTransferInService,
+                          _dateDepartureFromService,
+                          _worksPerformed.text,
+                          int.parse(_costService.text),
+                          _diagnosisService.text,
+                          _recommendationsNotes.text,
+                          _selectedDropdownStatusNew,
+                          _selectedDropdownDislocationNew,
+                          _dateReceipt,
+                        );
 
-                          _save(repair, providerModel).then((value) {
-                            _viewSnackBar(Icons.save, value, 'Заявка изменена', 'Заявка не изменена', true);
-                          });
-                          Navigator.pop(context);
-                        }
+                        _save(repair, providerModel).then((value) {
+                          _viewSnackBar(Icons.save, value, 'Заявка изменена', 'Заявка не изменена', true);
+                        });
                       },
                       child: const Text("Сохранить")),
                 ],
@@ -183,24 +173,36 @@ class _RepairViewState extends State<RepairView> {
         ));
   }
 
-  Color _getColorStepTwoRepair(){
-    if(_selectedDropdownService != null &&
-        _dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z"){
+  Color _getColorStepTwoRepair() {
+    if (_selectedDropdownService != null && _dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z") {
       return Colors.greenAccent.shade100;
     }
     return Colors.yellow.shade200;
   }
 
-  Color _getColorStepThreeRepair(){
-    if(_dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z" &&
-    _worksPerformed.text != '' &&
-    _costService.text != '' &&
-    _diagnosisService.text != '' &&
-    _recommendationsNotes.text != '' &&
-    _selectedDropdownStatusNew != null &&
-    _selectedDropdownDislocationNew != null &&
-    _dateReceipt.toString() != "-0001-11-30 00:00:00.000Z"
-    ){
+  Color _getColorStepThreeRepair() {
+    bool isDateDepartureFormService = _dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z"  ||
+        _dateDepartureFromService.toString() != "0001-11-30 00:00:00.000Z" ? true : false;
+    print(isDateDepartureFormService);
+    bool isDateReceipt = _dateReceipt.toString() != "-0001-11-30 00:00:00.000Z" ||
+        _dateReceipt.toString() != "0001-11-30 00:00:00.000Z" ? true : false;
+    print(isDateReceipt);
+
+    print('');
+    print('_worksPerformed ${_worksPerformed.text} - ${_worksPerformed.text != ''}');
+    print('_costService ${_costService.text} - ${_costService.text != ''}');
+    print('_diagnosisService ${_diagnosisService.text} - ${_diagnosisService.text != ''}');
+    print('_recommendationsNotes ${_recommendationsNotes.text} - ${_recommendationsNotes.text != ''}');
+    print('_selectedDropdownStatusNew ${_selectedDropdownStatusNew} - ${_selectedDropdownStatusNew != null}');
+    print('_selectedDropdownDislocationNew ${_selectedDropdownDislocationNew} - ${_selectedDropdownDislocationNew != null}');
+    if ( isDateDepartureFormService &&
+        _worksPerformed.text != '' &&
+        _costService.text != '' &&
+        _diagnosisService.text != '' &&
+        _recommendationsNotes.text != '' &&
+        _selectedDropdownStatusNew != null &&
+        _selectedDropdownDislocationNew != null &&
+        isDateReceipt) {
       return Colors.greenAccent.shade100;
     }
     return Colors.yellow.shade200;
@@ -242,26 +244,24 @@ class _RepairViewState extends State<RepairView> {
         Padding(
           padding: const EdgeInsets.only(left: 40, right: 40),
           child: ListTile(
-            title: DropdownButtonFormField<String>(
-                    decoration: myDecorationDropdown(),
-                    validator: (value) => value == null ? "Обязательное поле" : null,
-                    dropdownColor: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(10.0),
-                    hint: const Text('Мастер по ремонту'),
-                    value: _selectedDropdownService,
-                    items: providerModel.services.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? value) {
-                      setState(() {
-                        _selectedDropdownService = value!;
-                      });
-                    },
-                  )
-          ),
+              title: DropdownButtonFormField<String>(
+            decoration: myDecorationDropdown(),
+            dropdownColor: Colors.blue.shade50,
+            borderRadius: BorderRadius.circular(10.0),
+            hint: const Text('Мастер по ремонту'),
+            value: _selectedDropdownService,
+            items: providerModel.services.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (String? value) {
+              setState(() {
+                _selectedDropdownService = value!;
+              });
+            },
+          )),
         ),
       ],
     );
@@ -272,25 +272,27 @@ class _RepairViewState extends State<RepairView> {
       spacing: 5,
       children: [
         Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20.0),
-                child: Text(
-                  'Отвезли мастеру',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-              ),
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: Text(
+              'Отвезли мастеру',
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
+          ),
+        ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal:  57),
+          padding: const EdgeInsets.symmetric(horizontal: 57),
           child: GestureDetector(
-            onTap: (){
+            onTap: () {
               showDatePicker(
-                  context: context,
-                  initialDate: _dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z" ? _dateTransferInService : DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2099),
-                  locale: const Locale("ru", "RU"))
+                      context: context,
+                      initialDate: _dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z"
+                          ? _dateTransferInService
+                          : DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2099),
+                      locale: const Locale("ru", "RU"))
                   .then((date) {
                 if (date != null) {
                   setState(() {
@@ -300,17 +302,14 @@ class _RepairViewState extends State<RepairView> {
               });
             },
             child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
               child: Row(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
-                    child: Text(
-                        _dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z" ?
-                        DateFormat('d MMMM yyyy', 'ru_RU').format(_dateTransferInService ?? DateTime.now())
-                        : 'Дата отсутствует'
-                    ),
+                    child: Text(_dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z"
+                        ? DateFormat('d MMMM yyyy', 'ru_RU').format(_dateTransferInService ?? DateTime.now())
+                        : 'Дата отсутствует'),
                   ),
                 ],
               ),
@@ -336,15 +335,17 @@ class _RepairViewState extends State<RepairView> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal:  57),
+          padding: const EdgeInsets.symmetric(horizontal: 57),
           child: GestureDetector(
-            onTap: (){
+            onTap: () {
               showDatePicker(
-                  context: context,
-                  initialDate: _dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z" ? _dateDepartureFromService : DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2099),
-                  locale: const Locale("ru", "RU"))
+                      context: context,
+                      initialDate: _dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000Z" || _dateDepartureFromService.toString() == "0001-11-30 00:00:00.000Z"
+                          ? DateTime.now()
+                          : _dateDepartureFromService,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2099),
+                      locale: const Locale("ru", "RU"))
                   .then((date) {
                 if (date != null) {
                   setState(() {
@@ -354,17 +355,14 @@ class _RepairViewState extends State<RepairView> {
               });
             },
             child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
               child: Row(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
-                    child: Text(
-                        _dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z" ?
-                        DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDepartureFromService ?? DateTime.now())
-                            : 'Дата отсутствует'
-                    ),
+                    child: Text(_dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000Z" || _dateDepartureFromService.toString() == "0001-11-30 00:00:00.000Z"
+                        ? 'Дата отсутствует'
+                        : DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDepartureFromService ?? DateTime.now())),
                   ),
                 ],
               ),
@@ -390,17 +388,11 @@ class _RepairViewState extends State<RepairView> {
         ),
         ListTile(
           title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal:  40),
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: TextFormField(
               decoration: myDecorationTextFormField(null, "Произведенные работы"),
               controller: _worksPerformed,
               maxLines: 3,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Обязательное поле';
-                }
-                return null;
-              },
             ),
           ),
         ),
@@ -423,16 +415,10 @@ class _RepairViewState extends State<RepairView> {
         ),
         ListTile(
           title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal:  40),
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: TextFormField(
               decoration: myDecorationTextFormField(null, "Стоимость ремонта"),
               controller: _costService,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Обязательное поле';
-                }
-                return null;
-              },
             ),
           ),
         ),
@@ -455,17 +441,11 @@ class _RepairViewState extends State<RepairView> {
         ),
         ListTile(
           title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal:  40),
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: TextFormField(
               decoration: myDecorationTextFormField(null, "Диагноз мастерской"),
               controller: _diagnosisService,
               maxLines: 2,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Обязательное поле';
-                }
-                return null;
-              },
             ),
           ),
         ),
@@ -488,17 +468,11 @@ class _RepairViewState extends State<RepairView> {
         ),
         ListTile(
           title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal:  40),
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: TextFormField(
               decoration: myDecorationTextFormField(null, "Рекомендации/примечания"),
               controller: _recommendationsNotes,
               maxLines: 2,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Обязательное поле';
-                }
-                return null;
-              },
             ),
           ),
         ),
@@ -523,31 +497,32 @@ class _RepairViewState extends State<RepairView> {
           padding: const EdgeInsets.only(left: 40, right: 40),
           child: ListTile(
               title: DropdownButtonFormField<String>(
-                decoration: myDecorationDropdown(),
-                validator: (value) => value == null ? "Обязательное поле" : null,
-                dropdownColor: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(10.0),
-                hint: const Text('Новый статус'),
-                value: _selectedDropdownStatusNew,
-                items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? value) {
-                  setState(() {
-                    _selectedDropdownStatusNew = value!;
-                  });
-                },
-              )
-          ),
+            decoration: myDecorationDropdown(),
+            dropdownColor: Colors.blue.shade50,
+            borderRadius: BorderRadius.circular(10.0),
+            hint: const Text('Новый статус'),
+            value: _selectedDropdownStatusNew,
+            items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (String? value) {
+              setState(() {
+                _selectedDropdownStatusNew = value!;
+              });
+            },
+          )),
         ),
       ],
     );
   }
 
   Widget _buildNewDislocation(ProviderModel providerModel) {
+    if(_selectedDropdownDislocationNew == '' || _selectedDropdownDislocationNew == null){
+      _selectedDropdownDislocationNew = validateDropdownDislocationNew(providerModel);
+    }
     return Column(
       children: [
         Align(
@@ -564,25 +539,23 @@ class _RepairViewState extends State<RepairView> {
           padding: const EdgeInsets.only(left: 40, right: 40),
           child: ListTile(
               title: DropdownButtonFormField<String>(
-                decoration: myDecorationDropdown(),
-                validator: (value) => value == null ? "Обязательное поле" : null,
-                dropdownColor: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(10.0),
-                hint: const Text('Куда уехал'),
-                value: _selectedDropdownDislocationNew,
-                items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? value) {
-                  setState(() {
-                    _selectedDropdownDislocationNew = value!;
-                  });
-                },
-              )
-          ),
+            decoration: myDecorationDropdown(),
+            dropdownColor: Colors.blue.shade50,
+            borderRadius: BorderRadius.circular(10.0),
+            hint: const Text('Куда уехал'),
+            value: _selectedDropdownDislocationNew,
+            items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (String? value) {
+              setState(() {
+                _selectedDropdownDislocationNew = value!;
+              });
+            },
+          )),
         ),
       ],
     );
@@ -603,15 +576,16 @@ class _RepairViewState extends State<RepairView> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal:  57),
+          padding: const EdgeInsets.symmetric(horizontal: 57),
           child: GestureDetector(
-            onTap: (){
+            onTap: () {
               showDatePicker(
-                  context: context,
-                  initialDate: _dateReceipt.toString() != "-0001-11-30 00:00:00.000Z" ? _dateReceipt : DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2099),
-                  locale: const Locale("ru", "RU"))
+                      context: context,
+                      initialDate:
+                          _dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" || _dateReceipt.toString() == "0001-11-30 00:00:00.000Z" ? DateTime.now() : _dateReceipt,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2099),
+                      locale: const Locale("ru", "RU"))
                   .then((date) {
                 if (date != null) {
                   setState(() {
@@ -621,17 +595,14 @@ class _RepairViewState extends State<RepairView> {
               });
             },
             child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
               child: Row(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
-                    child: Text(
-                        _dateReceipt.toString() != "-0001-11-30 00:00:00.000Z" ?
-                        DateFormat('d MMMM yyyy', 'ru_RU').format(_dateReceipt ?? DateTime.now())
-                            : 'Дата отсутствует'
-                    ),
+                    child: Text(_dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" || _dateReceipt.toString() == "0001-11-30 00:00:00.000Z"
+                        ? 'Дата отсутствует'
+                        : DateFormat('d MMMM yyyy', 'ru_RU').format(_dateReceipt ?? DateTime.now())),
                   ),
                 ],
               ),
@@ -642,20 +613,33 @@ class _RepairViewState extends State<RepairView> {
     );
   }
 
-  Future<bool> _save(Repair repair, ProviderModel provider) async {
-    bool isResult = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, false);
-    if (isResult) {
+  Future<bool> _save(Repair repair, ProviderModel providerModel) async {
+    List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, false);
+    if (resultData != null) {
+      providerModel.refreshRepairs(resultData);
       Technic? technic = await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
-      if(technic != null){
-        bool isSaveStatus = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technic, provider.user.name);
-        if(isSaveStatus){
-          return true;
+      if (technic != null) {
+        if(repair.newStatus != null && repair.newDislocation != null){
+          technic.status = repair.newStatus!;
+          technic.dislocation = repair.newDislocation!;
+          bool isSaveStatus = await TechnicalSupportRepoImpl.downloadData
+              .updateStatusAndDislocationTechnic(technic, providerModel.user.name);
+          if (isSaveStatus) {
+            await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData().then((resultData){
+              providerModel.refreshTechnics(
+                  resultData['Photosalons'], resultData['Repairs'], resultData['Storages']);
+            });
+            return true;
+          }
+          _viewSnackBar(Icons.print_disabled, false, '',
+              'Статус и дислокацию техники изменить не удалось. Попробуйте вручную в карточке техники', false);
+          return false;
+        }else{
+          _viewSnackBar(Icons.print_disabled, false, '',
+              'У техники статус и дислокация не изменились. В заявке статус и/или дислокация не заполенены', false);
         }
-        _viewSnackBar(Icons.print_disabled, false, '', 'Статус и дислокацию техники изменить не удалось. Попробуйте вручную в карточке техники', false);
-        return false;
       }
       _viewSnackBar(Icons.print_disabled, false, '', 'Техника с таким номером в базе не обнаружена', false);
-      provider.addRepairInRepairs(repair);
       // await addHistory(technic, nameUser);
       return true;
     }
@@ -686,70 +670,29 @@ class _RepairViewState extends State<RepairView> {
   //   return result;
   // }
 
-  void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar) {
-    if(isSkipPrevSnackBar){
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
-            SizedBox(
-              width: 20,
-            ),
-            Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
-          ],
-        ),
-        duration: const Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
-  }
-}
-
-class IntegerCurrencyInputFormatter extends TextInputFormatter {
-  final validationRegex = RegExp(r'^[\d,]*$');
-  final replaceRegex = RegExp(r'[^\d]+');
-  static const thousandSeparator = ',';
-
-  @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    if (!validationRegex.hasMatch(newValue.text)) {
-      return oldValue;
-    }
-
-    final newValueNumber = newValue.text.replaceAll(replaceRegex, '');
-
-    var formattedText = newValueNumber;
-
-    /// Add thousand separators.
-    var index = newValueNumber.length;
-
-    while (index > 0) {
-      index -= 3;
-
-      if (index > 0) {
-        formattedText = formattedText.substring(0, index) +
-            thousandSeparator +
-            formattedText.substring(index, formattedText.length);
+  void _viewSnackBar(
+      IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar) {
+    if (context.mounted) {
+      if (isSkipPrevSnackBar) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+              SizedBox(
+                width: 20,
+              ),
+              Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
+            ],
+          ),
+          duration: const Duration(seconds: 5),
+          showCloseIcon: true,
+        ),
+      );
+      Navigator.pop(context);
     }
-
-    /// Check whether the text is unmodified.
-    if (oldValue.text == formattedText) {
-      return oldValue;
-    }
-
-    /// Handle moving cursor.
-    final initialNumberOfPrecedingSeparators = oldValue.text.characters.where((e) => e == thousandSeparator).length;
-    final newNumberOfPrecedingSeparators = formattedText.characters.where((e) => e == thousandSeparator).length;
-    final additionalOffset = newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
-
-    return newValue.copyWith(
-      text: formattedText,
-      selection: TextSelection.collapsed(offset: newValue.selection.baseOffset + additionalOffset),
-    );
   }
 }

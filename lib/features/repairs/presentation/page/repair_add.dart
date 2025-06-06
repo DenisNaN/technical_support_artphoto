@@ -20,7 +20,7 @@ class RepairAdd extends StatefulWidget {
 }
 
 class _RepairAddState extends State<RepairAdd> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final _innerNumberTechnic = TextEditingController();
   final _nameTechnicController = TextEditingController();
@@ -61,7 +61,7 @@ class _RepairAddState extends State<RepairAdd> {
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.addRepair, location: null, technic: null),
         body: Form(
-          key: _formKey,
+          key: formKey,
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
@@ -89,7 +89,7 @@ class _RepairAddState extends State<RepairAdd> {
                   ),
                   ElevatedButton(
                       onPressed: () {
-                        if (_formKey.currentState!.validate()) {
+                        if (formKey.currentState!.validate()) {
                           Repair repair = Repair(
                               !isBN ? int.parse(_innerNumberTechnic.text) : 0,
                               _nameTechnicController.text,
@@ -99,11 +99,10 @@ class _RepairAddState extends State<RepairAdd> {
                               _dateDeparture ?? DateTime.now(),
                               providerModel.user.name);
 
-                          bool isSave = false;
-                          _save(repair, providerModel).then((result) {
-                            isSave = result;
+                          _save(repair, providerModel).then((isSave) {
+                            _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана');
                           });
-                          _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', context);
+
                           Navigator.pop(context);
                         }
                       },
@@ -450,25 +449,28 @@ class _RepairAddState extends State<RepairAdd> {
   //   return result;
   // }
 
-  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText, BuildContext context) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
-            SizedBox(
-              width: 20,
-            ),
-            Flexible(child: Text(isSuccessful ? successText : notSuccessText)),
-          ],
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText) {
+    final contextViewSnackBar = formKey.currentContext;
+    if(contextViewSnackBar != null && contextViewSnackBar.mounted){
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+              SizedBox(
+                width: 20,
+              ),
+              Flexible(child: Text(isSuccessful ? successText : notSuccessText)),
+            ],
+          ),
+          duration: const Duration(seconds: 5),
+          showCloseIcon: true,
         ),
-        duration: const Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
-  }
+      );
+    }
+    }
 }
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {

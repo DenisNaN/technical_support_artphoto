@@ -53,6 +53,10 @@ class Repair implements Comparable {
 
   @override
   int compareTo(other) {
-    return other.dateDeparture.compareTo(dateDeparture);
+    int result = other.dateDeparture.compareTo(dateDeparture);
+    if(result == 0){
+      return other.id.compareTo(id);
+    }
+    return result;
   }
 }

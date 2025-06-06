@@ -20,6 +20,7 @@ class FirstStepRepairDesc extends StatefulWidget {
 }
 
 class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
+  final expansionTileKey = GlobalKey<State<FirstStepRepairDesc>>();
   final _innerNumberTechnic = TextEditingController();
   final _nameTechnicController = TextEditingController();
   final _complaint = TextEditingController();
@@ -75,6 +76,7 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     return ExpansionTile(
+      key: expansionTileKey,
       trailing: GestureDetector(
         onTap: () {
           _nameTechnicController.text = widget.repair.category;
@@ -87,7 +89,7 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
               context: context,
               builder: (_) {
                 return StatefulBuilder(
-                  builder: (context, setState){
+                  builder: (showDialogContext, setState){
                     return AlertDialog(
                       actions: [
                         Center(
@@ -98,16 +100,15 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                                       _nameTechnicController.text,
                                       _selectedDropdownDislocationOld ?? '',
                                       _selectedDropdownStatusOld ?? '',
-                                      _complaint.text = widget.repair.complaint,
+                                      _complaint.text,
                                       _dateDeparture ?? DateTime.now(),
-                                      widget.repair.whoTook,
+                                      _whoTook.text,
                                     );
                                     repair.id = widget.repair.id;
 
                                     _save(repair, providerModel).then((value) {
                                       _viewSnackBar(Icons.save, value, 'Заявка изменена', 'Заявка не изменена', true);
                                     });
-                                    Navigator.pop(context);
                                 },
                                 child: Text('Сохранить')))
                       ],
@@ -343,12 +344,13 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
     );
   }
 
-  Future<bool> _save(Repair repair, ProviderModel provider) async {
-    bool isResult = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, true);
-    if (isResult) {
+  Future<bool> _save(Repair repair, ProviderModel providerModel) async {
+    List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, true);
+    if (resultData != null) {
+      providerModel.refreshRepairs(resultData);
       Technic? technic = await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
       if(technic != null){
-        bool isSaveStatus = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technic, provider.user.name);
+        bool isSaveStatus = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technic, providerModel.user.name);
         if(isSaveStatus){
           return true;
         }
@@ -356,7 +358,6 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
         return false;
       }
       _viewSnackBar(Icons.print_disabled, false, '', 'Техника с таким номером в базе не обнаружена', false);
-      provider.addRepairInRepairs(repair);
       // await addHistory(technic, nameUser);
       return true;
     }
@@ -364,24 +365,28 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
   }
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar) {
-    if(isSkipPrevSnackBar){
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
-            SizedBox(
-              width: 20,
+      if(context.mounted){
+        if(isSkipPrevSnackBar){
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+                SizedBox(
+                  width: 20,
+                ),
+                Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
+              ],
             ),
-            Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
-          ],
-        ),
-        duration: const Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
-  }
+            duration: const Duration(seconds: 5),
+            showCloseIcon: true,
+          ),
+        );
+      }
+    Navigator.pop(context);
+    Navigator.pop(context);
+    }
 }

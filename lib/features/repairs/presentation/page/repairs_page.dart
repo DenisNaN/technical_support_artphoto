@@ -151,7 +151,7 @@ class _RepairsPageState extends State<RepairsPage> {
   }
 
   String fieldsFilled(Repair repair) {
-    if (repair.serviceDislocation == '') {
+    if (repair.serviceDislocation == null || repair.serviceDislocation == '' || repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z") {
       return 'red';
     }
     return 'yellow';

@@ -189,10 +189,6 @@ class ConnectDbMySQL {
     return result.isNotEmpty;
   }
 
-  String getDateFormatted(String date) {
-    return DateFormat('yyyy.MM.dd').format(DateTime.parse(date));
-  }
-
   Future<int> insertTechnicInDB(Technic technic, String nameUser) async {
     var result = await _connDB!.query(
         'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) VALUES (?, ?, ?, ?, ?, ?, ?)', [
@@ -213,7 +209,7 @@ class ConnectDbMySQL {
   Future insertStatusInDB(int id, String status, String dislocation, String nameUser) async {
     await _connDB!.query(
         'INSERT INTO statusEquipment (idEquipment, status, dislocation, date, user) VALUES (?, ?, ?, ?, ?)',
-        [id, status, dislocation, DateFormat('yyyy.MM.dd').format(DateTime.now()), nameUser]);
+        [id, status, dislocation, DateTime.now().dateFormattedForSQL(), nameUser]);
   }
 
   // Future insertTestDriveInDB(Technic technic, String nameUser) async {
@@ -392,7 +388,7 @@ Future<Technic?> getTechnic(int number) async {
         'repairEquipment.dateReceipt, '
         'repairEquipment.idTestDrive '
         'FROM repairEquipment '
-        'WHERE repairEquipment.dateReceipt = "0000-00-00"');
+        'WHERE repairEquipment.dateReceipt = "0000-00-00" OR "0001-11-30"');
 
     final List<Repair> list = repairListFromMap(result);
     return list;
@@ -601,7 +597,7 @@ Future<Technic?> getTechnic(int number) async {
     await _connDB!
         .query('UPDATE equipment SET name = ?, dateBuy = ?, cost = ?, comment = ? WHERE id = ?', [
       technic.name,
-      DateFormat('yyyy.MM.dd').format(technic.dateBuyTechnic),
+      technic.dateBuyTechnic.dateFormattedForSQL(),
       technic.cost,
       technic.comment,
       technic.id
@@ -648,15 +644,15 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
           'WHERE id = ?',
       [
         repair.serviceDislocation,
-        repair.dateTransferInService,
-        repair.dateDepartureFromService,
+        repair.dateTransferInService?.dateFormattedForSQL() ?? '',
+        repair.dateDepartureFromService?.dateFormattedForSQL() ?? '',
         repair.worksPerformed,
         repair.costService,
         repair.diagnosisService,
         repair.recommendationsNotes,
         repair.newStatus,
         repair.newDislocation,
-        repair.dateReceipt,
+        repair.dateReceipt?.dateFormattedForSQL() ?? '',
         repair.id
       ]);
 }
@@ -676,7 +672,7 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
           repair.dislocationOld,
           repair.status,
           repair.complaint,
-          repair.dateDeparture,
+          repair.dateDeparture.dateFormattedForSQL(),
           repair.whoTook,
           repair.id
         ]);

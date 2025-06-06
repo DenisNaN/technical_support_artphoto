@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_add.dart';
+
+import '../../../../core/api/provider/provider_model.dart';
 
 class MenuRepairPage extends StatefulWidget {
   const MenuRepairPage({super.key});
@@ -11,6 +14,7 @@ class MenuRepairPage extends StatefulWidget {
 class _MenuRepairPageState extends State<MenuRepairPage> {
   @override
   Widget build(BuildContext context) {
+    final providerModel = Provider.of<ProviderModel>(context);
     return PopupMenuButton(
       popUpAnimationStyle: AnimationStyle(
         curve: Easing.legacy,
@@ -20,7 +24,10 @@ class _MenuRepairPageState extends State<MenuRepairPage> {
           PopupMenuItem(
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const TechnicAdd()));
+                bool isChange = providerModel.setChangeRedAndYellow();
+                providerModel.sortListRepairs(providerModel.getAllRepairs, isChange);
+                providerModel.manualNotifyListeners();
+                Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
@@ -38,47 +45,13 @@ class _MenuRepairPageState extends State<MenuRepairPage> {
                     ),
                     borderRadius: BorderRadius.circular(20)),
                 child: Padding(
-                  padding: EdgeInsets.only(left: 15, top: 3, bottom: 3),
+                  padding: const EdgeInsets.all(8.0),
                   child: const Row(
+                    spacing: 10,
                     children: [
-                      Icon(Icons.add),
+                      Icon(Icons.published_with_changes),
                       Text(
-                        'Добавить технику',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          PopupMenuItem(
-            child: ElevatedButton(
-              onPressed: () {
-                debugPrint('Hi there');
-              },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-              child: Ink(
-                decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.bottomLeft,
-                      end: Alignment.topRight,
-                      colors: [Colors.lightBlueAccent, Colors.purpleAccent],
-                      stops: [0.0, 0.8],
-                      tileMode: TileMode.clamp,
-                    ),
-                    borderRadius: BorderRadius.circular(20)),
-                child: Padding(
-                  padding: EdgeInsets.only(left: 15, top: 3, bottom: 3),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.check),
-                      Text(
-                        'Проверить технику',
+                        'Поменять очередность',
                         style: TextStyle(fontSize: 15),
                       ),
                     ],

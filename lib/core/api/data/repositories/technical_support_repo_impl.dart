@@ -193,7 +193,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     List<Repair>? repairs;
     try {
       await ConnectDbMySQL.connDB.connDatabase();
-      int? id = await ConnectDbMySQL.connDB.insertRepairInDB(repair);
+      await ConnectDbMySQL.connDB.insertRepairInDB(repair);
       var result = await ConnectDbMySQL.connDB.fetchAllRepairs();
       repairs = result;
       await ConnectDbMySQL.connDB.dispose();
@@ -204,7 +204,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
-  Future<bool> updateRepair(Repair repair, bool isStepOne) async{
+  Future<List<Repair>?> updateRepair(Repair repair, bool isStepOne) async{
+    List<Repair>? repairs;
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       if(isStepOne){
@@ -212,10 +213,12 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
       }else{
         await ConnectDbMySQL.connDB.updateRepairInDBStepsTwoAndThree(repair);
       }
+      var result = await ConnectDbMySQL.connDB.fetchAllRepairs();
+      repairs = result;
       await ConnectDbMySQL.connDB.dispose();
-      return true;
+      return repairs;
     } catch (e) {
-      return false;
+      return repairs;
     }
   }
 
