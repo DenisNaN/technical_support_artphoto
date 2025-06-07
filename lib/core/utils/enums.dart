@@ -21,3 +21,11 @@ enum TypeDislocation{
   storage,
   repair,
 }
+
+enum TypeMessageForSaveRepairView{
+  successSaveRepair,
+  notSuccessSaveRepair,
+  notSuccessSaveStatus,
+  notWriteAllFieldStatus,
+  notCheckTechnicInDB,
+}

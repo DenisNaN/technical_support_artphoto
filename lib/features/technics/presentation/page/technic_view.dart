@@ -121,8 +121,8 @@ class _TechnicViewState extends State<TechnicView> {
                               _viewSnackBar(value ? Icons.save : Icons.dangerous_outlined, value,
                                   value ? 'Изменения приняты' : 'Изменения не сохранились');
                             });
-                            Navigator.pushReplacement(
-                                context, animationRouteSlideTransition(const ArtphotoTech()));
+                            Navigator.pushAndRemoveUntil(
+                                context, animationRouteSlideTransition(const ArtphotoTech()), (Route<dynamic> route) => false);
                           }
                         },
                         child: const Text("Сохранить")),
@@ -715,23 +715,25 @@ class _TechnicViewState extends State<TechnicView> {
   // }
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String text) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
-            SizedBox(
-              width: 20,
-            ),
-            Flexible(child: Text(text)),
-          ],
+    if(context.mounted){
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+              SizedBox(
+                width: 20,
+              ),
+              Flexible(child: Text(text)),
+            ],
+          ),
+          duration: const Duration(seconds: 5),
+          showCloseIcon: true,
         ),
-        duration: const Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
+      );
+    }
   }
 
 // String validateEmptyFields() {

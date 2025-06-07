@@ -55,7 +55,9 @@ class SplashScreenArtphoto extends StatelessWidget {
 }
 
 class ArtphotoTech extends StatefulWidget {
-  const ArtphotoTech({super.key});
+  const ArtphotoTech({super.key, this.indexPage = 0});
+
+  final int indexPage;
 
   @override
   State<ArtphotoTech> createState() => _ArtphotoTechState();
@@ -67,7 +69,7 @@ class _ArtphotoTechState extends State<ArtphotoTech> {
   @override
   void initState() {
     super.initState();
-    pageViewController = PageController();
+    pageViewController = PageController(initialPage: widget.indexPage);
   }
 
   @override

@@ -121,12 +121,14 @@ class _RepairsPageState extends State<RepairsPage> {
     }
     String repairLastDate = 'Забрали с точки: ${getDateFormatForInterface(repair.dateDeparture)}.';
 
-    if (repair.dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z") {
+    if (repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
+        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000Z") {}else{
       repairLastDate = 'Сдали в ремонт: ${getDateFormatForInterface(repair.dateTransferInService ?? DateTime.now())}.';
     }
-    if (repair.dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z") {
+    if (repair.dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z" ||
+        repair.dateDepartureFromService.toString() != "0001-11-30 00:00:00.000Z") {}else{
       repairLastDate =
-          'Забрали из ремонта: ${getDateFormatForInterface(repair.dateDepartureFromService ?? DateTime.now())}.';
+      'Забрали из ремонта: ${getDateFormatForInterface(repair.dateDepartureFromService ?? DateTime.now())}.';
     }
     return Text('Статус: $repairStatus\n'
         'Дислокация: $repairDislocation\n'

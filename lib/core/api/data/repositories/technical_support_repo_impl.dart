@@ -189,6 +189,19 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
+  Future<Repair?> getRepair(int id) async{
+    Repair? repair;
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      repair = await ConnectDbMySQL.connDB.getRepair(id);
+      await ConnectDbMySQL.connDB.dispose();
+      return repair;
+    } catch (e) {
+      return repair;
+    }
+  }
+
+  @override
   Future<List<Repair>?> saveRepair(Repair repair) async{
     List<Repair>? repairs;
     try {

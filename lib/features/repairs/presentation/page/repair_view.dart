@@ -5,8 +5,10 @@ import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app
 import '../../../../core/api/data/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
+import '../../../../core/navigation/animation_navigation.dart';
 import '../../../../core/shared/input_decoration/input_deroration.dart';
 import '../../../../core/utils/enums.dart';
+import '../../../../main.dart';
 import '../../models/repair.dart';
 import '../widget/first_step_repair_desc.dart';
 
@@ -158,9 +160,37 @@ class _RepairViewState extends State<RepairView> {
                           _dateReceipt,
                         );
 
-                        _save(repair, providerModel).then((value) {
-                          _viewSnackBar(Icons.save, value, 'Заявка изменена', 'Заявка не изменена', true);
+                        _save(repair, providerModel).then((TypeMessageForSaveRepairView value) {
+                          try{
+                            switch (value) {
+                              case TypeMessageForSaveRepairView.successSaveRepair:
+                                _viewSnackBar(Icons.save, true, 'Заявка изменена', '', true);
+                              case TypeMessageForSaveRepairView.notSuccessSaveRepair:
+                                _viewSnackBar(Icons.save, false, '', 'Заявка не изменена', true);
+                              case TypeMessageForSaveRepairView.notSuccessSaveStatus:
+                                _viewSnackBar(
+                                    Icons.print_disabled,
+                                    false,
+                                    '',
+                                    'Статус и дислокацию техники изменить не удалось. Попробуйте вручную в карточке техники',
+                                    false);
+                              case TypeMessageForSaveRepairView.notWriteAllFieldStatus:
+                                _viewSnackBar(
+                                    Icons.print_disabled, false, '', 'Статус или дислокация не заполенены.\n', false);
+                              case TypeMessageForSaveRepairView.notCheckTechnicInDB:
+                                _viewSnackBar(Icons.print_disabled, false, '',
+                                    'Техника с таким номером в базе не обнаружена', false);
+                            }
+                          }catch(e){
+                            debugPrint(e.toString());
+                          }
                         });
+                        if((repair.newStatus == null && repair.newDislocation != null) ||
+                            (repair.newStatus != null && repair.newDislocation == null)){}else{
+                          Navigator.pushAndRemoveUntil(
+                              context, animationRouteSlideTransition(const ArtphotoTech(indexPage: 1,)), (Route<dynamic> route) => false);
+                        }
+
                       },
                       child: const Text("Сохранить")),
                 ],
@@ -174,35 +204,28 @@ class _RepairViewState extends State<RepairView> {
   }
 
   Color _getColorStepTwoRepair() {
-    if (_selectedDropdownService != null && _dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z") {
-      return Colors.greenAccent.shade100;
+    bool isDateTransferInService = _dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
+        _dateTransferInService.toString() == "0001-11-30 00:00:00.000Z";
+    if (_selectedDropdownService == null || isDateTransferInService) {
+      return Colors.yellow.shade200;
     }
-    return Colors.yellow.shade200;
+    return Colors.greenAccent.shade100;
   }
 
   Color _getColorStepThreeRepair() {
-    bool isDateDepartureFormService = _dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z"  ||
-        _dateDepartureFromService.toString() != "0001-11-30 00:00:00.000Z" ? true : false;
-    print(isDateDepartureFormService);
-    bool isDateReceipt = _dateReceipt.toString() != "-0001-11-30 00:00:00.000Z" ||
-        _dateReceipt.toString() != "0001-11-30 00:00:00.000Z" ? true : false;
-    print(isDateReceipt);
+    bool isDateDepartureFormService = _dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000Z"  ||
+        _dateDepartureFromService.toString() == "0001-11-30 00:00:00.000Z" ? true : false;
+    bool isDateReceipt = _dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" ||
+        _dateReceipt.toString() == "0001-11-30 00:00:00.000Z" ? true : false;
 
-    print('');
-    print('_worksPerformed ${_worksPerformed.text} - ${_worksPerformed.text != ''}');
-    print('_costService ${_costService.text} - ${_costService.text != ''}');
-    print('_diagnosisService ${_diagnosisService.text} - ${_diagnosisService.text != ''}');
-    print('_recommendationsNotes ${_recommendationsNotes.text} - ${_recommendationsNotes.text != ''}');
-    print('_selectedDropdownStatusNew ${_selectedDropdownStatusNew} - ${_selectedDropdownStatusNew != null}');
-    print('_selectedDropdownDislocationNew ${_selectedDropdownDislocationNew} - ${_selectedDropdownDislocationNew != null}');
-    if ( isDateDepartureFormService &&
+    if (!isDateDepartureFormService &&
         _worksPerformed.text != '' &&
         _costService.text != '' &&
         _diagnosisService.text != '' &&
         _recommendationsNotes.text != '' &&
         _selectedDropdownStatusNew != null &&
         _selectedDropdownDislocationNew != null &&
-        isDateReceipt) {
+        !isDateReceipt) {
       return Colors.greenAccent.shade100;
     }
     return Colors.yellow.shade200;
@@ -287,9 +310,10 @@ class _RepairViewState extends State<RepairView> {
             onTap: () {
               showDatePicker(
                       context: context,
-                      initialDate: _dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z"
-                          ? _dateTransferInService
-                          : DateTime.now(),
+                      initialDate: _dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
+                          _dateTransferInService.toString() == "0001-11-30 00:00:00.000Z"
+                          ? DateTime.now()
+                          : _dateTransferInService,
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2099),
                       locale: const Locale("ru", "RU"))
@@ -307,9 +331,10 @@ class _RepairViewState extends State<RepairView> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
-                    child: Text(_dateTransferInService.toString() != "-0001-11-30 00:00:00.000Z"
-                        ? DateFormat('d MMMM yyyy', 'ru_RU').format(_dateTransferInService ?? DateTime.now())
-                        : 'Дата отсутствует'),
+                    child: Text(_dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
+                        _dateTransferInService.toString() == "0001-11-30 00:00:00.000Z"
+                        ? 'Дата отсутствует'
+                        : DateFormat('d MMMM yyyy', 'ru_RU').format(_dateTransferInService ?? DateTime.now())),
                   ),
                 ],
               ),
@@ -613,37 +638,39 @@ class _RepairViewState extends State<RepairView> {
     );
   }
 
-  Future<bool> _save(Repair repair, ProviderModel providerModel) async {
-    List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, false);
-    if (resultData != null) {
-      providerModel.refreshRepairs(resultData);
-      Technic? technic = await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
-      if (technic != null) {
-        if(repair.newStatus != null && repair.newDislocation != null){
+  Future<TypeMessageForSaveRepairView> _save(Repair repair, ProviderModel providerModel) async {
+    if((repair.newStatus != null && repair.newDislocation != null) || (repair.newStatus == null && repair.newDislocation == null)){
+      List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, false);
+      if (resultData != null) {
+        if(repair.newStatus == null && repair.newDislocation == null){
+          providerModel.refreshRepairs(resultData);
+          return TypeMessageForSaveRepairView.successSaveRepair;
+        }
+        Technic? technic = await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
+        if (technic != null) {
           technic.status = repair.newStatus!;
           technic.dislocation = repair.newDislocation!;
-          bool isSaveStatus = await TechnicalSupportRepoImpl.downloadData
+          bool isSaveStatusTechnic = await TechnicalSupportRepoImpl.downloadData
               .updateStatusAndDislocationTechnic(technic, providerModel.user.name);
-          if (isSaveStatus) {
-            await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData().then((resultData){
-              providerModel.refreshTechnics(
-                  resultData['Photosalons'], resultData['Repairs'], resultData['Storages']);
-            });
-            return true;
+          if (isSaveStatusTechnic) {
+            Map<String, dynamic> resultDataRefTech = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
+            providerModel..
+            refreshTechnics(resultDataRefTech['Photosalons'], resultDataRefTech['Repairs'], resultDataRefTech['Storages'])..
+            refreshRepairs(resultData);
+            return TypeMessageForSaveRepairView.successSaveRepair;
+          }else{
+            return TypeMessageForSaveRepairView.notSuccessSaveStatus;
           }
-          _viewSnackBar(Icons.print_disabled, false, '',
-              'Статус и дислокацию техники изменить не удалось. Попробуйте вручную в карточке техники', false);
-          return false;
         }else{
-          _viewSnackBar(Icons.print_disabled, false, '',
-              'У техники статус и дислокация не изменились. В заявке статус и/или дислокация не заполенены', false);
+          return TypeMessageForSaveRepairView.notCheckTechnicInDB;
         }
+      }else{
+        return TypeMessageForSaveRepairView.notSuccessSaveRepair;
       }
-      _viewSnackBar(Icons.print_disabled, false, '', 'Техника с таким номером в базе не обнаружена', false);
-      // await addHistory(technic, nameUser);
-      return true;
+    }else{
+      return TypeMessageForSaveRepairView.notWriteAllFieldStatus;
     }
-    return false;
+    // await addHistory(technic, nameUser);
   }
 
   Future addHistory(Repair repair) async {
@@ -692,7 +719,6 @@ class _RepairViewState extends State<RepairView> {
           showCloseIcon: true,
         ),
       );
-      Navigator.pop(context);
     }
   }
 }

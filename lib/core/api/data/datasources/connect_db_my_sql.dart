@@ -388,21 +388,27 @@ Future<Technic?> getTechnic(int number) async {
         'repairEquipment.dateReceipt, '
         'repairEquipment.idTestDrive '
         'FROM repairEquipment '
-        'WHERE repairEquipment.dateReceipt = "0000-00-00" OR "0001-11-30"');
+        'WHERE repairEquipment.dateReceipt = "0000-00-00" OR repairEquipment.dateReceipt = "0001-11-30"');
 
     final List<Repair> list = repairListFromMap(result);
     return list;
   }
 
-//
-// Future<Repair?> getRepair(int id) async {
-//   Repair? repair = null;
-//   var result = await _connDB!.query('SELECT * FROM repairEquipment WHERE id = ?', [id]);
-//   if(result.isNotEmpty) {
-//     repair = repairListFromMap(result).first;
-//   }
-//   return repair;
-// }
+
+Future<Repair?> getRepair(int id) async {
+  Repair? repair;
+  var result = await _connDB!.query('SELECT * FROM repairEquipment WHERE id = ?', [id]);
+    for (var row in result) {
+      print(row[1]);
+      repair = Repair.fullRepair(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9],
+          row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17]
+      );
+      print("1");
+      repair.idTestDrive = row[18];
+      return repair;
+    }
+  return repair;
+}
 
   List<Repair> repairListFromMap(var result) {
     List<Repair> list = [];
