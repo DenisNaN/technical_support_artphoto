@@ -39,6 +39,7 @@ class Repair implements Comparable {
       this.complaint,
       this.dateDeparture,
       this.whoTook,
+      this.idTrouble,
       this.serviceDislocation,
       this.dateTransferInService,
       this.dateDepartureFromService,
@@ -49,6 +50,7 @@ class Repair implements Comparable {
       this.newStatus,
       this.newDislocation,
       this.dateReceipt,
+      this.idTestDrive
       );
 
   @override

@@ -148,6 +148,7 @@ class _RepairViewState extends State<RepairView> {
                           widget.repair.complaint,
                           widget.repair.dateDeparture,
                           widget.repair.whoTook,
+                          widget.repair.idTrouble,
                           _selectedDropdownService,
                           _dateTransferInService,
                           _dateDepartureFromService,
@@ -158,6 +159,7 @@ class _RepairViewState extends State<RepairView> {
                           _selectedDropdownStatusNew,
                           _selectedDropdownDislocationNew,
                           _dateReceipt,
+                          widget.repair.idTestDrive,
                         );
 
                         _save(repair, providerModel).then((TypeMessageForSaveRepairView value) {

@@ -135,11 +135,12 @@ class HistoryTechnicPage extends StatelessWidget {
         Repair? repair;
         getRepairForHistory(currentHistoryTechnic.id).then((value){
           repair = value;
+          if(repair != null && context.mounted){
+            Navigator.push(context,
+                animationRouteSlideTransition(RepairView(repair: repair!)));
+          }
         });
-        if(repair != null){
-          Navigator.push(context,
-              animationRouteSlideTransition(RepairView(repair: repair!)));
-        }
+
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -251,7 +252,7 @@ class HistoryTechnicPage extends StatelessWidget {
     );
   }
 
-  Future<Repair?> getRepairForHistory(int id)async{
+  Future<Repair?> getRepairForHistory(int id) async{
     Repair? repair = await TechnicalSupportRepoImpl.downloadData.getRepair(id);
     return repair;
   }

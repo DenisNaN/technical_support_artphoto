@@ -451,7 +451,7 @@ class _RepairAddState extends State<RepairAdd> {
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText) {
     final contextViewSnackBar = formKey.currentContext;
-    if(contextViewSnackBar != null && contextViewSnackBar.mounted){
+    if(context.mounted){
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
