@@ -20,7 +20,7 @@ class _MainBottomPageViewState extends State<MainBottomPageView> with TickerProv
     const HomePage(),
 
     /// Repair
-    const RepairsPage(),
+    const RepairsPage(isCurrentRepairs: true,),
 
     /// Troubles
     const Padding(

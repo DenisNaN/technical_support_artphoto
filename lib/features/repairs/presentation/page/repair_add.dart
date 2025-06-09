@@ -38,6 +38,8 @@ class _RepairAddState extends State<RepairAdd> {
 
   Technic? technicFind;
 
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -59,6 +61,7 @@ class _RepairAddState extends State<RepairAdd> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     return Scaffold(
+        key: scaffoldKey,
         appBar: CustomAppBar(typePage: TypePage.addRepair, location: null, technic: null),
         body: Form(
           key: formKey,
@@ -100,10 +103,8 @@ class _RepairAddState extends State<RepairAdd> {
                               providerModel.user.name);
 
                           _save(repair, providerModel).then((isSave) {
-                            _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана');
+                            _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', scaffoldKey);
                           });
-
-                          Navigator.pop(context);
                         }
                       },
                       child: const Text("Сохранить")),
@@ -418,7 +419,7 @@ class _RepairAddState extends State<RepairAdd> {
   Future<bool> _save(Repair repair, ProviderModel providerModel) async{
     List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
     if(resultData != null){
-      providerModel.refreshRepairs(resultData);
+      providerModel.refreshCurrentRepairs(resultData);
       // await addHistory(technic, nameUser);
       return true;
     }
@@ -449,11 +450,11 @@ class _RepairAddState extends State<RepairAdd> {
   //   return result;
   // }
 
-  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText) {
-    final contextViewSnackBar = formKey.currentContext;
-    if(context.mounted){
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText, GlobalKey<ScaffoldState> scaffoldKey) {
+    final contextViewSnackBar = scaffoldKey.currentContext;
+    if(contextViewSnackBar != null && contextViewSnackBar.mounted){
+      ScaffoldMessenger.of(contextViewSnackBar).hideCurrentSnackBar();
+      ScaffoldMessenger.of(contextViewSnackBar).showSnackBar(
         SnackBar(
           content: Row(
             mainAxisSize: MainAxisSize.max,
@@ -469,6 +470,7 @@ class _RepairAddState extends State<RepairAdd> {
           showCloseIcon: true,
         ),
       );
+      Navigator.pop(contextViewSnackBar);
     }
     }
 }

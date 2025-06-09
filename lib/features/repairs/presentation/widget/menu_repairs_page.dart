@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/features/technics/presentation/page/technic_add.dart';
-
 import '../../../../core/api/provider/provider_model.dart';
+import '../../../../core/navigation/animation_navigation.dart';
+import '../../../../core/shared/gradients.dart';
+import '../page/repairs_page.dart';
 
 class MenuRepairPage extends StatefulWidget {
   const MenuRepairPage({super.key});
@@ -25,7 +26,7 @@ class _MenuRepairPageState extends State<MenuRepairPage> {
             child: ElevatedButton(
               onPressed: () {
                 bool isChange = providerModel.setChangeRedAndYellow();
-                providerModel.sortListRepairs(providerModel.getAllRepairs, isChange);
+                providerModel.sortListCurrentRepairs(providerModel.getCurrentRepairs, isChange);
                 providerModel.manualNotifyListeners();
                 Navigator.of(context).pop();
               },
@@ -36,13 +37,7 @@ class _MenuRepairPageState extends State<MenuRepairPage> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
               child: Ink(
                 decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.bottomLeft,
-                      end: Alignment.topRight,
-                      colors: [Colors.lightBlueAccent, Colors.purpleAccent],
-                      stops: [0.0, 0.8],
-                      tileMode: TileMode.clamp,
-                    ),
+                    gradient: gradientArtphoto(),
                     borderRadius: BorderRadius.circular(20)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -50,9 +45,43 @@ class _MenuRepairPageState extends State<MenuRepairPage> {
                     spacing: 10,
                     children: [
                       Icon(Icons.published_with_changes),
-                      Text(
-                        'Поменять очередность',
-                        style: TextStyle(fontSize: 15),
+                      Flexible(
+                        child: Text(
+                          'Поменять очередность',
+                          style: TextStyle(fontSize: 15, overflow: TextOverflow.ellipsis),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          PopupMenuItem(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, animationRouteFadeTransition(const RepairsPage(isCurrentRepairs: false,)));
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+              child: Ink(
+                decoration: BoxDecoration(
+                    gradient: gradientGreenAccentGreen(),
+                    borderRadius: BorderRadius.circular(20)),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: const Row(
+                    spacing: 10,
+                    children: [
+                      Icon(Icons.handyman, color: Colors.black54),
+                      Flexible(
+                        child: Text(
+                          'Завершенные ремонты',
+                          style: TextStyle(fontSize: 15, color: Colors.black54, overflow: TextOverflow.ellipsis),
+                        ),
                       ),
                     ],
                   ),

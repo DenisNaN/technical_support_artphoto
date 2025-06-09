@@ -121,8 +121,6 @@ class _TechnicViewState extends State<TechnicView> {
                               _viewSnackBar(value ? Icons.save : Icons.dangerous_outlined, value,
                                   value ? 'Изменения приняты' : 'Изменения не сохранились');
                             });
-                            Navigator.pushAndRemoveUntil(
-                                context, animationRouteSlideTransition(const ArtphotoTech()), (Route<dynamic> route) => false);
                           }
                         },
                         child: const Text("Сохранить")),
@@ -733,6 +731,8 @@ class _TechnicViewState extends State<TechnicView> {
           showCloseIcon: true,
         ),
       );
+      Navigator.pushAndRemoveUntil(
+          context, animationRouteSlideTransition(const ArtphotoTech()), (Route<dynamic> route) => false);
     }
   }
 

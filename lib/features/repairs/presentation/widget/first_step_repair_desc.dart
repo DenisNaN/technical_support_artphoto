@@ -347,7 +347,7 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
   Future<bool> _save(Repair repair, ProviderModel providerModel) async {
     List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, true);
     if (resultData != null) {
-      providerModel.refreshRepairs(resultData);
+      providerModel.refreshCurrentRepairs(resultData);
       Technic? technic = await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
       if(technic != null){
         bool isSaveStatus = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technic, providerModel.user.name);
@@ -385,8 +385,8 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
             showCloseIcon: true,
           ),
         );
+        Navigator.pop(context);
+        Navigator.pop(context);
       }
-    Navigator.pop(context);
-    Navigator.pop(context);
     }
 }

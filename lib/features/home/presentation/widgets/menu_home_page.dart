@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:technical_support_artphoto/core/shared/gradients.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_add.dart';
 
 class MenuHomePage extends StatefulWidget {
@@ -25,13 +26,7 @@ class _MenuHomePageState extends State<MenuHomePage> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
                   child: Ink(
                     decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.bottomLeft,
-                          end: Alignment.topRight,
-                          colors: [Colors.lightBlueAccent, Colors.purpleAccent],
-                          stops: [0.0, 0.8],
-                          tileMode: TileMode.clamp,
-                        ),
+                        gradient: gradientArtphoto(),
                         borderRadius: BorderRadius.circular(20)),
                     child: Padding(
                       padding: EdgeInsets.only(left: 15, top: 3, bottom: 3),
@@ -60,13 +55,7 @@ class _MenuHomePageState extends State<MenuHomePage> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
                   child: Ink(
                     decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.bottomLeft,
-                          end: Alignment.topRight,
-                          colors: [Colors.lightBlueAccent, Colors.purpleAccent],
-                          stops: [0.0, 0.8],
-                          tileMode: TileMode.clamp,
-                        ),
+                        gradient: gradientArtphoto(),
                         borderRadius: BorderRadius.circular(20)),
                     child: Padding(
                       padding: EdgeInsets.only(left: 15, top: 3, bottom: 3),

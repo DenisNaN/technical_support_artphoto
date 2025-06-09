@@ -93,7 +93,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                         ElevatedButton(onPressed: (){
                           TechnicalSupportRepoImpl.downloadData.deleteRepair(repair.id.toString()).then((result){
                             if(result){
-                              providerModel.removeRepairInRepairs(repair);
+                              providerModel.removeRepairInCurrentRepairs(repair);
                               _viewSnackBar(Icons.delete_forever, result, 'Заявка удаленна', 'Заявка не удаленна', false);
                             }
                           });

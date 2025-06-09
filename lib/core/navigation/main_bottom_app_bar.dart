@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
+import 'package:technical_support_artphoto/core/shared/gradients.dart';
 
 class MainBottomAppBar extends StatefulWidget {
   final PageController pageController;
@@ -18,14 +19,8 @@ class _MainBottomAppBarState extends State<MainBottomAppBar> {
 
     return Container(
       clipBehavior: Clip.hardEdge,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.bottomLeft,
-          end: Alignment.topRight,
-          colors: [Colors.lightBlueAccent, Colors.purpleAccent],
-          stops: [0.0, 0.8],
-          tileMode: TileMode.clamp,
-        ),
+      decoration: BoxDecoration(
+        gradient: gradientArtphoto(),
       ),
       child: NavigationBarTheme(
         data: NavigationBarThemeData(

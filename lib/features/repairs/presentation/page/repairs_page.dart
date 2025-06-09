@@ -6,13 +6,18 @@ import 'package:technical_support_artphoto/features/repairs/presentation/page/re
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
 import '../../../../core/navigation/animation_navigation.dart';
+import '../../../../core/shared/custom_app_bar/custom_app_bar.dart';
+import '../../../../core/shared/logo_animate/logo_matrix_transition_animate.dart';
+import '../../../../core/utils/enums.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../home/presentation/widgets/my_custom_refresh_indicator.dart';
 import '../../models/repair.dart';
 import '../widget/menu_repairs_page.dart';
 
 class RepairsPage extends StatefulWidget {
-  const RepairsPage({super.key});
+  const RepairsPage({super.key, required this.isCurrentRepairs});
+
+  final bool isCurrentRepairs;
 
   @override
   State<RepairsPage> createState() => _RepairsPageState();
@@ -23,62 +28,144 @@ class _RepairsPageState extends State<RepairsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final providerModel = Provider.of<ProviderModel>(context);
-    final List<Repair> repairs = providerModel.getAllRepairs;
     return Scaffold(
-        appBar: AppBar(
+        appBar: widget.isCurrentRepairs ? AppBar(
           title: Text('Ремонты'),
           actions: [
             MenuRepairPage()
           ],
+        ) : AppBar(
+          title: Text('Завершенные ремонты'),
         ),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: widget.isCurrentRepairs ? FloatingActionButton.extended(
           icon: Icon(Icons.add),
           label: Text('Новая заявка'),
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const RepairAdd()));
           },
-        ),
-        body: SafeArea(
-          child: WarpIndicator(
-            controller: _controller,
-            onRefresh: () => TechnicalSupportRepoImpl.downloadData.refreshRepairsData().then((resultData) {
-              providerModel.refreshRepairs(resultData);
-            }),
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: repairs.length,
-              itemBuilder: (context, index) {
-                Repair repair = repairs[index];
-                Color tileColor = getColorForList(repair);
+        ) : null,
+        body: widget.isCurrentRepairs ?
+        _buildBodyCurrentRepairs() :
+        _buildBodyFinishedRepairs()
+    );
+  }
 
-                return Container(
-                  margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(10), color: tileColor, boxShadow: const [
-                    BoxShadow(
-                      color: Colors.grey,
-                      blurRadius: 4,
-                      offset: Offset(2, 4), // Shadow position
+  Widget _buildBodyFinishedRepairs() {
+    return FutureBuilder(
+        future: TechnicalSupportRepoImpl.downloadData.getFinishedRepairs(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasData) {
+            final List<Repair> repairs = snapshot.data;
+            return SafeArea(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: repairs.length,
+                itemBuilder: (context, index) {
+                  Repair repair = repairs[index];
+                  return Container(
+                    margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
+                    decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.green.shade100, boxShadow: const [
+                      BoxShadow(
+                        color: Colors.grey,
+                        blurRadius: 4,
+                        offset: Offset(2, 4), // Shadow position
+                      ),
+                    ]),
+                    padding: const EdgeInsets.fromLTRB(3, 3, 3, 3),
+                    child: ListTile(
+                      onTap: () {
+                        Navigator.push(context,
+                            animationRouteSlideTransition(RepairView(repair: repair)));
+                      },
+                      title: _buildTextTitle(repair),
+                      subtitle: _buildTextSubtitle(repair),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
-                  ]),
-                  padding: const EdgeInsets.fromLTRB(3, 3, 3, 3),
-                  child: ListTile(
-                    onTap: () {
-                      Navigator.push(context,
-                          animationRouteSlideTransition(RepairView(repair: repair)));
-                    },
-                    title: _buildTextTitle(repair),
-                    subtitle: _buildTextSubtitle(repair),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                  );
+                },
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Scaffold(
+                appBar: CustomAppBar(typePage: TypePage.error, location: 'Произошел сбой', technic: null),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.wifi_off,
+                        size: 150,
+                        color: Colors.blue,
+                        shadows: [
+                          BoxShadow(
+                            color: Colors.grey.withValues(alpha: 0.5),
+                            spreadRadius: 3,
+                            blurRadius: 4,
+                            offset: Offset(0, 4), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'Данные не загрузились.\nПроверьте подключение к сети',
+                        style: TextStyle(fontSize: 20),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ));
+          } else {
+            return Center(child: MatrixTransitionLogo());
+          }
+        },
+    );
+  }
+
+  Widget _buildBodyCurrentRepairs() {
+    final providerModel = Provider.of<ProviderModel>(context);
+    final List<Repair> repairs = providerModel.getCurrentRepairs;
+    return SafeArea(
+        child: WarpIndicator(
+          controller: _controller,
+          onRefresh: () => TechnicalSupportRepoImpl.downloadData.refreshCurrentRepairsData().then((resultData) {
+            providerModel.refreshCurrentRepairs(resultData);
+          }),
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemCount: repairs.length,
+            itemBuilder: (context, index) {
+              Repair repair = repairs[index];
+              Color tileColor = getColorForList(repair);
+
+              return Container(
+                margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(10), color: tileColor, boxShadow: const [
+                  BoxShadow(
+                    color: Colors.grey,
+                    blurRadius: 4,
+                    offset: Offset(2, 4), // Shadow position
+                  ),
+                ]),
+                padding: const EdgeInsets.fromLTRB(3, 3, 3, 3),
+                child: ListTile(
+                  onTap: () {
+                    Navigator.push(context,
+                        animationRouteSlideTransition(RepairView(repair: repair)));
+                  },
+                  title: _buildTextTitle(repair),
+                  subtitle: _buildTextSubtitle(repair),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              );
+            },
           ),
-        ));
+        ),
+      );
   }
 
   Text _buildTextTitle(Repair repair) {
@@ -153,7 +240,10 @@ class _RepairsPageState extends State<RepairsPage> {
   }
 
   String fieldsFilled(Repair repair) {
-    if (repair.serviceDislocation == null || repair.serviceDislocation == '' || repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z") {
+    if (repair.serviceDislocation == null ||
+        repair.serviceDislocation == '' ||
+        repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
+        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000Z") {
       return 'red';
     }
     return 'yellow';

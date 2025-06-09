@@ -114,7 +114,6 @@ class _TechnicAddState extends State<TechnicAdd> {
                             _save(technic, providerModel).then((_) {
                               _viewSnackBar(Icons.save, true, 'Техника сохранена', 'Техника не сохранена');
                             });
-                            Navigator.pop(context);
                           }
                         },
                         child: const Text("Сохранить")),
@@ -681,6 +680,7 @@ class _TechnicAddState extends State<TechnicAdd> {
         showCloseIcon: true,
       ),
     );
+    Navigator.pop(context);
   }
 
   void _viewSnackBarCheckEmptyNumberTechnic(String text) {

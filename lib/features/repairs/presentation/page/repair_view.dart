@@ -166,33 +166,27 @@ class _RepairViewState extends State<RepairView> {
                           try{
                             switch (value) {
                               case TypeMessageForSaveRepairView.successSaveRepair:
-                                _viewSnackBar(Icons.save, true, 'Заявка изменена', '', true);
+                                _viewSnackBar(Icons.save, true, 'Заявка изменена', '', true, repair);
                               case TypeMessageForSaveRepairView.notSuccessSaveRepair:
-                                _viewSnackBar(Icons.save, false, '', 'Заявка не изменена', true);
+                                _viewSnackBar(Icons.save, false, '', 'Заявка не изменена', true, repair);
                               case TypeMessageForSaveRepairView.notSuccessSaveStatus:
                                 _viewSnackBar(
                                     Icons.print_disabled,
                                     false,
                                     '',
                                     'Статус и дислокацию техники изменить не удалось. Попробуйте вручную в карточке техники',
-                                    false);
+                                    false, repair);
                               case TypeMessageForSaveRepairView.notWriteAllFieldStatus:
                                 _viewSnackBar(
-                                    Icons.print_disabled, false, '', 'Статус или дислокация не заполенены.\n', false);
+                                    Icons.print_disabled, false, '', 'Статус или дислокация не заполенены.\n', false, repair);
                               case TypeMessageForSaveRepairView.notCheckTechnicInDB:
                                 _viewSnackBar(Icons.print_disabled, false, '',
-                                    'Техника с таким номером в базе не обнаружена', false);
+                                    'Техника с таким номером в базе не обнаружена', false, repair);
                             }
                           }catch(e){
                             debugPrint(e.toString());
                           }
                         });
-                        if((repair.newStatus == null && repair.newDislocation != null) ||
-                            (repair.newStatus != null && repair.newDislocation == null)){}else{
-                          Navigator.pushAndRemoveUntil(
-                              context, animationRouteSlideTransition(const ArtphotoTech(indexPage: 1,)), (Route<dynamic> route) => false);
-                        }
-
                       },
                       child: const Text("Сохранить")),
                 ],
@@ -645,7 +639,7 @@ class _RepairViewState extends State<RepairView> {
       List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, false);
       if (resultData != null) {
         if(repair.newStatus == null && repair.newDislocation == null){
-          providerModel.refreshRepairs(resultData);
+          providerModel.refreshCurrentRepairs(resultData);
           return TypeMessageForSaveRepairView.successSaveRepair;
         }
         Technic? technic = await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
@@ -658,7 +652,7 @@ class _RepairViewState extends State<RepairView> {
             Map<String, dynamic> resultDataRefTech = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
             providerModel..
             refreshTechnics(resultDataRefTech['Photosalons'], resultDataRefTech['Repairs'], resultDataRefTech['Storages'])..
-            refreshRepairs(resultData);
+            refreshCurrentRepairs(resultData);
             return TypeMessageForSaveRepairView.successSaveRepair;
           }else{
             return TypeMessageForSaveRepairView.notSuccessSaveStatus;
@@ -700,7 +694,7 @@ class _RepairViewState extends State<RepairView> {
   // }
 
   void _viewSnackBar(
-      IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar) {
+      IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar, Repair repair) {
     if (context.mounted) {
       if (isSkipPrevSnackBar) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -721,6 +715,11 @@ class _RepairViewState extends State<RepairView> {
           showCloseIcon: true,
         ),
       );
+      if((repair.newStatus == null && repair.newDislocation != null) ||
+          (repair.newStatus != null && repair.newDislocation == null)){}else{
+        Navigator.pushAndRemoveUntil(
+            context, animationRouteSlideTransition(const ArtphotoTech(indexPage: 1,)), (Route<dynamic> route) => false);
+      }
     }
   }
 }

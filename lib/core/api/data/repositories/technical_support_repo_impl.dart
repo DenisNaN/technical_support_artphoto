@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_my_sql.dart';
 import 'package:technical_support_artphoto/core/api/data/models/decommissioned.dart';
@@ -40,7 +41,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     technicsInRepairs = await ConnectDbMySQL.connDB.fetchTechnicsInRepairs();
     technicsInStorages = await ConnectDbMySQL.connDB.fetchTechnicsInStorages();
 
-    repairs = await ConnectDbMySQL.connDB.fetchAllRepairs();
+    repairs = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
 
     namePhotosalons = await ConnectDbMySQL.connDB.fetchNamePhotosalons();
     namePhotosalons.addAll(await ConnectDbMySQL.connDB.fetchNameStorages());
@@ -84,10 +85,10 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
-  Future<List<Repair>> refreshRepairsData() async{
+  Future<List<Repair>> refreshCurrentRepairsData() async{
     List<Repair> repairs = [];
     await ConnectDbMySQL.connDB.connDatabase();
-    var result = await ConnectDbMySQL.connDB.fetchAllRepairs();
+    var result = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
     await ConnectDbMySQL.connDB.dispose();
     repairs.addAll(result);
     return repairs;
@@ -189,11 +190,25 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
+  Future<List<Repair>> getFinishedRepairs() async{
+    List<Repair> repairs = [];
+    try{
+      await ConnectDbMySQL.connDB.connDatabase();
+      repairs.addAll(await ConnectDbMySQL.connDB.fetchFinishedRepairs());
+      await ConnectDbMySQL.connDB.dispose();
+    } catch (e) {
+      debugPrint(e.toString());
+      return repairs;
+    }
+    return repairs;
+  }
+
+  @override
   Future<Repair?> getRepair(int id) async{
     Repair? repair;
     try {
       await ConnectDbMySQL.connDB.connDatabase();
-      repair = await ConnectDbMySQL.connDB.getRepair(id);
+      repair = await ConnectDbMySQL.connDB.fetchRepair(id);
       await ConnectDbMySQL.connDB.dispose();
       return repair;
     } catch (e) {
@@ -207,7 +222,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       await ConnectDbMySQL.connDB.insertRepairInDB(repair);
-      var result = await ConnectDbMySQL.connDB.fetchAllRepairs();
+      var result = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
       repairs = result;
       await ConnectDbMySQL.connDB.dispose();
       return repairs;
@@ -226,7 +241,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
       }else{
         await ConnectDbMySQL.connDB.updateRepairInDBStepsTwoAndThree(repair);
       }
-      var result = await ConnectDbMySQL.connDB.fetchAllRepairs();
+      var result = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
       repairs = result;
       await ConnectDbMySQL.connDB.dispose();
       return repairs;

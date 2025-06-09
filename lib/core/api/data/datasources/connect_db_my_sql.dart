@@ -11,7 +11,6 @@ import 'package:technical_support_artphoto/features/technics/data/models/history
 import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
 import '../models/decommissioned.dart';
 import '../models/technic.dart';
-import 'package:intl/intl.dart';
 
 class ConnectDbMySQL {
   ConnectDbMySQL._();
@@ -366,30 +365,36 @@ Future<Technic?> getTechnic(int number) async {
 //   return list;
 // }
 
-  Future<List<Repair>> fetchAllRepairs() async {
+  Future<List<Repair>> fetchCurrentRepairs() async {
     var result = await _connDB!.query('SELECT * FROM repairEquipment '
         'WHERE repairEquipment.dateReceipt = "0000-00-00" OR repairEquipment.dateReceipt = "0001-11-30"');
     final List<Repair> list = repairListFromMap(result);
     return list;
   }
 
+  Future<List<Repair>> fetchFinishedRepairs() async {
+    var result = await _connDB!.query('SELECT * FROM repairEquipment '
+        'WHERE repairEquipment.dateReceipt <> "0000-00-00" AND repairEquipment.dateReceipt <> "0001-11-30"');
+    final List<Repair> list = repairListFromMap(result);
+    return list;
+  }
 
-Future<Repair?> getRepair(int id) async {
-  Repair? repair;
-  var result = await _connDB!.query('SELECT * FROM repairEquipment WHERE id = ?', [id]);
-    for (var row in result) {
-      // id-row[0], number-row[1],  number-row[1], category-row[2], dislocationOld-row[3], status-row[4],
-      // complaint-row[5], dateDeparture-row[6],j whoTook-row[7], idTrouble-row[8], serviceDislocation-row[9],
-      // dateTransferInService-row[10], dateDepartureFromService-row[11],  worksPerformed-row[12],
-      // costService-row[13], diagnosisService-row[14], recommendationsNotes-row[15], newStatus-row[16],
-      // newDislocation-row[17], dateReceipt-row[18], idTestDrive-row[19]
+  Future<Repair?> fetchRepair(int id) async {
+    Repair? repair;
+    var result = await _connDB!.query('SELECT * FROM repairEquipment WHERE id = ?', [id]);
+      for (var row in result) {
+        // id-row[0], number-row[1],  number-row[1], category-row[2], dislocationOld-row[3], status-row[4],
+        // complaint-row[5], dateDeparture-row[6],j whoTook-row[7], idTrouble-row[8], serviceDislocation-row[9],
+        // dateTransferInService-row[10], dateDepartureFromService-row[11],  worksPerformed-row[12],
+        // costService-row[13], diagnosisService-row[14], recommendationsNotes-row[15], newStatus-row[16],
+        // newDislocation-row[17], dateReceipt-row[18], idTestDrive-row[19]
 
-      repair = Repair.fullRepair(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9],
-          row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19]
-      );
-    }
-  return repair;
-}
+        repair = Repair.fullRepair(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9],
+            row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19]
+        );
+      }
+    return repair;
+  }
 
   List<Repair> repairListFromMap(var result) {
     List<Repair> list = [];
@@ -419,8 +424,6 @@ Future<Repair?> getRepair(int id) async {
       Repair repair = Repair.fullRepair(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9],
           row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19]
       );
-      repair.idTrouble = row[8];
-      repair.idTestDrive = row[19];
       list.add(repair);
     }
     return list;

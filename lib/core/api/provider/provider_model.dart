@@ -12,7 +12,7 @@ class ProviderModel with ChangeNotifier {
   late final Map<String, RepairLocation> _technicsInRepairs;
   late final Map<String, StorageLocation> _technicsInStorages;
 
-  late final List<Repair> _repairs;
+  late final List<Repair> _currentRepairs;
   bool _isChangeRedAndYellow = false;
 
   late final List<String> _namesEquipments;
@@ -35,7 +35,7 @@ class ProviderModel with ChangeNotifier {
 
   Map<String, StorageLocation> get technicsInStorages => _technicsInStorages;
 
-  List<Repair> get getAllRepairs => _repairs;
+  List<Repair> get getCurrentRepairs => _currentRepairs;
 
   bool get isChangeRedAndYellow => _isChangeRedAndYellow;
 
@@ -64,9 +64,9 @@ class ProviderModel with ChangeNotifier {
     _user = initUser;
   }
 
-  void downloadRepairs(List<Repair> repairs) {
-    _repairs = [];
-    sortListRepairs(repairs);
+  void downloadCurrentRepairs(List<Repair> repairs) {
+    _currentRepairs = [];
+    sortListCurrentRepairs(repairs);
   }
 
   void downloadAllCategoryDropDown(List<String> namesEquipments, List<String> namePhotosalons, List<String> services,
@@ -122,30 +122,6 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateRepairInProvider(Repair repair) {
-    _repairs.map((element) {
-      if (element.id == repair.id) {
-        element.numberTechnic == repair.numberTechnic;
-        element.costService == repair.costService;
-        element.worksPerformed == repair.worksPerformed;
-        element.dateDepartureFromService == repair.dateDepartureFromService;
-        element.dateTransferInService == repair.dateTransferInService;
-        element.dateReceipt == repair.dateReceipt;
-        element.category == repair.category;
-        element.complaint == repair.complaint;
-        element.diagnosisService == repair.diagnosisService;
-        element.dislocationOld == repair.dislocationOld;
-        element.idTestDrive == repair.idTestDrive;
-        element.dateDeparture == repair.dateDeparture;
-        element.newDislocation == repair.newDislocation;
-        element.newStatus == repair.newStatus;
-        element.recommendationsNotes == repair.recommendationsNotes;
-        element.serviceDislocation == repair.serviceDislocation;
-        element.status == repair.status;
-      }
-    });
-  }
-
   void updateUser(User newUser) {
     _user = newUser;
     notifyListeners();
@@ -161,14 +137,14 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void addRepairInRepairs(Repair repair) {
-    _repairs.add(repair);
-    sortListRepairs(_repairs);
+  void addRepairInCurrentRepairs(Repair repair) {
+    _currentRepairs.add(repair);
+    sortListCurrentRepairs(_currentRepairs);
     notifyListeners();
   }
 
-  void removeRepairInRepairs(Repair repair) {
-    _repairs.remove(repair);
+  void removeRepairInCurrentRepairs(Repair repair) {
+    _currentRepairs.remove(repair);
     notifyListeners();
   }
 
@@ -206,18 +182,19 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void refreshRepairs(List<Repair> repairs) {
-    sortListRepairs(repairs, _isChangeRedAndYellow);
+  void refreshCurrentRepairs(List<Repair> repairs) {
+    sortListCurrentRepairs(repairs, _isChangeRedAndYellow);
     notifyListeners();
   }
 
-  void sortListRepairs(List<Repair> repairs, [bool isChangeRedAndYellow = false]){
+  void sortListCurrentRepairs(List<Repair> repairs, [bool isChangeRedAndYellow = false]){
     List<Repair> filterRepairs = [];
     List<Repair> tmpRedList = [];
     List<Repair> tmpYellowList = [];
     for(int i = 0; i < repairs.length; i++){
       if(repairs[i].serviceDislocation == '' || repairs[i].serviceDislocation == null ||
-          repairs[i].dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z"){
+          repairs[i].dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
+          repairs[i].dateTransferInService.toString() == "0001-11-30 00:00:00.000Z"){
         tmpRedList.add(repairs[i]);
       }else{
         tmpYellowList.add(repairs[i]);
@@ -233,8 +210,8 @@ class ProviderModel with ChangeNotifier {
       filterRepairs.addAll(tmpRedList);
     }
 
-    _repairs.clear();
-    _repairs.addAll(filterRepairs);
+    _currentRepairs.clear();
+    _currentRepairs.addAll(filterRepairs);
   }
 
   bool setChangeRedAndYellow(){
