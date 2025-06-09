@@ -13,7 +13,6 @@ class GridViewBasketDecommissioned extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.sizeOf(context).height;
     return SliverPadding(
       padding: const EdgeInsets.all(14.0),
       sliver: SliverGrid.builder(
@@ -74,10 +73,7 @@ class GridViewBasketDecommissioned extends StatelessWidget {
                               ),
                             ));
                       } else {
-                        return Padding(
-                          padding: EdgeInsets.only(top: height / 2.5),
-                          child: Center(child: MatrixTransitionLogo()),
-                        );
+                        return Center(child: MatrixTransitionLogo());
                       }
                     },
                   );

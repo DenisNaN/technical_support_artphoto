@@ -60,7 +60,7 @@ class _TechnicViewState extends State<TechnicView> {
   void initState() {
     super.initState();
     _nameTechnic.text = '';
-    TechnicalSupportRepoImpl.downloadData.getSummsRepairs(widget.technic.number.toString()).then((value) {
+    TechnicalSupportRepoImpl.downloadData.getSumRepairs(widget.technic.number.toString()).then((value) {
       if (value.isNotEmpty) {
         setState(() {
           summsRepairs.addAll(value.values.first);
@@ -76,7 +76,7 @@ class _TechnicViewState extends State<TechnicView> {
     final providerModel = Provider.of<ProviderModel>(context);
     double widthScreen = MediaQuery.sizeOf(context).width;
     return Scaffold(
-        appBar: CustomAppBar(typePage: TypePage.view, location: widget.location, technic: widget.technic),
+        appBar: CustomAppBar(typePage: TypePage.viewTechnic, location: widget.location, technic: widget.technic),
         body: Form(
             key: _formInnerNumberKey,
             child: ListView(
@@ -121,8 +121,6 @@ class _TechnicViewState extends State<TechnicView> {
                               _viewSnackBar(value ? Icons.save : Icons.dangerous_outlined, value,
                                   value ? 'Изменения приняты' : 'Изменения не сохранились');
                             });
-                            Navigator.pushReplacement(
-                                context, animationRouteSlideTransition(const ArtphotoTech()));
                           }
                         },
                         child: const Text("Сохранить")),
@@ -407,7 +405,7 @@ class _TechnicViewState extends State<TechnicView> {
               hint: const Text('Дислокация'),
               value: _selectedDropdownDislocation == null ? widget.technic.dislocation : null,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: providerModel.namesPhotosalons.map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -689,8 +687,8 @@ class _TechnicViewState extends State<TechnicView> {
   Future<bool> _save(Technic technicModel, ProviderModel providerModel) async{
     bool isSuccess = false;
     isSuccess = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technicModel, providerModel.user.name);
-    Map<String, dynamic> result = await TechnicalSupportRepoImpl.downloadData.refreshData();
-    providerModel.refreshAllElement(result['Photosalons'], result['Repairs'], result['Storages']);
+    Map<String, dynamic> result = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
+    providerModel.refreshTechnics(result['Photosalons'], result['Repairs'], result['Storages']);
     return isSuccess;
   }
 
@@ -715,23 +713,27 @@ class _TechnicViewState extends State<TechnicView> {
   // }
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String text) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
-            SizedBox(
-              width: 20,
-            ),
-            Flexible(child: Text(text)),
-          ],
+    if(context.mounted){
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+              SizedBox(
+                width: 20,
+              ),
+              Flexible(child: Text(text)),
+            ],
+          ),
+          duration: const Duration(seconds: 5),
+          showCloseIcon: true,
         ),
-        duration: const Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
+      );
+      Navigator.pushAndRemoveUntil(
+          context, animationRouteSlideTransition(const ArtphotoTech()), (Route<dynamic> route) => false);
+    }
   }
 
 // String validateEmptyFields() {

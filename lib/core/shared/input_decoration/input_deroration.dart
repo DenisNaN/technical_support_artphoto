@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-InputDecoration myDecorationDropdown() {
+InputDecoration myDecorationDropdown([String? labelText]) {
   return InputDecoration(
     enabledBorder: OutlineInputBorder(
       borderSide: BorderSide(color: Colors.blue.shade50, width: 2),
@@ -15,6 +15,7 @@ InputDecoration myDecorationDropdown() {
     ),
     filled: true,
     fillColor: Colors.blue.shade50,
+    labelText: labelText
   );
 }
 
@@ -35,6 +36,7 @@ InputDecoration myDecorationTextFormField([String? labelText, String? hintText, 
           borderSide: BorderSide(color: Colors.red, width: 1),
           borderRadius: BorderRadius.circular(15)),
       labelText: labelText,
+      labelStyle: TextStyle(fontStyle: FontStyle.italic),
       hintText: hintText,
       prefix: prefix != null ? Text(prefix) : null);
 }

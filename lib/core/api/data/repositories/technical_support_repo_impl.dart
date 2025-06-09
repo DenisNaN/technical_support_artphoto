@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_my_sql.dart';
 import 'package:technical_support_artphoto/core/api/data/models/decommissioned.dart';
@@ -40,7 +41,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     technicsInRepairs = await ConnectDbMySQL.connDB.fetchTechnicsInRepairs();
     technicsInStorages = await ConnectDbMySQL.connDB.fetchTechnicsInStorages();
 
-    repairs = await ConnectDbMySQL.connDB.fetchAllRepairs();
+    repairs = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
 
     namePhotosalons = await ConnectDbMySQL.connDB.fetchNamePhotosalons();
     namePhotosalons.addAll(await ConnectDbMySQL.connDB.fetchNameStorages());
@@ -66,7 +67,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
-  Future<Map<String, dynamic>> refreshData() async {
+  Future<Map<String, dynamic>> refreshTechnicsData() async {
     Map<String, dynamic> result = {};
 
     await ConnectDbMySQL.connDB.connDatabase();
@@ -81,6 +82,16 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 
     await ConnectDbMySQL.connDB.dispose();
     return result;
+  }
+
+  @override
+  Future<List<Repair>> refreshCurrentRepairsData() async{
+    List<Repair> repairs = [];
+    await ConnectDbMySQL.connDB.connDatabase();
+    var result = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
+    await ConnectDbMySQL.connDB.dispose();
+    repairs.addAll(result);
+    return repairs;
   }
 
   @override
@@ -106,6 +117,27 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
+  Future<Technic?> getTechnic(String number) async{
+    await ConnectDbMySQL.connDB.connDatabase();
+    Technic? technic = await ConnectDbMySQL.connDB.getTechnic(int.parse(number));
+    await ConnectDbMySQL.connDB.dispose();
+    return technic;
+  }
+
+  @override
+  Future<int?> saveTechnic(Technic technic, String nameUser) async{
+    int? id;
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
+      await ConnectDbMySQL.connDB.dispose();
+      return id;
+    } catch (e) {
+      return id;
+    }
+  }
+
+  @override
   Future<bool> updateTechnic(Technic technic) async {
     try {
       await ConnectDbMySQL.connDB.connDatabase();
@@ -122,6 +154,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       await ConnectDbMySQL.connDB.insertStatusInDB(technic.id, technic.status, technic.dislocation, userName);
+      await ConnectDbMySQL.connDB.dispose();
       return true;
     } catch (e) {
       return false;
@@ -129,7 +162,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
-  Future<Map<int, List<SummRepair>>> getSummsRepairs(String numberTechnic) async{
+  Future<Map<int, List<SummRepair>>> getSumRepairs(String numberTechnic) async{
     await ConnectDbMySQL.connDB.connDatabase();
     Map<int, List<SummRepair>> summsRepairs = await ConnectDbMySQL.connDB.getSummsRepairs(numberTechnic);
     await ConnectDbMySQL.connDB.dispose();
@@ -156,6 +189,78 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     return decommissioned;
   }
 
+  @override
+  Future<List<Repair>> getFinishedRepairs() async{
+    List<Repair> repairs = [];
+    try{
+      await ConnectDbMySQL.connDB.connDatabase();
+      repairs.addAll(await ConnectDbMySQL.connDB.fetchFinishedRepairs());
+      await ConnectDbMySQL.connDB.dispose();
+    } catch (e) {
+      debugPrint(e.toString());
+      return repairs;
+    }
+    return repairs;
+  }
+
+  @override
+  Future<Repair?> getRepair(int id) async{
+    Repair? repair;
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      repair = await ConnectDbMySQL.connDB.fetchRepair(id);
+      await ConnectDbMySQL.connDB.dispose();
+      return repair;
+    } catch (e) {
+      return repair;
+    }
+  }
+
+  @override
+  Future<List<Repair>?> saveRepair(Repair repair) async{
+    List<Repair>? repairs;
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.insertRepairInDB(repair);
+      var result = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
+      repairs = result;
+      await ConnectDbMySQL.connDB.dispose();
+      return repairs;
+        } catch (e) {
+      return repairs;
+    }
+  }
+
+  @override
+  Future<List<Repair>?> updateRepair(Repair repair, bool isStepOne) async{
+    List<Repair>? repairs;
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      if(isStepOne){
+        await ConnectDbMySQL.connDB.updateRepairInDBStepOne(repair);
+      }else{
+        await ConnectDbMySQL.connDB.updateRepairInDBStepsTwoAndThree(repair);
+      }
+      var result = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
+      repairs = result;
+      await ConnectDbMySQL.connDB.dispose();
+      return repairs;
+    } catch (e) {
+      return repairs;
+    }
+  }
+
+  @override
+  Future<bool> deleteRepair(String id) async{
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.deleteRepairInDB(id);
+      await ConnectDbMySQL.connDB.dispose();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 
 //   List getNotifications() {
 //     List notifications = [];

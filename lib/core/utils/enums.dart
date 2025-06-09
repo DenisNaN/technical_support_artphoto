@@ -6,9 +6,11 @@ enum ColorStageRepair{
 
 enum TypePage{
   listTechnics,
-  add,
-  view,
+  addTechnic,
+  viewTechnic,
   repair,
+  addRepair,
+  viewRepair,
   history,
   technicRepair,
   error,
@@ -18,4 +20,12 @@ enum TypeDislocation{
   photosalon,
   storage,
   repair,
+}
+
+enum TypeMessageForSaveRepairView{
+  successSaveRepair,
+  notSuccessSaveRepair,
+  notSuccessSaveStatus,
+  notWriteAllFieldStatus,
+  notCheckTechnicInDB,
 }

@@ -12,7 +12,8 @@ class ProviderModel with ChangeNotifier {
   late final Map<String, RepairLocation> _technicsInRepairs;
   late final Map<String, StorageLocation> _technicsInStorages;
 
-  late final List<Repair> _repairs;
+  late final List<Repair> _currentRepairs;
+  bool _isChangeRedAndYellow = false;
 
   late final List<String> _namesEquipments;
   late final List<String> _namesDislocations;
@@ -23,6 +24,7 @@ class ProviderModel with ChangeNotifier {
   late User _user = User('user', 'access');
 
   int currentPageIndexMainBottomAppBar = 0;
+  Size? _mainBottomSize;
   final Color colorPhotosalons = Colors.blue.shade200;
   final Color colorStorages = Colors.white70;
   final Color colorRepairs = Colors.yellow.shade200;
@@ -33,9 +35,11 @@ class ProviderModel with ChangeNotifier {
 
   Map<String, StorageLocation> get technicsInStorages => _technicsInStorages;
 
-  List<Repair> get getAllRepairs => _repairs;
+  List<Repair> get getCurrentRepairs => _currentRepairs;
 
-  List<String> get namesPhotosalons => _namesDislocations;
+  bool get isChangeRedAndYellow => _isChangeRedAndYellow;
+
+  List<String> get namesDislocation => _namesDislocations;
 
   List<String> get services => _services;
 
@@ -47,27 +51,26 @@ class ProviderModel with ChangeNotifier {
 
   User get user => _user;
 
-  void downloadAllElements(Map<String, PhotosalonLocation> photosalons,
-      Map<String, RepairLocation> repairs, Map<String, StorageLocation> storages) {
+  Size? get mainBottomSize => _mainBottomSize;
+
+  void downloadAllElements(Map<String, PhotosalonLocation> photosalons, Map<String, RepairLocation> repairs,
+      Map<String, StorageLocation> storages) {
     _technicsInPhotosalons = photosalons;
     _technicsInRepairs = repairs;
     _technicsInStorages = storages;
   }
 
-  void initUser(User initUser){
+  void initUser(User initUser) {
     _user = initUser;
   }
 
-  void downloadRepairs(List<Repair> repairs){
-    _repairs = repairs;
+  void downloadCurrentRepairs(List<Repair> repairs) {
+    _currentRepairs = [];
+    sortListCurrentRepairs(repairs);
   }
 
-  void downloadAllCategoryDropDown(
-      List<String> namesEquipments,
-      List<String> namePhotosalons,
-      List<String> services,
-      List<String> statusForEquipment,
-      Map<String, int> colorsForEquipment) {
+  void downloadAllCategoryDropDown(List<String> namesEquipments, List<String> namePhotosalons, List<String> services,
+      List<String> statusForEquipment, Map<String, int> colorsForEquipment) {
     _namesEquipments = namesEquipments;
     _namesDislocations = namePhotosalons;
     _services = services;
@@ -81,10 +84,10 @@ class ProviderModel with ChangeNotifier {
   }
 
   void updateTechnicInProvider(dynamic location, Technic technic) {
-    switch(Location){
+    switch (Location) {
       case const (PhotosalonLocation):
-        _technicsInPhotosalons[technic.dislocation]!.technics.map((element){
-          if(technic.id == element.id){
+        _technicsInPhotosalons[technic.dislocation]!.technics.map((element) {
+          if (technic.id == element.id) {
             element.name = technic.name;
             element.dislocation = technic.dislocation;
             element.status = technic.status;
@@ -94,8 +97,8 @@ class ProviderModel with ChangeNotifier {
           }
         });
       case const (RepairLocation):
-        _technicsInRepairs[technic.dislocation]!.technics.map((element){
-          if(technic.id == element.id){
+        _technicsInRepairs[technic.dislocation]!.technics.map((element) {
+          if (technic.id == element.id) {
             element.name = technic.name;
             element.dislocation = technic.dislocation;
             element.status = technic.status;
@@ -104,9 +107,9 @@ class ProviderModel with ChangeNotifier {
             element.dateBuyTechnic = technic.dateBuyTechnic;
           }
         });
-      case const(StorageLocation):
-        _technicsInStorages[technic.dislocation]!.technics.map((element){
-          if(technic.id == element.id){
+      case const (StorageLocation):
+        _technicsInStorages[technic.dislocation]!.technics.map((element) {
+          if (technic.id == element.id) {
             element.name = technic.name;
             element.dislocation = technic.dislocation;
             element.status = technic.status;
@@ -119,31 +122,7 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateRepairInProvider(Repair repair) {
-    _repairs.map((element){
-      if(element.id == repair.id){
-        element.number == repair.number;
-        element.costService == repair.costService;
-        element.worksPerformed == repair.worksPerformed;
-        element.dateDepartureFromService == repair.dateDepartureFromService;
-        element.dateTransferInService == repair.dateTransferInService;
-        element.dateReceipt == repair.dateReceipt;
-        element.category == repair.category;
-        element.complaint == repair.complaint;
-        element.diagnosisService == repair.diagnosisService;
-        element.dislocationOld == repair.dislocationOld;
-        element.idTestDrive == repair.idTestDrive;
-        element.dateDeparture == repair.dateDeparture;
-        element.newDislocation == repair.newDislocation;
-        element.newStatus == repair.newStatus;
-        element.recommendationsNotes == repair.recommendationsNotes;
-        element.serviceDislocation == repair.serviceDislocation;
-        element.status == repair.status;
-      }
-    });
-  }
-
-  void updateUser(User newUser){
+  void updateUser(User newUser) {
     _user = newUser;
     notifyListeners();
   }
@@ -158,8 +137,14 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void addRepairInRepairs(Repair repair) {
-    _repairs.add(repair);
+  void addRepairInCurrentRepairs(Repair repair) {
+    _currentRepairs.add(repair);
+    sortListCurrentRepairs(_currentRepairs);
+    notifyListeners();
+  }
+
+  void removeRepairInCurrentRepairs(Repair repair) {
+    _currentRepairs.remove(repair);
     notifyListeners();
   }
 
@@ -183,11 +168,11 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void refreshAllElement(
-      Map<String, PhotosalonLocation> photosalons,
-      Map<String, RepairLocation> repairs,
-      Map<String, StorageLocation> storages,
-      ) {
+  void refreshTechnics(
+    Map<String, PhotosalonLocation> photosalons,
+    Map<String, RepairLocation> repairs,
+    Map<String, StorageLocation> storages,
+  ) {
     _technicsInPhotosalons.clear();
     _technicsInRepairs.clear();
     _technicsInStorages.clear();
@@ -195,5 +180,49 @@ class ProviderModel with ChangeNotifier {
     _technicsInRepairs.addAll(repairs);
     _technicsInStorages.addAll(storages);
     notifyListeners();
+  }
+
+  void refreshCurrentRepairs(List<Repair> repairs) {
+    sortListCurrentRepairs(repairs, _isChangeRedAndYellow);
+    notifyListeners();
+  }
+
+  void sortListCurrentRepairs(List<Repair> repairs, [bool isChangeRedAndYellow = false]){
+    List<Repair> filterRepairs = [];
+    List<Repair> tmpRedList = [];
+    List<Repair> tmpYellowList = [];
+    for(int i = 0; i < repairs.length; i++){
+      if(repairs[i].serviceDislocation == '' || repairs[i].serviceDislocation == null ||
+          repairs[i].dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
+          repairs[i].dateTransferInService.toString() == "0001-11-30 00:00:00.000Z"){
+        tmpRedList.add(repairs[i]);
+      }else{
+        tmpYellowList.add(repairs[i]);
+      }
+    }
+    tmpYellowList.sort();
+    tmpRedList.sort();
+    if(!isChangeRedAndYellow){
+      filterRepairs.addAll(tmpRedList);
+      filterRepairs.addAll(tmpYellowList);
+    }else{
+      filterRepairs.addAll(tmpYellowList);
+      filterRepairs.addAll(tmpRedList);
+    }
+
+    _currentRepairs.clear();
+    _currentRepairs.addAll(filterRepairs);
+  }
+
+  bool setChangeRedAndYellow(){
+    return _isChangeRedAndYellow = !_isChangeRedAndYellow;
+  }
+
+  void manualNotifyListeners(){
+    notifyListeners();
+  }
+
+  void setSizeMainBottom(Size? size) {
+    _mainBottomSize = size;
   }
 }

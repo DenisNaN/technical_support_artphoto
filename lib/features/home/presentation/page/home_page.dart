@@ -7,7 +7,7 @@ import 'package:technical_support_artphoto/features/home/presentation/widgets/gr
 import 'package:technical_support_artphoto/features/home/presentation/widgets/grid_view_home_page.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/my_custom_refresh_indicator.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_add.dart';
-import '../widgets/title_appbar_homepage.dart';
+import '../widgets/appbar_homepage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,19 +23,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    final double height = MediaQuery.sizeOf(context).height;
     return Scaffold(
-      appBar: AppBar(
-          title: TitleAppbarHomepage()
-          // actions: [
-          //   MenuHomePage(),
-          // ],
-          ),
+      appBar: AppBarHomepage(),
       body: SafeArea(
         child: WarpIndicator(
             controller: _controller,
-            onRefresh: () => TechnicalSupportRepoImpl.downloadData.refreshData().then((resultData) {
-                  providerModel.refreshAllElement(
+            onRefresh: () => TechnicalSupportRepoImpl.downloadData.refreshTechnicsData().then((resultData) {
+                  providerModel.refreshTechnics(
                       resultData['Photosalons'], resultData['Repairs'], resultData['Storages']);
                 }),
             child: CustomScrollView(
@@ -48,15 +42,12 @@ class _HomePageState extends State<HomePage> {
               ],
             )),
       ),
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: height / 11),
-        child: FloatingActionButton.extended(
-            icon: Icon(Icons.add),
-            label: Text('Добавить технику'),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const TechnicAdd()));
-            }),
-      ),
+      floatingActionButton: FloatingActionButton.extended(
+          icon: Icon(Icons.add),
+          label: Text('Добавить технику'),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const TechnicAdd()));
+          }),
     );
   }
 

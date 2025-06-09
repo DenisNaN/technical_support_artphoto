@@ -12,13 +12,13 @@ import 'core/navigation/main_bottom_app_bar.dart';
 
 void main() {
   runZonedGuarded<Future<void>>(
-    () async {
+        () async {
       WidgetsFlutterBinding.ensureInitialized();
       await initDependencies();
 
       runApp(const SplashScreenArtphoto());
     },
-    (Object error, StackTrace stack) {
+        (Object error, StackTrace stack) {
       debugPrint('ARTPHOTO [CrashEvent] [DEBUG] $error\n$stack');
     },
   );
@@ -54,21 +54,22 @@ class SplashScreenArtphoto extends StatelessWidget {
   }
 }
 
-///
 class ArtphotoTech extends StatefulWidget {
-  const ArtphotoTech({super.key});
+  const ArtphotoTech({super.key, this.indexPage = 0});
+
+  final int indexPage;
 
   @override
   State<ArtphotoTech> createState() => _ArtphotoTechState();
 }
 
-class _ArtphotoTechState extends State<ArtphotoTech>{
+class _ArtphotoTechState extends State<ArtphotoTech> {
   late PageController pageViewController;
 
   @override
   void initState() {
     super.initState();
-    pageViewController = PageController();
+    pageViewController = PageController(initialPage: widget.indexPage);
   }
 
   @override
@@ -80,7 +81,6 @@ class _ArtphotoTechState extends State<ArtphotoTech>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        extendBody: true,
         bottomNavigationBar: MainBottomAppBar(pageController: pageViewController),
         body: MainBottomPageView(pageController: pageViewController)
     );

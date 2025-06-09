@@ -11,6 +11,8 @@ import 'package:technical_support_artphoto/core/shared/input_decoration/input_de
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/features/history/history.dart';
 
+import '../../../../core/utils/formatters.dart';
+
 class TechnicAdd extends StatefulWidget {
   const TechnicAdd({super.key});
 
@@ -63,13 +65,12 @@ class _TechnicAddState extends State<TechnicAdd> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     return Scaffold(
-        appBar: CustomAppBar(typePage: TypePage.add, location: null, technic: null),
+        appBar: CustomAppBar(typePage: TypePage.addTechnic, location: null, technic: null),
         body: Form(
             key: _formInnerNumberKey,
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                // SizedBox(height: 20),
                 _buildInternalID(),
                 SizedBox(height: 20),
                 _buildCategoryTechnic(providerModel),
@@ -111,9 +112,8 @@ class _TechnicAddState extends State<TechnicAdd> {
                                 _comment.text);
 
                             _save(technic, providerModel).then((_) {
-                              _viewSnackBar(Icons.save, true, 'Техника сохранена');
+                              _viewSnackBar(Icons.save, true, 'Техника сохранена', 'Техника не сохранена');
                             });
-                            Navigator.pop(context);
                           }
                         },
                         child: const Text("Сохранить")),
@@ -125,10 +125,6 @@ class _TechnicAddState extends State<TechnicAdd> {
               ],
             )));
   }
-
-  final numberFormatter = FilteringTextInputFormatter.allow(
-    RegExp(r'[0-9]'),
-  );
 
   Column _buildInternalID() {
     return Column(
@@ -160,12 +156,6 @@ class _TechnicAddState extends State<TechnicAdd> {
                   enabled: !isBN,
                   decoration: myDecorationTextFormField(!isBN ? 'Номер техники' : 'Без номера'),
                   controller: _innerNumberTechnic,
-                  onChanged: (text) async{
-                    if(text.isNotEmpty){
-                      final check = await TechnicalSupportRepoImpl.downloadData.checkNumberTechnic(text);
-                      setState(() => isExistNumber = check);
-                    }
-                  },
                   validator: (value) {
                     if (value!.isEmpty && !isBN) {
                       return 'Обязательное поле';
@@ -419,7 +409,7 @@ class _TechnicAddState extends State<TechnicAdd> {
               hint: const Text('Дислокация'),
               value: _selectedDropdownDislocation,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: providerModel.namesPhotosalons.map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -456,6 +446,7 @@ class _TechnicAddState extends State<TechnicAdd> {
             child: TextFormField(
               decoration: myDecorationTextFormField(null, "Комментарий (необязательно)"),
               controller: _comment,
+              maxLines: 3,
             ),
           ),
         ),
@@ -630,14 +621,16 @@ class _TechnicAddState extends State<TechnicAdd> {
   //   );
   // }
 
-  Future _save(Technic technic, ProviderModel providerModel) async {
+  Future<bool> _save(Technic technic, ProviderModel providerModel) async {
     String nameUser = providerModel.user.name;
-    await ConnectDbMySQL.connDB.connDatabase();
-    int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
-    await ConnectDbMySQL.connDB.dispose();
-    technic.id = id;
-    // await addHistory(technic, nameUser);
-    addTechnicInProviderModel(technic, providerModel);
+    int? id = await TechnicalSupportRepoImpl.downloadData.saveTechnic(technic, nameUser);
+    if(id != null){
+      technic.id = id;
+      // await addHistory(technic, nameUser);
+      addTechnicInProviderModel(technic, providerModel);
+      return true;
+    }
+    return false;
   }
 
   void addTechnicInProviderModel(Technic technic, ProviderModel providerModel) {
@@ -669,7 +662,7 @@ class _TechnicAddState extends State<TechnicAdd> {
     return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
   }
 
-  void _viewSnackBar(IconData icon, bool isSuccessful, String text) {
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -680,13 +673,14 @@ class _TechnicAddState extends State<TechnicAdd> {
             SizedBox(
               width: 20,
             ),
-            Flexible(child: Text(text)),
+            Flexible(child: Text(isSuccessful ? successText : notSuccessText)),
           ],
         ),
         duration: const Duration(seconds: 5),
         showCloseIcon: true,
       ),
     );
+    Navigator.pop(context);
   }
 
   void _viewSnackBarCheckEmptyNumberTechnic(String text) {
