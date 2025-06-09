@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/shared/technic_image/IsFieldsFilled.dart';
 
 import '../../../../core/api/data/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -345,9 +346,12 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
   }
 
   Future<bool> _save(Repair repair, ProviderModel providerModel) async {
+    final bool isFinishedRepair = isFieldsFilledRepair(repair);
     List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, true);
     if (resultData != null) {
-      providerModel.refreshCurrentRepairs(resultData);
+      if (!isFinishedRepair) {
+        providerModel.refreshCurrentRepairs(resultData);
+      }
       Technic? technic = await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
       if(technic != null){
         bool isSaveStatus = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technic, providerModel.user.name);

@@ -56,6 +56,7 @@ class _RepairsPageState extends State<RepairsPage> {
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasData) {
             final List<Repair> repairs = snapshot.data;
+            repairs.sort();
             return SafeArea(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -76,7 +77,7 @@ class _RepairsPageState extends State<RepairsPage> {
                     child: ListTile(
                       onTap: () {
                         Navigator.push(context,
-                            animationRouteSlideTransition(RepairView(repair: repair)));
+                            animationRouteSlideTransition(RepairView(repair: repair, isFinishedRepair: true,)));
                       },
                       title: _buildTextTitle(repair),
                       subtitle: _buildTextSubtitle(repair),
@@ -153,7 +154,7 @@ class _RepairsPageState extends State<RepairsPage> {
                 child: ListTile(
                   onTap: () {
                     Navigator.push(context,
-                        animationRouteSlideTransition(RepairView(repair: repair)));
+                        animationRouteSlideTransition(RepairView(repair: repair, isFinishedRepair: false,)));
                   },
                   title: _buildTextTitle(repair),
                   subtitle: _buildTextSubtitle(repair),
