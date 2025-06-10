@@ -4,6 +4,7 @@ import 'package:technical_support_artphoto/core/api/data/models/photosalon_locat
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
+import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../../../features/repairs/models/repair.dart';
 import '../data/models/user.dart';
 
@@ -14,6 +15,8 @@ class ProviderModel with ChangeNotifier {
 
   late final List<Repair> _currentRepairs;
   bool _isChangeRedAndYellow = false;
+
+  late final List<Trouble> _troubles;
 
   late final List<String> _namesEquipments;
   late final List<String> _namesDislocations;
@@ -38,6 +41,8 @@ class ProviderModel with ChangeNotifier {
   List<Repair> get getCurrentRepairs => _currentRepairs;
 
   bool get isChangeRedAndYellow => _isChangeRedAndYellow;
+
+  List<Trouble> get getTroubles => _troubles;
 
   List<String> get namesDislocation => _namesDislocations;
 
@@ -67,6 +72,15 @@ class ProviderModel with ChangeNotifier {
   void downloadCurrentRepairs(List<Repair> repairs) {
     _currentRepairs = [];
     sortListCurrentRepairs(repairs);
+  }
+
+  void downloadTroubles(List<Trouble> troubles) {
+    _troubles = troubles;
+  }
+
+  void refreshTroubles(List<Trouble> troubles) {
+    _troubles = troubles;
+    notifyListeners();
   }
 
   void downloadAllCategoryDropDown(List<String> namesEquipments, List<String> namePhotosalons, List<String> services,

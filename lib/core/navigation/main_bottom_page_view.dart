@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/features/troubles/presentarion/page/troubles_page.dart';
 import '../../features/history/history_list.dart';
 import '../../features/home/presentation/page/home_page.dart';
 import '../../features/repairs/presentation/page/repairs_page.dart';
@@ -23,27 +24,7 @@ class _MainBottomPageViewState extends State<MainBottomPageView> with TickerProv
     const RepairsPage(isCurrentRepairs: true,),
 
     /// Troubles
-    const Padding(
-      padding: EdgeInsets.all(8.0),
-      child: Column(
-        children: <Widget>[
-          Card(
-            child: ListTile(
-              leading: Icon(Icons.notifications_sharp),
-              title: Text('Notification 1'),
-              subtitle: Text('This is a notification'),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              leading: Icon(Icons.notifications_sharp),
-              title: Text('Notification 2'),
-              subtitle: Text('This is a notification'),
-            ),
-          ),
-        ],
-      ),
-    ),
+    const TroublesPage(isCurrentTroubles: true),
 
     /// History
     HistoryList(),
