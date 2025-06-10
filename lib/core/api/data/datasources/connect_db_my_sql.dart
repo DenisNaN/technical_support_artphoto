@@ -439,7 +439,7 @@ Future<Technic?> getTechnic(int number) async {
     int totalSumm = 0;
     for (var row in result) {
       SummRepair summRepair = SummRepair(
-          idRepar: row[0],
+          idRepair: row[0],
           repairmen: row[1],
           summRepair: row[2],
           complaint: row[3],

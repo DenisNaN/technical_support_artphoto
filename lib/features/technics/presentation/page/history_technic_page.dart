@@ -138,7 +138,7 @@ class HistoryTechnicPage extends StatelessWidget {
           repair = value;
           if(repair != null && context.mounted){
             Navigator.push(context,
-                animationRouteSlideTransition(RepairView(repair: repair!, isFinishedRepair: true,)));
+                animationRouteSlideTransition(RepairView(repair: repair!)));
           }
         });
       },

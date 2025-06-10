@@ -1,6 +1,7 @@
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/shared/technic_image/IsFieldsFilled.dart';
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_add.dart';
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_view.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -77,7 +78,7 @@ class _RepairsPageState extends State<RepairsPage> {
                     child: ListTile(
                       onTap: () {
                         Navigator.push(context,
-                            animationRouteSlideTransition(RepairView(repair: repair, isFinishedRepair: true,)));
+                            animationRouteSlideTransition(RepairView(repair: repair)));
                       },
                       title: _buildTextTitle(repair),
                       subtitle: _buildTextSubtitle(repair),
@@ -139,7 +140,6 @@ class _RepairsPageState extends State<RepairsPage> {
             itemBuilder: (context, index) {
               Repair repair = repairs[index];
               Color tileColor = getColorForList(repair);
-
               return Container(
                 margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
                 decoration:
@@ -154,7 +154,7 @@ class _RepairsPageState extends State<RepairsPage> {
                 child: ListTile(
                   onTap: () {
                     Navigator.push(context,
-                        animationRouteSlideTransition(RepairView(repair: repair, isFinishedRepair: false,)));
+                        animationRouteSlideTransition(RepairView(repair: repair)));
                   },
                   title: _buildTextTitle(repair),
                   subtitle: _buildTextSubtitle(repair),
