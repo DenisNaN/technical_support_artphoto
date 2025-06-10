@@ -73,13 +73,15 @@ class HistoryTechnicPage extends StatelessWidget {
     if (currentHistoryTechnic.trouble != null) {
       return SizedBox();
     }
-    if (currentHistoryTechnic.location is PhotosalonLocation) {
+    if (currentHistoryTechnic.location is RepairLocation &&
+        currentHistoryTechnic.date.toString() != "-0001-11-30 00:00:00.000Z" &&
+        currentHistoryTechnic.date.toString() != "0001-11-30 00:00:00.000Z") {
+      return _buildListTileRepair(currentHistoryTechnic, isStartIndex, context, providerModel);
+    } else if (currentHistoryTechnic.location is PhotosalonLocation) {
       if (historyList.length > 1 && index > 0) {
         finishDate = _findDateFinishPhotosalon(historyList, index);
       }
       return _buildListTilePhotosalon(currentHistoryTechnic, isStartIndex, finishDate);
-    } else if (currentHistoryTechnic.location is RepairLocation && currentHistoryTechnic.date.toString() != "-0001-11-30 00:00:00.000Z") {
-      return _buildListTileRepair(currentHistoryTechnic, isStartIndex, context, providerModel);
     }
     return SizedBox();
   }
@@ -119,7 +121,7 @@ class HistoryTechnicPage extends StatelessWidget {
         _getListTroubles(currentHistoryTechnic.listTrouble),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: Icon(Icons.arrow_downward),
+          child: Icon(Icons.arrow_upward),
         ),
       ],
     );
@@ -139,7 +141,6 @@ class HistoryTechnicPage extends StatelessWidget {
                 animationRouteSlideTransition(RepairView(repair: repair!)));
           }
         });
-
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

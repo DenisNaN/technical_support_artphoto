@@ -1,5 +1,5 @@
 class SummRepair {
-  final int idRepar;
+  final int idRepair;
   final String repairmen;
   final int summRepair;
   final String complaint;
@@ -8,7 +8,7 @@ class SummRepair {
   DateTime? dateReceipt;
 
   SummRepair(
-      {required this.idRepar,
+      {required this.idRepair,
       required this.repairmen,
       required this.summRepair,
       required this.complaint,

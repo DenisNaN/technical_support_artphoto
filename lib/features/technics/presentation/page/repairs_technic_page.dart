@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
+import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
+import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
+import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
+import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_view.dart';
 
 class RepairsTechnicPage extends StatefulWidget {
   final List<SummRepair> summsRepairs;
@@ -42,17 +46,12 @@ class _RepairsTechnicPageState extends State<RepairsTechnicPage> {
                 title: _buildText(context, index),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 onTap: () {
-                  // Navigator.push(
-                  //     context, MaterialPageRoute(
-                  //     builder: (context) => RepairViewAndChange(repair: repair))).then((value) {
-                  //   setState(() {
-                  //     if (value != null) {
-                  //       Repair.repairList[indexRepairList] = value;
-                  //       Repair.totalSumRepairs[indexTotalSumRepairs] = TotalSumRepairs(value.id, value.internalID, value.costService);
-                  //       listTotalSumRepair[index] = value;
-                  //     }
-                  //   });
-                  // });
+                  TechnicalSupportRepoImpl.downloadData.getRepair(widget.summsRepairs[index].idRepair).then((repair){
+                    if(repair != null && context.mounted){
+                      Navigator.push(context,
+                          animationRouteSlideTransition(RepairView(repair: repair)));
+                    }
+                  });
                 },
               ),
             );

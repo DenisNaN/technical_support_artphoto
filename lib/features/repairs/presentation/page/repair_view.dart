@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/shared/technic_image/IsFieldsFilled.dart';
 import '../../../../core/api/data/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
@@ -218,7 +219,6 @@ class _RepairViewState extends State<RepairView> {
         _worksPerformed.text != '' &&
         _costService.text != '' &&
         _diagnosisService.text != '' &&
-        _recommendationsNotes.text != '' &&
         _selectedDropdownStatusNew != null &&
         _selectedDropdownDislocationNew != null &&
         !isDateReceipt) {
@@ -637,6 +637,7 @@ class _RepairViewState extends State<RepairView> {
   Future<TypeMessageForSaveRepairView> _save(Repair repair, ProviderModel providerModel) async {
     if((repair.newStatus != null && repair.newDislocation != null) || (repair.newStatus == null && repair.newDislocation == null)){
       List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, false);
+      bool isFinishedRepair = isFieldsFilledRepair(repair);
       if (resultData != null) {
         if(repair.newStatus == null && repair.newDislocation == null){
           providerModel.refreshCurrentRepairs(resultData);
@@ -650,9 +651,11 @@ class _RepairViewState extends State<RepairView> {
               .updateStatusAndDislocationTechnic(technic, providerModel.user.name);
           if (isSaveStatusTechnic) {
             Map<String, dynamic> resultDataRefTech = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
-            providerModel..
-            refreshTechnics(resultDataRefTech['Photosalons'], resultDataRefTech['Repairs'], resultDataRefTech['Storages'])..
-            refreshCurrentRepairs(resultData);
+            if (!isFinishedRepair) {
+              providerModel..
+                          refreshTechnics(resultDataRefTech['Photosalons'], resultDataRefTech['Repairs'], resultDataRefTech['Storages'])..
+                          refreshCurrentRepairs(resultData);
+            }
             return TypeMessageForSaveRepairView.successSaveRepair;
           }else{
             return TypeMessageForSaveRepairView.notSuccessSaveStatus;
@@ -696,6 +699,7 @@ class _RepairViewState extends State<RepairView> {
   void _viewSnackBar(
       IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar, Repair repair) {
     if (context.mounted) {
+      final providerModel = Provider.of<ProviderModel>(context, listen: false);
       if (isSkipPrevSnackBar) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
       }
@@ -717,6 +721,7 @@ class _RepairViewState extends State<RepairView> {
       );
       if((repair.newStatus == null && repair.newDislocation != null) ||
           (repair.newStatus != null && repair.newDislocation == null)){}else{
+        providerModel.changeCurrentPageMainBottomAppBar(1);
         Navigator.pushAndRemoveUntil(
             context, animationRouteSlideTransition(const ArtphotoTech(indexPage: 1,)), (Route<dynamic> route) => false);
       }
