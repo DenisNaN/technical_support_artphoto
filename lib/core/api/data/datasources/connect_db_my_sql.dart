@@ -648,11 +648,11 @@ Future<List<Trouble>> fetchTroubles() async{
         'VALUES (?, ?, ?, ?, ?, ?)';
     await _connDB!.query(str, [
       trouble.photosalon,
-      trouble.dateTrouble,
+      trouble.dateTrouble.dateFormattedForSQL(),
       trouble.employee,
-      trouble.numberTechnic,
+      trouble.numberTechnic.toString(),
       trouble.trouble,
-      trouble.photoTrouble
+      trouble.photoTrouble ?? ''
     ]);
   }
 

@@ -101,7 +101,10 @@ class _TroublesPageState extends State<TroublesPage> {
                 style: const TextStyle(fontStyle: FontStyle.italic),
                 text:
                     '${DateFormat('d MMMM yyyy', "ru_RU").format(troubles[index].dateTrouble)}\n'),
-            TextSpan(text: 'Проблема: ${troubles[index].trouble}\n', children: [
+            TextSpan(
+                style: TextStyle(fontWeight: FontWeight.bold),
+                text: 'Проблема: '),
+            TextSpan(text: troubles[index].trouble, children: [
               WidgetSpan(
                   child: Row(children: [
                 const Text('Фото: '),
