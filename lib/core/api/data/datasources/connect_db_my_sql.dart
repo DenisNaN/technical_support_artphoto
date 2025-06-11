@@ -637,6 +637,25 @@ Future<List<Trouble>> fetchTroubles() async{
   return reversedList;
 }
 
+  Future<void> insertTroubleInDB(Trouble trouble) async{
+    String str = 'INSERT INTO Неисправности '
+        '(Фотосалон, '
+        'ДатаНеисправности, '
+        'Сотрудник, '
+        'НомерТехники, '
+        'Неисправность, '
+        'Фотография) '
+        'VALUES (?, ?, ?, ?, ?, ?)';
+    await _connDB!.query(str, [
+      trouble.photosalon,
+      trouble.dateTrouble,
+      trouble.employee,
+      trouble.numberTechnic,
+      trouble.trouble,
+      trouble.photoTrouble
+    ]);
+  }
+
 //
 // Future<Trouble?> getTrouble(int id) async {
 //   var result = await _connDB!.query('SELECT * FROM Неисправности WHERE id = ?', [id]);
@@ -659,12 +678,12 @@ List<Trouble> troubleListFromMap(var result) {
         dateTrouble: row[2],
         employee: row[3].toString(),
         numberTechnic: row[4],
-        trouble: row[5].toString(),
-        dateFixTroubleEmployee: row[6],
-        fixTroubleEmployee: row[7].toString(),
-        dateFixTroubleEngineer: row[8],
-        fixTroubleEngineer: row[9].toString(),
-        photoTrouble: image);
+        trouble: row[5].toString(),);
+        trouble.dateFixTroubleEmployee = row[6];
+        trouble.fixTroubleEmployee = row[7];
+        trouble.dateFixTroubleEngineer = row[8];
+        trouble.fixTroubleEngineer = row[9];
+        trouble.photoTrouble = image;
     list.add(trouble);
   }
   return list;

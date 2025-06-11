@@ -4,8 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
+import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/my_custom_refresh_indicator.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
+import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_add.dart';
 
 class TroublesPage extends StatefulWidget {
   const TroublesPage({super.key, required this.isCurrentTroubles});
@@ -25,7 +27,14 @@ class _TroublesPageState extends State<TroublesPage> {
       appBar: AppBar(
         title: Text('Неисправности'),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {}),
+      floatingActionButton: FloatingActionButton.extended(
+          icon: Icon(Icons.add),
+          label: Text('Новая проблема'),
+          onPressed: () {
+            Navigator.push(context,
+                animationRouteSlideTransition(TroubleAdd()));
+          },
+      ),
       body: _buildBodyCurrentRepairs(),
     );
   }
@@ -65,17 +74,17 @@ class _TroublesPageState extends State<TroublesPage> {
                 })));
   }
 
-  Row _buildTitleListTile(BuildContext context, int index, List troubleList) {
+  Row _buildTitleListTile(BuildContext context, int index, List<Trouble> troubles) {
     bool checkboxValueEngineer;
     bool checkboxValueEmployee;
     bool checkboxValuePhoto = false;
 
-    troubleList[index].dateCheckFixTroubleEngineer != '' ? checkboxValueEngineer = true : checkboxValueEngineer = false;
-    troubleList[index].dateCheckFixTroubleEmployee != '' ? checkboxValueEmployee = true : checkboxValueEmployee = false;
+    troubles[index].fixTroubleEngineer.toString() != '' ? checkboxValueEngineer = true : checkboxValueEngineer = false;
+    troubles[index].fixTroubleEmployee.toString() != '' ? checkboxValueEmployee = true : checkboxValueEmployee = false;
 
-    if (troubleList[index].photoTrouble != null) {
-      troubleList[index].photoTrouble.isNotEmpty ? checkboxValuePhoto = true : checkboxValuePhoto = false;
-    }
+    troubles[index].photoTrouble != null && troubles[index].photoTrouble!.isNotEmpty ?
+    checkboxValuePhoto = true : checkboxValuePhoto = false;
+
     return Row(
       children: [
         Expanded(
@@ -83,16 +92,16 @@ class _TroublesPageState extends State<TroublesPage> {
           children: [
             TextSpan(
                 style: const TextStyle(fontWeight: FontWeight.bold),
-                text: troubleList[index].internalID != 0 ? '№ ${troubleList[index].internalID} ' : 'БН '),
+                text: troubles[index].numberTechnic != 0 ? '№ ${troubles[index].numberTechnic} ' : 'БН '),
             TextSpan(
                 style: const TextStyle(fontWeight: FontWeight.bold),
-                text: '${troubleList[index].photosalon} '
-                    '${troubleList[index].employee}\n'),
+                text: '${troubles[index].photosalon} '
+                    '${troubles[index].employee}\n'),
             TextSpan(
                 style: const TextStyle(fontStyle: FontStyle.italic),
                 text:
-                    '${DateFormat('d MMMM yyyy', "ru_RU").format(DateTime.parse(troubleList[index].dateTrouble.replaceAll('.', '-')))}\n'),
-            TextSpan(text: 'Проблема: ${troubleList[index].trouble}\n', children: [
+                    '${DateFormat('d MMMM yyyy', "ru_RU").format(troubles[index].dateTrouble)}\n'),
+            TextSpan(text: 'Проблема: ${troubles[index].trouble}\n', children: [
               WidgetSpan(
                   child: Row(children: [
                 const Text('Фото: '),
@@ -119,7 +128,8 @@ class _TroublesPageState extends State<TroublesPage> {
 
   bool isFieldFilled(Trouble trouble) {
     bool result = false;
-    if (trouble.dateFixTroubleEmployee.toString() != '') {
+    if (trouble.dateFixTroubleEmployee.toString() != "-0001-11-30 00:00:00.000Z" &&
+        trouble.dateFixTroubleEmployee.toString() != "0001-11-30 00:00:00.000Z") {
       result = true;
     }
     return result;

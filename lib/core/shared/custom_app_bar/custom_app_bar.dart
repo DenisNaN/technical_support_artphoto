@@ -65,6 +65,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         TypePage.error => _error(widget.location.toString()),
         TypePage.addRepair => _addRepair(),
         TypePage.viewRepair => _viewRepair(providerModel),
+        TypePage.addTrouble => _addTrouble(),
       }
     );
   }
@@ -75,6 +76,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   Widget _addRepair(){
     return const Text('Новая заявка на ремонт', style: TextStyle(color: Colors.black));
+  }
+
+  Widget _addTrouble(){
+    return const Text('Новая неисправность', style: TextStyle(color: Colors.black));
   }
 
   Widget _viewRepair(ProviderModel providerModel){
@@ -97,6 +102,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                               _viewSnackBar(Icons.delete_forever, result, 'Заявка удаленна', 'Заявка не удаленна', false);
                             }
                           });
+                          Navigator.of(context).pop();
                           Navigator.of(context).pop();
                           Navigator.of(context).pop();
                         }, child: Text('Удалить')),

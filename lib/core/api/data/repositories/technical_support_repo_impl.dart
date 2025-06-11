@@ -298,6 +298,21 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     }
   }
 
+  @override
+  Future<List<Trouble>?> saveTrouble(Trouble trouble) async{
+    List<Trouble>? troubles;
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.insertTroubleInDB(trouble);
+      var result = await ConnectDbMySQL.connDB.fetchTroubles();
+      troubles = result;
+      await ConnectDbMySQL.connDB.dispose();
+      return troubles;
+    } catch (e) {
+      return troubles;
+    }
+  }
+
 //   List getNotifications() {
 //     List notifications = [];
 //     notifications.addAll(getListNotificationsDontTestDriveAfterRepairBetter1Day());

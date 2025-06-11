@@ -79,7 +79,8 @@ class ProviderModel with ChangeNotifier {
   }
 
   void refreshTroubles(List<Trouble> troubles) {
-    _troubles = troubles;
+    _troubles.clear();
+    _troubles.addAll(troubles);
     notifyListeners();
   }
 
