@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_my_sql.dart';
+import 'package:technical_support_artphoto/core/api/data/models/free_number_for_technic.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
@@ -187,7 +188,7 @@ class _TechnicAddState extends State<TechnicAdd> {
           onPressed: () async {
             if (_innerNumberTechnic.text != '' && !isBN) {
               TechnicalSupportRepoImpl.downloadData.checkNumberTechnic(_innerNumberTechnic.text).then((result) {
-                _viewSnackBarCheckEmptyNumberTechnic(result ? 'Техника с таким номером есть.' : 'Номер свободен');
+                _viewSnackBarCheckEmptyNumberTechnic(result);
               });
             }
           },
@@ -683,15 +684,16 @@ class _TechnicAddState extends State<TechnicAdd> {
     Navigator.pop(context);
   }
 
-  void _viewSnackBarCheckEmptyNumberTechnic(String text) {
+  void _viewSnackBarCheckEmptyNumberTechnic(FreeNumbersForTechnic freeNumbersForTechnic) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           mainAxisSize: MainAxisSize.max,
           children: [
-            Icon(Icons.bolt, size: 40, color: text == 'Номер свободен' ? Colors.green : Colors.red),
-            Flexible(child: Text(text)),
+            Icon(Icons.bolt, size: 40, color: freeNumbersForTechnic.isFreeNumber ? Colors.green : Colors.red),
+            Flexible(child: Text(freeNumbersForTechnic.isFreeNumber ? 'Номер свободен' :
+            'Номер занят!\nВыберите другой номер.\nНапример: ${freeNumbersForTechnic.freeNumbers.toString()}')),
           ],
         ),
         duration: const Duration(seconds: 5),

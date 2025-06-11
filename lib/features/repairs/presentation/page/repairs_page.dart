@@ -1,7 +1,6 @@
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/core/shared/technic_image/IsFieldsFilled.dart';
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_add.dart';
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_view.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';

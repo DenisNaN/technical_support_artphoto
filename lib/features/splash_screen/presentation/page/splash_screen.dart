@@ -50,6 +50,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 snapshot.data!['statusForEquipment'],
                 snapshot.data!['colorsForEquipment']);
             providerModel.downloadCurrentRepairs(snapshot.data!['AllRepairs']);
+            providerModel.downloadTroubles(snapshot.data!['AllTroubles']);
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
               User? user = localServices.getUser();

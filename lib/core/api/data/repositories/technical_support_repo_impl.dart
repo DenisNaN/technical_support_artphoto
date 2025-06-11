@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_my_sql.dart';
 import 'package:technical_support_artphoto/core/api/data/models/decommissioned.dart';
+import 'package:technical_support_artphoto/core/api/data/models/free_number_for_technic.dart';
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
@@ -9,6 +10,7 @@ import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/domain/repositories/technical_support_repo.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
+import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 
 import '../../../../features/repairs/models/repair.dart';
 import '../models/technic.dart';
@@ -27,6 +29,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     Map<String, StorageLocation> technicsInStorages = {};
 
     List<Repair> repairs = [];
+    List<Trouble> troubles = [];
 
     /// CategoryDropDown
     List<String> namePhotosalons;
@@ -42,6 +45,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     technicsInStorages = await ConnectDbMySQL.connDB.fetchTechnicsInStorages();
 
     repairs = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
+    troubles = await ConnectDbMySQL.connDB.fetchTroubles();
 
     namePhotosalons = await ConnectDbMySQL.connDB.fetchNamePhotosalons();
     namePhotosalons.addAll(await ConnectDbMySQL.connDB.fetchNameStorages());
@@ -55,6 +59,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     result['Storages'] = technicsInStorages;
 
     result['AllRepairs'] = repairs;
+    result['AllTroubles'] = troubles;
 
     result['namePhotosalons'] = namePhotosalons;
     result['nameEquipment'] = nameEquipment;
@@ -109,11 +114,28 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
-  Future<bool> checkNumberTechnic(String number) async{
+  Future<FreeNumbersForTechnic> checkNumberTechnic(String number) async{
+    List<int> listFreeNumbers = [];
+
     await ConnectDbMySQL.connDB.connDatabase();
-    bool result = await ConnectDbMySQL.connDB.checkNumberTechnic(number);
-    await ConnectDbMySQL.connDB.dispose();
-    return result;
+    bool isFeeNumber = await ConnectDbMySQL.connDB.checkNumberTechnic(number);
+    if(isFeeNumber){
+      return FreeNumbersForTechnic(isFreeNumber: isFeeNumber, freeNumbers: listFreeNumbers);
+    }else{
+      int i = 0;
+      int numberTechnic = int.parse(number);
+      numberTechnic++;
+      do{
+        bool result = await ConnectDbMySQL.connDB.checkNumberTechnic(numberTechnic.toString());
+        if(result){
+          listFreeNumbers.add(numberTechnic);
+          i++;
+        }
+        numberTechnic++;
+      }
+      while (i < 3);
+      return FreeNumbersForTechnic(isFreeNumber: isFeeNumber, freeNumbers: listFreeNumbers);
+    }
   }
 
   @override
@@ -259,6 +281,35 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  @override
+  Future<List<Trouble>> getTroubles() async{
+    List<Trouble> troubles = [];
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      var result = await ConnectDbMySQL.connDB.fetchTroubles();
+      troubles = result;
+      await ConnectDbMySQL.connDB.dispose();
+      return troubles;
+    } catch (e) {
+      return troubles;
+    }
+  }
+
+  @override
+  Future<List<Trouble>?> saveTrouble(Trouble trouble) async{
+    List<Trouble>? troubles;
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.insertTroubleInDB(trouble);
+      var result = await ConnectDbMySQL.connDB.fetchTroubles();
+      troubles = result;
+      await ConnectDbMySQL.connDB.dispose();
+      return troubles;
+    } catch (e) {
+      return troubles;
     }
   }
 

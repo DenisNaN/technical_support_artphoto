@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
@@ -9,6 +10,7 @@ import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
+import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../models/decommissioned.dart';
 import '../models/technic.dart';
 
@@ -185,7 +187,7 @@ class ConnectDbMySQL {
 
   Future<bool> checkNumberTechnic(String number) async {
     var result = await _connDB!.query('SELECT 1 FROM equipment WHERE number = $number');
-    return result.isNotEmpty;
+    return result.isEmpty;
   }
 
   Future<int> insertTechnicInDB(Technic technic, String nameUser) async {
@@ -245,14 +247,6 @@ class ConnectDbMySQL {
   //   for (var row in result) {
   //     id = row[0];
   //   }
-  //   return id;
-  // }
-
-  // Future<int> findLastRepair(Technic technic) async {
-  //   await ConnectDbMySQL.connDB.connDatabase();
-  //   var result = await _connDB!
-  //       .query('SELECT id FROM repairEquipment WHERE number = ? ORDER BY id DESC LIMIT 1', [technic.internalID]);
-  //   int id = lastTectDriveListFromMap(result);
   //   return id;
   // }
 
@@ -505,46 +499,6 @@ Future<Technic?> getTechnic(int number) async {
     return historyTechnics;
   }
 
-// Future<List> getAllTrouble() async{
-//   var result = await _connDB!.query('SELECT '
-//       'id, Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, '
-//       'ДатаУстрСотр, СотрПодтверУстр, '
-//       'ДатаУстрИнженер, ИнженерПодтверУстр, Фотография '
-//       'FROM Неисправности');
-//
-//   var list = troubleListFromMap(result);
-//   var reversedList = List.from(list.reversed);
-//   return reversedList;
-// }
-//
-
-//
-// Future<Trouble?> getTrouble(int id) async {
-//   var result = await _connDB!.query('SELECT * FROM Неисправности WHERE id = ?', [id]);
-//   Trouble? trouble = troubleListFromMap(result).first;
-//   return trouble;
-// }
-//
-// List troubleListFromMap(var result) {
-//   List list = [];
-//   for (var row in result) {
-//     // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
-//     // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
-//     // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
-//     String dateTrouble = row[2].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[2].toString());
-//     String dateCheckFixTroubleEmployee = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
-//     String dateCheckFixTroubleEngineer = row[8].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[8].toString());
-//
-//     Blob blobImage = row[10];
-//     Uint8List image = Uint8List.fromList(blobImage.toBytes());
-//
-//     Trouble trouble = Trouble(row[0], row[1].toString(),  dateTrouble,  row[3].toString(), row[4], row[5].toString(), dateCheckFixTroubleEmployee,
-//         row[7].toString(), dateCheckFixTroubleEngineer, row[9].toString(), image);
-//     list.add(trouble);
-//   }
-//   return list;
-// }
-//
 // Future<List> getAllHistory() async{
 //   var result = await _connDB!.query('SELECT * FROM history');
 //   var list = historyListFromMap(result);
@@ -674,6 +628,66 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
   Future deleteRepairInDB(String id) async{
     await _connDB!.query('DELETE FROM repairEquipment WHERE id = ?', [id]);
   }
+
+Future<List<Trouble>> fetchTroubles() async{
+  var result = await _connDB!.query('SELECT * FROM Неисправности WHERE СотрПодтверУстр = "" OR ИнженерПодтверУстр = ""');
+
+  var list = troubleListFromMap(result);
+  List<Trouble> reversedList = List.from(list.reversed);
+  return reversedList;
+}
+
+  Future<void> insertTroubleInDB(Trouble trouble) async{
+    String str = 'INSERT INTO Неисправности '
+        '(Фотосалон, '
+        'ДатаНеисправности, '
+        'Сотрудник, '
+        'НомерТехники, '
+        'Неисправность, '
+        'Фотография) '
+        'VALUES (?, ?, ?, ?, ?, ?)';
+    await _connDB!.query(str, [
+      trouble.photosalon,
+      trouble.dateTrouble,
+      trouble.employee,
+      trouble.numberTechnic,
+      trouble.trouble,
+      trouble.photoTrouble
+    ]);
+  }
+
+//
+// Future<Trouble?> getTrouble(int id) async {
+//   var result = await _connDB!.query('SELECT * FROM Неисправности WHERE id = ?', [id]);
+//   Trouble? trouble = troubleListFromMap(result).first;
+//   return trouble;
+// }
+
+List<Trouble> troubleListFromMap(var result) {
+  List<Trouble> list = [];
+  for (var row in result) {
+    // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
+    // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
+    // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
+
+    Blob blobImage = row[10];
+    Uint8List image = Uint8List.fromList(blobImage.toBytes());
+    Trouble trouble = Trouble(
+        id: row[0],
+        photosalon: row[1].toString(),
+        dateTrouble: row[2],
+        employee: row[3].toString(),
+        numberTechnic: row[4],
+        trouble: row[5].toString(),);
+        trouble.dateFixTroubleEmployee = row[6];
+        trouble.fixTroubleEmployee = row[7];
+        trouble.dateFixTroubleEngineer = row[8];
+        trouble.fixTroubleEngineer = row[9];
+        trouble.photoTrouble = image;
+    list.add(trouble);
+  }
+  return list;
+}
 
 // Future<int> insertTroubleInDB(Trouble trouble) async{
 //   await ConnectDbMySQL.connDB.connDatabase();
