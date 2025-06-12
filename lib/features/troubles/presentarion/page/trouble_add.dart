@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -370,14 +373,10 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
 
   Widget _buildPhotoTroubleListTile() {
     return Column(children: [
-      Align(
-        alignment: Alignment.centerLeft,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 20.0),
-          child: Text(
-            'Фотография',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
+      Center(
+        child: Text(
+          'Фотография',
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
       ListTile(
@@ -391,46 +390,55 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
                   });
                 }),
         subtitle: Container(
+          decoration: imageFile != null ? BoxDecoration(
+            border: Border.all(color: Colors.white, width: 4.5),
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.grey,
+                  blurRadius: 4,
+                  offset: Offset(2, 4), // Shadow position
+                ),
+              ]
+          ) : null,
             child: imageFile == null
-                ? Padding(
-                    padding: const EdgeInsets.only(left: 35.0),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            _getFromGallery();
-                          },
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.photo_library_outlined,
-                                size: 50,
-                              ),
-                              Text(
-                                'Галлерея',
-                                style: TextStyle(fontStyle: FontStyle.italic),
-                              )
-                            ],
+                ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        _getFromGallery();
+                      },
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.photo_library_outlined,
+                            size: 50,
                           ),
-                        ),
-                        SizedBox(width: 50),
-                        GestureDetector(
-                          onTap: () {
-                            _getFromCamera();
-                          },
-                          child: Column(
-                            children: [
-                              Icon(Icons.camera_alt_outlined, size: 50),
-                              Text(
-                                'Фотоаппарат',
-                                style: TextStyle(fontStyle: FontStyle.italic),
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
+                          Text(
+                            'Галлерея',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          )
+                        ],
+                      ),
                     ),
-                  )
+                    GestureDetector(
+                      onTap: () {
+                        _getFromCamera();
+                      },
+                      child: Column(
+                        children: [
+                          Icon(Icons.camera_alt_outlined, size: 50),
+                          Text(
+                            'Фотоаппарат',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                )
                 : _buildImage()),
       )
     ]);
@@ -487,6 +495,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
     List<Trouble>? resultData = await TechnicalSupportRepoImpl.downloadData.saveTrouble(trouble);
     if (resultData != null) {
       providerModel.refreshTroubles(resultData);
+      await sendEmailNewTrouble(trouble);
       // await addHistory(technic, nameUser);
       return true;
     }
@@ -495,6 +504,31 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
 
   Uint8List _decoderPhotoToBlob(File image) {
     return image.readAsBytesSync();
+  }
+
+  Future<void> sendEmailNewTrouble(Trouble trouble) async{
+    final smtpServer = mailru(dotenv.env['USERNAMEEMAIL']!, dotenv.env['PASSWORDEMAIL']!);
+    final message = Message()
+    ..from = Address(dotenv.env['USERNAMEEMAIL']!)
+    ..recipients.addAll(['Pigarev-Denis@mail.ru', 'CINEMAMAN2008@yandex.ru', 'gurov-vs@list.ru', 'inzhener.6razryada@mail.ru'])
+    ..subject = 'Проблема в фотосалоне ${trouble.photosalon}'
+    ..text = trouble.numberTechnic != 0 ? 'Номер техники: ${trouble.numberTechnic}.\n'
+        'В фотосалоне "${trouble.photosalon}" ${trouble.employee} сообщает, что:\n'
+        '${trouble.trouble}' : 'Без номера\n'
+      'В фотосалоне "${trouble.photosalon}" ${trouble.employee} сообщает, что:\n'
+      '${trouble.trouble}'
+    ..attachments = [
+      if (imageFile != null) FileAttachment(imageFile!)
+    ];
+
+    try {
+      await send(message, smtpServer);
+    } on MailerException catch (e) {
+      debugPrint('Message not sent.');
+      for (var p in e.problems) {
+        debugPrint('Problem: ${p.code}: ${p.msg}');
+      }
+    }
   }
 
   // Future addHistory(Trouble trouble) async {

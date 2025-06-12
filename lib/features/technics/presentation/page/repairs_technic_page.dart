@@ -6,7 +6,6 @@ import 'package:technical_support_artphoto/core/api/data/repositories/technical_
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
-import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_view.dart';
 
