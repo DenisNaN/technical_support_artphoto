@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
@@ -17,18 +23,22 @@ class TroubleAdd extends StatefulWidget {
   State<TroubleAdd> createState() => _TroubleAddState();
 }
 
-class _TroubleAddState extends State<TroubleAdd> {
+class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   bool _isBN = false;
   final _numberTechnic = TextEditingController();
   final _nameTechnicController = TextEditingController();
-  String? _nameTechnic;
   String? _selectedDropdownDislocation;
   String? _dislocation;
   DateTime? _dateTrouble;
   final _complaint = TextEditingController();
   Uint8List? _photoTrouble;
+  File? imageFile;
+  late TransformationController transformationController;
+  late AnimationController animationController;
+  Animation<Matrix4>? animation;
+  TapDownDetails? tapDownDetails;
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -37,6 +47,11 @@ class _TroubleAddState extends State<TroubleAdd> {
     super.initState();
     _dateTrouble = DateTime.now();
     _dislocation = '';
+    transformationController = TransformationController();
+    animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300))
+      ..addListener(() {
+        transformationController.value = animation!.value;
+      });
   }
 
   @override
@@ -44,6 +59,8 @@ class _TroubleAddState extends State<TroubleAdd> {
     _numberTechnic.dispose();
     _nameTechnicController.dispose();
     _complaint.dispose();
+    transformationController.dispose();
+    animationController.dispose();
     super.dispose();
   }
 
@@ -61,12 +78,14 @@ class _TroubleAddState extends State<TroubleAdd> {
               _buildInternalID(),
               SizedBox(height: 20),
               _buildNameTechnic(),
-              SizedBox(height: _isBN ? 14 : 25),
+              SizedBox(height: 14),
               _buildDislocation(providerModel),
               SizedBox(height: 20),
               _buildComplaint(),
               SizedBox(height: 20),
               _buildDateTrouble(),
+              SizedBox(height: 20),
+              _buildPhotoTroubleListTile(),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -82,12 +101,16 @@ class _TroubleAddState extends State<TroubleAdd> {
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
                           Trouble trouble = Trouble(
-                              id: null,
-                              photosalon: _isBN ? _selectedDropdownDislocation ?? '' : _dislocation ?? '',
-                              dateTrouble: _dateTrouble ?? DateTime.now(),
-                              employee: providerModel.user.name,
-                              numberTechnic: _isBN ? int.parse(_numberTechnic.text) : 0,
-                              trouble: _complaint.text,);
+                            id: null,
+                            photosalon: _isBN ? _selectedDropdownDislocation ?? '' : _dislocation ?? '',
+                            dateTrouble: _dateTrouble ?? DateTime.now(),
+                            employee: providerModel.user.name,
+                            numberTechnic: !_isBN ? int.parse(_numberTechnic.text) : 0,
+                            trouble: _complaint.text,
+                          );
+                          if(imageFile != null) {
+                            _photoTrouble = _decoderPhotoToBlob(imageFile!);
+                          }
                           trouble.photoTrouble = _photoTrouble;
 
                           _save(trouble, providerModel).then((isSave) {
@@ -255,12 +278,15 @@ class _TroubleAddState extends State<TroubleAdd> {
                     },
                   )
                 : Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 24),
-              decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(15),
-              ),
-                child: Text(_dislocation == '' ? 'Введите номер техники' : _dislocation ?? '', style: TextStyle(color: Colors.black45),)),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 22.5),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Text(
+                      _dislocation == '' ? 'Введите номер техники' : _dislocation ?? '',
+                      style: TextStyle(color: Colors.black45),
+                    )),
           ),
         ),
       ],
@@ -282,7 +308,7 @@ class _TroubleAddState extends State<TroubleAdd> {
         ),
         ListTile(
           title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal:  40),
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: TextFormField(
               decoration: myDecorationTextFormField(null, "Жалоба"),
               controller: _complaint,
@@ -308,7 +334,7 @@ class _TroubleAddState extends State<TroubleAdd> {
           child: Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
-              'Дата, когда забрали.',
+              'Дата, когда забрали',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
@@ -345,6 +371,190 @@ class _TroubleAddState extends State<TroubleAdd> {
     );
   }
 
+  Widget _buildPhotoTroubleListTile() {
+    return Column(children: [
+      Center(
+        child: Text(
+          'Фотография',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      ),
+      ListTile(
+        title: imageFile == null
+            ? null
+            : IconButton(
+                icon: Icon(Icons.delete_forever_outlined, color: Colors.red, size: 40,),
+                onPressed: () {
+                  setState(() {
+                    imageFile = null;
+                  });
+                }),
+        subtitle: Container(
+          decoration: imageFile != null ? BoxDecoration(
+            border: Border.all(color: Colors.white, width: 4.5),
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.grey,
+                  blurRadius: 4,
+                  offset: Offset(2, 4), // Shadow position
+                ),
+              ]
+          ) : null,
+            child: imageFile == null
+                ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        _getFromGallery();
+                      },
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.photo_library_outlined,
+                            size: 50,
+                          ),
+                          Text(
+                            'Галлерея',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          )
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        _getFromCamera();
+                      },
+                      child: Column(
+                        children: [
+                          Icon(Icons.camera_alt_outlined, size: 50),
+                          Text(
+                            'Фотоаппарат',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+                : _buildImage()),
+      )
+    ]);
+  }
+
+  /// Get from gallery
+  _getFromGallery() async {
+    XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 1800, maxHeight: 1800, imageQuality: 50);
+    if (pickedFile != null) {
+      setState(() {
+        imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
+  /// Get from Camera
+  _getFromCamera() async {
+    XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.camera, maxWidth: 1800, maxHeight: 1800, imageQuality: 50);
+    if (pickedFile != null) {
+      setState(() {
+        imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
+  Widget _buildImage() => GestureDetector(
+      onDoubleTapDown: (details) => tapDownDetails = details,
+      onDoubleTap: () {
+        final position = tapDownDetails!.localPosition;
+
+        const double scale = 3;
+        final x = -position.dx * (scale - 1);
+        final y = -position.dy * (scale - 1);
+        final zoomed = Matrix4.identity()
+          ..translate(x, y)
+          ..scale(scale);
+
+        final end = transformationController.value.isIdentity() ? zoomed : Matrix4.identity();
+
+        animation = Matrix4Tween(begin: transformationController.value, end: end)
+            .animate(CurveTween(curve: Curves.easeOut).animate(animationController));
+        animationController.forward(from: 0);
+      },
+      child: InteractiveViewer(
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          transformationController: transformationController,
+          panEnabled: true,
+          scaleEnabled: true,
+          child: AspectRatio(aspectRatio: 1, child: Image.file(imageFile!))));
+
+  Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
+    List<Trouble>? resultData = await TechnicalSupportRepoImpl.downloadData.saveTrouble(trouble);
+    if (resultData != null) {
+      providerModel.refreshTroubles(resultData);
+      await sendEmailNewTrouble(trouble);
+      // await addHistory(technic, nameUser);
+      return true;
+    }
+    return false;
+  }
+
+  Uint8List _decoderPhotoToBlob(File image) {
+    return image.readAsBytesSync();
+  }
+
+  Future<void> sendEmailNewTrouble(Trouble trouble) async{
+    final smtpServer = mailru(dotenv.env['USERNAMEEMAIL']!, dotenv.env['PASSWORDEMAIL']!);
+    final message = Message()
+    ..from = Address(dotenv.env['USERNAMEEMAIL']!)
+    ..recipients.addAll(['Pigarev-Denis@mail.ru', 'CINEMAMAN2008@yandex.ru', 'gurov-vs@list.ru', 'inzhener.6razryada@mail.ru'])
+    ..subject = 'Проблема в фотосалоне ${trouble.photosalon}'
+    ..text = trouble.numberTechnic != 0 ? 'Номер техники: ${trouble.numberTechnic}.\n'
+        'В фотосалоне "${trouble.photosalon}" ${trouble.employee} сообщает, что:\n'
+        '${trouble.trouble}' : 'Без номера\n'
+      'В фотосалоне "${trouble.photosalon}" ${trouble.employee} сообщает, что:\n'
+      '${trouble.trouble}'
+    ..attachments = [
+      if (imageFile != null) FileAttachment(imageFile!)
+    ];
+
+    try {
+      await send(message, smtpServer);
+    } on MailerException catch (e) {
+      debugPrint('Message not sent.');
+      for (var p in e.problems) {
+        debugPrint('Problem: ${p.code}: ${p.msg}');
+      }
+    }
+  }
+
+  // Future addHistory(Trouble trouble) async {
+  // String descForHistory = descriptionForHistory(repair);
+  // History historyForSQL = History(
+  //     History.historyList.last.id + 1,
+  //     'Repair',
+  //     repair.id!,
+  //     'create',
+  //     descForHistory,
+  //     LoginPassword.login,
+  //     DateFormat('yyyy.MM.dd').format(DateTime.now())
+  // );
+  //
+  // ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
+  // HistorySQFlite.db.insertHistory(historyForSQL);
+  // History.historyList.insert(0, historyForSQL);
+  // }
+
+  // String descriptionForHistory(Repair repair){
+  //   String internalID = repair.internalID == -1 ? 'БН' : '№${repair.internalID}';
+  //   String result = 'Заявка на ремонт $internalID добавленна';
+  //
+  //   return result;
+  // }
+
   void _viewSnackBarGetTechnic(String text) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -362,43 +572,10 @@ class _TroubleAddState extends State<TroubleAdd> {
     );
   }
 
-  Future<bool> _save(Trouble trouble, ProviderModel providerModel) async{
-    List<Trouble>? resultData = await TechnicalSupportRepoImpl.downloadData.saveTrouble(trouble);
-    if(resultData != null){
-      providerModel.refreshTroubles(resultData);
-      // await addHistory(technic, nameUser);
-      return true;
-    }
-    return false;
-  }
-
-  // Future addHistory(Trouble trouble) async {
-    // String descForHistory = descriptionForHistory(repair);
-    // History historyForSQL = History(
-    //     History.historyList.last.id + 1,
-    //     'Repair',
-    //     repair.id!,
-    //     'create',
-    //     descForHistory,
-    //     LoginPassword.login,
-    //     DateFormat('yyyy.MM.dd').format(DateTime.now())
-    // );
-    //
-    // ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
-    // HistorySQFlite.db.insertHistory(historyForSQL);
-    // History.historyList.insert(0, historyForSQL);
-  // }
-
-  // String descriptionForHistory(Repair repair){
-  //   String internalID = repair.internalID == -1 ? 'БН' : '№${repair.internalID}';
-  //   String result = 'Заявка на ремонт $internalID добавленна';
-  //
-  //   return result;
-  // }
-
-  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText, GlobalKey<ScaffoldState> scaffoldKey) {
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText,
+      GlobalKey<ScaffoldState> scaffoldKey) {
     final contextViewSnackBar = scaffoldKey.currentContext;
-    if(contextViewSnackBar != null && contextViewSnackBar.mounted){
+    if (contextViewSnackBar != null && contextViewSnackBar.mounted) {
       ScaffoldMessenger.of(contextViewSnackBar).hideCurrentSnackBar();
       ScaffoldMessenger.of(contextViewSnackBar).showSnackBar(
         SnackBar(
@@ -418,7 +595,7 @@ class _TroubleAddState extends State<TroubleAdd> {
       );
       Navigator.pop(contextViewSnackBar);
     }
-    }
+  }
 }
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {
