@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/features/troubles/presentarion/page/troubles_page.dart';
-import '../../../../core/api/provider/provider_model.dart';
 import '../../../../core/navigation/animation_navigation.dart';
 import '../../../../core/shared/gradients.dart';
 
@@ -15,7 +13,6 @@ class MenuTroublesPage extends StatefulWidget {
 class _MenuTroublesPageState extends State<MenuTroublesPage> {
   @override
   Widget build(BuildContext context) {
-    final providerModel = Provider.of<ProviderModel>(context);
     return PopupMenuButton(
       popUpAnimationStyle: AnimationStyle(
         curve: Easing.legacy,
