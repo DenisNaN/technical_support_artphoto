@@ -74,8 +74,12 @@ class ProviderModel with ChangeNotifier {
     _user = initUser;
   }
 
-  void initAccountMailRu(TroubleAccountMailRu troubleAccountMailRu) {
-    _accountMailRu = troubleAccountMailRu;
+  void initAccountMailRu(TroubleAccountMailRu? troubleAccountMailRu) {
+    if(troubleAccountMailRu != null){
+      _accountMailRu = troubleAccountMailRu;
+    }else{
+      _accountMailRu = TroubleAccountMailRu(id: 0, name: 'name', account: 'account', password: 'password');
+    }
   }
 
   void downloadCurrentRepairs(List<Repair> repairs) {

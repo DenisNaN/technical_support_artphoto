@@ -318,13 +318,11 @@ class ConnectDbMySQL {
   }
 
   Future<TroubleAccountMailRu?> fetchAccountMailRu() async {
-    var result = await _connDB!.query('SELECT * FROM tmp_account');
-
     TroubleAccountMailRu? accountMailRu;
-    // Map<String, int> map = {};
-    // for (var row in result) {
-      accountMailRu = TroubleAccountMailRu.fromJson(jsonDecode(result.toString()));
-    // }
+    var result = await _connDB!.query('SELECT * FROM tmp_account');
+    for (var row in result) {
+      accountMailRu = TroubleAccountMailRu(id: row[0], name: row[1], account: row[2], password: row[3]);
+    }
     return accountMailRu;
   }
 
@@ -643,13 +641,20 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
     await _connDB!.query('DELETE FROM repairEquipment WHERE id = ?', [id]);
   }
 
-Future<List<Trouble>> fetchTroubles() async{
-  var result = await _connDB!.query('SELECT * FROM Неисправности WHERE СотрПодтверУстр = "" OR ИнженерПодтверУстр = ""');
+  Future<List<Trouble>> fetchTroubles() async{
+    var result = await _connDB!.query('SELECT * FROM Неисправности WHERE СотрПодтверУстр = "" OR ИнженерПодтверУстр = ""');
 
-  var list = troubleListFromMap(result);
-  List<Trouble> reversedList = List.from(list.reversed);
-  return reversedList;
-}
+    var list = troubleListFromMap(result);
+    List<Trouble> reversedList = List.from(list.reversed);
+    return reversedList;
+  }
+
+  Future<List<Trouble>> fetchFinishedTroubles() async {
+    var result = await _connDB!.query('SELECT * FROM Неисправности '
+        'WHERE Неисправности.СотрПодтверУстр <> "" AND Неисправности.ИнженерПодтверУстр <> ""');
+    final List<Trouble> list = troubleListFromMap(result);
+    return list;
+  }
 
   Future<void> insertTroubleInDB(Trouble trouble) async{
     String str = 'INSERT INTO Неисправности '

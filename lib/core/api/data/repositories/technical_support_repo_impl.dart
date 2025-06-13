@@ -39,7 +39,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     List<String> statusForEquipment;
     Map<String, int> colorsForEquipment;
 
-    TroubleAccountMailRu accountMailRu;
+    TroubleAccountMailRu? accountMailRu;
 
     await ConnectDbMySQL.connDB.connDatabase();
 
@@ -57,7 +57,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     statusForEquipment = await ConnectDbMySQL.connDB.fetchStatusForEquipment();
     colorsForEquipment = await ConnectDbMySQL.connDB.fetchColorsForEquipment();
 
-
+    accountMailRu = await ConnectDbMySQL.connDB.fetchAccountMailRu();
 
     result['Photosalons'] = technicsInPhotosalons;
     result['Repairs'] = technicsInRepairs;
@@ -71,6 +71,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     result['services'] = services;
     result['statusForEquipment'] = statusForEquipment;
     result['colorsForEquipment'] = colorsForEquipment;
+
+    result['accountMailRu'] = accountMailRu;
 
     await ConnectDbMySQL.connDB.dispose();
     return result;
@@ -116,6 +118,26 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     }
     await ConnectDbMySQL.connDB.dispose();
     return user;
+  }
+
+  @override
+  Future<TroubleAccountMailRu?> getAccountMailRu() async{
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      TroubleAccountMailRu? result = await ConnectDbMySQL.connDB.fetchAccountMailRu();
+      await ConnectDbMySQL.connDB.dispose();
+      return result;
+    } catch (e) {
+      return null;
+    }
+
+    // if (result != null) {
+    //   for (var row in result) {
+    //     user = User(row[0], row[1]);
+    //   }
+    // }
+    // await ConnectDbMySQL.connDB.dispose();
+    // return user;
   }
 
   @override
@@ -316,6 +338,20 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     } catch (e) {
       return troubles;
     }
+  }
+
+  @override
+  Future<List<Trouble>> getFinishedTroubles() async{
+    List<Trouble> troubles = [];
+    try{
+      await ConnectDbMySQL.connDB.connDatabase();
+      troubles.addAll(await ConnectDbMySQL.connDB.fetchFinishedTroubles());
+      await ConnectDbMySQL.connDB.dispose();
+    } catch (e) {
+      debugPrint(e.toString());
+      return troubles;
+    }
+    return troubles;
   }
 
 //   List getNotifications() {

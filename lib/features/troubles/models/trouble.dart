@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-class Trouble{
+class Trouble implements Comparable{
   final int? id;
   final String photosalon;
   final DateTime dateTrouble;
@@ -20,4 +20,9 @@ class Trouble{
     required this.employee,
     required this.numberTechnic,
     required this.trouble});
+
+  @override
+  int compareTo(other) {
+    return other.id.compareTo(id!);
+  }
 }

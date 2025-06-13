@@ -8,6 +8,11 @@ import 'package:technical_support_artphoto/core/navigation/animation_navigation.
 import 'package:technical_support_artphoto/features/home/presentation/widgets/my_custom_refresh_indicator.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_add.dart';
+import 'package:technical_support_artphoto/features/troubles/presentarion/widget/menu_troubles_page.dart';
+
+import '../../../../core/shared/custom_app_bar/custom_app_bar.dart';
+import '../../../../core/shared/logo_animate/logo_matrix_transition_animate.dart';
+import '../../../../core/utils/enums.dart';
 
 class TroublesPage extends StatefulWidget {
   const TroublesPage({super.key, required this.isCurrentTroubles});
@@ -24,22 +29,28 @@ class _TroublesPageState extends State<TroublesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: widget.isCurrentTroubles ? AppBar(
         title: Text('Неисправности'),
+        actions: [
+          MenuTroublesPage()
+        ],
+      ) : AppBar(
+        title: Text('Завершенные неисправности'),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-          icon: Icon(Icons.add),
-          label: Text('Новая проблема'),
-          onPressed: () {
-            Navigator.push(context,
-                animationRouteSlideTransition(TroubleAdd()));
-          },
-      ),
-      body: _buildBodyCurrentRepairs(),
+      floatingActionButton: widget.isCurrentTroubles
+          ? FloatingActionButton.extended(
+              icon: Icon(Icons.add),
+              label: Text('Новая проблема'),
+              onPressed: () {
+                Navigator.push(context, animationRouteSlideTransition(TroubleAdd()));
+              },
+            )
+          : null,
+      body: widget.isCurrentTroubles ? _buildBodyCurrentTroubles() : _buildBodyFinishedTroubles(),
     );
   }
 
-  Widget _buildBodyCurrentRepairs() {
+  Widget _buildBodyCurrentTroubles() {
     final providerModel = Provider.of<ProviderModel>(context);
     final List<Trouble> troubles = providerModel.getTroubles;
     return SafeArea(
@@ -74,6 +85,72 @@ class _TroublesPageState extends State<TroublesPage> {
                 })));
   }
 
+  Widget _buildBodyFinishedTroubles() {
+    return FutureBuilder(
+        future: TechnicalSupportRepoImpl.downloadData.getFinishedTroubles(),
+        builder: (context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasData) {
+            final List<Trouble> troubles = snapshot.data;
+            troubles.sort();
+            return SafeArea(
+                child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: troubles.length,
+                    itemBuilder: (context, index) {
+                      bool isDoneTrouble = isFieldFilled(troubles[index]);
+                      return Container(
+                        margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey, width: 0.5),
+                            borderRadius: BorderRadius.circular(10),
+                            color: isDoneTrouble ? Colors.lightGreenAccent : Colors.white,
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.grey,
+                                blurRadius: 4,
+                                offset: Offset(2, 4), // Shadow position
+                              ),
+                            ]),
+                        child: ListTile(
+                            onTap: () {},
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                            title: _buildTitleListTile(context, index, troubles)),
+                      );
+                    }));
+          } else if (snapshot.hasError) {
+            return Scaffold(
+                appBar: CustomAppBar(typePage: TypePage.error, location: 'Произошел сбой', technic: null),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.wifi_off,
+                        size: 150,
+                        color: Colors.blue,
+                        shadows: [
+                          BoxShadow(
+                            color: Colors.grey.withValues(alpha: 0.5),
+                            spreadRadius: 3,
+                            blurRadius: 4,
+                            offset: Offset(0, 4), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'Данные не загрузились.\nПроверьте подключение к сети',
+                        style: TextStyle(fontSize: 20),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ));
+          } else {
+            return Center(child: MatrixTransitionLogo());
+          }
+        });
+  }
+
   Row _buildTitleListTile(BuildContext context, int index, List<Trouble> troubles) {
     bool checkboxValueEngineer;
     bool checkboxValueEmployee;
@@ -82,8 +159,9 @@ class _TroublesPageState extends State<TroublesPage> {
     troubles[index].fixTroubleEngineer.toString() != '' ? checkboxValueEngineer = true : checkboxValueEngineer = false;
     troubles[index].fixTroubleEmployee.toString() != '' ? checkboxValueEmployee = true : checkboxValueEmployee = false;
 
-    troubles[index].photoTrouble != null && troubles[index].photoTrouble!.isNotEmpty ?
-    checkboxValuePhoto = true : checkboxValuePhoto = false;
+    troubles[index].photoTrouble != null && troubles[index].photoTrouble!.isNotEmpty
+        ? checkboxValuePhoto = true
+        : checkboxValuePhoto = false;
 
     return Row(
       children: [
@@ -99,11 +177,8 @@ class _TroublesPageState extends State<TroublesPage> {
                     '${troubles[index].employee}\n'),
             TextSpan(
                 style: const TextStyle(fontStyle: FontStyle.italic),
-                text:
-                    '${DateFormat('d MMMM yyyy', "ru_RU").format(troubles[index].dateTrouble)}\n'),
-            TextSpan(
-                style: TextStyle(fontWeight: FontWeight.bold),
-                text: 'Проблема: '),
+                text: '${DateFormat('d MMMM yyyy', "ru_RU").format(troubles[index].dateTrouble)}\n'),
+            TextSpan(style: TextStyle(fontWeight: FontWeight.bold), text: 'Проблема: '),
             TextSpan(text: troubles[index].trouble, children: [
               WidgetSpan(
                   child: Row(children: [

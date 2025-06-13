@@ -1,4 +1,5 @@
 import 'package:technical_support_artphoto/core/api/data/models/free_number_for_technic.dart';
+import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
@@ -14,6 +15,7 @@ abstract interface class TechnicalSupportRepo {
   Future<List<Repair>> refreshCurrentRepairsData();
 
   Future<User?> getUser(String password);
+  Future<TroubleAccountMailRu?> getAccountMailRu();
 
   Future<FreeNumbersForTechnic> checkNumberTechnic(String number);
   Future<Technic?> getTechnic(String number);
@@ -31,4 +33,5 @@ abstract interface class TechnicalSupportRepo {
 
   Future<List<Trouble>> getTroubles();
   Future<List<Trouble>?> saveTrouble(Trouble trouble);
+  Future<List<Trouble>> getFinishedTroubles();
 }
