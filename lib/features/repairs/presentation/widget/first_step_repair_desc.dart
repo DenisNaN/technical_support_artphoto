@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/core/shared/technic_image/is_fields_filled.dart';
+import 'package:technical_support_artphoto/core/shared/is_fields_filled.dart';
 
 import '../../../technics/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';

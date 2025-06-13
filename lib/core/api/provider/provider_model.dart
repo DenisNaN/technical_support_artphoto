@@ -191,6 +191,11 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
+  void removeTroubleInTroubles(Trouble trouble) {
+    _troubles.remove(trouble);
+    notifyListeners();
+  }
+
   void changeCurrentPageMainBottomAppBar(int index) {
     currentPageIndexMainBottomAppBar = index;
     notifyListeners();

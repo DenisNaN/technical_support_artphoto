@@ -341,6 +341,33 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
+  Future<List<Trouble>?> updateTrouble(Trouble trouble) async{
+    List<Trouble>? troubles;
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.updateTrouble(trouble);
+      var result = await ConnectDbMySQL.connDB.fetchTroubles();
+      troubles = result;
+      await ConnectDbMySQL.connDB.dispose();
+      return troubles;
+    } catch (e) {
+      return troubles;
+    }
+  }
+
+  @override
+  Future<bool> deleteTrouble(String id) async{
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.deleteTroubleInDB(id);
+      await ConnectDbMySQL.connDB.dispose();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
   Future<List<Trouble>> getFinishedTroubles() async{
     List<Trouble> troubles = [];
     try{

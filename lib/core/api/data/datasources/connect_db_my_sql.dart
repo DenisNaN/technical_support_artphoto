@@ -673,6 +673,38 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
     ]);
   }
 
+  Future updateTrouble(Trouble trouble) async{
+    await _connDB!.query(
+        'UPDATE Неисправности SET '
+            'Фотосалон = ?, '
+            'ДатаНеисправности = ?, '
+            'Сотрудник = ?, '
+            'НомерТехники = ?, '
+            'Неисправность = ?, '
+            'ДатаУстрСотр = ?, '
+            'СотрПодтверУстр = ?, '
+            'ДатаУстрИнженер = ?, '
+            'ИнженерПодтверУстр = ?, '
+            'Фотография = ? '
+            'WHERE id = ?',
+        [
+          trouble.photosalon,
+          trouble.dateTrouble,
+          trouble.employee,
+          trouble.numberTechnic,
+          trouble.trouble,
+          trouble.dateFixTroubleEmployee,
+          trouble.fixTroubleEmployee,
+          trouble.dateFixTroubleEngineer,
+          trouble.fixTroubleEngineer,
+          trouble.photoTrouble
+        ]);
+  }
+
+  Future deleteTroubleInDB(String id) async{
+    await _connDB!.query('DELETE FROM Неисправности WHERE id = ?', [id]);
+  }
+
 //
 // Future<Trouble?> getTrouble(int id) async {
 //   var result = await _connDB!.query('SELECT * FROM Неисправности WHERE id = ?', [id]);

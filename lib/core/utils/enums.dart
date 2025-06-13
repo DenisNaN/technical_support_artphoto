@@ -14,6 +14,7 @@ enum TypePage{
   history,
   technicRepair,
   addTrouble,
+  viewTrouble,
   error,
 }
 

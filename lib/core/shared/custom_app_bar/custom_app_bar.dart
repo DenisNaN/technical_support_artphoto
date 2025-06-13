@@ -7,6 +7,7 @@ import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/history_technic_page.dart';
 
 import '../../../features/repairs/models/repair.dart';
+import '../../../features/troubles/models/trouble.dart';
 import '../../api/data/models/location.dart';
 import '../../api/provider/provider_model.dart';
 
@@ -66,6 +67,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         TypePage.addRepair => _addRepair(),
         TypePage.viewRepair => _viewRepair(providerModel),
         TypePage.addTrouble => _addTrouble(),
+        TypePage.viewTrouble => _viewTrouble(providerModel),
       }
     );
   }
@@ -100,6 +102,42 @@ class _CustomAppBarState extends State<CustomAppBar> {
                             if(result){
                               providerModel.removeRepairInCurrentRepairs(repair);
                               _viewSnackBar(Icons.delete_forever, result, 'Заявка удаленна', 'Заявка не удаленна', false);
+                            }
+                          });
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        }, child: Text('Удалить')),
+                        ElevatedButton(onPressed: (){
+                          Navigator.of(context).pop();
+                        }, child: Text('Отмена'))
+                      ],
+                    );
+                  });
+            },
+            icon: Icon(Icons.delete_forever, color: Colors.red.shade600, size: 35,)) : SizedBox()
+      ],
+    );
+  }
+
+  Widget _viewTrouble(ProviderModel providerModel){
+    Trouble trouble = widget.location;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('Неисправность', style: TextStyle(color: Colors.black)),
+        providerModel.user.access == 'admin' ? IconButton(
+            onPressed: () {
+              showDialog(context: context,
+                  builder: (_){
+                    return AlertDialog(
+                      title: Text('Подтвердите удаление неисправности'),
+                      actions: [
+                        ElevatedButton(onPressed: (){
+                          TechnicalSupportRepoImpl.downloadData.deleteTrouble(trouble.id.toString()).then((result){
+                            if(result){
+                              providerModel.removeTroubleInTroubles(trouble);
+                              _viewSnackBar(Icons.delete_forever, result, 'Неисправность удаленна', 'Неисправность не удаленна', false);
                             }
                           });
                           Navigator.of(context).pop();

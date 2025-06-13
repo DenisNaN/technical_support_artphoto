@@ -8,6 +8,7 @@ import 'package:technical_support_artphoto/core/navigation/animation_navigation.
 import 'package:technical_support_artphoto/features/home/presentation/widgets/my_custom_refresh_indicator.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_add.dart';
+import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_view.dart';
 import 'package:technical_support_artphoto/features/troubles/presentarion/widget/menu_troubles_page.dart';
 
 import '../../../../core/shared/custom_app_bar/custom_app_bar.dart';
@@ -64,6 +65,7 @@ class _TroublesPageState extends State<TroublesPage> {
                 itemCount: troubles.length,
                 itemBuilder: (context, index) {
                   bool isDoneTrouble = isFieldFilled(troubles[index]);
+                  Trouble trouble = troubles[index];
                   return Container(
                     margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
                     decoration: BoxDecoration(
@@ -78,7 +80,10 @@ class _TroublesPageState extends State<TroublesPage> {
                           ),
                         ]),
                     child: ListTile(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(context,
+                              animationRouteSlideTransition(TroubleView(trouble: trouble)));
+                        },
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                         title: _buildTitleListTile(context, index, troubles)),
                   );
@@ -98,6 +103,7 @@ class _TroublesPageState extends State<TroublesPage> {
                     itemCount: troubles.length,
                     itemBuilder: (context, index) {
                       bool isDoneTrouble = isFieldFilled(troubles[index]);
+                      Trouble trouble = troubles[index];
                       return Container(
                         margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
                         decoration: BoxDecoration(
@@ -112,7 +118,10 @@ class _TroublesPageState extends State<TroublesPage> {
                               ),
                             ]),
                         child: ListTile(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(context,
+                                  animationRouteSlideTransition(TroubleView(trouble: trouble)));
+                            },
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                             title: _buildTitleListTile(context, index, troubles)),
                       );
