@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:image_picker/image_picker.dart';
@@ -495,7 +494,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
     List<Trouble>? resultData = await TechnicalSupportRepoImpl.downloadData.saveTrouble(trouble);
     if (resultData != null) {
       providerModel.refreshTroubles(resultData);
-      await sendEmailNewTrouble(trouble);
+      await sendEmailNewTrouble(trouble, providerModel);
       // await addHistory(technic, nameUser);
       return true;
     }
@@ -506,10 +505,10 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
     return image.readAsBytesSync();
   }
 
-  Future<void> sendEmailNewTrouble(Trouble trouble) async{
-    final smtpServer = mailru(dotenv.env['USERNAMEEMAIL']!, dotenv.env['PASSWORDEMAIL']!);
+  Future<void> sendEmailNewTrouble(Trouble trouble, ProviderModel providerModel) async{
+    final smtpServer = mailru(providerModel.accountMailRu.account, providerModel.accountMailRu.password);
     final message = Message()
-    ..from = Address(dotenv.env['USERNAMEEMAIL']!)
+    ..from = Address(providerModel.accountMailRu.account)
     ..recipients.addAll(['Pigarev-Denis@mail.ru', 'CINEMAMAN2008@yandex.ru', 'gurov-vs@list.ru', 'inzhener.6razryada@mail.ru'])
     ..subject = 'Проблема в фотосалоне ${trouble.photosalon}'
     ..text = trouble.numberTechnic != 0 ? 'Номер техники: ${trouble.numberTechnic}.\n'
