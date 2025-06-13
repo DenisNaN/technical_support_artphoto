@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/shared/technic_image/is_fields_filled.dart';
-import '../../../../core/api/data/models/technic.dart';
+import '../../../technics/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
 import '../../../../core/navigation/animation_navigation.dart';

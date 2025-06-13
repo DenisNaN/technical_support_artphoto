@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
+import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/core/shared/technic_image/technic_image.dart';

@@ -1,4 +1,4 @@
-import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
+import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 
 import 'location.dart';
 

@@ -6,6 +6,7 @@ import 'package:technical_support_artphoto/core/api/data/models/free_number_for_
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/domain/repositories/technical_support_repo.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
@@ -13,7 +14,7 @@ import 'package:technical_support_artphoto/features/technics/data/models/history
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 
 import '../../../../features/repairs/models/repair.dart';
-import '../models/technic.dart';
+import '../../../../features/technics/models/technic.dart';
 
 class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   TechnicalSupportRepoImpl._();
@@ -38,6 +39,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     List<String> statusForEquipment;
     Map<String, int> colorsForEquipment;
 
+    TroubleAccountMailRu accountMailRu;
+
     await ConnectDbMySQL.connDB.connDatabase();
 
     technicsInPhotosalons = await ConnectDbMySQL.connDB.fetchTechnicsInPhotosalons();
@@ -53,6 +56,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     services = await ConnectDbMySQL.connDB.fetchServices();
     statusForEquipment = await ConnectDbMySQL.connDB.fetchStatusForEquipment();
     colorsForEquipment = await ConnectDbMySQL.connDB.fetchColorsForEquipment();
+
+
 
     result['Photosalons'] = technicsInPhotosalons;
     result['Repairs'] = technicsInRepairs;

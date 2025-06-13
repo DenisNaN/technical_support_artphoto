@@ -3,7 +3,8 @@ import 'package:technical_support_artphoto/core/api/data/models/location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
-import 'package:technical_support_artphoto/core/api/data/models/technic.dart';
+import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
+import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../../../features/repairs/models/repair.dart';
 import '../data/models/user.dart';
@@ -25,6 +26,8 @@ class ProviderModel with ChangeNotifier {
   late final Map<String, int> _colorsForEquipment;
 
   late User _user = User('user', 'access');
+
+  late TroubleAccountMailRu _accountMailRu;
 
   int currentPageIndexMainBottomAppBar = 0;
   Size? _mainBottomSize;
@@ -56,6 +59,8 @@ class ProviderModel with ChangeNotifier {
 
   User get user => _user;
 
+  TroubleAccountMailRu get accountMailRu => _accountMailRu;
+
   Size? get mainBottomSize => _mainBottomSize;
 
   void downloadAllElements(Map<String, PhotosalonLocation> photosalons, Map<String, RepairLocation> repairs,
@@ -67,6 +72,10 @@ class ProviderModel with ChangeNotifier {
 
   void initUser(User initUser) {
     _user = initUser;
+  }
+
+  void initAccountMailRu(TroubleAccountMailRu troubleAccountMailRu) {
+    _accountMailRu = troubleAccountMailRu;
   }
 
   void downloadCurrentRepairs(List<Repair> repairs) {

@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
 import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/history/history.dart';
 import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
@@ -12,7 +15,7 @@ import 'package:technical_support_artphoto/features/technics/data/models/history
 import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../models/decommissioned.dart';
-import '../models/technic.dart';
+import '../../../../features/technics/models/technic.dart';
 
 class ConnectDbMySQL {
   ConnectDbMySQL._();
@@ -312,6 +315,17 @@ class ConnectDbMySQL {
       map[row[1]] = int.parse(row[2]);
     }
     return map;
+  }
+
+  Future<TroubleAccountMailRu?> fetchAccountMailRu() async {
+    var result = await _connDB!.query('SELECT * FROM tmp_account');
+
+    TroubleAccountMailRu? accountMailRu;
+    // Map<String, int> map = {};
+    // for (var row in result) {
+      accountMailRu = TroubleAccountMailRu.fromJson(jsonDecode(result.toString()));
+    // }
+    return accountMailRu;
   }
 
 Future<Technic?> getTechnic(int number) async {
