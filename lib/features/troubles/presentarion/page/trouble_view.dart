@@ -16,9 +16,9 @@ import '../../../technics/models/technic.dart';
 import '../widget/header_view_trouble.dart';
 
 class TroubleView extends StatefulWidget {
-  const TroubleView({super.key, required this.trouble});
+  const TroubleView({super.key, required this.troubleMain});
 
-  final Trouble trouble;
+  final Trouble troubleMain;
 
   @override
   State<TroubleView> createState() => _TroubleViewState();
@@ -26,13 +26,12 @@ class TroubleView extends StatefulWidget {
 
 class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final expansionTileKey = GlobalKey<State<TroubleView>>();
   Uint8List? _photoTrouble;
-  File? imageFile;
   DateTime? _dateFixTroubleEmployee;
   final _fixTroubleEmployee = TextEditingController();
   DateTime? _dateFixTroubleEngineer;
   final _fixTroubleEngineer = TextEditingController();
+  late Trouble trouble;
 
   late TransformationController transformationController;
   late AnimationController animationController;
@@ -44,17 +43,19 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    _photoTrouble = widget.trouble.photoTrouble;
-    _dateFixTroubleEmployee = widget.trouble.dateFixTroubleEmployee;
-    _fixTroubleEmployee.text = widget.trouble.fixTroubleEmployee ?? '';
-    _dateFixTroubleEngineer = widget.trouble.dateFixTroubleEngineer;
-    _fixTroubleEngineer.text = widget.trouble.fixTroubleEngineer ?? '';
+    trouble = widget.troubleMain;
+    _photoTrouble = widget.troubleMain.photoTrouble;
+    _dateFixTroubleEmployee = widget.troubleMain.dateFixTroubleEmployee;
+    _fixTroubleEmployee.text = widget.troubleMain.fixTroubleEmployee ?? '';
+    _dateFixTroubleEngineer = widget.troubleMain.dateFixTroubleEngineer;
+    _fixTroubleEngineer.text = widget.troubleMain.fixTroubleEngineer ?? '';
 
     transformationController = TransformationController();
-    animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300))
-      ..addListener(() {
-        transformationController.value = animation!.value;
-      });
+    animationController =
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 300))
+          ..addListener(() {
+            transformationController.value = animation!.value;
+          });
   }
 
   @override
@@ -69,9 +70,11 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
     final providerModel = Provider.of<ProviderModel>(context);
     return Scaffold(
         key: scaffoldKey,
-        appBar: CustomAppBar(typePage: TypePage.viewTrouble, location: widget.trouble, technic: null),
+        appBar: CustomAppBar(
+            typePage: TypePage.viewTrouble, location: trouble, technic: null),
         body: FutureBuilder(
-            future: TechnicalSupportRepoImpl.downloadData.getTechnic(widget.trouble.numberTechnic.toString()),
+            future: TechnicalSupportRepoImpl.downloadData
+                .getTechnic(trouble.numberTechnic.toString()),
             builder: (context, AsyncSnapshot<dynamic> snapshot) {
               if (snapshot.hasData) {
                 Technic technic = snapshot.data;
@@ -80,14 +83,14 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                   child: ListView(
                     padding: EdgeInsets.zero,
                     children: [
-                      HeaderViewTrouble(trouble: widget.trouble, technic: technic),
+                      HeaderViewTrouble(trouble: trouble, technic: technic),
                       SizedBox(height: 20),
                       _buildPhotoTrouble(),
                       SizedBox(height: 14),
                       _buildDateFixTroubleEmployee(providerModel),
                       SizedBox(height: 20),
                       _buildFixTroubleEmployee(),
-                      SizedBox(height: 20),
+                      SizedBox(height: 15),
                       _buildDateFixTroubleEngineer(providerModel),
                       SizedBox(height: 20),
                       _buildFixTroubleEngineer(),
@@ -99,34 +102,41 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                            style: ButtonStyle(
+                                backgroundColor: WidgetStatePropertyAll(Colors.grey)),
                             child: Text("Отмена"),
                           ),
                           ElevatedButton(
                               onPressed: () {
-                                Trouble trouble = Trouble(
-                                  id: widget.trouble.id,
-                                  photosalon: widget.trouble.photosalon,
-                                  dateTrouble: widget.trouble.dateTrouble,
-                                  employee: widget.trouble.employee,
-                                  numberTechnic: widget.trouble.numberTechnic,
-                                  trouble: widget.trouble.trouble,
+                                Trouble troubleNew = Trouble(
+                                  id: trouble.id,
+                                  photosalon: trouble.photosalon,
+                                  dateTrouble: trouble.dateTrouble,
+                                  employee: trouble.employee,
+                                  numberTechnic: trouble.numberTechnic,
+                                  trouble: trouble.trouble,
                                 );
-                                if(imageFile != null) {
-                                  _photoTrouble = _decoderPhotoToBlob(imageFile!);
-                                  trouble.photoTrouble = _photoTrouble;
+                                if (_photoTrouble != null) {
+                                  troubleNew.photoTrouble = _photoTrouble;
                                 }
-                                if(_dateFixTroubleEmployee != null && _fixTroubleEmployee.text != ''){
-                                  trouble.dateFixTroubleEmployee = _dateFixTroubleEmployee;
-                                  trouble.fixTroubleEmployee = _fixTroubleEmployee.text;
+                                if (_dateFixTroubleEmployee != null &&
+                                    _fixTroubleEmployee.text != '') {
+                                  troubleNew.dateFixTroubleEmployee =
+                                      _dateFixTroubleEmployee;
+                                  troubleNew.fixTroubleEmployee =
+                                      _fixTroubleEmployee.text;
                                 }
-                                if(_dateFixTroubleEngineer != null && _fixTroubleEngineer.text != ''){
-                                  trouble.dateFixTroubleEngineer = _dateFixTroubleEngineer;
-                                  trouble.fixTroubleEngineer = _fixTroubleEngineer.text;
+                                if (_dateFixTroubleEngineer != null &&
+                                    _fixTroubleEngineer.text != '') {
+                                  troubleNew.dateFixTroubleEngineer =
+                                      _dateFixTroubleEngineer;
+                                  troubleNew.fixTroubleEngineer =
+                                      _fixTroubleEngineer.text;
                                 }
 
-                                _save(trouble, providerModel).then((isSave) {
-                                  _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', scaffoldKey);
+                                _save(troubleNew, providerModel).then((isSave) {
+                                  _viewSnackBar(Icons.save, isSave, 'Изменения приняты',
+                                      'Изменения не приняты', false);
                                 });
                               },
                               child: const Text("Сохранить")),
@@ -138,9 +148,12 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                     ],
                   ),
                 );
-              }else if (snapshot.hasError) {
+              } else if (snapshot.hasError) {
                 return Scaffold(
-                    appBar: CustomAppBar(typePage: TypePage.error, location: 'Произошел сбой', technic: null),
+                    appBar: CustomAppBar(
+                        typePage: TypePage.error,
+                        location: 'Произошел сбой',
+                        technic: null),
                     body: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -169,11 +182,13 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
               } else {
                 return Center(child: MatrixTransitionLogo());
               }
-            }
-        ));
+            }));
   }
 
   Widget _buildDateFixTroubleEmployee(ProviderModel providerModel) {
+    bool isValidateDate = _dateFixTroubleEmployee != null &&
+        _dateFixTroubleEmployee.toString() != "-0001-11-30 00:00:00.000Z" &&
+        _dateFixTroubleEmployee.toString() != "0001-11-30 00:00:00.000Z";
     return Column(
       children: [
         Align(
@@ -188,31 +203,59 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
         ),
         Padding(
           padding: const EdgeInsets.only(left: 55, right: 55, top: 6),
-          child: ListTile(
-            title: Text(
-              DateFormat('d MMMM yyyy', 'ru_RU').format(_dateFixTroubleEmployee ?? DateTime.now()),
-              style: TextStyle(color: Colors.black54),
-            ),
-            tileColor: Colors.blue.shade50,
-            shape: RoundedRectangleBorder(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
               borderRadius: BorderRadius.circular(15),
             ),
-            onTap: () {
-              showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2099),
-                  locale: const Locale("ru", "RU"))
-                  .then((date) {
-                setState(() {
-                  if (date != null) {
-                    _dateFixTroubleEmployee = date;
-                    _fixTroubleEmployee.text = providerModel.user.name;
+            child: Row(
+              children: [
+                Expanded(
+                  child: ListTile(
+                    title: Text(
+                      isValidateDate ? DateFormat('d MMMM yyyy', 'ru_RU')
+                          .format(_dateFixTroubleEmployee ?? DateTime.now()) : 'Дата отсутствует',
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                    onTap: () {
+                      showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2099),
+                              locale: const Locale("ru", "RU"))
+                          .then((date) {
+                        setState(() {
+                          if (date != null) {
+                            _dateFixTroubleEmployee = date;
+                            _fixTroubleEmployee.text = providerModel.user.name;
+                          }
+                        });
+                      });
+                    },
+                  ),
+                ),
+                IconButton(
+                    onPressed: () {
+                  setState(() {
+                    _dateFixTroubleEmployee = DateTime.tryParse("-0001-11-30 00:00:00.000Z");
+                    _fixTroubleEmployee.text = '';
+                  });
+                  Trouble troubleNew = trouble;
+                  troubleNew.dateFixTroubleEmployee = null;
+                  troubleNew.fixTroubleEmployee = null;
+                  try {
+                    TechnicalSupportRepoImpl.downloadData.updateTrouble(troubleNew).then((resultData){
+                      if (resultData != null) {
+                        providerModel.refreshTroubles(resultData);
+                      }
+                    });
+                  } catch (e) {
+                    debugPrint(e.toString());
                   }
-                });
-              });
-            },
+                }, icon: Icon(Icons.close, color: Colors.red,))
+              ],
+            ),
           ),
         ),
       ],
@@ -236,7 +279,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
           padding: const EdgeInsets.only(left: 40, right: 40),
           child: ListTile(
             title: TextFormField(
-              decoration: myDecorationTextFormField('Сотрудник закрывший неис-ть', 'Сотрудник закрывший неис-ть'),
+              decoration: myDecorationTextFormField(),
               controller: _fixTroubleEmployee,
               validator: (value) {
                 if (value!.isEmpty) {
@@ -252,6 +295,9 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
   }
 
   Widget _buildDateFixTroubleEngineer(ProviderModel providerModel) {
+    bool isValidateDate = _dateFixTroubleEngineer != null &&
+        _dateFixTroubleEngineer.toString() != "-0001-11-30 00:00:00.000Z" &&
+        _dateFixTroubleEngineer.toString() != "0001-11-30 00:00:00.000Z";
     return Column(
       children: [
         Align(
@@ -259,38 +305,66 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
           child: Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
-              'Дата закрытия сотрудником',
+              'Дата закрытия техником',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.only(left: 55, right: 55, top: 6),
-          child: ListTile(
-            title: Text(
-              DateFormat('d MMMM yyyy', 'ru_RU').format(_dateFixTroubleEngineer ?? DateTime.now()),
-              style: TextStyle(color: Colors.black54),
-            ),
-            tileColor: Colors.blue.shade50,
-            shape: RoundedRectangleBorder(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
               borderRadius: BorderRadius.circular(15),
             ),
-            onTap: () {
-              showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2099),
-                  locale: const Locale("ru", "RU"))
-                  .then((date) {
-                setState(() {
-                  if (date != null) {
-                    _dateFixTroubleEngineer = date;
-                    _fixTroubleEngineer.text = providerModel.user.name;
-                  }
-                });
-              });
-            },
+            child: Row(
+              children: [
+                Expanded(
+                  child: ListTile(
+                    title: Text(isValidateDate ?
+                      DateFormat('d MMMM yyyy', 'ru_RU')
+                          .format(_dateFixTroubleEngineer ?? DateTime.now()) : 'Дата отсутствует',
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                    onTap: () {
+                      showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2099),
+                              locale: const Locale("ru", "RU"))
+                          .then((date) {
+                        setState(() {
+                          if (date != null) {
+                            _dateFixTroubleEngineer = date;
+                            _fixTroubleEngineer.text = providerModel.user.name;
+                          }
+                        });
+                      });
+                    },
+                  ),
+                ),
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _dateFixTroubleEngineer = DateTime.tryParse("-0001-11-30 00:00:00.000Z");
+                        _fixTroubleEngineer.text = '';
+                      });
+                      Trouble troubleNew = trouble;
+                      troubleNew.dateFixTroubleEngineer = null;
+                      troubleNew.fixTroubleEngineer = null;
+                      try {
+                        TechnicalSupportRepoImpl.downloadData.updateTrouble(troubleNew).then((resultData){
+                          if (resultData != null) {
+                            providerModel.refreshTroubles(resultData);
+                          }
+                        });
+                      } catch (e) {
+                        debugPrint(e.toString());
+                      }
+                    }, icon: Icon(Icons.close, color: Colors.red,))
+              ],
+            ),
           ),
         ),
       ],
@@ -305,7 +379,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
           child: Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
-              'Сотрудник закрывший неис-ть',
+              'Техник закрывший неис-ть',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
@@ -314,7 +388,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
           padding: const EdgeInsets.only(left: 40, right: 40),
           child: ListTile(
             title: TextFormField(
-              decoration: myDecorationTextFormField('Сотрудник закрывший неис-ть', 'Сотрудник закрывший неис-ть'),
+              decoration: myDecorationTextFormField(),
               controller: _fixTroubleEngineer,
               validator: (value) {
                 if (value!.isEmpty) {
@@ -330,15 +404,25 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
   }
 
   Widget _buildPhotoTrouble() {
-    bool isPhoto = widget.trouble.photoTrouble != null ? true : false;
+    final providerModel = Provider.of<ProviderModel>(context);
+    bool isPhoto = trouble.photoTrouble != null &&
+        trouble.photoTrouble!.isNotEmpty ? true : false;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: ExpansionTile(
-        key: expansionTileKey,
-        title: Center(child: Text('Фотография', style: TextStyle(
-            fontSize: 23, fontStyle: FontStyle.italic, color: Colors.black45))),
-        trailing: Icon(isPhoto ? Icons.check : Icons.dangerous_outlined,
-          color: isPhoto ? Colors.green : Colors.red,),
+        controlAffinity: ListTileControlAffinity.leading,
+        title: Text('Фотография',
+            style: TextStyle(
+                fontSize: 23, fontStyle: FontStyle.italic, color: Colors.black45)),
+        trailing: CircleAvatar(
+          maxRadius: 15,
+          backgroundColor: isPhoto ? Colors.green : Colors.red,
+          child: Icon(
+            isPhoto ? Icons.check : Icons.close,
+            color: Colors.white,
+            size: 25,
+          ),
+        ),
         collapsedShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
@@ -348,97 +432,124 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
         ),
         backgroundColor: Colors.blue[100],
         children: [
-          isPhoto ? _buildImage() : _createPhoto()
+          isPhoto
+              ? Column(
+                  children: [
+                    _buildImage(),
+                    IconButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (_) {
+                              return AlertDialog(
+                                title: Text('Подтвердите удаление фотографии'),
+                                actions: [
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        trouble.photoTrouble = Uint8List(0);
+                                        TechnicalSupportRepoImpl.downloadData
+                                            .updateTrouble(trouble)
+                                            .then((result) {
+                                          bool isResult = result?.isNotEmpty ?? false;
+                                          if (isResult) {
+                                            providerModel.refreshTroubles(result ?? []);
+                                            setState(() {});
+                                          }
+                                          _viewSnackBar(
+                                            Icons.delete_forever,
+                                            isResult, 'Фотография удалена',
+                                            'Фотография не удалена', true);
+                                        });
+                                      },
+                                      child: Text('Удалить')),
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('Отмена'))
+                                ],
+                              );
+                            });
+                      },
+                      icon: Icon(
+                        Icons.delete_forever_outlined,
+                        color: Colors.red,
+                        size: 40,
+                      ),
+                    )
+                  ],
+                )
+              : _createPhoto()
         ],
       ),
     );
   }
 
-    Widget _createPhoto() {
+  Widget _createPhoto() {
     return Column(children: [
       ListTile(
-        title: imageFile == null
-            ? null
-            : IconButton(
-                icon: Icon(Icons.delete_forever_outlined, color: Colors.red, size: 40,),
-                onPressed: () {
-                  setState(() {
-                    imageFile = null;
-                  });
-                }),
-        subtitle: Container(
-          decoration: imageFile != null ? BoxDecoration(
-            border: Border.all(color: Colors.white, width: 4.5),
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.grey,
-                  blurRadius: 4,
-                  offset: Offset(2, 4), // Shadow position
-                ),
-              ]
-          ) : null,
-            child: imageFile == null
-                ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        _getFromGallery();
-                      },
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.photo_library_outlined,
-                            size: 50,
-                          ),
-                          Text(
-                            'Галлерея',
-                            style: TextStyle(fontStyle: FontStyle.italic),
-                          )
-                        ],
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        _getFromCamera();
-                      },
-                      child: Column(
-                        children: [
-                          Icon(Icons.camera_alt_outlined, size: 50),
-                          Text(
-                            'Фотоаппарат',
-                            style: TextStyle(fontStyle: FontStyle.italic),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-                : _buildImage()),
+        subtitle: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            GestureDetector(
+              onTap: () {
+                _getFromGallery();
+              },
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.photo_library_outlined,
+                    size: 50,
+                  ),
+                  Text(
+                    'Галлерея',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  )
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                _getFromCamera();
+              },
+              child: Column(
+                children: [
+                  Icon(Icons.camera_alt_outlined, size: 50),
+                  Text(
+                    'Фотоаппарат',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       )
     ]);
   }
 
   /// Get from gallery
   _getFromGallery() async {
-    XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 1800, maxHeight: 1800, imageQuality: 50);
+    XFile? pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.gallery, maxWidth: 1800, maxHeight: 1800, imageQuality: 50);
     if (pickedFile != null) {
       setState(() {
-        imageFile = File(pickedFile.path);
+        Uint8List photo = _decoderPhotoToBlob(File(pickedFile.path));
+        _photoTrouble = photo;
+        trouble.photoTrouble = photo;
       });
     }
   }
 
   /// Get from Camera
   _getFromCamera() async {
-    XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.camera, maxWidth: 1800, maxHeight: 1800, imageQuality: 50);
+    XFile? pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.camera, maxWidth: 1800, maxHeight: 1800, imageQuality: 50);
     if (pickedFile != null) {
       setState(() {
-        imageFile = File(pickedFile.path);
+        Uint8List photo = _decoderPhotoToBlob(File(pickedFile.path));
+        _photoTrouble = photo;
+        trouble.photoTrouble = photo;
       });
     }
   }
@@ -455,7 +566,8 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
           ..translate(x, y)
           ..scale(scale);
 
-        final end = transformationController.value.isIdentity() ? zoomed : Matrix4.identity();
+        final end =
+            transformationController.value.isIdentity() ? zoomed : Matrix4.identity();
 
         animation = Matrix4Tween(begin: transformationController.value, end: end)
             .animate(CurveTween(curve: Curves.easeOut).animate(animationController));
@@ -466,26 +578,40 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
           transformationController: transformationController,
           panEnabled: true,
           scaleEnabled: true,
-          child: AspectRatio(
-              aspectRatio: 1,
-              child: _photoTrouble != null ? Image.memory(_photoTrouble!) :
-              Image.file(imageFile!))));
+          child: AspectRatio(aspectRatio: 1, child: Image.memory(_photoTrouble!))));
 
   Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
-    if ((trouble.dateFixTroubleEmployee != null && trouble.fixTroubleEmployee == '') ||
-        (trouble.dateFixTroubleEmployee == null && trouble.fixTroubleEmployee != '') ||
-        (trouble.dateFixTroubleEngineer != null && trouble.fixTroubleEngineer == '') ||
-        (trouble.dateFixTroubleEngineer == null && trouble.fixTroubleEngineer != '')
-    ) {
-      _viewSnackBar(Icons.save, false, '', 'Заполните и дату, и сотрудника', scaffoldKey);
+    bool isEmptyDateEmployee = trouble.dateFixTroubleEmployee == null ||
+        trouble.dateFixTroubleEmployee.toString() == "-0001-11-30 00:00:00.000Z" ||
+        trouble.dateFixTroubleEmployee.toString() == "0001-11-30 00:00:00.000Z";
+    bool isEmptyEmployee = trouble.fixTroubleEmployee == null ||
+        trouble.fixTroubleEmployee == '';
+    bool isEmptyDateEngineer = trouble.dateFixTroubleEngineer == null ||
+        trouble.dateFixTroubleEngineer.toString() == "-0001-11-30 00:00:00.000Z" ||
+        trouble.dateFixTroubleEngineer.toString() == "0001-11-30 00:00:00.000Z";
+    bool isEmptyEngineer = trouble.fixTroubleEngineer == null ||
+        trouble.fixTroubleEngineer == '';
+
+    if(isEmptyDateEmployee && isEmptyEmployee && isEmptyDateEngineer &&
+        isEmptyEngineer) {
       return false;
-    }else{
-      List<Trouble>? resultData = await TechnicalSupportRepoImpl.downloadData.saveTrouble(trouble);
-      if (resultData != null) {
-        providerModel.refreshTroubles(resultData);
-        // await addHistory(technic, nameUser);
-        return true;
-      }
+    }
+    if((isEmptyDateEmployee && !isEmptyEmployee) ||
+        (!isEmptyDateEmployee && isEmptyEmployee)) {
+      _viewSnackBar(Icons.save, false, '', 'Заполните и дату, и сотрудника', false);
+      return false;
+    }
+    if((isEmptyDateEngineer && !isEmptyEngineer) ||
+        (!isEmptyDateEngineer && isEmptyEngineer)) {
+      _viewSnackBar(Icons.save, false, '', 'Заполните и дату, и техника', false);
+      return false;
+    }
+    List<Trouble>? resultData =
+        await TechnicalSupportRepoImpl.downloadData.updateTrouble(trouble);
+    if (resultData != null) {
+      providerModel.refreshTroubles(resultData);
+      // await addHistory(technic, nameUser);
+      return true;
     }
     return false;
   }
@@ -514,29 +640,13 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
   //   return result;
   // }
 
-  void _viewSnackBarGetTechnic(String text) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(Icons.bolt, size: 40, color: Colors.red),
-            Flexible(child: Text(text)),
-          ],
-        ),
-        duration: const Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
-  }
-
-  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText,
-      GlobalKey<ScaffoldState> scaffoldKey) {
-    final contextViewSnackBar = scaffoldKey.currentContext;
-    if (contextViewSnackBar != null && contextViewSnackBar.mounted) {
-      ScaffoldMessenger.of(contextViewSnackBar).hideCurrentSnackBar();
-      ScaffoldMessenger.of(contextViewSnackBar).showSnackBar(
+  void _viewSnackBar(
+      IconData icon, bool isSuccessful, String successText, String notSuccessText, bool isSkip) {
+    if (context.mounted) {
+      if (isSkip) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
             mainAxisSize: MainAxisSize.max,
@@ -552,7 +662,9 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
           showCloseIcon: true,
         ),
       );
-      Navigator.pop(contextViewSnackBar);
+      if (isSuccessful) {
+        Navigator.pop(context);
+      }
     }
   }
 }
@@ -567,7 +679,8 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
   static const thousandSeparator = ',';
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     if (!validationRegex.hasMatch(newValue.text)) {
       return oldValue;
     }
@@ -595,13 +708,17 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
     }
 
     /// Handle moving cursor.
-    final initialNumberOfPrecedingSeparators = oldValue.text.characters.where((e) => e == thousandSeparator).length;
-    final newNumberOfPrecedingSeparators = formattedText.characters.where((e) => e == thousandSeparator).length;
-    final additionalOffset = newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
+    final initialNumberOfPrecedingSeparators =
+        oldValue.text.characters.where((e) => e == thousandSeparator).length;
+    final newNumberOfPrecedingSeparators =
+        formattedText.characters.where((e) => e == thousandSeparator).length;
+    final additionalOffset =
+        newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
 
     return newValue.copyWith(
       text: formattedText,
-      selection: TextSelection.collapsed(offset: newValue.selection.baseOffset + additionalOffset),
+      selection: TextSelection.collapsed(
+          offset: newValue.selection.baseOffset + additionalOffset),
     );
   }
 }

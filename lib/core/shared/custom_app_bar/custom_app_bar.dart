@@ -101,7 +101,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                           TechnicalSupportRepoImpl.downloadData.deleteRepair(repair.id.toString()).then((result){
                             if(result){
                               providerModel.removeRepairInCurrentRepairs(repair);
-                              _viewSnackBar(Icons.delete_forever, result, 'Заявка удаленна', 'Заявка не удаленна', false);
+                              _viewSnackBar(Icons.delete_forever, result, 'Заявка удалена', 'Заявка не удалена', false);
                             }
                           });
                           Navigator.of(context).pop();
@@ -137,7 +137,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                           TechnicalSupportRepoImpl.downloadData.deleteTrouble(trouble.id.toString()).then((result){
                             if(result){
                               providerModel.removeTroubleInTroubles(trouble);
-                              _viewSnackBar(Icons.delete_forever, result, 'Неисправность удаленна', 'Неисправность не удаленна', false);
+                              _viewSnackBar(Icons.delete_forever, result, 'Неисправность удалена', 'Неисправность не удалена', false);
                             }
                           });
                           Navigator.of(context).pop();

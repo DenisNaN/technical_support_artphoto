@@ -82,7 +82,7 @@ class _TroublesPageState extends State<TroublesPage> {
                     child: ListTile(
                         onTap: () {
                           Navigator.push(context,
-                              animationRouteSlideTransition(TroubleView(trouble: trouble)));
+                              animationRouteSlideTransition(TroubleView(troubleMain: trouble)));
                         },
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                         title: _buildTitleListTile(context, index, troubles)),
@@ -120,7 +120,7 @@ class _TroublesPageState extends State<TroublesPage> {
                         child: ListTile(
                             onTap: () {
                               Navigator.push(context,
-                                  animationRouteSlideTransition(TroubleView(trouble: trouble)));
+                                  animationRouteSlideTransition(TroubleView(troubleMain: trouble)));
                             },
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                             title: _buildTitleListTile(context, index, troubles)),
@@ -192,7 +192,11 @@ class _TroublesPageState extends State<TroublesPage> {
               WidgetSpan(
                   child: Row(children: [
                 const Text('Фото: '),
-                SizedBox(width: 30, height: 10, child: Checkbox(value: checkboxValuePhoto, onChanged: null)),
+                troubles[index].photoTrouble != null &&
+                    troubles[index].photoTrouble!.isNotEmpty ?
+                Icon(Icons.check_circle, color: Colors.green,) :
+                Icon(Icons.close, color: Colors.red, )
+                // SizedBox(width: 30, height: 10, child: Checkbox(value: checkboxValuePhoto, onChanged: null)),
               ]))
             ])
           ],

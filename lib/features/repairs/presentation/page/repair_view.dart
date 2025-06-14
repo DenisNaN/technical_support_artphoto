@@ -227,23 +227,19 @@ class _RepairViewState extends State<RepairView> {
     return Colors.yellow.shade200;
   }
 
-  Column _headerData() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: const [
-              BoxShadow(
-                color: Colors.grey,
-                blurRadius: 4,
-                offset: Offset(2, 4), // Shadow position
-              ),
-            ]),
-            child: FirstStepRepairDesc(repair: widget.repair),
+  Widget _headerData() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      child: Container(
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: const [
+          BoxShadow(
+            color: Colors.grey,
+            blurRadius: 4,
+            offset: Offset(2, 4), // Shadow position
           ),
-        ),
-      ],
+        ]),
+        child: FirstStepRepairDesc(repair: widget.repair),
+      ),
     );
   }
 
