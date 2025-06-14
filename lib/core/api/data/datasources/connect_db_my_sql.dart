@@ -689,15 +689,16 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
             'WHERE id = ?',
         [
           trouble.photosalon,
-          trouble.dateTrouble,
+          trouble.dateTrouble.dateFormattedForSQL(),
           trouble.employee,
-          trouble.numberTechnic,
+          trouble.numberTechnic.toString(),
           trouble.trouble,
-          trouble.dateFixTroubleEmployee,
-          trouble.fixTroubleEmployee,
-          trouble.dateFixTroubleEngineer,
-          trouble.fixTroubleEngineer,
-          trouble.photoTrouble
+          trouble.dateFixTroubleEmployee?.dateFormattedForSQL() ?? '',
+          trouble.fixTroubleEmployee ?? '',
+          trouble.dateFixTroubleEngineer?.dateFormattedForSQL() ?? '',
+          trouble.fixTroubleEngineer ?? '',
+          trouble.photoTrouble ?? '',
+          trouble.id
         ]);
   }
 

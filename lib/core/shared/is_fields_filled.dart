@@ -24,14 +24,7 @@ bool isFieldsFilledRepair(Repair repair){
 }
 
 bool isFieldsFilledTrouble(Trouble trouble){
-    bool isDateTrouble = trouble.dateTrouble.toString() == "-0001-11-30 00:00:00.000Z" ||
-        trouble.dateTrouble.toString() == "0001-11-30 00:00:00.000Z";
-
-    if (trouble.photosalon == '' &&
-        isDateTrouble &&
-        trouble.employee == '' &&
-        trouble.trouble == '' &&
-        trouble.fixTroubleEngineer == '' &&
+    if (trouble.fixTroubleEngineer == '' ||
         trouble.fixTroubleEmployee == ''
         ) {
         return false;

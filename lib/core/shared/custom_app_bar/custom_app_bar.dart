@@ -30,7 +30,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     return AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.grey.shade50,
         shadowColor: Colors.transparent,
         leadingWidth: 80,
         leading: Padding(

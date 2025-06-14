@@ -26,7 +26,7 @@ class TroubleView extends StatefulWidget {
 
 class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
+  final expansionTileKey = GlobalKey<State<TroubleView>>();
   Uint8List? _photoTrouble;
   File? imageFile;
   DateTime? _dateFixTroubleEmployee;
@@ -330,13 +330,32 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
   }
 
   Widget _buildPhotoTrouble() {
-    return Column(children: [
-      Center(
-        child: Text(
-          'Фотография',
-          style: Theme.of(context).textTheme.headlineMedium,
+    bool isPhoto = widget.trouble.photoTrouble != null ? true : false;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: ExpansionTile(
+        key: expansionTileKey,
+        title: Center(child: Text('Фотография', style: TextStyle(
+            fontSize: 23, fontStyle: FontStyle.italic, color: Colors.black45))),
+        trailing: Icon(isPhoto ? Icons.check : Icons.dangerous_outlined,
+          color: isPhoto ? Colors.green : Colors.red,),
+        collapsedShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
         ),
+        collapsedBackgroundColor: Colors.blue[100],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        backgroundColor: Colors.blue[100],
+        children: [
+          isPhoto ? _buildImage() : _createPhoto()
+        ],
       ),
+    );
+  }
+
+    Widget _createPhoto() {
+    return Column(children: [
       ListTile(
         title: imageFile == null
             ? null

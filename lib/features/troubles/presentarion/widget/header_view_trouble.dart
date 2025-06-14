@@ -23,7 +23,6 @@ class HeaderViewTrouble extends StatefulWidget {
 
 class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
   final _numberTechnic = TextEditingController();
-  final _nameTechnicController = TextEditingController();
   String? _selectedDropdownDislocation;
   DateTime? _dateTrouble;
   final _employee = TextEditingController();
@@ -42,182 +41,188 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    return ListTile(
-      title: _buildTextTitle(widget.technic),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      tileColor: Colors.blue[100],
-      subtitle: _buildTextSubtitle(),
-      trailing: GestureDetector(
-        onTap: () {
-          showDialog(
-              context: context,
-              builder: (_) {
-                return StatefulBuilder(
-                  builder: (showDialogContext, setState) {
-                    return AlertDialog(
-                      actions: [
-                        Center(
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  Trouble trouble = Trouble(
-                                      id: widget.trouble.id,
-                                      photosalon: _selectedDropdownDislocation!,
-                                      dateTrouble: _dateTrouble!,
-                                      employee: _employee.text,
-                                      numberTechnic: int.parse(_numberTechnic.text),
-                                      trouble: _complaint.text);
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+      child: ListTile(
+        title: _buildTextTitle(widget.technic),
+        subtitle: _buildTextSubtitle(),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        tileColor: Colors.blue[100],
+        trailing: GestureDetector(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (_) {
+                  return StatefulBuilder(
+                    builder: (showDialogContext, setState) {
+                      return AlertDialog(
+                        actions: [
+                          Center(
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    Trouble trouble = Trouble(
+                                        id: widget.trouble.id,
+                                        photosalon: _selectedDropdownDislocation!,
+                                        dateTrouble: _dateTrouble!,
+                                        employee: _employee.text,
+                                        numberTechnic: int.parse(_numberTechnic.text),
+                                        trouble: _complaint.text);
+                                    trouble.dateFixTroubleEmployee = widget.trouble.dateFixTroubleEmployee;
+                                    trouble.fixTroubleEmployee = widget.trouble.fixTroubleEmployee;
+                                    trouble.dateFixTroubleEngineer = widget.trouble.dateFixTroubleEngineer;
+                                    trouble.fixTroubleEngineer = widget.trouble.fixTroubleEngineer;
+                                    trouble.photoTrouble = widget.trouble.photoTrouble;
 
-                                  _save(trouble, providerModel).then((value) {
-                                    _viewSnackBar(
-                                        Icons.save, value, 'Неисправность изменена', 'Неисправность не изменена', true);
+                                    _save(trouble, providerModel).then((value) {
+                                      _viewSnackBar(
+                                          Icons.save, value, 'Неисправность изменена', 'Неисправность не изменена', true);
+                                    });
+                                  },
+                                  child: Text('Сохранить')))
+                        ],
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                        title: Text('Редактировать неисправность'),
+                        titleTextStyle: Theme.of(context).textTheme.headlineMedium,
+                        content: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            spacing: 20,
+                            children: [
+                              TextFormField(
+                                decoration: myDecorationTextFormField('Жалоба', 'Жалоба'),
+                                controller: _complaint,
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Обязательное поле';
+                                  }
+                                  return null;
+                                },
+                                maxLines: _complaint.text.length > 120 ? 4 : 3,
+                              ),
+                              DropdownButtonFormField<String>(
+                                decoration: myDecorationDropdown('Откуда увезли'),
+                                validator: (value) => value == null ? "Обязательное поле" : null,
+                                borderRadius: BorderRadius.circular(10.0),
+                                hint: const Text('Последнее местонахождение'),
+                                value: _selectedDropdownDislocation,
+                                items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    _selectedDropdownDislocation = value!;
                                   });
                                 },
-                                child: Text('Сохранить')))
-                      ],
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                      title: Text('Редактировать неисправность'),
-                      titleTextStyle: Theme.of(context).textTheme.headlineMedium,
-                      content: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: 20,
-                          children: [
-                            TextFormField(
-                              decoration: myDecorationTextFormField('Наименование техники', 'Наименование техники'),
-                              controller: _nameTechnicController,
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Обязательное поле';
-                                }
-                                return null;
-                              },
-                            ),
-                            TextFormField(
-                              decoration: myDecorationTextFormField('Жалоба', 'Жалоба'),
-                              controller: _complaint,
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Обязательное поле';
-                                }
-                                return null;
-                              },
-                              maxLines: _complaint.text.length > 120 ? 4 : 3,
-                            ),
-                            DropdownButtonFormField<String>(
-                              decoration: myDecorationDropdown('Откуда увезли'),
-                              validator: (value) => value == null ? "Обязательное поле" : null,
-                              dropdownColor: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(10.0),
-                              hint: const Text('Последнее местонахождение'),
-                              value: _selectedDropdownDislocation,
-                              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              onChanged: (String? value) {
-                                setState(() {
-                                  _selectedDropdownDislocation = value!;
-                                });
-                              },
-                            ),
-                            TextFormField(
-                              decoration: myDecorationTextFormField('Сотрудник', 'Сотрудник'),
-                              controller: _employee,
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Обязательное поле';
-                                }
-                                return null;
-                              },
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                showDatePicker(
-                                        context: context,
-                                        initialDate: _dateTrouble,
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime(2099),
-                                        locale: const Locale("ru", "RU"))
-                                    .then((date) {
-                                  if (date != null) {
-                                    setState(() {
-                                      _dateTrouble = date;
-                                    });
+                              ),
+                              TextFormField(
+                                decoration: myDecorationTextFormField('Сотрудник', 'Сотрудник'),
+                                controller: _employee,
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Обязательное поле';
                                   }
-                                });
-                              },
-                              child: Stack(clipBehavior: Clip.none, children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
-                                  child: Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 12, bottom: 12, left: 10, right: 0),
-                                        child: Text(
-                                            DateFormat('d MMMM yyyy', 'ru_RU').format(_dateTrouble ?? DateTime.now())),
-                                      ),
-                                    ],
+                                  return null;
+                                },
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  showDatePicker(
+                                          context: context,
+                                          initialDate: _dateTrouble,
+                                          firstDate: DateTime(2000),
+                                          lastDate: DateTime(2099),
+                                          locale: const Locale("ru", "RU"))
+                                      .then((date) {
+                                    if (date != null) {
+                                      setState(() {
+                                        _dateTrouble = date;
+                                      });
+                                    }
+                                  });
+                                },
+                                child: Stack(clipBehavior: Clip.none, children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 12, bottom: 12, left: 10, right: 0),
+                                          child: Text(
+                                              DateFormat('d MMMM yyyy', 'ru_RU').format(_dateTrouble ?? DateTime.now())),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                Positioned(
-                                    left: 11,
-                                    top: -6.5,
-                                    child: Text(
-                                      'Дата неисправности',
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontStyle: FontStyle.italic,
-                                          color: Colors.black.withValues(alpha: 0.6)),
-                                    )),
-                              ]),
-                            ),
-                          ],
+                                  Positioned(
+                                      left: 11,
+                                      top: -6.5,
+                                      child: Text(
+                                        'Дата неисправности',
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontStyle: FontStyle.italic,
+                                            color: Colors.black.withValues(alpha: 0.6)),
+                                      )),
+                                ]),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                );
-              });
-        },
-        child: Icon(Icons.edit),
+                      );
+                    },
+                  );
+                });
+          },
+          child: Icon(Icons.edit),
+        ),
       ),
     );
   }
 
   Widget _buildTextTitle(Technic technic) {
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: () {
-            TechnicalSupportRepoImpl.downloadData.getTechnic(widget.trouble.numberTechnic.toString()).then((technic) {
-              if (technic != null) {
-                _navigationOnTehcnicView(technic);
-              } else {
-                _viewSnackBar(Icons.print, false, '', 'Такой техники нет в базе', false);
-              }
-            });
-          },
-          child: CircleAvatar(
-            radius: widget.trouble.numberTechnic.toString().length > 4 ? 27 : null,
-            child: Text(
-              widget.trouble.numberTechnic.toString(),
-              style: TextStyle(fontWeight: FontWeight.bold),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              TechnicalSupportRepoImpl.downloadData.getTechnic(widget.trouble.numberTechnic.toString()).then((technic) {
+                if (technic != null) {
+                  _navigationOnTehcnicView(technic);
+                } else {
+                  _viewSnackBar(Icons.print, false, '', 'Такой техники нет в базе', false);
+                }
+              });
+            },
+            child: CircleAvatar(
+              radius: widget.trouble.numberTechnic.toString().length > 4 ? 27 : null,
+              child: Text(
+                widget.trouble.numberTechnic.toString(),
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ),
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Text(
-          technic.category,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ],
+          SizedBox(
+            width: 10,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                technic.category,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Text(technic.name)
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -243,11 +248,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
               width: 7,
             ),
             Icon(
-              Icons.delivery_dining,
-              color: Colors.green.shade700,
-            ),
-            Icon(
-              Icons.arrow_forward,
+              Icons.message,
               color: Colors.green.shade700,
             ),
             SizedBox(
@@ -270,10 +271,10 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
   }
 
   Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
-    final bool isFinishedRepair = isFieldsFilledTrouble(trouble);
+    final bool isFinishedTrouble = isFieldsFilledTrouble(trouble);
     List<Trouble>? resultData = await TechnicalSupportRepoImpl.downloadData.updateTrouble(trouble);
     if (resultData != null) {
-      if (!isFinishedRepair) {
+      if (!isFinishedTrouble) {
         providerModel.refreshTroubles(resultData);
       }
       // await addHistory(technic, nameUser);
