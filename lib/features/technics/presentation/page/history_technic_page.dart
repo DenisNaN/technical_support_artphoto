@@ -221,7 +221,9 @@ class HistoryTechnicPage extends StatelessWidget {
             onTap: (){
               TechnicalSupportRepoImpl.downloadData.getTrouble(troubles[i].id.toString()).then((trouble){
                 if(trouble != null){
-                  _navigationOnTechnicView(trouble, context);
+                  if (context.mounted) {
+                    _navigationOnTechnicView(trouble, context);
+                  }
                 }
               });
             },
