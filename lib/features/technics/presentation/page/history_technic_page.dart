@@ -9,6 +9,8 @@ import 'package:technical_support_artphoto/core/shared/logo_animate/logo_matrix_
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
+import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
+import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_view.dart';
 
 import '../../../../core/api/provider/provider_model.dart';
 import '../../../../core/navigation/animation_navigation.dart';
@@ -81,7 +83,7 @@ class HistoryTechnicPage extends StatelessWidget {
       if (historyList.length > 1 && index > 0) {
         finishDate = _findDateFinishPhotosalon(historyList, index);
       }
-      return _buildListTilePhotosalon(currentHistoryTechnic, isStartIndex, finishDate);
+      return _buildListTilePhotosalon(currentHistoryTechnic, isStartIndex, finishDate, context);
     }
     return SizedBox();
   }
@@ -89,7 +91,7 @@ class HistoryTechnicPage extends StatelessWidget {
   Widget _buildListTilePhotosalon(
     HistoryTechnic currentHistoryTechnic,
     bool isStartIndex,
-    DateTime? finishDate,
+    DateTime? finishDate, BuildContext context
   ) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -118,7 +120,7 @@ class HistoryTechnicPage extends StatelessWidget {
             ],
           ),
         ),
-        _getListTroubles(currentHistoryTechnic.listTrouble),
+        _getListTroubles(currentHistoryTechnic.listTrouble, context),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0),
           child: Icon(Icons.arrow_upward),
@@ -211,42 +213,53 @@ class HistoryTechnicPage extends StatelessWidget {
     );
   }
 
-  Widget _getListTroubles(List<TroubleTechnicOnPeriod> troubles) {
+  Widget _getListTroubles(List<TroubleTechnicOnPeriod> troubles, BuildContext context) {
     return Column(
       children: [
         for (int i = 0; i < troubles.length; i++)
-          Stack(
-            children: <Widget>[
-              Container(
-                width: double.infinity,
-                margin: EdgeInsets.fromLTRB(20, 20, 20, 10),
-                padding: EdgeInsets.only(bottom: 7),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Color.fromARGB(255, 51, 204, 255), width: 1),
-                  borderRadius: BorderRadius.circular(10),
-                  shape: BoxShape.rectangle,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 12.0, top: 10),
-                  child: Text(
-                    '${troubles[i].trouble}',
-                    style: TextStyle(color: Colors.black, fontSize: 14),
+          GestureDetector(
+            onTap: (){
+              TechnicalSupportRepoImpl.downloadData.getTrouble(troubles[i].id.toString()).then((trouble){
+                if(trouble != null){
+                  if (context.mounted) {
+                    _navigationOnTechnicView(trouble, context);
+                  }
+                }
+              });
+            },
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.fromLTRB(20, 20, 20, 10),
+                  padding: EdgeInsets.only(bottom: 7),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Color.fromARGB(255, 51, 204, 255), width: 1),
+                    borderRadius: BorderRadius.circular(10),
+                    shape: BoxShape.rectangle,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 12.0, top: 10),
+                    child: Text(
+                      '${troubles[i].trouble}',
+                      style: TextStyle(color: Colors.black, fontSize: 14),
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                left: 50,
-                top: 12,
-                child: Container(
-                  padding: EdgeInsets.only(left: 5, right: 5),
-                  color: Colors.grey.shade50,
-                  child: Text(
-                    '${troubles[i].employee}',
-                    style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+                Positioned(
+                  left: 50,
+                  top: 12,
+                  child: Container(
+                    padding: EdgeInsets.only(left: 5, right: 5),
+                    color: Colors.grey.shade50,
+                    child: Text(
+                      '${troubles[i].employee}',
+                      style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           )
       ],
     );
@@ -262,5 +275,10 @@ class HistoryTechnicPage extends StatelessWidget {
       if (historyList[i].location is PhotosalonLocation) return historyList[i - 1].date;
     }
     return null;
+  }
+
+  void _navigationOnTechnicView(Trouble trouble, BuildContext context) {
+    Navigator.push(context,
+        animationRouteSlideTransition(TroubleView(troubleMain: trouble)));
   }
 }

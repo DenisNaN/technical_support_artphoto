@@ -4,19 +4,25 @@ import '../../features/repairs/models/repair.dart';
 
 bool isFieldsFilledRepair(Repair repair){
     bool isDateTransferInService = repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
-        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000Z";
+        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000Z" || repair.dateTransferInService == null;
+    bool isServiceDislocation = repair.serviceDislocation == null;
     bool isDateDepartureFormService = repair.dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000Z"  ||
-        repair.dateDepartureFromService.toString() == "0001-11-30 00:00:00.000Z" ? true : false;
+        repair.dateDepartureFromService.toString() == "0001-11-30 00:00:00.000Z" || repair.dateDepartureFromService == null;
+    bool isWorksPerformed = repair.worksPerformed == '' || repair.worksPerformed == null;
+    bool isDiagnosisService = repair.diagnosisService == '' || repair.diagnosisService == null;
+    bool isNewStatus = repair.newStatus == '' || repair.newStatus == null;
+    bool isNewDislocation = repair.newDislocation == '' || repair.newDislocation == null;
     bool isDateReceipt = repair.dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" ||
-        repair.dateReceipt.toString() == "0001-11-30 00:00:00.000Z" ? true : false;
+        repair.dateReceipt.toString() == "0001-11-30 00:00:00.000Z" || repair.dateReceipt == null;
+
 
     if (isDateTransferInService &&
-        repair.serviceDislocation == null &&
+        isServiceDislocation &&
         isDateDepartureFormService &&
-        repair.worksPerformed == '' &&
-        repair.diagnosisService == '' &&
-        repair.newStatus == '' &&
-        repair.newDislocation == '' &&
+        isWorksPerformed &&
+        isDiagnosisService &&
+        isNewStatus &&
+        isNewDislocation &&
         isDateReceipt) {
       return false;
     }

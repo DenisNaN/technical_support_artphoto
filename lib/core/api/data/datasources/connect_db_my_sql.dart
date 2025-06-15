@@ -706,75 +706,35 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
     await _connDB!.query('DELETE FROM Неисправности WHERE id = ?', [id]);
   }
 
-//
-// Future<Trouble?> getTrouble(int id) async {
-//   var result = await _connDB!.query('SELECT * FROM Неисправности WHERE id = ?', [id]);
-//   Trouble? trouble = troubleListFromMap(result).first;
-//   return trouble;
-// }
-
-List<Trouble> troubleListFromMap(var result) {
-  List<Trouble> list = [];
-  for (var row in result) {
-    // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
-    // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
-    // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
-
-    Blob blobImage = row[10];
-    Uint8List image = Uint8List.fromList(blobImage.toBytes());
-    Trouble trouble = Trouble(
-        id: row[0],
-        photosalon: row[1].toString(),
-        dateTrouble: row[2],
-        employee: row[3].toString(),
-        numberTechnic: row[4],
-        trouble: row[5].toString(),);
-        trouble.dateFixTroubleEmployee = row[6];
-        trouble.fixTroubleEmployee = row[7];
-        trouble.dateFixTroubleEngineer = row[8];
-        trouble.fixTroubleEngineer = row[9];
-        trouble.photoTrouble = image;
-    list.add(trouble);
+  Future<Trouble?> fetchTrouble(String id) async {
+    var result = await _connDB!.query('SELECT * FROM Неисправности WHERE id = ?', [id]);
+    Trouble? trouble = troubleListFromMap(result).first;
+    return trouble;
   }
-  return list;
-}
 
-// Future<int> insertTroubleInDB(Trouble trouble) async{
-//   await ConnectDbMySQL.connDB.connDatabase();
-//   var result = await _connDB!.query('INSERT INTO Неисправности ('
-//       'Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, '
-//       'ДатаУстрСотр, СотрПодтверУстр, '
-//       'ДатаУстрИнженер, ИнженерПодтверУстр, Фотография) '
-//       'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-//     trouble.photosalon,
-//     trouble.dateTrouble,
-//     trouble.employee,
-//     trouble.internalID,
-//     trouble.trouble,
-//     trouble.dateCheckFixTroubleEmployee,
-//     trouble.employeeCheckFixTrouble,
-//     trouble.dateCheckFixTroubleEngineer,
-//     trouble.engineerCheckFixTrouble,
-//     trouble.photoTrouble ?? ''
-//   ]);
-//   return result.insertId!;
-// }
-//
-// Future updateTroubleInDB(Trouble trouble) async{
-//   await ConnectDbMySQL.connDB.connDatabase();
-//   await _connDB!.query(
-//       'UPDATE Неисправности SET '
-//           'ДатаУстрСотр = ?, '
-//           'СотрПодтверУстр = ?, '
-//           'ДатаУстрИнженер = ?, '
-//           'ИнженерПодтверУстр = ? '
-//           'WHERE id = ?',
-//       [
-//         trouble.dateCheckFixTroubleEmployee,
-//         trouble.employeeCheckFixTrouble,
-//         trouble.dateCheckFixTroubleEngineer,
-//         trouble.engineerCheckFixTrouble,
-//         trouble.id
-//       ]);
-// }
+  List<Trouble> troubleListFromMap(var result) {
+    List<Trouble> list = [];
+    for (var row in result) {
+      // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
+      // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
+      // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
+
+      Blob blobImage = row[10];
+      Uint8List image = Uint8List.fromList(blobImage.toBytes());
+      Trouble trouble = Trouble(
+          id: row[0],
+          photosalon: row[1].toString(),
+          dateTrouble: row[2],
+          employee: row[3].toString(),
+          numberTechnic: row[4],
+          trouble: row[5].toString(),);
+          trouble.dateFixTroubleEmployee = row[6];
+          trouble.fixTroubleEmployee = row[7];
+          trouble.dateFixTroubleEngineer = row[8];
+          trouble.fixTroubleEngineer = row[9];
+          trouble.photoTrouble = image;
+      list.add(trouble);
+    }
+    return list;
+  }
 }

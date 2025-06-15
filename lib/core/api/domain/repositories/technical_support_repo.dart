@@ -32,6 +32,7 @@ abstract interface class TechnicalSupportRepo {
   Future<bool> deleteRepair(String id);
 
   Future<List<Trouble>> getTroubles();
+  Future<Trouble?> getTrouble(String id);
   Future<List<Trouble>?> saveTrouble(Trouble trouble);
   Future<List<Trouble>> getFinishedTroubles();
   Future<bool> deleteTrouble(String id);

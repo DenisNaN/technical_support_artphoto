@@ -5,6 +5,7 @@ import 'package:technical_support_artphoto/core/api/data/repositories/technical_
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/history_technic_page.dart';
+import 'package:technical_support_artphoto/main.dart';
 
 import '../../../features/repairs/models/repair.dart';
 import '../../../features/troubles/models/trouble.dart';
@@ -104,9 +105,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
                               _viewSnackBar(Icons.delete_forever, result, 'Заявка удалена', 'Заявка не удалена', false);
                             }
                           });
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
+                          Navigator.pushAndRemoveUntil(
+                              context, animationRouteFadeTransition(const ArtphotoTech(indexPage: 1,)), (Route<dynamic> route) => false);
                         }, child: Text('Удалить')),
                         ElevatedButton(onPressed: (){
                           Navigator.of(context).pop();
@@ -128,7 +128,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
         Text('Неисправность', style: TextStyle(color: Colors.black)),
         providerModel.user.access == 'admin' ? IconButton(
             onPressed: () {
-              showDialog(context: context,
+              showDialog(
+                  context: context,
                   builder: (_){
                     return AlertDialog(
                       title: Text('Подтвердите удаление неисправности'),
@@ -140,9 +141,13 @@ class _CustomAppBarState extends State<CustomAppBar> {
                               _viewSnackBar(Icons.delete_forever, result, 'Неисправность удалена', 'Неисправность не удалена', false);
                             }
                           });
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
+                          providerModel.changeCurrentPageMainBottomAppBar(2);
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              animationRouteSlideTransition(const ArtphotoTech(
+                                indexPage: 2,
+                              )),
+                                  (Route<dynamic> route) => false);
                         }, child: Text('Удалить')),
                         ElevatedButton(onPressed: (){
                           Navigator.of(context).pop();

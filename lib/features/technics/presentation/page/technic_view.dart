@@ -59,6 +59,8 @@ class _TechnicViewState extends State<TechnicView> {
   @override
   void initState() {
     super.initState();
+    _selectedDropdownStatus = widget.technic.status;
+    _selectedDropdownDislocation = widget.technic.dislocation;
     _nameTechnic.text = '';
     TechnicalSupportRepoImpl.downloadData.getSumRepairs(widget.technic.number.toString()).then((value) {
       if (value.isNotEmpty) {
@@ -366,7 +368,7 @@ class _TechnicViewState extends State<TechnicView> {
               hint: const Text('Статус техники'),
               validator: (value) => value == null ? "Обязательное поле" : null,
               dropdownColor: Colors.blue.shade50,
-              value: _selectedDropdownStatus == null ? widget.technic.status : null,
+              value: _selectedDropdownStatus,
               items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -374,7 +376,17 @@ class _TechnicViewState extends State<TechnicView> {
                 );
               }).toList(),
               onChanged: (String? value) {
-                  _selectedDropdownStatus = value!;
+                setState(() {
+                  if(value != null && _selectedDropdownStatus != 'В ремонте' &&
+                      value == 'В ремонте'){
+                    _selectedDropdownDislocation = null;
+                  }
+                  if(value != null && _selectedDropdownStatus == 'В ремонте' &&
+                      value != 'В ремонте'){
+                    _selectedDropdownDislocation = null;
+                  }
+                  _selectedDropdownStatus = value;
+                });
               },
             ),
           ),
@@ -403,16 +415,24 @@ class _TechnicViewState extends State<TechnicView> {
               decoration: myDecorationDropdown(),
               borderRadius: BorderRadius.circular(10.0),
               hint: const Text('Дислокация'),
-              value: _selectedDropdownDislocation == null ? widget.technic.dislocation : null,
+              value: _selectedDropdownDislocation,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+              items: _selectedDropdownStatus == 'В ремонте' ? providerModel.services.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList() :
+              providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
                 );
               }).toList(),
               onChanged: (String? value) {
+                setState(() {
                   _selectedDropdownDislocation = value!;
+                });
               },
             ),
           ),

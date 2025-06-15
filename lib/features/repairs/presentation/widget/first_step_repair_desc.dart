@@ -49,11 +49,11 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
     super.dispose();
   }
 
-  String? validateDropdownDislocationOld(ProviderModel providerModel){
+  String? validateDropdownDislocationOld(ProviderModel providerModel) {
     List<String> nameDislocation = providerModel.namesDislocation;
     for (var element in nameDislocation) {
-      if(widget.repair.dislocationOld != ''){
-        if(element == widget.repair.dislocationOld){
+      if (widget.repair.dislocationOld != '') {
+        if (element == widget.repair.dislocationOld) {
           return widget.repair.dislocationOld;
         }
       }
@@ -61,11 +61,11 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
     return null;
   }
 
-  String? validateDropdownStatus(ProviderModel providerModel){
+  String? validateDropdownStatus(ProviderModel providerModel) {
     List<String> nameStatus = providerModel.statusForEquipment;
     for (var element in nameStatus) {
-      if(widget.repair.status != ''){
-        if(element == widget.repair.status){
+      if (widget.repair.status != '') {
+        if (element == widget.repair.status) {
           return widget.repair.status;
         }
       }
@@ -90,30 +90,32 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
               context: context,
               builder: (_) {
                 return StatefulBuilder(
-                  builder: (showDialogContext, setState){
+                  builder: (showDialogContext, setState) {
                     return AlertDialog(
                       actions: [
                         Center(
                             child: ElevatedButton(
                                 onPressed: () {
-                                    Repair repair = Repair(
-                                      widget.repair.numberTechnic,
-                                      _nameTechnicController.text,
-                                      _selectedDropdownDislocationOld ?? '',
-                                      _selectedDropdownStatusOld ?? '',
-                                      _complaint.text,
-                                      _dateDeparture ?? DateTime.now(),
-                                      _whoTook.text,
-                                    );
-                                    repair.id = widget.repair.id;
+                                  Repair repair = Repair(
+                                    widget.repair.numberTechnic,
+                                    _nameTechnicController.text,
+                                    _selectedDropdownDislocationOld ?? '',
+                                    _selectedDropdownStatusOld ?? '',
+                                    _complaint.text,
+                                    _dateDeparture ?? DateTime.now(),
+                                    _whoTook.text,
+                                  );
+                                  repair.id = widget.repair.id;
 
-                                    _save(repair, providerModel).then((value) {
-                                      _viewSnackBar(Icons.save, value, 'Заявка изменена', 'Заявка не изменена', true);
-                                    });
+                                  _save(repair, providerModel).then((value) {
+                                    _viewSnackBar(Icons.save, value, 'Заявка изменена',
+                                        'Заявка не изменена', true);
+                                  });
                                 },
                                 child: Text('Сохранить')))
                       ],
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
                       title: Text('Редактировать заявку'),
                       titleTextStyle: Theme.of(context).textTheme.headlineMedium,
                       content: SingleChildScrollView(
@@ -122,7 +124,8 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                           spacing: 20,
                           children: [
                             TextFormField(
-                              decoration: myDecorationTextFormField('Наименование техники', 'Наименование техники'),
+                              decoration: myDecorationTextFormField(
+                                  'Наименование техники', 'Наименование техники'),
                               controller: _nameTechnicController,
                               validator: (value) {
                                 if (value!.isEmpty) {
@@ -143,7 +146,8 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                               maxLines: _complaint.text.length > 120 ? 4 : 3,
                             ),
                             TextFormField(
-                              decoration: myDecorationTextFormField('Кто забрал', 'Кто забрал'),
+                              decoration:
+                                  myDecorationTextFormField('Кто забрал', 'Кто забрал'),
                               controller: _whoTook,
                               validator: (value) {
                                 if (value!.isEmpty) {
@@ -153,13 +157,13 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                               },
                             ),
                             GestureDetector(
-                              onTap: (){
+                              onTap: () {
                                 showDatePicker(
-                                    context: context,
-                                    initialDate: _dateDeparture,
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime(2099),
-                                    locale: const Locale("ru", "RU"))
+                                        context: context,
+                                        initialDate: _dateDeparture,
+                                        firstDate: DateTime(2000),
+                                        lastDate: DateTime(2099),
+                                        locale: const Locale("ru", "RU"))
                                     .then((date) {
                                   if (date != null) {
                                     setState(() {
@@ -168,38 +172,44 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                                   }
                                 });
                               },
-                              child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
-                                      child: Row(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 12, bottom: 12, left: 10, right: 0),
-                                            child: Text(DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDeparture ?? DateTime.now())),
-                                          ),
-                                        ],
+                              child: Stack(clipBehavior: Clip.none, children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.blue.shade50,
+                                      borderRadius: BorderRadius.circular(12)),
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 12, bottom: 12, left: 10, right: 0),
+                                        child: Text(DateFormat('d MMMM yyyy', 'ru_RU')
+                                            .format(_dateDeparture ?? DateTime.now())),
                                       ),
-                                    ),
-                                    Positioned(
-                                        left: 11,
-                                        top: -6.5,
-                                        child: Text(
-                                          'Когда увезли',
-                                          style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: Colors.black.withValues(alpha: 0.6)),
-                                        )),
-                                  ]),
+                                    ],
+                                  ),
+                                ),
+                                Positioned(
+                                    left: 11,
+                                    top: -6.5,
+                                    child: Text(
+                                      'Когда увезли',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontStyle: FontStyle.italic,
+                                          color: Colors.black.withValues(alpha: 0.6)),
+                                    )),
+                              ]),
                             ),
                             DropdownButtonFormField<String>(
                               decoration: myDecorationDropdown('Откуда увезли'),
-                              validator: (value) => value == null ? "Обязательное поле" : null,
+                              validator: (value) =>
+                                  value == null ? "Обязательное поле" : null,
                               dropdownColor: Colors.blue.shade50,
                               borderRadius: BorderRadius.circular(10.0),
                               hint: const Text('Последнее местонахождение'),
                               value: _selectedDropdownDislocationOld,
-                              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+                              items: providerModel.namesDislocation
+                                  .map<DropdownMenuItem<String>>((String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,
                                   child: Text(value),
@@ -213,12 +223,14 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                             ),
                             DropdownButtonFormField<String>(
                               decoration: myDecorationDropdown('Статус'),
-                              validator: (value) => value == null ? "Обязательное поле" : null,
+                              validator: (value) =>
+                                  value == null ? "Обязательное поле" : null,
                               dropdownColor: Colors.blue.shade50,
                               borderRadius: BorderRadius.circular(10.0),
                               hint: const Text('Статус'),
                               value: _selectedDropdownStatusOld,
-                              items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+                              items: providerModel.statusForEquipment
+                                  .map<DropdownMenuItem<String>>((String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,
                                   child: Text(value),
@@ -259,18 +271,27 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
       children: [
         GestureDetector(
           onTap: () {
-            TechnicalSupportRepoImpl.downloadData.getTechnic(widget.repair.numberTechnic.toString()).then((technic) {
-              if (technic != null) {
-                _navigationOnTehcnicView(technic);
-              }else{
-                _viewSnackBar(Icons.print, false, '', 'Такой техники нет в базе', false);
-              }
-            });
+            if (widget.repair.numberTechnic != 0) {
+              TechnicalSupportRepoImpl.downloadData
+                  .getTechnic(widget.repair.numberTechnic.toString())
+                  .then((technic) {
+                if (technic != null) {
+                  _navigationOnTechnicView(technic);
+                } else {
+                  _viewSnackBar(
+                      Icons.print, false, '', 'Такой техники нет в базе', false);
+                }
+              });
+            }
           },
           child: CircleAvatar(
+            backgroundColor: widget.repair.numberTechnic == 0 ? Colors.grey : null,
+            foregroundColor: widget.repair.numberTechnic == 0 ? Colors.white : null,
             radius: widget.repair.numberTechnic.toString().length > 4 ? 27 : null,
             child: Text(
-              widget.repair.numberTechnic.toString(),
+              widget.repair.numberTechnic != 0
+                  ? widget.repair.numberTechnic.toString()
+                  : 'БН',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -286,9 +307,11 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
     );
   }
 
-  void _navigationOnTehcnicView(Technic technic) {
+  void _navigationOnTechnicView(Technic technic) {
     Navigator.push(
-        context, animationRouteSlideTransition(TechnicView(location: technic.dislocation, technic: technic)));
+        context,
+        animationRouteSlideTransition(
+            TechnicView(location: technic.dislocation, technic: technic)));
   }
 
   Widget _buildTextSubtitle() {
@@ -298,12 +321,17 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
       children: [
         Text.rich(TextSpan(children: [
           TextSpan(text: 'Жалоба: ', style: TextStyle(fontWeight: FontWeight.bold)),
-          TextSpan(text: widget.repair.complaint != '' ? widget.repair.complaint : 'Данные отсутствуют'),
+          TextSpan(
+              text: widget.repair.complaint != ''
+                  ? widget.repair.complaint
+                  : 'Данные отсутствуют'),
           TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
         ])),
         Row(
           children: [
-            Text(widget.repair.dislocationOld != '' ? widget.repair.dislocationOld : 'Неизвестно откуда забрали'),
+            Text(widget.repair.dislocationOld != ''
+                ? widget.repair.dislocationOld
+                : 'Неизвестно откуда забрали'),
             SizedBox(
               width: 7,
             ),
@@ -318,7 +346,9 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
             SizedBox(
               width: 5,
             ),
-            widget.repair.whoTook != '' ? Text(widget.repair.whoTook) : Icon(Icons.person_off),
+            widget.repair.whoTook != ''
+                ? Text(widget.repair.whoTook)
+                : Icon(Icons.person_off),
           ],
         ),
         Row(children: [
@@ -327,7 +357,9 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
             child: Text.rich(TextSpan(children: [
               TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
               TextSpan(text: 'Статус: '),
-              TextSpan(text: widget.repair.status != '' ? widget.repair.status : 'Отсутствует'),
+              TextSpan(
+                  text:
+                      widget.repair.status != '' ? widget.repair.status : 'Отсутствует'),
             ])),
           ),
           SizedBox(
@@ -347,50 +379,42 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
 
   Future<bool> _save(Repair repair, ProviderModel providerModel) async {
     final bool isFinishedRepair = isFieldsFilledRepair(repair);
-    List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, true);
+    List<Repair>? resultData =
+        await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, true);
     if (resultData != null) {
       if (!isFinishedRepair) {
         providerModel.refreshCurrentRepairs(resultData);
       }
-      Technic? technic = await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
-      if(technic != null){
-        bool isSaveStatus = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technic, providerModel.user.name);
-        if(isSaveStatus){
-          return true;
-        }
-        _viewSnackBar(Icons.print_disabled, false, '', 'Статус и дислокацию техники изменить не удалось. Попробуйте вручную в карточке техники', false);
-        return false;
-      }
-      _viewSnackBar(Icons.print_disabled, false, '', 'Техника с таким номером в базе не обнаружена', false);
       // await addHistory(technic, nameUser);
       return true;
     }
     return false;
   }
 
-  void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar) {
-      if(context.mounted){
-        if(isSkipPrevSnackBar){
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
-                SizedBox(
-                  width: 20,
-                ),
-                Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
-              ],
-            ),
-            duration: const Duration(seconds: 5),
-            showCloseIcon: true,
-          ),
-        );
-        Navigator.pop(context);
-        Navigator.pop(context);
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText,
+      String notSuccessfulText, bool isSkipPrevSnackBar) {
+    if (context.mounted) {
+      if (isSkipPrevSnackBar) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+              SizedBox(
+                width: 20,
+              ),
+              Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
+            ],
+          ),
+          duration: const Duration(seconds: 5),
+          showCloseIcon: true,
+        ),
+      );
+      Navigator.pop(context);
+      Navigator.pop(context);
     }
+  }
 }
