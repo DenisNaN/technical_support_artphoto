@@ -68,6 +68,7 @@ class GridViewHomePage extends StatelessWidget {
                                 alignment: Alignment.centerRight,
                                 child: CircleAvatar(
                                   radius: 12,
+                                  foregroundColor: Colors.white,
                                   backgroundColor: isHeaderRepair ? Colors.green.shade400 : Colors.red.shade400,
                                   child: Text(isHeaderRepair? countTechnics.toString() : countBrokenTechnics.toString()),
                                 ),

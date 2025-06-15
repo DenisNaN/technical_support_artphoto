@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_add.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
@@ -98,6 +100,8 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                       _buildDateFixTroubleEngineer(providerModel),
                       SizedBox(height: 20),
                       _buildFixTroubleEngineer(),
+                      SizedBox(height: 20),
+                      _buildCreateNewRepair(trouble, technic),
                       SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -380,6 +384,21 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCreateNewRepair(Trouble trouble, Technic? technic){
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 80),
+      child: ElevatedButton(
+          onPressed: (){
+            Navigator.push(context, animationRouteFadeTransition(RepairAdd(trouble: trouble, technic: technic,)));
+          },
+          style: const ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(Colors.greenAccent)
+          ),
+          child: const Text('Сформировать заявку на ремонт'),
+      ),
     );
   }
 

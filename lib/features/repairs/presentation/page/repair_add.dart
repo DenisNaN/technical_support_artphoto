@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
+import 'package:technical_support_artphoto/main.dart';
 
 import '../../../technics/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -13,7 +16,10 @@ import '../../../../core/utils/formatters.dart';
 import '../../models/repair.dart';
 
 class RepairAdd extends StatefulWidget {
-  const RepairAdd({super.key});
+  const RepairAdd({super.key, this.trouble, this.technic});
+
+  final Trouble? trouble;
+  final Technic? technic;
 
   @override
   State<RepairAdd> createState() => _RepairAddState();
@@ -32,7 +38,7 @@ class _RepairAddState extends State<RepairAdd> {
   final _diagnosisService = TextEditingController();
   final _recommendationsNotes = TextEditingController();
   String? _selectedDropdownDislocationOld;
-  String? _selectedDropdownStatusOld = 'Неисправна';
+  String? _selectedDropdownStatusOld = 'В ремонте';
   bool isBN = false;
   bool isExistNumber = false;
 
@@ -43,6 +49,18 @@ class _RepairAddState extends State<RepairAdd> {
   @override
   void initState() {
     super.initState();
+    if(widget.trouble != null){
+      _complaint.text = widget.trouble!.trouble;
+      _dislocationOldController.text = widget.trouble!.photosalon;
+      _selectedDropdownDislocationOld = widget.trouble!.photosalon;
+      if(widget.technic != null){
+        _innerNumberTechnic.text = widget.technic!.number.toString();
+        _nameTechnicController.text = widget.technic!.name;
+      }else{
+        isBN = true;
+        _selectedDropdownDislocationOld = widget.trouble!.photosalon;
+      }
+    }
     _dateDeparture = DateTime.now();
   }
 
@@ -103,6 +121,7 @@ class _RepairAddState extends State<RepairAdd> {
                               providerModel.user.name);
 
                           _save(repair, providerModel).then((isSave) {
+                            providerModel.changeCurrentPageMainBottomAppBar(1);
                             _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', scaffoldKey);
                           });
                         }
@@ -417,8 +436,21 @@ class _RepairAddState extends State<RepairAdd> {
   }
 
   Future<bool> _save(Repair repair, ProviderModel providerModel) async{
-    List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
+    List<Repair>? resultData =
+      await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
     if(resultData != null){
+      Technic? technic =
+        await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
+      if (technic != null) {
+        technic.status = repair.status;
+        if(technic.status == 'В ремонте'){
+          technic.dislocation = 'Сергей';
+        }
+        await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technic, providerModel.user.name);
+        Map<String, dynamic> technics = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
+        providerModel.refreshTechnics(
+            technics['Photosalons'], technics['Repairs'], technics['Storages']);
+      }
       providerModel.refreshCurrentRepairs(resultData);
       // await addHistory(technic, nameUser);
       return true;
@@ -470,7 +502,8 @@ class _RepairAddState extends State<RepairAdd> {
           showCloseIcon: true,
         ),
       );
-      Navigator.pop(contextViewSnackBar);
+      Navigator.pushAndRemoveUntil(
+          context, animationRouteSlideTransition(const ArtphotoTech(indexPage: 1,)), (Route<dynamic> route) => false);
     }
     }
 }

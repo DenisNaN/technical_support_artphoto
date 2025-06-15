@@ -37,15 +37,18 @@ class _RepairViewState extends State<RepairView> {
   @override
   void initState() {
     super.initState();
-    _selectedDropdownService = widget.repair.serviceDislocation != '' ? widget.repair.serviceDislocation : null;
+    _selectedDropdownService =
+        widget.repair.serviceDislocation != '' ? widget.repair.serviceDislocation : null;
     _dateTransferInService = widget.repair.dateTransferInService;
     _dateDepartureFromService = widget.repair.dateDepartureFromService;
     _worksPerformed.text = widget.repair.worksPerformed ?? '';
     _costService.text = widget.repair.costService.toString();
     _diagnosisService.text = widget.repair.diagnosisService ?? '';
     _recommendationsNotes.text = widget.repair.recommendationsNotes ?? '';
-    _selectedDropdownStatusNew = widget.repair.newStatus != '' ? widget.repair.newStatus : null;
-    _selectedDropdownDislocationNew = widget.repair.newDislocation != '' ? widget.repair.newDislocation : null;
+    _selectedDropdownStatusNew =
+        widget.repair.newStatus != '' ? widget.repair.newStatus : null;
+    _selectedDropdownDislocationNew =
+        widget.repair.newDislocation != '' ? widget.repair.newDislocation : null;
     _dateReceipt = widget.repair.dateReceipt;
   }
 
@@ -76,7 +79,8 @@ class _RepairViewState extends State<RepairView> {
     Color colorStepTwoRepair = _getColorStepTwoRepair();
     Color colorStepThreeRepair = _getColorStepThreeRepair();
     return Scaffold(
-        appBar: CustomAppBar(typePage: TypePage.viewRepair, location: widget.repair, technic: null),
+        appBar: CustomAppBar(
+            typePage: TypePage.viewRepair, location: widget.repair, technic: null),
         body: Form(
           child: ListView(
             children: [
@@ -92,7 +96,9 @@ class _RepairViewState extends State<RepairView> {
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Container(
                     padding: EdgeInsets.symmetric(vertical: 20),
-                    decoration: BoxDecoration(color: colorStepTwoRepair, borderRadius: BorderRadius.circular(30)),
+                    decoration: BoxDecoration(
+                        color: colorStepTwoRepair,
+                        borderRadius: BorderRadius.circular(30)),
                     child: Column(spacing: 10, children: [
                       _buildServices(providerModel),
                       _buildDateTransferInService(),
@@ -112,7 +118,9 @@ class _RepairViewState extends State<RepairView> {
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Container(
                     padding: EdgeInsets.symmetric(vertical: 20),
-                    decoration: BoxDecoration(color: colorStepThreeRepair, borderRadius: BorderRadius.circular(30)),
+                    decoration: BoxDecoration(
+                        color: colorStepThreeRepair,
+                        borderRadius: BorderRadius.circular(30)),
                     child: Column(
                       spacing: 10,
                       children: [
@@ -135,7 +143,8 @@ class _RepairViewState extends State<RepairView> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                    style:
+                        ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
                     child: Text("Отмена"),
                   ),
                   ElevatedButton(
@@ -163,28 +172,42 @@ class _RepairViewState extends State<RepairView> {
                           widget.repair.idTestDrive,
                         );
 
-                        _save(repair, providerModel).then((TypeMessageForSaveRepairView value) {
-                          try{
+                        _save(repair, providerModel)
+                            .then((TypeMessageForSaveRepairView value) {
+                          try {
                             switch (value) {
                               case TypeMessageForSaveRepairView.successSaveRepair:
-                                _viewSnackBar(Icons.save, true, 'Заявка изменена', '', true, repair);
+                                _viewSnackBar(Icons.save, true, 'Заявка изменена', '',
+                                    true, repair);
                               case TypeMessageForSaveRepairView.notSuccessSaveRepair:
-                                _viewSnackBar(Icons.save, false, '', 'Заявка не изменена', true, repair);
+                                _viewSnackBar(Icons.save, false, '', 'Заявка не изменена',
+                                    true, repair);
                               case TypeMessageForSaveRepairView.notSuccessSaveStatus:
                                 _viewSnackBar(
                                     Icons.print_disabled,
                                     false,
                                     '',
                                     'Статус и дислокацию техники изменить не удалось. Попробуйте вручную в карточке техники',
-                                    false, repair);
+                                    false,
+                                    repair);
                               case TypeMessageForSaveRepairView.notWriteAllFieldStatus:
                                 _viewSnackBar(
-                                    Icons.print_disabled, false, '', 'Статус или дислокация не заполенены.\n', false, repair);
+                                    Icons.print_disabled,
+                                    false,
+                                    '',
+                                    'Статус или дислокация не заполенены.\n',
+                                    false,
+                                    repair);
                               case TypeMessageForSaveRepairView.notCheckTechnicInDB:
-                                _viewSnackBar(Icons.print_disabled, false, '',
-                                    'Техника с таким номером в базе не обнаружена', false, repair);
+                                _viewSnackBar(
+                                    Icons.print_disabled,
+                                    false,
+                                    '',
+                                    'Техника с таким номером в базе не обнаружена',
+                                    false,
+                                    repair);
                             }
-                          }catch(e){
+                          } catch (e) {
                             debugPrint(e.toString());
                           }
                         });
@@ -201,8 +224,9 @@ class _RepairViewState extends State<RepairView> {
   }
 
   Color _getColorStepTwoRepair() {
-    bool isDateTransferInService = _dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
-        _dateTransferInService.toString() == "0001-11-30 00:00:00.000Z";
+    bool isDateTransferInService =
+        _dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
+            _dateTransferInService.toString() == "0001-11-30 00:00:00.000Z";
     if (_selectedDropdownService == null || isDateTransferInService) {
       return Colors.yellow.shade200;
     }
@@ -210,10 +234,15 @@ class _RepairViewState extends State<RepairView> {
   }
 
   Color _getColorStepThreeRepair() {
-    bool isDateDepartureFormService = _dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000Z"  ||
-        _dateDepartureFromService.toString() == "0001-11-30 00:00:00.000Z" ? true : false;
+    bool isDateDepartureFormService =
+        _dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000Z" ||
+                _dateDepartureFromService.toString() == "0001-11-30 00:00:00.000Z"
+            ? true
+            : false;
     bool isDateReceipt = _dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" ||
-        _dateReceipt.toString() == "0001-11-30 00:00:00.000Z" ? true : false;
+            _dateReceipt.toString() == "0001-11-30 00:00:00.000Z"
+        ? true
+        : false;
 
     if (!isDateDepartureFormService &&
         _worksPerformed.text != '' &&
@@ -231,7 +260,8 @@ class _RepairViewState extends State<RepairView> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: const [
+        decoration:
+            BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: const [
           BoxShadow(
             color: Colors.grey,
             blurRadius: 4,
@@ -302,8 +332,10 @@ class _RepairViewState extends State<RepairView> {
             onTap: () {
               showDatePicker(
                       context: context,
-                      initialDate: _dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
-                          _dateTransferInService.toString() == "0001-11-30 00:00:00.000Z"
+                      initialDate: _dateTransferInService.toString() ==
+                                  "-0001-11-30 00:00:00.000Z" ||
+                              _dateTransferInService.toString() ==
+                                  "0001-11-30 00:00:00.000Z"
                           ? DateTime.now()
                           : _dateTransferInService,
                       firstDate: DateTime(2000),
@@ -318,15 +350,19 @@ class _RepairViewState extends State<RepairView> {
               });
             },
             child: Container(
-              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                  color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
               child: Row(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
-                    child: Text(_dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
-                        _dateTransferInService.toString() == "0001-11-30 00:00:00.000Z"
+                    child: Text(_dateTransferInService.toString() ==
+                                "-0001-11-30 00:00:00.000Z" ||
+                            _dateTransferInService.toString() ==
+                                "0001-11-30 00:00:00.000Z"
                         ? 'Дата отсутствует'
-                        : DateFormat('d MMMM yyyy', 'ru_RU').format(_dateTransferInService ?? DateTime.now())),
+                        : DateFormat('d MMMM yyyy', 'ru_RU')
+                            .format(_dateTransferInService ?? DateTime.now())),
                   ),
                 ],
               ),
@@ -357,7 +393,10 @@ class _RepairViewState extends State<RepairView> {
             onTap: () {
               showDatePicker(
                       context: context,
-                      initialDate: _dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000Z" || _dateDepartureFromService.toString() == "0001-11-30 00:00:00.000Z"
+                      initialDate: _dateDepartureFromService.toString() ==
+                                  "-0001-11-30 00:00:00.000Z" ||
+                              _dateDepartureFromService.toString() ==
+                                  "0001-11-30 00:00:00.000Z"
                           ? DateTime.now()
                           : _dateDepartureFromService,
                       firstDate: DateTime(2000),
@@ -372,14 +411,19 @@ class _RepairViewState extends State<RepairView> {
               });
             },
             child: Container(
-              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                  color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
               child: Row(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
-                    child: Text(_dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000Z" || _dateDepartureFromService.toString() == "0001-11-30 00:00:00.000Z"
+                    child: Text(_dateDepartureFromService.toString() ==
+                                "-0001-11-30 00:00:00.000Z" ||
+                            _dateDepartureFromService.toString() ==
+                                "0001-11-30 00:00:00.000Z"
                         ? 'Дата отсутствует'
-                        : DateFormat('d MMMM yyyy', 'ru_RU').format(_dateDepartureFromService ?? DateTime.now())),
+                        : DateFormat('d MMMM yyyy', 'ru_RU')
+                            .format(_dateDepartureFromService ?? DateTime.now())),
                   ),
                 ],
               ),
@@ -519,7 +563,8 @@ class _RepairViewState extends State<RepairView> {
             borderRadius: BorderRadius.circular(10.0),
             hint: const Text('Новый статус'),
             value: _selectedDropdownStatusNew,
-            items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+            items: providerModel.statusForEquipment
+                .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(value),
@@ -537,7 +582,8 @@ class _RepairViewState extends State<RepairView> {
   }
 
   Widget _buildNewDislocation(ProviderModel providerModel) {
-    if(_selectedDropdownDislocationNew == '' || _selectedDropdownDislocationNew == null){
+    if (_selectedDropdownDislocationNew == '' ||
+        _selectedDropdownDislocationNew == null) {
       _selectedDropdownDislocationNew = validateDropdownDislocationNew(providerModel);
     }
     return Column(
@@ -561,7 +607,8 @@ class _RepairViewState extends State<RepairView> {
             borderRadius: BorderRadius.circular(10.0),
             hint: const Text('Куда уехал'),
             value: _selectedDropdownDislocationNew,
-            items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+            items: providerModel.namesDislocation
+                .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(value),
@@ -599,7 +646,10 @@ class _RepairViewState extends State<RepairView> {
               showDatePicker(
                       context: context,
                       initialDate:
-                          _dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" || _dateReceipt.toString() == "0001-11-30 00:00:00.000Z" ? DateTime.now() : _dateReceipt,
+                          _dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" ||
+                                  _dateReceipt.toString() == "0001-11-30 00:00:00.000Z"
+                              ? DateTime.now()
+                              : _dateReceipt,
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2099),
                       locale: const Locale("ru", "RU"))
@@ -612,14 +662,17 @@ class _RepairViewState extends State<RepairView> {
               });
             },
             child: Container(
-              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                  color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
               child: Row(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
-                    child: Text(_dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" || _dateReceipt.toString() == "0001-11-30 00:00:00.000Z"
+                    child: Text(_dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" ||
+                            _dateReceipt.toString() == "0001-11-30 00:00:00.000Z"
                         ? 'Дата отсутствует'
-                        : DateFormat('d MMMM yyyy', 'ru_RU').format(_dateReceipt ?? DateTime.now())),
+                        : DateFormat('d MMMM yyyy', 'ru_RU')
+                            .format(_dateReceipt ?? DateTime.now())),
                   ),
                 ],
               ),
@@ -630,39 +683,44 @@ class _RepairViewState extends State<RepairView> {
     );
   }
 
-  Future<TypeMessageForSaveRepairView> _save(Repair repair, ProviderModel providerModel) async {
-    if((repair.newStatus != null && repair.newDislocation != null) || (repair.newStatus == null && repair.newDislocation == null)){
-      List<Repair>? resultData = await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, false);
-      bool isFinishedRepair = isFieldsFilledRepair(repair);
+  Future<TypeMessageForSaveRepairView> _save(
+      Repair repair, ProviderModel providerModel) async {
+    if ((repair.newStatus != null && repair.newDislocation != null) ||
+        (repair.newStatus == null && repair.newDislocation == null)) {
+      List<Repair>? resultData =
+          await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, false);
       if (resultData != null) {
-        if(repair.newStatus == null && repair.newDislocation == null){
-          providerModel.refreshCurrentRepairs(resultData);
-          return TypeMessageForSaveRepairView.successSaveRepair;
-        }
-        Technic? technic = await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
+        Technic? technic = await TechnicalSupportRepoImpl.downloadData
+            .getTechnic(repair.numberTechnic.toString());
         if (technic != null) {
-          technic.status = repair.newStatus!;
-          technic.dislocation = repair.newDislocation!;
+          if (technic.status == 'В ремонте') {
+            technic.dislocation = repair.serviceDislocation!;
+          }
+          if (repair.newStatus != null && repair.newDislocation != null) {
+            technic.status = repair.newStatus!;
+            technic.dislocation = repair.newDislocation!;
+          }
           bool isSaveStatusTechnic = await TechnicalSupportRepoImpl.downloadData
               .updateStatusAndDislocationTechnic(technic, providerModel.user.name);
           if (isSaveStatusTechnic) {
-            Map<String, dynamic> resultDataRefTech = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
-            if (!isFinishedRepair) {
-              providerModel..
-                          refreshTechnics(resultDataRefTech['Photosalons'], resultDataRefTech['Repairs'], resultDataRefTech['Storages'])..
-                          refreshCurrentRepairs(resultData);
-            }
+            Map<String, dynamic> resultDataRefTech =
+                await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
+            providerModel
+              ..refreshTechnics(resultDataRefTech['Photosalons'],
+                  resultDataRefTech['Repairs'], resultDataRefTech['Storages'])
+              ..refreshCurrentRepairs(resultData);
+
             return TypeMessageForSaveRepairView.successSaveRepair;
-          }else{
+          } else {
             return TypeMessageForSaveRepairView.notSuccessSaveStatus;
           }
-        }else{
+        } else {
           return TypeMessageForSaveRepairView.notCheckTechnicInDB;
         }
-      }else{
+      } else {
         return TypeMessageForSaveRepairView.notSuccessSaveRepair;
       }
-    }else{
+    } else {
       return TypeMessageForSaveRepairView.notWriteAllFieldStatus;
     }
     // await addHistory(technic, nameUser);
@@ -692,8 +750,8 @@ class _RepairViewState extends State<RepairView> {
   //   return result;
   // }
 
-  void _viewSnackBar(
-      IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar, Repair repair) {
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText,
+      String notSuccessfulText, bool isSkipPrevSnackBar, Repair repair) {
     if (context.mounted) {
       final providerModel = Provider.of<ProviderModel>(context, listen: false);
       if (isSkipPrevSnackBar) {
@@ -715,11 +773,16 @@ class _RepairViewState extends State<RepairView> {
           showCloseIcon: true,
         ),
       );
-      if((repair.newStatus == null && repair.newDislocation != null) ||
-          (repair.newStatus != null && repair.newDislocation == null)){}else{
+      if ((repair.newStatus == null && repair.newDislocation != null) ||
+          (repair.newStatus != null && repair.newDislocation == null)) {
+      } else {
         providerModel.changeCurrentPageMainBottomAppBar(1);
         Navigator.pushAndRemoveUntil(
-            context, animationRouteSlideTransition(const ArtphotoTech(indexPage: 1,)), (Route<dynamic> route) => false);
+            context,
+            animationRouteSlideTransition(const ArtphotoTech(
+              indexPage: 1,
+            )),
+            (Route<dynamic> route) => false);
       }
     }
   }

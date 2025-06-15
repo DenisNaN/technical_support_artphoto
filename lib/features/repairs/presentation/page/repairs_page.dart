@@ -177,7 +177,7 @@ class _RepairsPageState extends State<RepairsPage> {
     if (repair.numberTechnic != -1 || repair.numberTechnic != 0) {
       return Text.rich(TextSpan(children: [
         TextSpan(
-            text: '№ ${repair.numberTechnic}. ${repair.category}.\n',
+            text: '№ ${repair.numberTechnic != 0 ? repair.numberTechnic : 'БН'}. ${repair.category}.\n',
             style: const TextStyle(fontWeight: FontWeight.bold)),
         TextSpan(text: 'Жалоба: $repairComplaint')
       ]));

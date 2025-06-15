@@ -378,7 +378,15 @@ class _TechnicAddState extends State<TechnicAdd> {
               }).toList(),
               onChanged: (String? value) {
                 setState(() {
-                  _selectedDropdownStatus = value!;
+                  if(value != null && _selectedDropdownStatus != 'В ремонте' &&
+                      value == 'В ремонте'){
+                    _selectedDropdownDislocation = null;
+                    _selectedDropdownStatus = value;
+                  }else if(value != null && _selectedDropdownStatus == 'В ремонте' &&
+                      value != 'В ремонте'){
+                    _selectedDropdownDislocation = null;
+                    _selectedDropdownStatus = value;
+                  }
                 });
               },
             ),
@@ -410,7 +418,13 @@ class _TechnicAddState extends State<TechnicAdd> {
               hint: const Text('Дислокация'),
               value: _selectedDropdownDislocation,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+              items: _selectedDropdownStatus == 'В ремонте' ? providerModel.services.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList() :
+              providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
