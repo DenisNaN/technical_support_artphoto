@@ -76,8 +76,12 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
             future: TechnicalSupportRepoImpl.downloadData
                 .getTechnic(trouble.numberTechnic.toString()),
             builder: (context, AsyncSnapshot<dynamic> snapshot) {
-              if (snapshot.hasData) {
-                Technic technic = snapshot.data;
+              if (snapshot.hasData || !snapshot.hasData) {
+                Technic? technic;
+                bool isTechnicNull = !snapshot.hasData;
+                if(!isTechnicNull){
+                  technic = snapshot.data;
+                }
                 return Form(
                   key: formKey,
                   child: ListView(
@@ -135,8 +139,8 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                                 }
 
                                 _save(troubleNew, providerModel).then((isSave) {
-                                  _viewSnackBar(Icons.save, isSave, 'Изменения приняты',
-                                      'Изменения не приняты', false);
+                                  _viewSnackBar(Icons.save, isSave, 'Изменения сохранены',
+                                      'Изменения не сохранены', false);
                                 });
                               },
                               child: const Text("Сохранить")),
@@ -241,18 +245,6 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                     _dateFixTroubleEmployee = DateTime.tryParse("-0001-11-30 00:00:00.000Z");
                     _fixTroubleEmployee.text = '';
                   });
-                  Trouble troubleNew = trouble;
-                  troubleNew.dateFixTroubleEmployee = null;
-                  troubleNew.fixTroubleEmployee = null;
-                  try {
-                    TechnicalSupportRepoImpl.downloadData.updateTrouble(troubleNew).then((resultData){
-                      if (resultData != null) {
-                        providerModel.refreshTroubles(resultData);
-                      }
-                    });
-                  } catch (e) {
-                    debugPrint(e.toString());
-                  }
                 }, icon: Icon(Icons.close, color: Colors.red,))
               ],
             ),
@@ -350,18 +342,6 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                         _dateFixTroubleEngineer = DateTime.tryParse("-0001-11-30 00:00:00.000Z");
                         _fixTroubleEngineer.text = '';
                       });
-                      Trouble troubleNew = trouble;
-                      troubleNew.dateFixTroubleEngineer = null;
-                      troubleNew.fixTroubleEngineer = null;
-                      try {
-                        TechnicalSupportRepoImpl.downloadData.updateTrouble(troubleNew).then((resultData){
-                          if (resultData != null) {
-                            providerModel.refreshTroubles(resultData);
-                          }
-                        });
-                      } catch (e) {
-                        debugPrint(e.toString());
-                      }
                     }, icon: Icon(Icons.close, color: Colors.red,))
               ],
             ),
@@ -592,10 +572,6 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
     bool isEmptyEngineer = trouble.fixTroubleEngineer == null ||
         trouble.fixTroubleEngineer == '';
 
-    if(isEmptyDateEmployee && isEmptyEmployee && isEmptyDateEngineer &&
-        isEmptyEngineer) {
-      return false;
-    }
     if((isEmptyDateEmployee && !isEmptyEmployee) ||
         (!isEmptyDateEmployee && isEmptyEmployee)) {
       _viewSnackBar(Icons.save, false, '', 'Заполните и дату, и сотрудника', false);

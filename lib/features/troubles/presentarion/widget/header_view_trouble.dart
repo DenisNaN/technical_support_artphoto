@@ -15,7 +15,7 @@ class HeaderViewTrouble extends StatefulWidget {
   const HeaderViewTrouble({super.key, required this.trouble, required this.technic});
 
   final Trouble trouble;
-  final Technic technic;
+  final Technic? technic;
 
   @override
   State<HeaderViewTrouble> createState() => _HeaderViewTroubleState();
@@ -70,20 +70,29 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
                                           employee: _employee.text,
                                           numberTechnic: int.parse(_numberTechnic.text),
                                           trouble: _complaint.text);
-                                      trouble.dateFixTroubleEmployee = widget.trouble.dateFixTroubleEmployee;
-                                      trouble.fixTroubleEmployee = widget.trouble.fixTroubleEmployee;
-                                      trouble.dateFixTroubleEngineer = widget.trouble.dateFixTroubleEngineer;
-                                      trouble.fixTroubleEngineer = widget.trouble.fixTroubleEngineer;
+                                      trouble.dateFixTroubleEmployee =
+                                          widget.trouble.dateFixTroubleEmployee;
+                                      trouble.fixTroubleEmployee =
+                                          widget.trouble.fixTroubleEmployee;
+                                      trouble.dateFixTroubleEngineer =
+                                          widget.trouble.dateFixTroubleEngineer;
+                                      trouble.fixTroubleEngineer =
+                                          widget.trouble.fixTroubleEngineer;
                                       trouble.photoTrouble = widget.trouble.photoTrouble;
 
                                       _save(trouble, providerModel).then((value) {
                                         _viewSnackBar(
-                                            Icons.save, value, 'Неисправность изменена', 'Неисправность не изменена', true);
+                                            Icons.save,
+                                            value,
+                                            'Неисправность изменена',
+                                            'Неисправность не изменена',
+                                            true);
                                       });
                                     },
                                     child: Text('Сохранить')))
                           ],
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(10))),
                           title: Text('Редактировать неисправность'),
                           titleTextStyle: Theme.of(context).textTheme.headlineMedium,
                           content: SingleChildScrollView(
@@ -92,7 +101,8 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
                               spacing: 20,
                               children: [
                                 TextFormField(
-                                  decoration: myDecorationTextFormField('Жалоба', 'Жалоба'),
+                                  decoration:
+                                      myDecorationTextFormField('Жалоба', 'Жалоба'),
                                   controller: _complaint,
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -104,11 +114,13 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
                                 ),
                                 DropdownButtonFormField<String>(
                                   decoration: myDecorationDropdown('Откуда увезли'),
-                                  validator: (value) => value == null ? "Обязательное поле" : null,
+                                  validator: (value) =>
+                                      value == null ? "Обязательное поле" : null,
                                   borderRadius: BorderRadius.circular(10.0),
                                   hint: const Text('Последнее местонахождение'),
                                   value: _selectedDropdownDislocation,
-                                  items: providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
+                                  items: providerModel.namesDislocation
+                                      .map<DropdownMenuItem<String>>((String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Text(value),
@@ -121,7 +133,8 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
                                   },
                                 ),
                                 TextFormField(
-                                  decoration: myDecorationTextFormField('Сотрудник', 'Сотрудник'),
+                                  decoration:
+                                      myDecorationTextFormField('Сотрудник', 'Сотрудник'),
                                   controller: _employee,
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -149,13 +162,15 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
                                   child: Stack(clipBehavior: Clip.none, children: [
                                     Container(
                                       decoration: BoxDecoration(
-                                          color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+                                          color: Colors.blue.shade50,
+                                          borderRadius: BorderRadius.circular(12)),
                                       child: Row(
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 12, bottom: 12, left: 10, right: 0),
-                                            child: Text(
-                                                DateFormat('d MMMM yyyy', 'ru_RU').format(_dateTrouble ?? DateTime.now())),
+                                            padding: const EdgeInsets.only(
+                                                top: 12, bottom: 12, left: 10, right: 0),
+                                            child: Text(DateFormat('d MMMM yyyy', 'ru_RU')
+                                                .format(_dateTrouble ?? DateTime.now())),
                                           ),
                                         ],
                                       ),
@@ -187,25 +202,30 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
     );
   }
 
-  Widget _buildTextTitle(Technic technic) {
+  Widget _buildTextTitle(Technic? technic) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Row(
         children: [
           GestureDetector(
             onTap: () {
-              TechnicalSupportRepoImpl.downloadData.getTechnic(widget.trouble.numberTechnic.toString()).then((technic) {
-                if (technic != null) {
-                  _navigationOnTehcnicView(technic);
-                } else {
-                  _viewSnackBar(Icons.print, false, '', 'Такой техники нет в базе', false);
-                }
-              });
+              if (technic != null) {
+                TechnicalSupportRepoImpl.downloadData
+                    .getTechnic(widget.trouble.numberTechnic.toString())
+                    .then((technic) {
+                  if (technic != null) {
+                    _navigationOnTehcnicView(technic);
+                  } else {
+                    _viewSnackBar(
+                        Icons.print, false, '', 'Такой техники нет в базе', false);
+                  }
+                });
+              }
             },
             child: CircleAvatar(
               radius: widget.trouble.numberTechnic.toString().length > 4 ? 27 : null,
-              child: Text(
-                widget.trouble.numberTechnic.toString(),
+              child: Text(technic != null ?
+                widget.trouble.numberTechnic.toString() : 'БН',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -213,7 +233,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
           SizedBox(
             width: 10,
           ),
-          Column(
+          technic != null ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -222,7 +242,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
               ),
               Text(technic.name)
             ],
-          ),
+          ) : Text('Техника без номера'),
         ],
       ),
     );
@@ -230,7 +250,9 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
 
   void _navigationOnTehcnicView(Technic technic) {
     Navigator.push(
-        context, animationRouteSlideTransition(TechnicView(location: technic.dislocation, technic: technic)));
+        context,
+        animationRouteSlideTransition(
+            TechnicView(location: technic.dislocation, technic: technic)));
   }
 
   Widget _buildTextSubtitle() {
@@ -239,13 +261,19 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text.rich(TextSpan(children: [
-          TextSpan(text: 'Жалоба: ', style: TextStyle(fontWeight: FontWeight.bold)),
-          TextSpan(text: widget.trouble.trouble != '' ? widget.trouble.trouble : 'Данные отсутствуют'),
+          TextSpan(text: 'Жалоба: ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          TextSpan(
+              text: widget.trouble.trouble != ''
+                  ? widget.trouble.trouble
+                  : 'Данные отсутствуют',
+          style: TextStyle(fontSize: 18)),
           TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
         ])),
         Row(
           children: [
-            Text(widget.trouble.photosalon != '' ? widget.trouble.photosalon : 'Неизвестно, где неисправность'),
+            Text(widget.trouble.photosalon != ''
+                ? widget.trouble.photosalon
+                : 'Неизвестно, где неисправность'),
             SizedBox(
               width: 7,
             ),
@@ -256,7 +284,9 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
             SizedBox(
               width: 5,
             ),
-            widget.trouble.employee != '' ? Text(widget.trouble.employee) : Icon(Icons.person_off),
+            widget.trouble.employee != ''
+                ? Text(widget.trouble.employee)
+                : Icon(Icons.person_off),
           ],
         ),
         Row(children: [
@@ -274,7 +304,8 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
 
   Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
     final bool isFinishedTrouble = isFieldsFilledTrouble(trouble);
-    List<Trouble>? resultData = await TechnicalSupportRepoImpl.downloadData.updateTrouble(trouble);
+    List<Trouble>? resultData =
+        await TechnicalSupportRepoImpl.downloadData.updateTrouble(trouble);
     if (resultData != null) {
       if (!isFinishedTrouble) {
         providerModel.refreshTroubles(resultData);
@@ -285,8 +316,8 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
     return false;
   }
 
-  void _viewSnackBar(
-      IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar) {
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText,
+      String notSuccessfulText, bool isSkipPrevSnackBar) {
     if (context.mounted) {
       if (isSkipPrevSnackBar) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();

@@ -31,3 +31,12 @@ bool isFieldsFilledTrouble(Trouble trouble){
     }
     return true;
 }
+
+bool isFieldEmployeeFilledTrouble(Trouble trouble) {
+    bool result = false;
+    if (trouble.dateFixTroubleEmployee.toString() != "-0001-11-30 00:00:00.000Z" &&
+        trouble.dateFixTroubleEmployee.toString() != "0001-11-30 00:00:00.000Z") {
+        result = true;
+    }
+    return result;
+}
