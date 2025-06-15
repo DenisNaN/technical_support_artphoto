@@ -109,8 +109,8 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
                           );
                           if(imageFile != null) {
                             _photoTrouble = _decoderPhotoToBlob(imageFile!);
+                            trouble.photoTrouble = _photoTrouble;
                           }
-                          trouble.photoTrouble = _photoTrouble;
 
                           _save(trouble, providerModel).then((isSave) {
                             _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', scaffoldKey);
@@ -333,7 +333,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
           child: Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
-              'Дата, когда забрали',
+              'Дата неисправности',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),

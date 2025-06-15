@@ -5,9 +5,11 @@ import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
+import 'package:technical_support_artphoto/core/shared/is_fields_filled.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/my_custom_refresh_indicator.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_add.dart';
+import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_view.dart';
 import 'package:technical_support_artphoto/features/troubles/presentarion/widget/menu_troubles_page.dart';
 
 import '../../../../core/shared/custom_app_bar/custom_app_bar.dart';
@@ -63,7 +65,8 @@ class _TroublesPageState extends State<TroublesPage> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 itemCount: troubles.length,
                 itemBuilder: (context, index) {
-                  bool isDoneTrouble = isFieldFilled(troubles[index]);
+                  bool isDoneTrouble = isFieldEmployeeFilledTrouble(troubles[index]);
+                  Trouble trouble = troubles[index];
                   return Container(
                     margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
                     decoration: BoxDecoration(
@@ -78,7 +81,10 @@ class _TroublesPageState extends State<TroublesPage> {
                           ),
                         ]),
                     child: ListTile(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(context,
+                              animationRouteSlideTransition(TroubleView(troubleMain: trouble)));
+                        },
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                         title: _buildTitleListTile(context, index, troubles)),
                   );
@@ -97,7 +103,8 @@ class _TroublesPageState extends State<TroublesPage> {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: troubles.length,
                     itemBuilder: (context, index) {
-                      bool isDoneTrouble = isFieldFilled(troubles[index]);
+                      bool isDoneTrouble = isFieldEmployeeFilledTrouble(troubles[index]);
+                      Trouble trouble = troubles[index];
                       return Container(
                         margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
                         decoration: BoxDecoration(
@@ -112,7 +119,10 @@ class _TroublesPageState extends State<TroublesPage> {
                               ),
                             ]),
                         child: ListTile(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(context,
+                                  animationRouteSlideTransition(TroubleView(troubleMain: trouble)));
+                            },
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                             title: _buildTitleListTile(context, index, troubles)),
                       );
@@ -154,14 +164,9 @@ class _TroublesPageState extends State<TroublesPage> {
   Row _buildTitleListTile(BuildContext context, int index, List<Trouble> troubles) {
     bool checkboxValueEngineer;
     bool checkboxValueEmployee;
-    bool checkboxValuePhoto = false;
 
     troubles[index].fixTroubleEngineer.toString() != '' ? checkboxValueEngineer = true : checkboxValueEngineer = false;
     troubles[index].fixTroubleEmployee.toString() != '' ? checkboxValueEmployee = true : checkboxValueEmployee = false;
-
-    troubles[index].photoTrouble != null && troubles[index].photoTrouble!.isNotEmpty
-        ? checkboxValuePhoto = true
-        : checkboxValuePhoto = false;
 
     return Row(
       children: [
@@ -173,8 +178,8 @@ class _TroublesPageState extends State<TroublesPage> {
                 text: troubles[index].numberTechnic != 0 ? '№ ${troubles[index].numberTechnic} ' : 'БН '),
             TextSpan(
                 style: const TextStyle(fontWeight: FontWeight.bold),
-                text: '${troubles[index].photosalon} '
-                    '${troubles[index].employee}\n'),
+                text: '${troubles[index].photosalon} '),
+            TextSpan(text: '${troubles[index].employee}\n'),
             TextSpan(
                 style: const TextStyle(fontStyle: FontStyle.italic),
                 text: '${DateFormat('d MMMM yyyy', "ru_RU").format(troubles[index].dateTrouble)}\n'),
@@ -183,7 +188,10 @@ class _TroublesPageState extends State<TroublesPage> {
               WidgetSpan(
                   child: Row(children: [
                 const Text('Фото: '),
-                SizedBox(width: 30, height: 10, child: Checkbox(value: checkboxValuePhoto, onChanged: null)),
+                troubles[index].photoTrouble != null &&
+                    troubles[index].photoTrouble!.isNotEmpty ?
+                Icon(Icons.check_circle, color: Colors.green,) :
+                Icon(Icons.close, color: Colors.red, )
               ]))
             ])
           ],
@@ -202,14 +210,5 @@ class _TroublesPageState extends State<TroublesPage> {
         )
       ],
     );
-  }
-
-  bool isFieldFilled(Trouble trouble) {
-    bool result = false;
-    if (trouble.dateFixTroubleEmployee.toString() != "-0001-11-30 00:00:00.000Z" &&
-        trouble.dateFixTroubleEmployee.toString() != "0001-11-30 00:00:00.000Z") {
-      result = true;
-    }
-    return result;
   }
 }

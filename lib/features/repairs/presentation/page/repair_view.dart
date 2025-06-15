@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
-import 'package:technical_support_artphoto/core/shared/technic_image/is_fields_filled.dart';
+import 'package:technical_support_artphoto/core/shared/is_fields_filled.dart';
 import '../../../technics/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
@@ -227,23 +227,19 @@ class _RepairViewState extends State<RepairView> {
     return Colors.yellow.shade200;
   }
 
-  Column _headerData() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: const [
-              BoxShadow(
-                color: Colors.grey,
-                blurRadius: 4,
-                offset: Offset(2, 4), // Shadow position
-              ),
-            ]),
-            child: FirstStepRepairDesc(repair: widget.repair),
+  Widget _headerData() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      child: Container(
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: const [
+          BoxShadow(
+            color: Colors.grey,
+            blurRadius: 4,
+            offset: Offset(2, 4), // Shadow position
           ),
-        ),
-      ],
+        ]),
+        child: FirstStepRepairDesc(repair: widget.repair),
+      ),
     );
   }
 

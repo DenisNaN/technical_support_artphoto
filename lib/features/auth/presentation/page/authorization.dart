@@ -143,6 +143,7 @@ class _AuthorizationState extends State<Authorization> {
                                     if (user != null) {
                                       String? imagePath = localServices.getUser()?.imagePath;
                                       User userModel = User(user.name, user.access, isSavePassword, imagePath);
+                                      localServices.saveUser(userModel);
                                       providerModel.updateUser(userModel);
                                       _navigationForNextPage();
                                     } else {

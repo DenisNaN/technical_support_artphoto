@@ -204,7 +204,7 @@ class HistoryTechnicPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: Icon(Icons.arrow_downward),
+            child: Icon(Icons.arrow_upward),
           ),
         ],
       ),
