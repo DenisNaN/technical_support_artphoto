@@ -1,23 +1,27 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/core/domain/models/providerModel.dart';
-import 'package:technical_support_artphoto/features/history/history_list.dart';
-import 'package:technical_support_artphoto/features/navigation/main_bottom_app_bar.dart';
-import 'package:technical_support_artphoto/core/utils/utils.dart' as utils;
-import 'package:technical_support_artphoto/features/presentation/home_page.dart';
-import 'package:technical_support_artphoto/features/start_screens/splash_screen.dart';
+import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
+import 'package:technical_support_artphoto/core/di/init_dependencies.dart';
+import 'package:technical_support_artphoto/core/navigation/main_bottom_page_view.dart';
+import 'package:technical_support_artphoto/features/splash_screen/presentation/page/splash_screen.dart';
+import 'core/navigation/main_bottom_app_bar.dart';
 
 void main() {
-  startMeUp() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    utils.packageInfo = packageInfo;
-    runApp(ChangeNotifierProvider(create: (_) => ProviderModel(), child: SplashScreenArtphoto()));
-  }
-  startMeUp();
+  runZonedGuarded<Future<void>>(
+        () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      await initDependencies();
+
+      runApp(const SplashScreenArtphoto());
+    },
+        (Object error, StackTrace stack) {
+      debugPrint('ARTPHOTO [CrashEvent] [DEBUG] $error\n$stack');
+    },
+  );
 }
 
 class SplashScreenArtphoto extends StatelessWidget {
@@ -25,128 +29,100 @@ class SplashScreenArtphoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate
-        ],
-        home: const SplashScreen(),
-        theme: ThemeData(
-          useMaterial3: false,
-          textTheme: TextTheme(
-            headlineMedium: GoogleFonts.philosopher(
-              fontSize: 21,
-              color: Colors.black54,
-              fontWeight: FontWeight.w700,
-              fontStyle: FontStyle.italic,
+    return ChangeNotifierProvider(
+      create: (_) => ProviderModel(),
+      child: MaterialApp(
+          localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+          home: const SplashScreen(),
+          theme: ThemeData(
+            useMaterial3: false,
+            textTheme: TextTheme(
+              headlineMedium: GoogleFonts.philosopher(
+                fontSize: 21,
+                color: Colors.black54,
+                fontWeight: FontWeight.w700,
+                fontStyle: FontStyle.italic,
+              ),
+              titleSmall: GoogleFonts.philosopher(
+                fontSize: 15,
+                color: Colors.black,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            titleSmall: GoogleFonts.philosopher(
-              fontSize: 15,
-              color: Colors.black,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ));
+          )),
+    );
   }
 }
 
-/// AABBBC
 class ArtphotoTech extends StatefulWidget {
-  const ArtphotoTech({super.key});
+  const ArtphotoTech({super.key, this.indexPage = 0});
+
+  final int indexPage;
 
   @override
   State<ArtphotoTech> createState() => _ArtphotoTechState();
 }
 
-class _ArtphotoTechState extends State<ArtphotoTech> with SingleTickerProviderStateMixin {
+class _ArtphotoTechState extends State<ArtphotoTech> {
+  late PageController pageViewController;
+
+  @override
+  void initState() {
+    super.initState();
+    pageViewController = PageController(initialPage: widget.indexPage);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    pageViewController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final providerModel = Provider.of<ProviderModel>(context);
-      return Scaffold(
-        bottomNavigationBar: MainBottomAppBar(),
-        body: <Widget>[
-          /// Home page
-          HomePage(),
-
-          /// Repair
-          Card(
-            shadowColor: Colors.transparent,
-            margin: const EdgeInsets.all(8.0),
-            child: SizedBox.expand(
-              child: Center(
-                child: Text(
-                  'Home page',
-                ),
-              ),
-            ),
-          ),
-
-          /// Troubles
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              children: <Widget>[
-                Card(
-                  child: ListTile(
-                    leading: Icon(Icons.notifications_sharp),
-                    title: Text('Notification 1'),
-                    subtitle: Text('This is a notification'),
-                  ),
-                ),
-                Card(
-                  child: ListTile(
-                    leading: Icon(Icons.notifications_sharp),
-                    title: Text('Notification 2'),
-                    subtitle: Text('This is a notification'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          /// History
-          HistoryList(),
-        ][providerModel.currentPageIndexMainBottomAppBar],
-      );
+    return Scaffold(
+        bottomNavigationBar: MainBottomAppBar(pageController: pageViewController),
+        body: MainBottomPageView(pageController: pageViewController)
+    );
   }
 
-  // Row _buildTitleAppBar(String nameUser, ProviderModel providerModel) {
-  //   return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-  //     Text(nameUser),
-  //       providerModel.currentPageIndexMainBottomAppBar == 3
-  //         ? const SizedBox()
-  //         : Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: ElevatedButton(
-  //         style: ElevatedButton.styleFrom(
-  //           shadowColor: Colors.transparent,
-  //           backgroundColor: Colors.black.withOpacity(0.4),
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(30),
-  //           ),
-  //           padding: const EdgeInsets.all(12),
-  //         ),
-  //         child: const Row(
-  //           children: [Icon(Icons.search), Text('Поиск и сортировка')],
-  //         ),
-  //         onPressed: () {
-  //           switch (providerModel.currentPageIndexMainBottomAppBar) {
-  //             case 0:
-  //             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTechnic()));
-  //               break;
-  //             case 1:
-  //             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedRepairs()));
-  //               break;
-  //             case 2:
-  //             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTrouble()));
-  //               break;
-  //           }
-  //         },
-  //       ),
-  //     ),
-  //     Expanded(child: Container(alignment: Alignment.centerRight, child: myAppBarIconNotifications())),
-  //   ]);
-  // }
+// Row _buildTitleAppBar(String nameUser, ProviderModel providerModel) {
+//   return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+//     Text(nameUser),
+//       providerModel.currentPageIndexMainBottomAppBar == 3
+//         ? const SizedBox()
+//         : Padding(
+//       padding: const EdgeInsets.all(8.0),
+//       child: ElevatedButton(
+//         style: ElevatedButton.styleFrom(
+//           shadowColor: Colors.transparent,
+//           backgroundColor: Colors.black.withOpacity(0.4),
+//           shape: RoundedRectangleBorder(
+//             borderRadius: BorderRadius.circular(30),
+//           ),
+//           padding: const EdgeInsets.all(12),
+//         ),
+//         child: const Row(
+//           children: [Icon(Icons.search), Text('Поиск и сортировка')],
+//         ),
+//         onPressed: () {
+//           switch (providerModel.currentPageIndexMainBottomAppBar) {
+//             case 0:
+//             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTechnic()));
+//               break;
+//             case 1:
+//             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedRepairs()));
+//               break;
+//             case 2:
+//             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTrouble()));
+//               break;
+//           }
+//         },
+//       ),
+//     ),
+//     Expanded(child: Container(alignment: Alignment.centerRight, child: myAppBarIconNotifications())),
+//   ]);
+// }
 
 // Widget myAppBarIconNotifications() {
 //   return GestureDetector(
