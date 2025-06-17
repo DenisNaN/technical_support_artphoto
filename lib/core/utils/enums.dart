@@ -31,3 +31,10 @@ enum TypeMessageForSaveRepairView{
   notWriteAllFieldStatus,
   notCheckTechnicInDB,
 }
+
+enum StatusTestDrive{
+  notMake,
+  inProcess,
+  finished,
+  missDeadline,
+}

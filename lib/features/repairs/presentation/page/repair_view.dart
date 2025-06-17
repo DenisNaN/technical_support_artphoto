@@ -710,30 +710,30 @@ class _RepairViewState extends State<RepairView> {
               ..refreshTechnics(resultDataRefTech['Photosalons'],
                   resultDataRefTech['Repairs'], resultDataRefTech['Storages'])
               ..refreshCurrentRepairs(resultData);
-            if(context.mounted){
+            if(mounted){
               LoadingOverlay.of(context).hide();
             }
             return TypeMessageForSaveRepairView.successSaveRepair;
           } else {
-            if(context.mounted){
+            if(mounted){
               LoadingOverlay.of(context).hide();
             }
             return TypeMessageForSaveRepairView.notSuccessSaveStatus;
           }
         } else {
-          if(context.mounted){
+          if(mounted){
             LoadingOverlay.of(context).hide();
           }
           return TypeMessageForSaveRepairView.notCheckTechnicInDB;
         }
       } else {
-        if(context.mounted){
+        if(mounted){
           LoadingOverlay.of(context).hide();
         }
         return TypeMessageForSaveRepairView.notSuccessSaveRepair;
       }
     } else {
-      if(context.mounted){
+      if(mounted){
         LoadingOverlay.of(context).hide();
       }
       return TypeMessageForSaveRepairView.notWriteAllFieldStatus;

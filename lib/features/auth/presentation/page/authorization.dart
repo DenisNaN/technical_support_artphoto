@@ -5,10 +5,10 @@ import 'package:technical_support_artphoto/core/api/data/datasources/save_local_
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
+import 'package:technical_support_artphoto/core/shared/gradients.dart';
 import 'package:technical_support_artphoto/core/shared/logo_animate/draggable_logo.dart';
 import 'package:technical_support_artphoto/main.dart';
 import '../../../../core/api/data/models/user.dart';
-import '../../../../core/utils/utils.dart';
 import '../../../../core/utils/utils.dart' as utils;
 
 class Authorization extends StatefulWidget {
@@ -36,7 +36,6 @@ class _AuthorizationState extends State<Authorization> {
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    MyColor myColor = MyColor();
     String? version = utils.packageInfo?.version;
     SaveLocalServices localServices = SaveLocalServices();
 
@@ -47,7 +46,9 @@ class _AuthorizationState extends State<Authorization> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          flexibleSpace: myColor.appBar(),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(gradient: gradientArtphoto()),
+          ),
           title: Row(children: [
             Text('v. $version', style: const TextStyle(fontSize: 12, color: Colors.white)),
             const Expanded(
@@ -116,19 +117,21 @@ class _AuthorizationState extends State<Authorization> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
-                          child: Row(children: [
-                            Checkbox(
-                                side: BorderSide(color: Colors.blue, width: 1),
-                                splashRadius: 10,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                                value: isSavePassword,
-                                onChanged: (bool? value){
-                                  setState(() {
-                                    isSavePassword = value!;
-                                  });
-                                }),
-                            Text('Сохранить пароль'),
-                          ],),
+                          child: Row(
+                            children: [
+                              Checkbox(
+                                  side: BorderSide(color: Colors.blue, width: 1),
+                                  splashRadius: 10,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                  value: isSavePassword,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      isSavePassword = value!;
+                                    });
+                                  }),
+                              Text('Сохранить пароль'),
+                            ],
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(28),
@@ -139,7 +142,7 @@ class _AuthorizationState extends State<Authorization> {
                               onPressed: () {
                                 String password = passwordController.text;
                                 if (password.isNotEmpty) {
-                                  TechnicalSupportRepoImpl.downloadData.getUser(password).then((user){
+                                  TechnicalSupportRepoImpl.downloadData.getUser(password).then((user) {
                                     if (user != null) {
                                       String? imagePath = localServices.getUser()?.imagePath;
                                       User userModel = User(user.name, user.access, isSavePassword, imagePath);
@@ -205,8 +208,7 @@ class _AuthorizationState extends State<Authorization> {
     );
   }
 
-  void _navigationForNextPage(){
-    Navigator.pushReplacement(
-        context, animationRouteSlideTransition(const ArtphotoTech()));
+  void _navigationForNextPage() {
+    Navigator.pushReplacement(context, animationRouteSlideTransition(const ArtphotoTech()));
   }
 }

@@ -313,12 +313,12 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
         providerModel.refreshTroubles(resultData);
       }
       // await addHistory(technic, nameUser);
-      if(context.mounted){
+      if(mounted){
         LoadingOverlay.of(context).hide();
       }
       return true;
     }
-    if(context.mounted){
+    if(mounted){
       LoadingOverlay.of(context).hide();
     }
     return false;
@@ -326,7 +326,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText,
       String notSuccessfulText, bool isSkipPrevSnackBar) {
-    if (context.mounted) {
+    if (mounted) {
       if (isSkipPrevSnackBar) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
       }

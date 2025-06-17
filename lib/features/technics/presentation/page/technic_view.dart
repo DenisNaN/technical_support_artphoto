@@ -12,6 +12,7 @@ import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/core/shared/input_decoration/input_deroration.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/repairs_technic_page.dart';
+import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import '../../../../core/shared/technic_image/technic_image.dart';
 import '../../../../main.dart';
 
@@ -94,6 +95,8 @@ class _TechnicViewState extends State<TechnicView> {
                 SizedBox(height: 10),
                 _buildDislocation(providerModel),
                 SizedBox(height: 10),
+                _buildTestDrive(widget.technic),
+                SizedBox(height: 20),
                 _buildCostAndTotalSumRepairs(providerModel),
                 SizedBox(height: 30),
                 Row(
@@ -442,6 +445,96 @@ class _TechnicViewState extends State<TechnicView> {
     );
   }
 
+  Widget _buildTestDrive(Technic technic) {
+    TestDrive testDrive = TestDrive(
+        idTechnic: 195,
+        categoryTechnic: 'Принтер',
+        dislocationTechnic: 'Рязанский',
+        dateStart: DateTime.parse('2025-06-15'),
+        user: 'user');
+    testDrive.isCloseTestDrive = false;
+    technic.testDrive = testDrive;
+    StatusTestDrive status = getStatusTestDrive(technic);
+    Color color = getColorTestDrive(status);
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0, bottom: 5),
+            child: Text(
+              'Тест-драйв',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 40, right: 40),
+          child: ExpansionTile(
+            title: Text(getStatusNameTestDrive(status)),
+            tilePadding: EdgeInsets.symmetric(horizontal: 28),
+            collapsedShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            collapsedBackgroundColor: color,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            backgroundColor: color,
+            showTrailingIcon: false,
+            textColor: Colors.black,
+            enabled: status == StatusTestDrive.notMake ? false : true,
+          )
+        ),
+      ],
+    );
+  }
+
+  StatusTestDrive getStatusTestDrive(Technic technic){
+    if(_selectedDropdownStatus != 'Тест-драйв'){
+      return StatusTestDrive.finished;
+    }
+    if(technic.testDrive == null){
+      return StatusTestDrive.notMake;
+    }
+    if(technic.testDrive!.isCloseTestDrive == false && technic.testDrive!.dateStart.difference(DateTime.now()).inDays > 14){
+      return StatusTestDrive.missDeadline;
+    }
+    if(technic.testDrive!.isCloseTestDrive == false){
+      return StatusTestDrive.inProcess;
+    } else{
+      return StatusTestDrive.finished;
+    }
+  }
+
+  String getStatusNameTestDrive(StatusTestDrive status){
+    if(status == StatusTestDrive.notMake){
+      return 'Не проводился';
+    }
+    if(status == StatusTestDrive.missDeadline){
+      return 'Просрочен';
+    }
+    if(status == StatusTestDrive.inProcess){
+      return 'В процессе';
+    } else{
+      return 'Завершен';
+    }
+  }
+
+  Color getColorTestDrive(StatusTestDrive status){
+    if(status == StatusTestDrive.notMake){
+      return Colors.blue.shade50;
+    }
+    if(status == StatusTestDrive.missDeadline){
+      return Colors.red.shade100;
+    }
+    if(status == StatusTestDrive.inProcess){
+      return Colors.yellow.shade100;
+    } else{
+      return Colors.green.shade100;
+    }
+  }
+
   Widget _buildCostAndTotalSumRepairs(ProviderModel provider) {
     bool isListEmpty = summsRepairs.isEmpty;
     return Column(
@@ -711,7 +804,7 @@ class _TechnicViewState extends State<TechnicView> {
     isSuccess = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technicModel, providerModel.user.name);
     Map<String, dynamic> result = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
     providerModel.refreshTechnics(result['Photosalons'], result['Repairs'], result['Storages']);
-    if (context.mounted) {
+    if (mounted) {
       LoadingOverlay.of(context).hide();
     }
     return isSuccess;

@@ -645,12 +645,12 @@ class _TechnicAddState extends State<TechnicAdd> {
       technic.id = id;
       // await addHistory(technic, nameUser);
       addTechnicInProviderModel(technic, providerModel);
-      if(context.mounted){
+      if(mounted){
         LoadingOverlay.of(context).hide();
       }
       return true;
     }
-    if(context.mounted){
+    if(mounted){
       LoadingOverlay.of(context).hide();
     }
     return false;

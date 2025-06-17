@@ -498,12 +498,12 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
       providerModel.refreshTroubles(resultData);
       await sendEmailNewTrouble(trouble, providerModel);
       // await addHistory(technic, nameUser);
-      if (context.mounted) {
+      if (mounted) {
         LoadingOverlay.of(context).hide();
       }
       return true;
     }
-    if (context.mounted) {
+    if (mounted) {
       LoadingOverlay.of(context).hide();
     }
     return false;

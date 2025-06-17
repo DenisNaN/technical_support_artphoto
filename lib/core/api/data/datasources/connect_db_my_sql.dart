@@ -217,7 +217,7 @@ class ConnectDbMySQL {
   // Future insertTestDriveInDB(Technic technic, String nameUser) async {
   //   await ConnectDbMySQL.connDB.connDatabase();
   //   await _connDB!.query(
-  //       'INSERT INTO testDrive (idEquipment, category, testDriveDislocation, dateStart, dateFinish, result, '
+  //       'INSERT INTO test_drive (idEquipment, category, testDriveDislocation, dateStart, dateFinish, result, '
   //       'checkEquipment, user) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
   //       [
   //         technic.id,
@@ -238,7 +238,7 @@ class ConnectDbMySQL {
   // Future<int> findIDLastTestDriveTechnic(TechnicModel technic) async {
   //   await ConnectDbMySQL.connDB.connDatabase();
   //   var result =
-  //       await _connDB!.query('SELECT id FROM testDrive WHERE idEquipment = ? ORDER BY id DESC LIMIT 1', [technic.id]);
+  //       await _connDB!.query('SELECT id FROM test_drive WHERE idEquipment = ? ORDER BY id DESC LIMIT 1', [technic.id]);
   //   int id = lastTectDriveListFromMap(result);
   //   return id;
   // }
@@ -349,7 +349,7 @@ Future<Technic?> getTechnic(int number) async {
 
 // Future<List> getAllTestDrive() async {
 //   List list = [];
-//   var result = await _connDB!.query('SELECT * FROM testDrive');
+//   var result = await _connDB!.query('SELECT * FROM test_drive');
 //   // id-row[0], idEquipment-row[1],  category-row[2],  testDriveDislocation-row[3],
 //   // dateStart-row[4], dateFinish-row[5], result-row[6], checkEquipment-row[7], user-row[8]
 //
@@ -361,7 +361,7 @@ Future<Technic?> getTechnic(int number) async {
 //     bool checkTestDrive = false;
 //     if(row[7] != null && row[7] == 1) checkTestDrive = true;
 //
-//     Technic testDriveTechnic = Technic.testDrive(
+//     Technic testDriveTechnic = Technic.test_drive(
 //         row[1], row[2], row[3], dateStartTestDrive, dateFinishTestDrive,
 //         row[6], checkTestDrive, row[8]);
 //     list.add(testDriveTechnic);
@@ -538,7 +538,7 @@ Future<Technic?> getTechnic(int number) async {
 //   await ConnectDbMySQL.connDB.connDatabase();
 //   int id = await findIDLastTestDriveTechnic(technic);
 //   await _connDB!.query(
-//       'UPDATE testDrive SET testDriveDislocation = ?, dateStart = ?, dateFinish = ?, '
+//       'UPDATE test_drive SET testDriveDislocation = ?, dateStart = ?, dateFinish = ?, '
 //           'result = ?, checkEquipment = ? WHERE id = ?',
 //       [
 //         technic.testDriveDislocation,

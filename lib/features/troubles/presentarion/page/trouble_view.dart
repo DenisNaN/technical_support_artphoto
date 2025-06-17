@@ -614,12 +614,12 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
     if (resultData != null) {
       providerModel.refreshTroubles(resultData);
       // await addHistory(technic, nameUser);
-      if(context.mounted){
+      if(mounted){
         LoadingOverlay.of(context).hide();
       }
       return true;
     }
-    if(context.mounted){
+    if(mounted){
       LoadingOverlay.of(context).hide();
     }
     return false;
