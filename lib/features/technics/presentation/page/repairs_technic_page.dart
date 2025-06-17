@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
@@ -48,7 +49,7 @@ class _RepairsTechnicPageState extends State<RepairsTechnicPage> {
                   TechnicalSupportRepoImpl.downloadData.getRepair(widget.summsRepairs[index].idRepair).then((repair){
                     if(repair != null && context.mounted){
                       Navigator.push(context,
-                          animationRouteSlideTransition(RepairView(repair: repair)));
+                          animationRouteSlideTransition(LoadingOverlay(child: RepairView(repair: repair))));
                     }
                   });
                 },

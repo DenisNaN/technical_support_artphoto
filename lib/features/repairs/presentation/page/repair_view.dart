@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import '../../../technics/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
@@ -267,7 +268,7 @@ class _RepairViewState extends State<RepairView> {
             offset: Offset(2, 4), // Shadow position
           ),
         ]),
-        child: FirstStepRepairDesc(repair: widget.repair),
+        child: LoadingOverlay(child: FirstStepRepairDesc(repair: widget.repair)),
       ),
     );
   }
@@ -684,6 +685,7 @@ class _RepairViewState extends State<RepairView> {
 
   Future<TypeMessageForSaveRepairView> _save(
       Repair repair, ProviderModel providerModel) async {
+    LoadingOverlay.of(context).show();
     if ((repair.newStatus != null && repair.newDislocation != null) ||
         (repair.newStatus == null && repair.newDislocation == null)) {
       List<Repair>? resultData =
@@ -708,18 +710,32 @@ class _RepairViewState extends State<RepairView> {
               ..refreshTechnics(resultDataRefTech['Photosalons'],
                   resultDataRefTech['Repairs'], resultDataRefTech['Storages'])
               ..refreshCurrentRepairs(resultData);
-
+            if(context.mounted){
+              LoadingOverlay.of(context).hide();
+            }
             return TypeMessageForSaveRepairView.successSaveRepair;
           } else {
+            if(context.mounted){
+              LoadingOverlay.of(context).hide();
+            }
             return TypeMessageForSaveRepairView.notSuccessSaveStatus;
           }
         } else {
+          if(context.mounted){
+            LoadingOverlay.of(context).hide();
+          }
           return TypeMessageForSaveRepairView.notCheckTechnicInDB;
         }
       } else {
+        if(context.mounted){
+          LoadingOverlay.of(context).hide();
+        }
         return TypeMessageForSaveRepairView.notSuccessSaveRepair;
       }
     } else {
+      if(context.mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return TypeMessageForSaveRepairView.notWriteAllFieldStatus;
     }
     // await addHistory(technic, nameUser);

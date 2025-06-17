@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import 'package:technical_support_artphoto/main.dart';
 
@@ -436,6 +437,7 @@ class _RepairAddState extends State<RepairAdd> {
   }
 
   Future<bool> _save(Repair repair, ProviderModel providerModel) async{
+    LoadingOverlay.of(context).show();
     List<Repair>? resultData =
       await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
     if(resultData != null){
@@ -453,7 +455,13 @@ class _RepairAddState extends State<RepairAdd> {
       }
       providerModel.refreshCurrentRepairs(resultData);
       // await addHistory(technic, nameUser);
+      if(context.mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return true;
+    }
+    if(context.mounted){
+      LoadingOverlay.of(context).hide();
     }
     return false;
   }

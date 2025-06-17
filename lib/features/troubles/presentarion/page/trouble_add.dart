@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
@@ -491,12 +492,19 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
           child: AspectRatio(aspectRatio: 1, child: Image.file(imageFile!))));
 
   Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
+    LoadingOverlay.of(context).show();
     List<Trouble>? resultData = await TechnicalSupportRepoImpl.downloadData.saveTrouble(trouble);
     if (resultData != null) {
       providerModel.refreshTroubles(resultData);
       await sendEmailNewTrouble(trouble, providerModel);
       // await addHistory(technic, nameUser);
+      if (context.mounted) {
+        LoadingOverlay.of(context).hide();
+      }
       return true;
+    }
+    if (context.mounted) {
+      LoadingOverlay.of(context).hide();
     }
     return false;
   }

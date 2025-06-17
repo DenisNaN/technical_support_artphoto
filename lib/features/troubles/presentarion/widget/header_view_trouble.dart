@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
@@ -252,7 +253,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
     Navigator.push(
         context,
         animationRouteSlideTransition(
-            TechnicView(location: technic.dislocation, technic: technic)));
+            LoadingOverlay(child: TechnicView(location: technic.dislocation, technic: technic))));
   }
 
   Widget _buildTextSubtitle() {
@@ -303,6 +304,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
   }
 
   Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
+    LoadingOverlay.of(context).show();
     final bool isFinishedTrouble = isFieldsFilledTrouble(trouble);
     List<Trouble>? resultData =
         await TechnicalSupportRepoImpl.downloadData.updateTrouble(trouble);
@@ -311,7 +313,13 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
         providerModel.refreshTroubles(resultData);
       }
       // await addHistory(technic, nameUser);
+      if(context.mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return true;
+    }
+    if(context.mounted){
+      LoadingOverlay.of(context).hide();
     }
     return false;
   }

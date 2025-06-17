@@ -5,14 +5,14 @@ import '../../../../core/navigation/animation_navigation.dart';
 import '../../../../core/shared/gradients.dart';
 import '../page/repairs_page.dart';
 
-class MenuRepairPage extends StatefulWidget {
-  const MenuRepairPage({super.key});
+class PopupMenuRepairPage extends StatefulWidget {
+  const PopupMenuRepairPage({super.key});
 
   @override
-  State<MenuRepairPage> createState() => _MenuRepairPageState();
+  State<PopupMenuRepairPage> createState() => _PopupMenuRepairPageState();
 }
 
-class _MenuRepairPageState extends State<MenuRepairPage> {
+class _PopupMenuRepairPageState extends State<PopupMenuRepairPage> {
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
