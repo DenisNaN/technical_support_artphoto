@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
@@ -705,10 +706,14 @@ class _TechnicViewState extends State<TechnicView> {
   // }
 
   Future<bool> _save(Technic technicModel, ProviderModel providerModel) async{
+    LoadingOverlay.of(context).show();
     bool isSuccess = false;
     isSuccess = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technicModel, providerModel.user.name);
     Map<String, dynamic> result = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
     providerModel.refreshTechnics(result['Photosalons'], result['Repairs'], result['Storages']);
+    if (context.mounted) {
+      LoadingOverlay.of(context).hide();
+    }
     return isSuccess;
   }
 

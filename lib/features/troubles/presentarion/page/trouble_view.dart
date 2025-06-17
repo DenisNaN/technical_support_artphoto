@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_add.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -89,7 +90,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                   child: ListView(
                     padding: EdgeInsets.zero,
                     children: [
-                      HeaderViewTrouble(trouble: trouble, technic: technic),
+                      LoadingOverlay(child: HeaderViewTrouble(trouble: trouble, technic: technic)),
                       SizedBox(height: 20),
                       _buildPhotoTrouble(),
                       SizedBox(height: 14),
@@ -392,7 +393,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
       padding: const EdgeInsets.symmetric(horizontal: 80),
       child: ElevatedButton(
           onPressed: (){
-            Navigator.push(context, animationRouteFadeTransition(RepairAdd(trouble: trouble, technic: technic,)));
+            Navigator.push(context, animationRouteFadeTransition(LoadingOverlay(child: RepairAdd(trouble: trouble, technic: technic,))));
           },
           style: const ButtonStyle(
               backgroundColor: WidgetStatePropertyAll(Colors.greenAccent)
@@ -580,6 +581,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
           child: AspectRatio(aspectRatio: 1, child: Image.memory(_photoTrouble!))));
 
   Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
+    LoadingOverlay.of(context).show();
     bool isEmptyDateEmployee = trouble.dateFixTroubleEmployee == null ||
         trouble.dateFixTroubleEmployee.toString() == "-0001-11-30 00:00:00.000Z" ||
         trouble.dateFixTroubleEmployee.toString() == "0001-11-30 00:00:00.000Z";
@@ -594,11 +596,17 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
     if((isEmptyDateEmployee && !isEmptyEmployee) ||
         (!isEmptyDateEmployee && isEmptyEmployee)) {
       _viewSnackBar(Icons.save, false, '', 'Заполните и дату, и сотрудника', false);
+      if(context.mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return false;
     }
     if((isEmptyDateEngineer && !isEmptyEngineer) ||
         (!isEmptyDateEngineer && isEmptyEngineer)) {
       _viewSnackBar(Icons.save, false, '', 'Заполните и дату, и техника', false);
+      if(context.mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return false;
     }
     List<Trouble>? resultData =
@@ -606,7 +614,13 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
     if (resultData != null) {
       providerModel.refreshTroubles(resultData);
       // await addHistory(technic, nameUser);
+      if(context.mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return true;
+    }
+    if(context.mounted){
+      LoadingOverlay.of(context).hide();
     }
     return false;
   }

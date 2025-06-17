@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/grid_view_basket_decommissioned.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/grid_view_home_page.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/my_custom_refresh_indicator.dart';
@@ -46,7 +47,7 @@ class _HomePageState extends State<HomePage> {
           icon: Icon(Icons.add),
           label: Text('Добавить технику'),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const TechnicAdd()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const LoadingOverlay(child: TechnicAdd())));
           }),
     );
   }

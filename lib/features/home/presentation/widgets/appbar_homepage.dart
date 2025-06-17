@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/shared/input_decoration/input_deroration.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_view.dart';
 
@@ -132,7 +133,7 @@ class _AppBarHomepageState extends State<AppBarHomepage> {
     Navigator.push(
         context,
         animationRouteSlideTransition(
-            TechnicView(location: technic.dislocation, technic: technic)));
+            LoadingOverlay(child: TechnicView(location: technic.dislocation, technic: technic))));
   }
 
   final numberFormatter = FilteringTextInputFormatter.allow(

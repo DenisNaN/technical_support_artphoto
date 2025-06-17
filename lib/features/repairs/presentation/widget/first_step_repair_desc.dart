@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/is_fields_filled.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 
 import '../../../technics/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -311,7 +312,7 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
     Navigator.push(
         context,
         animationRouteSlideTransition(
-            TechnicView(location: technic.dislocation, technic: technic)));
+            LoadingOverlay(child: TechnicView(location: technic.dislocation, technic: technic))));
   }
 
   Widget _buildTextSubtitle() {
@@ -378,6 +379,7 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
   }
 
   Future<bool> _save(Repair repair, ProviderModel providerModel) async {
+    LoadingOverlay.of(context).show();
     final bool isFinishedRepair = isFieldsFilledRepair(repair);
     List<Repair>? resultData =
         await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, true);
@@ -386,7 +388,13 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
         providerModel.refreshCurrentRepairs(resultData);
       }
       // await addHistory(technic, nameUser);
+      if(context.mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return true;
+    }
+    if(context.mounted){
+      LoadingOverlay.of(context).hide();
     }
     return false;
   }

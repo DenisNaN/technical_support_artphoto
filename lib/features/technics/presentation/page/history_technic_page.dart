@@ -5,6 +5,7 @@ import 'package:technical_support_artphoto/core/api/data/models/photosalon_locat
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/core/shared/logo_animate/logo_matrix_transition_animate.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
@@ -140,7 +141,7 @@ class HistoryTechnicPage extends StatelessWidget {
           repair = value;
           if(repair != null && context.mounted){
             Navigator.push(context,
-                animationRouteSlideTransition(RepairView(repair: repair!)));
+                animationRouteSlideTransition(LoadingOverlay(child: RepairView(repair: repair!))));
           }
         });
       },
@@ -279,6 +280,6 @@ class HistoryTechnicPage extends StatelessWidget {
 
   void _navigationOnTechnicView(Trouble trouble, BuildContext context) {
     Navigator.push(context,
-        animationRouteSlideTransition(TroubleView(troubleMain: trouble)));
+        animationRouteSlideTransition(LoadingOverlay(child: TroubleView(troubleMain: trouble))));
   }
 }

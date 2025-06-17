@@ -6,6 +6,7 @@ import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_
 import 'package:technical_support_artphoto/core/api/data/models/free_number_for_technic.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/shared/input_decoration/input_deroration.dart';
@@ -637,13 +638,20 @@ class _TechnicAddState extends State<TechnicAdd> {
   // }
 
   Future<bool> _save(Technic technic, ProviderModel providerModel) async {
+    LoadingOverlay.of(context).show();
     String nameUser = providerModel.user.name;
     int? id = await TechnicalSupportRepoImpl.downloadData.saveTechnic(technic, nameUser);
     if(id != null){
       technic.id = id;
       // await addHistory(technic, nameUser);
       addTechnicInProviderModel(technic, providerModel);
+      if(context.mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return true;
+    }
+    if(context.mounted){
+      LoadingOverlay.of(context).hide();
     }
     return false;
   }

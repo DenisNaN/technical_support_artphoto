@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:technical_support_artphoto/core/shared/gradients.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_add.dart';
 
 class MenuHomePage extends StatefulWidget {
@@ -17,7 +18,7 @@ class _MenuHomePageState extends State<MenuHomePage> {
               PopupMenuItem(
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const TechnicAdd()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const LoadingOverlay(child: TechnicAdd())));
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
