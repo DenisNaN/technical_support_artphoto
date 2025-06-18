@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/core/shared/plurals.dart';
+import 'package:technical_support_artphoto/core/utils/constants.dart';
+import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
@@ -31,20 +34,15 @@ class _TechnicViewState extends State<TechnicView> {
   final _nameTechnic = TextEditingController();
   final _costTechnic = TextEditingController();
   final _comment = TextEditingController();
-  final List<SummRepair> summsRepairs = [];
-  late final int totalSumm;
-
-  // late final String _dateStartTestDrive;
-  // String _dateFinishTestDrive = '';
-  final _resultTestDrive = TextEditingController();
   String? _selectedDropdownDislocation;
   String? _selectedDropdownStatus;
-  bool isBN = false;
+  final List<SummRepair> sumsRepairs = [];
+  late final int totalSumm;
 
-  // String? _selectedDropdownTestDriveDislocation;
-  // bool _switchTestDrive = false;
-  // bool _checkboxTestDrive = false;
-  // bool _isCategoryPhotocamera = false;
+  DateTime? _dateStartTestDrive;
+  DateTime? _dateFinishTestDrive;
+  bool _isDoneTestDrive = false;
+  final _resultTestDrive = TextEditingController();
 
   final GlobalKey<FormState> _formInnerNumberKey = GlobalKey<FormState>();
 
@@ -64,21 +62,31 @@ class _TechnicViewState extends State<TechnicView> {
     _selectedDropdownStatus = widget.technic.status;
     _selectedDropdownDislocation = widget.technic.dislocation;
     _nameTechnic.text = '';
+    if (widget.technic.testDrive != null) {
+      _dateStartTestDrive = widget.technic.testDrive!.dateStart;
+      _dateFinishTestDrive = widget.technic.testDrive!.dateFinish.toString() == '' ?
+      widget.technic.testDrive!.dateFinish : _dateStartTestDrive!.add(Duration(days: countDaysTestDrive));
+      _isDoneTestDrive = widget.technic.testDrive!.isCloseTestDrive;
+      _resultTestDrive.text = widget.technic.testDrive!.result;
+    } else if (widget.technic.testDrive == null && _selectedDropdownStatus == 'Тест-драйв') {
+      _selectedDropdownStatus = null;
+    }
     TechnicalSupportRepoImpl.downloadData.getSumRepairs(widget.technic.number.toString()).then((value) {
       if (value.isNotEmpty) {
         setState(() {
-          summsRepairs.addAll(value.values.first);
+          sumsRepairs.addAll(value.values.first);
           totalSumm = value.keys.first;
         });
       }
     });
-    // _dateStartTestDrive = DateFormat('d MMMM yyyy', 'ru_RU').format(DateTime.now());
   }
 
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    double widthScreen = MediaQuery.sizeOf(context).width;
+    double widthScreen = MediaQuery
+        .sizeOf(context)
+        .width;
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.viewTechnic, location: widget.location, technic: widget.technic),
         body: Form(
@@ -112,6 +120,7 @@ class _TechnicViewState extends State<TechnicView> {
                     ElevatedButton(
                         onPressed: () {
                           if (_formInnerNumberKey.currentState!.validate()) {
+                            SaveTestDrive status = SaveTestDrive.notSave;
                             Technic technic = Technic(
                                 widget.technic.id,
                                 widget.technic.number,
@@ -122,8 +131,29 @@ class _TechnicViewState extends State<TechnicView> {
                                 widget.technic.dateBuyTechnic,
                                 widget.technic.cost,
                                 widget.technic.comment);
+                            if (_selectedDropdownStatus == 'Тест-драйв') {
+                              if (_selectedDropdownStatus == 'Тест-драйв' && widget.technic.status == 'Тест-драйв') {
+                                status = SaveTestDrive.update;
+                              } else {
+                                status = SaveTestDrive.save;
+                              }
+                              if (technic.testDrive == null) {
+                                status = SaveTestDrive.save;
+                              }
+                              TestDrive testDrive = TestDrive(
+                                  idTechnic: widget.technic.id,
+                                  categoryTechnic: widget.technic.category,
+                                  dislocationTechnic: widget.technic.dislocation,
+                                  dateStart: _dateStartTestDrive ?? DateTime.now(),
+                                  dateFinish: _dateFinishTestDrive ?? DateTime.now().add(
+                                      Duration(days: countDaysTestDrive)),
+                                  result: _resultTestDrive.text,
+                                  isCloseTestDrive: _isDoneTestDrive,
+                                  user: providerModel.user.name);
+                              technic.testDrive = testDrive;
+                            }
 
-                            _save(technic, providerModel).then((value){
+                            _save(technic, providerModel, status).then((value) {
                               _viewSnackBar(value ? Icons.save : Icons.dangerous_outlined, value,
                                   value ? 'Изменения приняты' : 'Изменения не сохранились');
                             });
@@ -169,7 +199,10 @@ class _TechnicViewState extends State<TechnicView> {
                   ],
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                   title: Text('Редактировать'),
-                  titleTextStyle: Theme.of(context).textTheme.headlineMedium,
+                  titleTextStyle: Theme
+                      .of(context)
+                      .textTheme
+                      .headlineMedium,
                   content: TextFormField(
                     decoration: myDecorationTextFormField(null, 'Наименование техники'),
                     controller: _nameTechnic..text = widget.technic.name,
@@ -208,7 +241,9 @@ class _TechnicViewState extends State<TechnicView> {
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: CircleAvatar(
-                        radius: widget.technic.number.toString().length > 4 ? 25 : null,
+                        radius: widget.technic.number
+                            .toString()
+                            .length > 4 ? 25 : null,
                         child: Text(widget.technic.number.toString()),
                       ),
                     )),
@@ -252,7 +287,10 @@ class _TechnicViewState extends State<TechnicView> {
                 ],
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                 title: Text('Редактировать'),
-                titleTextStyle: Theme.of(context).textTheme.headlineMedium,
+                titleTextStyle: Theme
+                    .of(context)
+                    .textTheme
+                    .headlineMedium,
                 content: TextFormField(
                   maxLines: 4,
                   decoration: myDecorationTextFormField(null, 'Комментарий'),
@@ -277,16 +315,19 @@ class _TechnicViewState extends State<TechnicView> {
                 children: [
                   Text(
                     isCommentEmpty ? 'Добавить комментарий' : 'Комментарий',
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .headlineMedium,
                   ),
                   SizedBox(
                     width: 10,
                   ),
                   isCommentEmpty
                       ? Icon(
-                          Icons.edit,
-                          color: Colors.grey,
-                        )
+                    Icons.edit,
+                    color: Colors.grey,
+                  )
                       : SizedBox()
                 ],
               ),
@@ -294,15 +335,15 @@ class _TechnicViewState extends State<TechnicView> {
           ),
           !isCommentEmpty
               ? ListTile(
-                  title: Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Container(
-                        padding: EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.blue.shade50),
-                        child: Text(widget.technic.comment!)),
-                  ),
-                )
+            title: Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: Container(
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.blue.shade50),
+                  child: Text(widget.technic.comment!)),
+            ),
+          )
               : SizedBox(),
         ],
       ),
@@ -313,11 +354,11 @@ class _TechnicViewState extends State<TechnicView> {
     return InkWell(
       onTap: () {
         showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU"))
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2099),
+            locale: const Locale("ru", "RU"))
             .then((date) {
           if (date != null) {
             Technic technic = widget.technic;
@@ -359,7 +400,10 @@ class _TechnicViewState extends State<TechnicView> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Статус техники',
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headlineMedium,
             ),
           ),
         ),
@@ -381,13 +425,18 @@ class _TechnicViewState extends State<TechnicView> {
               }).toList(),
               onChanged: (String? value) {
                 setState(() {
-                  if(value != null && _selectedDropdownStatus != 'В ремонте' &&
-                      value == 'В ремонте'){
+                  if (value != null && _selectedDropdownStatus != 'В ремонте' &&
+                      value == 'В ремонте') {
                     _selectedDropdownDislocation = null;
                   }
-                  if(value != null && _selectedDropdownStatus == 'В ремонте' &&
-                      value != 'В ремонте'){
+                  if (value != null && _selectedDropdownStatus == 'В ремонте' &&
+                      value != 'В ремонте') {
                     _selectedDropdownDislocation = null;
+                  }
+                  if (value != null && value == 'Тест-драйв') {
+                    _dateStartTestDrive = DateTime.now();
+                    _dateFinishTestDrive = DateTime.now().add(Duration(days: countDaysTestDrive));
+                    _isDoneTestDrive = false;
                   }
                   _selectedDropdownStatus = value;
                 });
@@ -408,7 +457,10 @@ class _TechnicViewState extends State<TechnicView> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Местонахождение техники',
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headlineMedium,
             ),
           ),
         ),
@@ -421,7 +473,8 @@ class _TechnicViewState extends State<TechnicView> {
               hint: const Text('Дислокация'),
               value: _selectedDropdownDislocation,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: _selectedDropdownStatus == 'В ремонте' ? providerModel.services.map<DropdownMenuItem<String>>((String value) {
+              items: _selectedDropdownStatus == 'В ремонте' ? providerModel.services.map<DropdownMenuItem<String>>((
+                  String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -446,14 +499,6 @@ class _TechnicViewState extends State<TechnicView> {
   }
 
   Widget _buildTestDrive(Technic technic) {
-    TestDrive testDrive = TestDrive(
-        idTechnic: 195,
-        categoryTechnic: 'Принтер',
-        dislocationTechnic: 'Рязанский',
-        dateStart: DateTime.parse('2025-06-15'),
-        user: 'user');
-    testDrive.isCloseTestDrive = false;
-    technic.testDrive = testDrive;
     StatusTestDrive status = getStatusTestDrive(technic);
     Color color = getColorTestDrive(status);
     return Column(
@@ -464,79 +509,171 @@ class _TechnicViewState extends State<TechnicView> {
             padding: const EdgeInsets.only(left: 20.0, bottom: 5),
             child: Text(
               'Тест-драйв',
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headlineMedium,
             ),
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(left: 40, right: 40),
-          child: ExpansionTile(
-            title: Text(getStatusNameTestDrive(status)),
-            tilePadding: EdgeInsets.symmetric(horizontal: 28),
-            collapsedShape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            collapsedBackgroundColor: color,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            backgroundColor: color,
-            showTrailingIcon: false,
-            textColor: Colors.black,
-            enabled: status == StatusTestDrive.notMake ? false : true,
-          )
+            padding: const EdgeInsets.only(left: 40, right: 40),
+            child: ExpansionTile(
+              title: Text(getTitleTestDrive(status)),
+              tilePadding: EdgeInsets.only(left: 28),
+              collapsedShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              collapsedBackgroundColor: color,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              backgroundColor: color,
+              showTrailingIcon: false,
+              textColor: Colors.black,
+              enabled: status == StatusTestDrive.notMake ? false : true,
+              children: [
+                _selectedDropdownStatus == 'Тест-драйв' ? getSubtitleTestDrive() : SizedBox(),
+              ],
+            )
         ),
       ],
     );
   }
 
-  StatusTestDrive getStatusTestDrive(Technic technic){
-    if(_selectedDropdownStatus != 'Тест-драйв'){
-      return StatusTestDrive.finished;
-    }
-    if(technic.testDrive == null){
+  StatusTestDrive getStatusTestDrive(Technic technic) {
+    if (technic.testDrive == null && _selectedDropdownStatus != 'Тест-драйв') {
       return StatusTestDrive.notMake;
     }
-    if(technic.testDrive!.isCloseTestDrive == false && technic.testDrive!.dateStart.difference(DateTime.now()).inDays > 14){
+    if (_dateFinishTestDrive!.difference(DateTime.now()) < Duration(days: -1)) {
       return StatusTestDrive.missDeadline;
     }
-    if(technic.testDrive!.isCloseTestDrive == false){
+    if (_isDoneTestDrive == false) {
       return StatusTestDrive.inProcess;
-    } else{
+    } else {
       return StatusTestDrive.finished;
     }
   }
 
-  String getStatusNameTestDrive(StatusTestDrive status){
-    if(status == StatusTestDrive.notMake){
+  String getTitleTestDrive(StatusTestDrive status) {
+    if (status == StatusTestDrive.notMake) {
       return 'Не проводился';
     }
-    if(status == StatusTestDrive.missDeadline){
-      return 'Просрочен';
+    if (status == StatusTestDrive.missDeadline) {
+      int days = _dateFinishTestDrive!.difference(DateTime.now()).inDays;
+      return 'Просрочен на ${days.abs()} ${pluralize(days.abs())}';
     }
-    if(status == StatusTestDrive.inProcess){
-      return 'В процессе';
-    } else{
-      return 'Завершен';
+    if (status == StatusTestDrive.inProcess) {
+      return 'В процессе до ${_dateFinishTestDrive!.dateFormattedForInterface()}';
+    } else {
+      return 'Завершен ${_dateFinishTestDrive!.dateFormattedForInterface()}';
     }
   }
 
-  Color getColorTestDrive(StatusTestDrive status){
-    if(status == StatusTestDrive.notMake){
+  Widget getSubtitleTestDrive() {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 20,
+            children: [
+              Column(children: [
+                Text('Начало', style: TextStyle(fontStyle: FontStyle.italic),),
+                GestureDetector(
+                  onTap: () {
+                    showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2099),
+                        locale: const Locale("ru", "RU"))
+                        .then((date) {
+                      setState(() {
+                        if (date != null) {
+                          _dateStartTestDrive = date;
+                          _dateFinishTestDrive = _dateStartTestDrive!.add(Duration(days: countDaysTestDrive));
+                        }
+                      });
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black26)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        spacing: 2,
+                        children: [
+                          Icon(Icons.calendar_today_outlined, size: 20, color: Colors.grey,),
+                          Text(DateFormat('dd/MM/yyyy').format(_dateStartTestDrive!)),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              ],),
+              Column(children: [
+                Text('Конец', style: TextStyle(fontStyle: FontStyle.italic),),
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black26)
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      spacing: 2,
+                      children: [
+                        Icon(Icons.calendar_today_outlined, size: 20, color: Colors.grey,),
+                        Text(DateFormat('dd/MM/yyyy').format(_dateFinishTestDrive!)),
+                      ],
+                    ),
+                  ),
+                )
+              ],),
+            ],),
+          SizedBox(height: 15,),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 3,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Text('Результат', style: TextStyle(fontStyle: FontStyle.italic),),
+                ),
+                TextFormField(
+                  maxLines: 2,
+                  decoration: myDecorationTextFormField(),
+                  controller: _resultTestDrive,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10,),
+        ],),
+    );
+  }
+
+  Color getColorTestDrive(StatusTestDrive status) {
+    if (status == StatusTestDrive.notMake) {
       return Colors.blue.shade50;
     }
-    if(status == StatusTestDrive.missDeadline){
-      return Colors.red.shade100;
+    if (status == StatusTestDrive.missDeadline) {
+      return Colors.red.shade50;
     }
-    if(status == StatusTestDrive.inProcess){
-      return Colors.yellow.shade100;
-    } else{
-      return Colors.green.shade100;
+    if (status == StatusTestDrive.inProcess) {
+      return Colors.yellow.shade50;
+    } else {
+      return Colors.green.shade50;
     }
   }
 
   Widget _buildCostAndTotalSumRepairs(ProviderModel provider) {
-    bool isListEmpty = summsRepairs.isEmpty;
+    bool isListEmpty = sumsRepairs.isEmpty;
     return Column(
       children: [
         InkWell(
@@ -562,7 +699,10 @@ class _TechnicViewState extends State<TechnicView> {
                     ],
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                     title: Text('Редактировать'),
-                    titleTextStyle: Theme.of(context).textTheme.headlineMedium,
+                    titleTextStyle: Theme
+                        .of(context)
+                        .textTheme
+                        .headlineMedium,
                     content: TextFormField(
                       decoration: myDecorationTextFormField(null, 'Стоимость техники'),
                       controller: _costTechnic..text = widget.technic.cost.toString(),
@@ -584,7 +724,10 @@ class _TechnicViewState extends State<TechnicView> {
                 children: [
                   Text(
                     'Стоимость техники: ${NumberFormat('#,###', 'fr').format(widget.technic.cost)} р.',
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .headlineMedium,
                   ),
                   SizedBox(
                     width: 7,
@@ -601,32 +744,32 @@ class _TechnicViewState extends State<TechnicView> {
         isListEmpty
             ? SizedBox()
             : InkWell(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      animationRouteSlideTransition(RepairsTechnicPage(
-                        summsRepairs: summsRepairs,
-                        technic: widget.technic,
-                      )));
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                  child: Container(
-                    padding: EdgeInsets.only(left: 10, top: 5, bottom: 5),
-                    decoration:
-                        BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.blue.shade50),
-                    child: ListTile(
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Количество ремонтов: ${summsRepairs.length}'),
-                          Text('Cтоимость ремонтов: ${NumberFormat('#,###', 'fr').format(totalSumm)} р.')
-                        ],
-                      ),
-                    ),
-                  ),
+          onTap: () {
+            Navigator.push(
+                context,
+                animationRouteSlideTransition(RepairsTechnicPage(
+                  summsRepairs: sumsRepairs,
+                  technic: widget.technic,
+                )));
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: Container(
+              padding: EdgeInsets.only(left: 10, top: 5, bottom: 5),
+              decoration:
+              BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.blue.shade50),
+              child: ListTile(
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Количество ремонтов: ${sumsRepairs.length}'),
+                    Text('Cтоимость ремонтов: ${NumberFormat('#,###', 'fr').format(totalSumm)} р.')
+                  ],
                 ),
               ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -798,40 +941,31 @@ class _TechnicViewState extends State<TechnicView> {
   //   );
   // }
 
-  Future<bool> _save(Technic technicModel, ProviderModel providerModel) async{
+  Future<bool> _save(Technic technicModel, ProviderModel providerModel, SaveTestDrive status) async {
     LoadingOverlay.of(context).show();
-    bool isSuccess = false;
-    isSuccess = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technicModel, providerModel.user.name);
+    bool isSuccessStatus = false;
+    bool isSuccessTestDrive = false;
+    isSuccessStatus = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(
+        technicModel, providerModel.user.name);
+    switch (status) {
+      case SaveTestDrive.save:
+        isSuccessTestDrive = await TechnicalSupportRepoImpl.downloadData.saveTestDrive(technicModel.testDrive!);
+      case SaveTestDrive.update:
+        isSuccessTestDrive = await TechnicalSupportRepoImpl.downloadData.updateTestDrive(technicModel.testDrive!);
+      case SaveTestDrive.notSave:
+        isSuccessTestDrive = true;
+    }
+
     Map<String, dynamic> result = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
     providerModel.refreshTechnics(result['Photosalons'], result['Repairs'], result['Storages']);
     if (mounted) {
       LoadingOverlay.of(context).hide();
     }
-    return isSuccess;
+    return isSuccessStatus && isSuccessTestDrive;
   }
 
-  // Future addHistory(Technic technic, String nameUser) async {
-  //   String descForHistory = descriptionForHistory(technic);
-  //   History history = History(History.historyList.last.id + 1, 'Technic', technic.id, 'create', descForHistory,
-  //       nameUser, DateFormat('yyyy.MM.dd').format(DateTime.now()));
-  //
-  //   ConnectDbMySQL.connDB.insertHistory(history);
-  //   History.historyList.insert(0, history);
-  // }
-  //
-  // String descriptionForHistory(Technic technic) {
-  //   String internalID = technic.number == -1 ? 'БН' : '№${technic.number}';
-  //   String result = 'Новая техника $internalID добавленна';
-  //
-  //   return result;
-  // }
-
-  // String getDateFormat(String date) {
-  //   return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
-  // }
-
   void _viewSnackBar(IconData icon, bool isSuccessful, String text) {
-    if(context.mounted){
+    if (context.mounted) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -853,48 +987,6 @@ class _TechnicViewState extends State<TechnicView> {
           context, animationRouteSlideTransition(const ArtphotoTech()), (Route<dynamic> route) => false);
     }
   }
-
-// String validateEmptyFields() {
-//   String result = '';
-//   String tmpResult = '';
-//   int countEmptyFields = 0;
-//
-//   if (_innerNumberTechnic.text == "") {
-//     tmpResult += 'Номер техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_selectedDropdownCategory == null) {
-//     tmpResult += 'Наименование техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_costTechnic.text == "") {
-//     tmpResult += 'Стоимость техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_dateBuyTechnic == "") {
-//     tmpResult += 'Дата покупки техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_selectedDropdownStatus == null) {
-//     tmpResult += 'Статус техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_selectedDropdownDislocation == null) {
-//     tmpResult += 'Дислокация техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_switchTestDrive && _selectedDropdownTestDriveDislocation == null) {
-//     tmpResult += 'Место тест-драйва, ';
-//     countEmptyFields++;
-//   }
-//
-//   if (countEmptyFields > 0) {
-//     tmpResult = tmpResult.trim().replaceFirst(',', '', tmpResult.length - 5);
-//     result = getFieldAddition(countEmptyFields);
-//     result += '$tmpResult.';
-//   }
-//   return result;
-// }
 }
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {

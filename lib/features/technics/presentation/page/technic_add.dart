@@ -665,15 +665,6 @@ class _TechnicAddState extends State<TechnicAdd> {
     }
   }
 
-  Future addHistory(Technic technic, String nameUser) async {
-    String descForHistory = descriptionForHistory(technic);
-    History history = History(History.historyList.last.id + 1, 'Technic', technic.id, 'create', descForHistory,
-        nameUser, DateFormat('yyyy.MM.dd').format(DateTime.now()));
-
-    ConnectDbMySQL.connDB.insertHistory(history);
-    History.historyList.insert(0, history);
-  }
-
   String descriptionForHistory(Technic technic) {
     String internalID = technic.number == -1 ? 'БН' : '№${technic.number}';
     String result = 'Новая техника $internalID добавленна';

@@ -11,6 +11,7 @@ import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/domain/repositories/technical_support_repo.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
+import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 
 import '../../../../features/repairs/models/repair.dart';
@@ -395,6 +396,30 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     return troubles;
   }
 
+  @override
+  Future<bool> saveTestDrive(TestDrive testDrive) async{
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.insertTestDriveInDB(testDrive);
+      await ConnectDbMySQL.connDB.dispose();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> updateTestDrive(TestDrive testDrive) async{
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.updateTestDriveInDB(testDrive);
+      await ConnectDbMySQL.connDB.dispose();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
 //   List getNotifications() {
 //     List notifications = [];
 //     notifications.addAll(getListNotificationsDontTestDriveAfterRepairBetter1Day());
@@ -483,29 +508,5 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 //       }
 //     });
 //     return notifications;
-//   }
-//
-//   DateTime? getDate(String date) {
-//     if(date != '') {
-//       return DateTime.parse(date.replaceAll('.', '-'));
-//     }
-//     return null;
-//   }
-//
-//   String getDayAddition(int num) {
-//     double preLastDigit = num % 100 / 10;
-//     if (preLastDigit.round() == 1) {
-//       return "дней";
-//     }
-//     switch (num % 10) {
-//       case 1:
-//         return "день";
-//       case 2:
-//       case 3:
-//       case 4:
-//         return "дня";
-//       default:
-//         return "дней";
-//     }
 //   }
 }

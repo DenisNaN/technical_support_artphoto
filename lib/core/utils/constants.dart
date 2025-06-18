@@ -1,0 +1,1 @@
+const int countDaysTestDrive = 14;

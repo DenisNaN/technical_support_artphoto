@@ -38,3 +38,9 @@ enum StatusTestDrive{
   finished,
   missDeadline,
 }
+
+enum SaveTestDrive{
+  notSave,
+  save,
+  update,
+}
