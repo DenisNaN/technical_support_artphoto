@@ -5,3 +5,9 @@ extension DateForSQL on DateTime {
     return DateFormat('yyyy.MM.dd').format(this);
   }
 }
+
+extension DateForInterface on DateTime{
+  String dateFormattedForInterface(){
+    return DateFormat("d MMMM yyyy", "ru_RU").format(this);
+  }
+}

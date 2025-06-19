@@ -470,187 +470,19 @@ class _TechnicAddState extends State<TechnicAdd> {
     );
   }
 
-  // ListTile _buildSwitchTestDrive() {
-  //   return ListTile(
-  //     title: Row(mainAxisSize: MainAxisSize.min, children: [
-  //       _switchTestDrive
-  //           ? const Text('Выключить тест-драйв ')
-  //           : const Text('Включить тест-драйв '),
-  //       Switch(
-  //           value: _switchTestDrive,
-  //           onChanged: (value) {
-  //             setState(() {
-  //               _switchTestDrive = value;
-  //               if (!_switchTestDrive) {
-  //                 _dateStartTestDrive = '';
-  //                 _dateFinishTestDrive = '';
-  //                 _resultTestDrive.text = '';
-  //                 _checkboxTestDrive = false;
-  //               } else {
-  //                 _dateStartTestDrive = DateFormat('yyyy.MM.dd').format(DateTime.now());
-  //               }
-  //               if (_switchTestDrive &&
-  //                   !_checkboxTestDrive &&
-  //                   _dateFinishTestDrive == '' &&
-  //                   !_isCategoryPhotocamera) {
-  //                 DateTime finishTestDrive = DateFormat('yyyy.MM.dd')
-  //                     .parse(_dateStartTestDrive)
-  //                     .add(const Duration(days: 14));
-  //                 _dateFinishTestDrive = DateFormat('yyyy.MM.dd').format(finishTestDrive);
-  //               }
-  //             });
-  //           }),
-  //     ]),
-  //   );
-  // }
-  //
-  // ListTile _buildTestDrive(ProviderModel providerModel) {
-  //   return ListTile(
-  //       title: _switchTestDrive
-  //           ? _buildTestDriveListTile(providerModel)
-  //           : const Text('Тест-драйв не проводился'));
-  // }
-  //
-  // Padding _buildTestDriveListTile(ProviderModel providerModel) {
-  //   return Padding(
-  //     padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-  //     child: Container(
-  //       decoration: BoxDecoration(
-  //           color: Colors.blue.shade50,
-  //           borderRadius: BorderRadius.circular(20),
-  //           boxShadow: const [
-  //             BoxShadow(
-  //               color: Colors.grey,
-  //               blurRadius: 4,
-  //               offset: Offset(2, 4), // Shadow position
-  //             ),
-  //           ]),
-  //       child: ListTile(
-  //         title: Column(
-  //           children: [
-  //             ListTile(
-  //               contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-  //               leading: const Icon(Icons.airport_shuttle),
-  //               title: DropdownButton<String>(
-  //                 isExpanded: true,
-  //                 hint: const Text('Место тест-драйва'),
-  //                 icon: _selectedDropdownTestDriveDislocation != null
-  //                     ? IconButton(
-  //                         icon: const Icon(Icons.clear, color: Colors.grey),
-  //                         onPressed: () {
-  //                           setState(() {
-  //                             _selectedDropdownTestDriveDislocation = null;
-  //                           });
-  //                         })
-  //                     : null,
-  //                 value: _selectedDropdownTestDriveDislocation,
-  //                 items: providerModel.namesPhotosalons
-  //                     .map<DropdownMenuItem<String>>((String value) {
-  //                   return DropdownMenuItem<String>(
-  //                     value: value,
-  //                     child: Text(value),
-  //                   );
-  //                 }).toList(),
-  //                 onChanged: (String? value) {
-  //                   setState(() {
-  //                     _selectedDropdownTestDriveDislocation = value!;
-  //                   });
-  //                 },
-  //               ),
-  //             ),
-  //             ListTile(
-  //               contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-  //               leading: const Icon(Icons.today),
-  //               title: const Text("Дата начала тест-драйва"),
-  //               subtitle: Text(_dateStartTestDrive),
-  //               trailing: IconButton(
-  //                   icon: const Icon(Icons.edit),
-  //                   onPressed: () {
-  //                     showDatePicker(
-  //                             context: context,
-  //                             initialDate: DateTime.now(),
-  //                             firstDate: DateTime(2000),
-  //                             lastDate: DateTime(2099),
-  //                             locale: const Locale("ru", "RU"))
-  //                         .then((date) {
-  //                       setState(() {
-  //                         if (date != null) {
-  //                           _dateStartTestDrive =
-  //                               DateFormat('d MMMM yyyy', "ru_RU").format(date);
-  //                         }
-  //                       });
-  //                     });
-  //                   },
-  //                   color: Colors.blue),
-  //             ),
-  //             !_isCategoryPhotocamera
-  //                 ? ListTile(
-  //                     contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-  //                     leading: const Icon(Icons.today),
-  //                     title: const Text("Дата конца тест-драйва"),
-  //                     subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(
-  //                         DateTime.parse(_dateFinishTestDrive.replaceAll('.', '-')))),
-  //                     trailing: IconButton(
-  //                         icon: const Icon(Icons.edit),
-  //                         onPressed: () {
-  //                           showDatePicker(
-  //                                   context: context,
-  //                                   initialDate: DateTime.now(),
-  //                                   firstDate: DateTime(2000),
-  //                                   lastDate: DateTime(2099),
-  //                                   locale: const Locale("ru", "RU"))
-  //                               .then((date) {
-  //                             setState(() {
-  //                               if (date != null) {
-  //                                 _dateFinishTestDrive =
-  //                                     DateFormat('d MMMM yyyy', "ru_RU").format(date);
-  //                               }
-  //                             });
-  //                           });
-  //                         },
-  //                         color: Colors.blue),
-  //                   )
-  //                 : const SizedBox.shrink(),
-  //             ListTile(
-  //               contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-  //               leading: const Icon(Icons.create),
-  //               title: TextFormField(
-  //                 decoration:
-  //                     const InputDecoration(hintText: "Результат проверки-тестирования"),
-  //                 controller: _resultTestDrive,
-  //               ),
-  //             ),
-  //             CheckboxListTile(
-  //                 contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-  //                 title: const Text('Тест-драйв выполнен'),
-  //                 secondary: const Icon(Icons.check),
-  //                 value: _checkboxTestDrive,
-  //                 onChanged: (bool? value) {
-  //                   setState(() {
-  //                     _checkboxTestDrive = value!;
-  //                   });
-  //                 })
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Future<bool> _save(Technic technic, ProviderModel providerModel) async {
     LoadingOverlay.of(context).show();
     String nameUser = providerModel.user.name;
     int? id = await TechnicalSupportRepoImpl.downloadData.saveTechnic(technic, nameUser);
     if(id != null){
       technic.id = id;
-      // await addHistory(technic, nameUser);
       addTechnicInProviderModel(technic, providerModel);
-      if(context.mounted){
+      if(mounted){
         LoadingOverlay.of(context).hide();
       }
       return true;
     }
-    if(context.mounted){
+    if(mounted){
       LoadingOverlay.of(context).hide();
     }
     return false;
@@ -663,15 +495,6 @@ class _TechnicAddState extends State<TechnicAdd> {
     } else {
       providerModel.addTechnicInStorage(dislocation, technic);
     }
-  }
-
-  Future addHistory(Technic technic, String nameUser) async {
-    String descForHistory = descriptionForHistory(technic);
-    History history = History(History.historyList.last.id + 1, 'Technic', technic.id, 'create', descForHistory,
-        nameUser, DateFormat('yyyy.MM.dd').format(DateTime.now()));
-
-    ConnectDbMySQL.connDB.insertHistory(history);
-    History.historyList.insert(0, history);
   }
 
   String descriptionForHistory(Technic technic) {

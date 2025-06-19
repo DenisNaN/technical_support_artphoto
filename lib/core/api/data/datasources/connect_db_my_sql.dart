@@ -6,11 +6,11 @@ import 'package:technical_support_artphoto/core/api/data/models/repair_location.
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
 import 'package:technical_support_artphoto/core/utils/extension.dart';
-import 'package:technical_support_artphoto/features/history/history.dart';
 import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
+import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../models/decommissioned.dart';
 import '../../../../features/technics/models/technic.dart';
@@ -66,6 +66,8 @@ class ConnectDbMySQL {
       var result = await _connDB!.query(query);
       for (var row in result) {
         Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
+        TestDrive? testDrive = await fetchTestDrive(technic.id.toString());
+        if(testDrive != null) technic.testDrive = testDrive;
         photosalon.technics.add(technic);
       }
       photosalons[namePhotosalon] = photosalon;
@@ -95,6 +97,8 @@ class ConnectDbMySQL {
       var result = await _connDB!.query(query);
       for (var row in result) {
         Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
+        TestDrive? testDrive = await fetchTestDrive(technic.id.toString());
+        if(testDrive != null) technic.testDrive = testDrive;
         repair.technics.add(technic);
       }
       repairs[nameRepair] = repair;
@@ -124,6 +128,8 @@ class ConnectDbMySQL {
       var result = await _connDB!.query(query);
       for (var row in result) {
         Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
+        TestDrive? testDrive = await fetchTestDrive(technic.id.toString());
+        if(testDrive != null) technic.testDrive = testDrive;
         storage.technics.add(technic);
       }
       storages[nameStorage] = storage;
@@ -149,6 +155,8 @@ class ConnectDbMySQL {
     var result = await _connDB!.query(query);
     for (var row in result) {
       Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
+      TestDrive? testDrive = await fetchTestDrive(technic.id.toString());
+      if(testDrive != null) technic.testDrive = testDrive;
       decommissionedTechnics.technics.add(technic);
     }
     return decommissionedTechnics;
@@ -214,56 +222,66 @@ class ConnectDbMySQL {
         [id, status, dislocation, DateTime.now().dateFormattedForSQL(), nameUser]);
   }
 
-  // Future insertTestDriveInDB(Technic technic, String nameUser) async {
-  //   await ConnectDbMySQL.connDB.connDatabase();
-  //   await _connDB!.query(
-  //       'INSERT INTO testDrive (idEquipment, category, testDriveDislocation, dateStart, dateFinish, result, '
-  //       'checkEquipment, user) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-  //       [
-  //         technic.id,
-  //         technic.category,
-  //         technic.testDriveDislocation,
-  //         technic.dateStartTestDrive,
-  //         technic.dateFinishTestDrive,
-  //         technic.resultTestDrive,
-  //         technic.checkboxTestDrive,
-  //         nameUser
-  //       ]);
-  //
-  //   int idLastTestDrive = await findIDLastTestDriveTechnic(technic);
-  //   int idLastRepair = await findLastRepair(technic);
-  //   await _connDB!.query('UPDATE repairEquipment SET idTestDrive = ? WHERE id = ?', [idLastTestDrive, idLastRepair]);
-  // }
-
-  // Future<int> findIDLastTestDriveTechnic(TechnicModel technic) async {
-  //   await ConnectDbMySQL.connDB.connDatabase();
-  //   var result =
-  //       await _connDB!.query('SELECT id FROM testDrive WHERE idEquipment = ? ORDER BY id DESC LIMIT 1', [technic.id]);
-  //   int id = lastTectDriveListFromMap(result);
-  //   return id;
-  // }
-
-  // int lastTectDriveListFromMap(var result) {
-  //   int id = -1;
-  //   for (var row in result) {
-  //     id = row[0];
-  //   }
-  //   return id;
-  // }
-
-  Future insertHistory(History history) async {
-    await _connDB!.query(
-        'INSERT INTO history ('
-        'section, idSection, typeOperation, description, login, date) '
-        'VALUES (?, ?, ?, ?, ?, ?)',
+  Future<int> insertTestDriveInDB(TestDrive testDrive) async {
+    int closeTestDrive = 0;
+    if(testDrive.isCloseTestDrive) closeTestDrive = 1;
+    var result = await _connDB!.query(
+        'INSERT INTO test_drive (idEquipment, category, testDriveDislocation, dateStart, dateFinish, result, '
+        'checkEquipment, user) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         [
-          history.section,
-          history.idSection,
-          history.typeOperation,
-          history.description,
-          history.login,
-          history.date,
+          testDrive.idTechnic.toString(),
+          testDrive.categoryTechnic,
+          testDrive.dislocationTechnic,
+          testDrive.dateStart.dateFormattedForSQL(),
+          testDrive.dateFinish.dateFormattedForSQL(),
+          testDrive.result,
+          closeTestDrive.toString(),
+          testDrive.user
         ]);
+    return result.insertId!;
+  }
+
+  Future updateTestDriveInDB(TestDrive testDrive) async{
+    int checkBox = 0;
+    if(testDrive.isCloseTestDrive) checkBox = 1;
+
+    await _connDB!.query(
+      'UPDATE test_drive SET testDriveDislocation = ?, dateStart = ?, dateFinish = ?, '
+          'result = ?, checkEquipment = ? WHERE id = ?',
+      [
+        testDrive.dislocationTechnic,
+        testDrive.dateStart.dateFormattedForSQL(),
+        testDrive.dateFinish.dateFormattedForSQL(),
+        testDrive.result,
+        checkBox.toString(),
+        testDrive.id.toString()
+      ]);
+  }
+
+  Future<TestDrive?> fetchTestDrive(String id) async {
+    TestDrive? testDrive;
+    var result =
+        await _connDB!.query('SELECT * FROM test_drive WHERE idEquipment = $id ORDER BY id DESC LIMIT 1');
+    testDrive = testDriveFromMap(result);
+    return testDrive;
+  }
+
+  TestDrive? testDriveFromMap(var result) {
+    TestDrive? testDrive;
+    for (var row in result) {
+      bool isCloseTestDrive = row[7] == 0 ? false : true;
+      testDrive = TestDrive(
+          idTechnic: row[1],
+          categoryTechnic: row[2],
+          dislocationTechnic: row[3],
+          dateStart: row[4],
+          dateFinish: row[5],
+          result: row[6],
+          isCloseTestDrive: isCloseTestDrive,
+          user: row[8]);
+      testDrive.id = row[0];
+    }
+    return testDrive;
   }
 
   Future<List<String>> fetchStatusForEquipment() async {
@@ -347,28 +365,6 @@ Future<Technic?> getTechnic(int number) async {
   return technic;
 }
 
-// Future<List> getAllTestDrive() async {
-//   List list = [];
-//   var result = await _connDB!.query('SELECT * FROM testDrive');
-//   // id-row[0], idEquipment-row[1],  category-row[2],  testDriveDislocation-row[3],
-//   // dateStart-row[4], dateFinish-row[5], result-row[6], checkEquipment-row[7], user-row[8]
-//
-//   for(var row in result){
-//     String dateStartTestDrive = '';
-//     if(row[4] != null && row[4].toString() != "-0001-11-30 00:00:00.000Z") dateStartTestDrive = getDateFormatted(row[4].toString());
-//     String dateFinishTestDrive = '';
-//     if(row[5] != null && row[5].toString() != "-0001-11-30 00:00:00.000Z") dateFinishTestDrive = getDateFormatted(row[5].toString());
-//     bool checkTestDrive = false;
-//     if(row[7] != null && row[7] == 1) checkTestDrive = true;
-//
-//     Technic testDriveTechnic = Technic.testDrive(
-//         row[1], row[2], row[3], dateStartTestDrive, dateFinishTestDrive,
-//         row[6], checkTestDrive, row[8]);
-//     list.add(testDriveTechnic);
-//   }
-//   return list;
-// }
-
   Future<List<Repair>> fetchCurrentRepairs() async {
     var result = await _connDB!.query('SELECT * FROM repairEquipment '
         'WHERE repairEquipment.dateReceipt = "0000-00-00" OR repairEquipment.dateReceipt = "0001-11-30"');
@@ -433,28 +429,28 @@ Future<Technic?> getTechnic(int number) async {
     return list;
   }
 
-  Future<Map<int, List<SummRepair>>> getSummsRepairs(String numberTechnic) async {
+  Future<Map<int, List<SumRepair>>> getSummsRepairs(String numberTechnic) async {
     var result = await _connDB!.query(
         'SELECT '
         'id, serviceDislocation, costService, complaint, worksPerformed, dateTransferInService, dateReceipt '
         'FROM repairEquipment WHERE number = ?',
         [numberTechnic]);
-    List<SummRepair> listSummsRepairs = [];
+    List<SumRepair> listSummsRepairs = [];
     int totalSumm = 0;
     for (var row in result) {
-      SummRepair summRepair = SummRepair(
+      SumRepair summRepair = SumRepair(
           idRepair: row[0],
           repairmen: row[1],
-          summRepair: row[2],
+          sumRepair: row[2],
           complaint: row[3],
           worksPerformed: row[4],
           dateTransferInService: row[5],
           dateReceipt: row[6]);
       listSummsRepairs.add(summRepair);
-      totalSumm += summRepair.summRepair;
+      totalSumm += summRepair.sumRepair;
     }
-    List<SummRepair> reversedList = List.from(listSummsRepairs.reversed);
-    Map<int, List<SummRepair>> mapResult = {};
+    List<SumRepair> reversedList = List.from(listSummsRepairs.reversed);
+    Map<int, List<SumRepair>> mapResult = {};
     mapResult[totalSumm] = reversedList;
     return mapResult;
   }
@@ -528,26 +524,6 @@ Future<Technic?> getTechnic(int number) async {
 //     list.add(history);
 //   }
 //   return list;
-// }
-//
-
-// Future updateTestDriveInDB(Technic technic) async{
-//   int checkBox = 0;
-//   if(technic.checkboxTestDrive) checkBox = 1;
-//
-//   await ConnectDbMySQL.connDB.connDatabase();
-//   int id = await findIDLastTestDriveTechnic(technic);
-//   await _connDB!.query(
-//       'UPDATE testDrive SET testDriveDislocation = ?, dateStart = ?, dateFinish = ?, '
-//           'result = ?, checkEquipment = ? WHERE id = ?',
-//       [
-//         technic.testDriveDislocation,
-//         technic.dateStartTestDrive,
-//         technic.dateFinishTestDrive,
-//         technic.resultTestDrive,
-//         checkBox,
-//         id
-//       ]);
 // }
 
   Future<void> updateTechnicInDB(Technic technic) async {

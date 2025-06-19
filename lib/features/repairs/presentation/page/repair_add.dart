@@ -455,12 +455,12 @@ class _RepairAddState extends State<RepairAdd> {
       }
       providerModel.refreshCurrentRepairs(resultData);
       // await addHistory(technic, nameUser);
-      if(context.mounted){
+      if(mounted){
         LoadingOverlay.of(context).hide();
       }
       return true;
     }
-    if(context.mounted){
+    if(mounted){
       LoadingOverlay.of(context).hide();
     }
     return false;
