@@ -6,7 +6,6 @@ import 'package:technical_support_artphoto/core/api/data/models/repair_location.
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
 import 'package:technical_support_artphoto/core/utils/extension.dart';
-import 'package:technical_support_artphoto/features/history/history.dart';
 import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
@@ -244,7 +243,6 @@ class ConnectDbMySQL {
 
   Future updateTestDriveInDB(TestDrive testDrive) async{
     int checkBox = 0;
-    String result = 'ok';
     if(testDrive.isCloseTestDrive) checkBox = 1;
 
     await _connDB!.query(
@@ -252,18 +250,16 @@ class ConnectDbMySQL {
           'result = ?, checkEquipment = ? WHERE id = ?',
       [
         testDrive.dislocationTechnic,
-        testDrive.dateStart,
-        testDrive.dateFinish,
-        testDrive.result != '' ? testDrive.result : result,
-        checkBox,
-        testDrive.id
+        testDrive.dateStart.dateFormattedForSQL(),
+        testDrive.dateFinish.dateFormattedForSQL(),
+        testDrive.result,
+        checkBox.toString(),
+        testDrive.id.toString()
       ]);
   }
 
-  /// TODO
   Future<TestDrive?> fetchTestDrive(String id) async {
     TestDrive? testDrive;
-    await ConnectDbMySQL.connDB.connDatabase();
     var result =
         await _connDB!.query('SELECT * FROM test_drive WHERE idEquipment = $id ORDER BY id DESC LIMIT 1');
     testDrive = testDriveFromMap(result);
@@ -433,28 +429,28 @@ Future<Technic?> getTechnic(int number) async {
     return list;
   }
 
-  Future<Map<int, List<SummRepair>>> getSummsRepairs(String numberTechnic) async {
+  Future<Map<int, List<SumRepair>>> getSummsRepairs(String numberTechnic) async {
     var result = await _connDB!.query(
         'SELECT '
         'id, serviceDislocation, costService, complaint, worksPerformed, dateTransferInService, dateReceipt '
         'FROM repairEquipment WHERE number = ?',
         [numberTechnic]);
-    List<SummRepair> listSummsRepairs = [];
+    List<SumRepair> listSummsRepairs = [];
     int totalSumm = 0;
     for (var row in result) {
-      SummRepair summRepair = SummRepair(
+      SumRepair summRepair = SumRepair(
           idRepair: row[0],
           repairmen: row[1],
-          summRepair: row[2],
+          sumRepair: row[2],
           complaint: row[3],
           worksPerformed: row[4],
           dateTransferInService: row[5],
           dateReceipt: row[6]);
       listSummsRepairs.add(summRepair);
-      totalSumm += summRepair.summRepair;
+      totalSumm += summRepair.sumRepair;
     }
-    List<SummRepair> reversedList = List.from(listSummsRepairs.reversed);
-    Map<int, List<SummRepair>> mapResult = {};
+    List<SumRepair> reversedList = List.from(listSummsRepairs.reversed);
+    Map<int, List<SumRepair>> mapResult = {};
     mapResult[totalSumm] = reversedList;
     return mapResult;
   }
