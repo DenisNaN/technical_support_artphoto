@@ -46,7 +46,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    trouble = widget.troubleMain;
+    trouble = widget.troubleMain.copyWith();
     _photoTrouble = widget.troubleMain.photoTrouble;
     _dateFixTroubleEmployee = widget.troubleMain.dateFixTroubleEmployee;
     _fixTroubleEmployee.text = widget.troubleMain.fixTroubleEmployee ?? '';
@@ -90,7 +90,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                   child: ListView(
                     padding: EdgeInsets.zero,
                     children: [
-                      LoadingOverlay(child: HeaderViewTrouble(trouble: trouble, technic: technic)),
+                      HeaderViewTrouble(trouble: trouble, technic: technic),
                       SizedBox(height: 20),
                       _buildPhotoTrouble(),
                       SizedBox(height: 14),
@@ -398,7 +398,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
           style: const ButtonStyle(
               backgroundColor: WidgetStatePropertyAll(Colors.greenAccent)
           ),
-          child: const Text('Сформировать заявку на ремонт'),
+          child: const Text('Сформировать заявку на ремонт', textAlign: TextAlign.center,),
       ),
     );
   }
@@ -613,7 +613,6 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
         await TechnicalSupportRepoImpl.downloadData.updateTrouble(trouble);
     if (resultData != null) {
       providerModel.refreshTroubles(resultData);
-      // await addHistory(technic, nameUser);
       if(mounted){
         LoadingOverlay.of(context).hide();
       }
@@ -624,30 +623,6 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
     }
     return false;
   }
-
-  // Future addHistory(Trouble trouble) async {
-  // String descForHistory = descriptionForHistory(repair);
-  // History historyForSQL = History(
-  //     History.historyList.last.id + 1,
-  //     'Repair',
-  //     repair.id!,
-  //     'create',
-  //     descForHistory,
-  //     LoginPassword.login,
-  //     DateFormat('yyyy.MM.dd').format(DateTime.now())
-  // );
-  //
-  // ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
-  // HistorySQFlite.db.insertHistory(historyForSQL);
-  // History.historyList.insert(0, historyForSQL);
-  // }
-
-  // String descriptionForHistory(Repair repair){
-  //   String internalID = repair.internalID == -1 ? 'БН' : '№${repair.internalID}';
-  //   String result = 'Заявка на ремонт $internalID добавленна';
-  //
-  //   return result;
-  // }
 
   void _viewSnackBar(
       IconData icon, bool isSuccessful, String successText, String notSuccessText, bool isSkip) {

@@ -228,24 +228,26 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar) {
-    if(isSkipPrevSnackBar){
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
-            SizedBox(
-              width: 20,
-            ),
-            Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
-          ],
+    if (mounted) {
+      if(isSkipPrevSnackBar){
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+              SizedBox(
+                width: 20,
+              ),
+              Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
+            ],
+          ),
+          duration: const Duration(seconds: 5),
+          showCloseIcon: true,
         ),
-        duration: const Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
+      );
+    }
   }
 }

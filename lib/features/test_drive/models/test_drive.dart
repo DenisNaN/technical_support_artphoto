@@ -10,6 +10,7 @@ class TestDrive{
   final String user;
 
   TestDrive({
+    this.id,
     required this.idTechnic,
     required this.categoryTechnic,
     required this.dislocationTechnic,

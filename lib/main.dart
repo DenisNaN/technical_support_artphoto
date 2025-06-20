@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -7,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/di/init_dependencies.dart';
 import 'package:technical_support_artphoto/core/navigation/main_bottom_page_view.dart';
+import 'package:technical_support_artphoto/core/shared/failed_application/send_mail_failed_app.dart';
 import 'package:technical_support_artphoto/features/splash_screen/presentation/page/splash_screen.dart';
 import 'core/navigation/main_bottom_app_bar.dart';
 
@@ -15,11 +17,21 @@ void main() {
         () async {
       WidgetsFlutterBinding.ensureInitialized();
       await initDependencies();
+      FlutterError.onError = (FlutterErrorDetails details) {
+        sendEmailNewTrouble(error: null, stack: null, flutterErrorDetails: '${details.exception}\n\nStack: ${details.stack}');
+        debugPrint('🔥 FlutterError.onError поймал ошибку: ${details.exception}');
+      };
+      PlatformDispatcher.instance.onError = (error, stack) {
+        sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '');
+        debugPrint('🔥 PlatformDispatcher поймал ошибку: $error');
+        return true;
+      };
 
       runApp(const SplashScreenArtphoto());
     },
         (Object error, StackTrace stack) {
-      debugPrint('ARTPHOTO [CrashEvent] [DEBUG] $error\n$stack');
+          sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '');
+          debugPrint('ARTPHOTO [CrashEvent] [DEBUG] $error\n$stack');
     },
   );
 }
@@ -55,7 +67,7 @@ class SplashScreenArtphoto extends StatelessWidget {
 }
 
 class ArtphotoTech extends StatefulWidget {
-  const ArtphotoTech({super.key, this.indexPage = 0});
+  const ArtphotoTech({super.key, this.indexPage = 0,});
 
   final int indexPage;
 
@@ -85,44 +97,6 @@ class _ArtphotoTechState extends State<ArtphotoTech> {
         body: MainBottomPageView(pageController: pageViewController)
     );
   }
-
-// Row _buildTitleAppBar(String nameUser, ProviderModel providerModel) {
-//   return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-//     Text(nameUser),
-//       providerModel.currentPageIndexMainBottomAppBar == 3
-//         ? const SizedBox()
-//         : Padding(
-//       padding: const EdgeInsets.all(8.0),
-//       child: ElevatedButton(
-//         style: ElevatedButton.styleFrom(
-//           shadowColor: Colors.transparent,
-//           backgroundColor: Colors.black.withOpacity(0.4),
-//           shape: RoundedRectangleBorder(
-//             borderRadius: BorderRadius.circular(30),
-//           ),
-//           padding: const EdgeInsets.all(12),
-//         ),
-//         child: const Row(
-//           children: [Icon(Icons.search), Text('Поиск и сортировка')],
-//         ),
-//         onPressed: () {
-//           switch (providerModel.currentPageIndexMainBottomAppBar) {
-//             case 0:
-//             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTechnic()));
-//               break;
-//             case 1:
-//             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedRepairs()));
-//               break;
-//             case 2:
-//             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTrouble()));
-//               break;
-//           }
-//         },
-//       ),
-//     ),
-//     Expanded(child: Container(alignment: Alignment.centerRight, child: myAppBarIconNotifications())),
-//   ]);
-// }
 
 // Widget myAppBarIconNotifications() {
 //   return GestureDetector(
