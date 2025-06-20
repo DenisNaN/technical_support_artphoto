@@ -33,7 +33,6 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
   void initState() {
     super.initState();
     _numberTechnic.text = widget.trouble.numberTechnic.toString();
-    _selectedDropdownDislocation = widget.trouble.photosalon;
     _dateTrouble = widget.trouble.dateTrouble;
     _employee.text = widget.trouble.employee;
     _complaint.text = widget.trouble.trouble;
@@ -41,6 +40,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
 
   @override
   Widget build(BuildContext context) {
+    _selectedDropdownDislocation = validateDropdownPhotosalon(widget.trouble);
     final providerModel = Provider.of<ProviderModel>(context);
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
@@ -304,7 +304,6 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
   }
 
   Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
-    LoadingOverlay.of(context).show();
     final bool isFinishedTrouble = isFieldsFilledTrouble(trouble);
     List<Trouble>? resultData =
         await TechnicalSupportRepoImpl.downloadData.updateTrouble(trouble);
@@ -312,14 +311,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
       if (!isFinishedTrouble) {
         providerModel.refreshTroubles(resultData);
       }
-      // await addHistory(technic, nameUser);
-      if(mounted){
-        LoadingOverlay.of(context).hide();
-      }
       return true;
-    }
-    if(mounted){
-      LoadingOverlay.of(context).hide();
     }
     return false;
   }
@@ -349,5 +341,18 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
       Navigator.pop(context);
       Navigator.pop(context);
     }
+  }
+
+  String? validateDropdownPhotosalon(Trouble trouble) {
+    final providerModel = Provider.of<ProviderModel>(context);
+    List<String> nameDislocation = providerModel.namesDislocation;
+    for (var element in nameDislocation) {
+      if (trouble.photosalon != '') {
+        if (element == trouble.photosalon) {
+          return trouble.photosalon;
+        }
+      }
+    }
+    return null;
   }
 }

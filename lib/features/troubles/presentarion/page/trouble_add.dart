@@ -497,7 +497,6 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
     if (resultData != null) {
       providerModel.refreshTroubles(resultData);
       await sendEmailNewTrouble(trouble, providerModel);
-      // await addHistory(technic, nameUser);
       if (mounted) {
         LoadingOverlay.of(context).hide();
       }
@@ -537,30 +536,6 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
       }
     }
   }
-
-  // Future addHistory(Trouble trouble) async {
-  // String descForHistory = descriptionForHistory(repair);
-  // History historyForSQL = History(
-  //     History.historyList.last.id + 1,
-  //     'Repair',
-  //     repair.id!,
-  //     'create',
-  //     descForHistory,
-  //     LoginPassword.login,
-  //     DateFormat('yyyy.MM.dd').format(DateTime.now())
-  // );
-  //
-  // ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
-  // HistorySQFlite.db.insertHistory(historyForSQL);
-  // History.historyList.insert(0, historyForSQL);
-  // }
-
-  // String descriptionForHistory(Repair repair){
-  //   String internalID = repair.internalID == -1 ? 'БН' : '№${repair.internalID}';
-  //   String result = 'Заявка на ремонт $internalID добавленна';
-  //
-  //   return result;
-  // }
 
   void _viewSnackBarGetTechnic(String text) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();

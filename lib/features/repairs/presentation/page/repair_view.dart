@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import '../../../technics/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
@@ -268,7 +269,7 @@ class _RepairViewState extends State<RepairView> {
             offset: Offset(2, 4), // Shadow position
           ),
         ]),
-        child: LoadingOverlay(child: FirstStepRepairDesc(repair: widget.repair)),
+        child: FirstStepRepairDesc(repair: widget.repair),
       ),
     );
   }
@@ -694,6 +695,20 @@ class _RepairViewState extends State<RepairView> {
         Technic? technic = await TechnicalSupportRepoImpl.downloadData
             .getTechnic(repair.numberTechnic.toString());
         if (technic != null) {
+          if(technic.status == 'Тест-драйв'){
+            if (technic.testDrive != null) {
+              TestDrive testDrive = TestDrive(
+                  idTechnic: technic.testDrive!.id!,
+                  categoryTechnic: technic.category,
+                  dislocationTechnic: technic.dislocation,
+                  dateStart: technic.testDrive!.dateStart,
+                  dateFinish: DateTime.now(),
+                  result: 'Увезли в ремонт',
+                  isCloseTestDrive: true,
+                  user: providerModel.user.name);
+              await TechnicalSupportRepoImpl.downloadData.updateTestDrive(testDrive);
+            }
+          }
           if (technic.status == 'В ремонте') {
             technic.dislocation = repair.serviceDislocation!;
           }

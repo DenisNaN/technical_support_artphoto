@@ -545,8 +545,9 @@ Future<int> insertRepairInDB(Repair repair) async{
         'status, '
         'complaint, '
         'dateDeparture, '
-        'whoTook) '
-        'VALUES (?, ?, ?, ?, ?, ?, ?)';
+        'whoTook, '
+        'idTrouble) '
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
   var result = await _connDB!.query(str, [
     repair.numberTechnic,
     repair.category,
@@ -554,7 +555,8 @@ Future<int> insertRepairInDB(Repair repair) async{
     repair.status,
     repair.complaint,
     repair.dateDeparture.dateFormattedForSQL(),
-    repair.whoTook
+    repair.whoTook,
+    repair.idTrouble.toString()
   ]);
 
   int id = result.insertId!;

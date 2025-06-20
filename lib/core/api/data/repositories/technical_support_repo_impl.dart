@@ -158,6 +158,10 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   @override
   Future<Technic?> getTechnic(String number) async{
     Technic? technic = await ConnectDbMySQL.connDB.getTechnic(int.parse(number));
+    if (technic != null) {
+      TestDrive? testDrive = await ConnectDbMySQL.connDB.fetchTestDrive(technic.id.toString());
+      technic.testDrive = testDrive;
+    }
     return technic;
   }
 

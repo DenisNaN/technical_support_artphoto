@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import 'package:technical_support_artphoto/main.dart';
 
@@ -119,7 +120,10 @@ class _RepairAddState extends State<RepairAdd> {
                               _selectedDropdownStatusOld ?? '',
                               _complaint.text,
                               _dateDeparture ?? DateTime.now(),
-                              providerModel.user.name);
+                              providerModel.user.name,);
+                          if(widget.trouble != null){
+                            repair.idTrouble = widget.trouble!.id!;
+                          }
 
                           _save(repair, providerModel).then((isSave) {
                             providerModel.changeCurrentPageMainBottomAppBar(1);
@@ -444,6 +448,21 @@ class _RepairAddState extends State<RepairAdd> {
       Technic? technic =
         await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
       if (technic != null) {
+        if(technic.status == 'Тест-драйв'){
+          if (technic.testDrive != null) {
+            TestDrive testDrive = TestDrive(
+                id: technic.testDrive!.id!,
+                idTechnic: technic.id,
+                categoryTechnic: technic.category,
+                dislocationTechnic: technic.dislocation,
+                dateStart: technic.testDrive!.dateStart,
+                dateFinish: DateTime.now(),
+                result: 'Увезли в ремонт',
+                isCloseTestDrive: true,
+                user: providerModel.user.name);
+            await TechnicalSupportRepoImpl.downloadData.updateTestDrive(testDrive);
+          }
+        }
         technic.status = repair.status;
         if(technic.status == 'В ремонте'){
           technic.dislocation = 'Сергей';

@@ -48,7 +48,8 @@ class _HomePageState extends State<HomePage> {
           label: Text('Добавить технику'),
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const LoadingOverlay(child: TechnicAdd())));
-          }),
+          }
+          ),
     );
   }
 

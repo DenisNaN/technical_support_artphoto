@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/is_fields_filled.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_view.dart';
 
 import '../../../technics/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -263,7 +264,10 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
       ),
       backgroundColor: Colors.blue[100],
       title: _buildTextTitle(),
-      children: <Widget>[ListTile(title: _buildTextSubtitle())],
+      children: <Widget>[ListTile(title: Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: _buildTextSubtitle(),
+      ))],
     );
   }
 
@@ -316,70 +320,99 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
   }
 
   Widget _buildTextSubtitle() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text.rich(TextSpan(children: [
-          TextSpan(text: 'Жалоба: ', style: TextStyle(fontWeight: FontWeight.bold)),
-          TextSpan(
-              text: widget.repair.complaint != ''
-                  ? widget.repair.complaint
-                  : 'Данные отсутствуют'),
-          TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
-        ])),
-        Row(
+    return GestureDetector(
+      onTap: (){
+        if(widget.repair.idTrouble != 0){
+          TechnicalSupportRepoImpl.downloadData.getTrouble(widget.repair.idTrouble.toString()).then((trouble){
+            if(mounted && trouble != null){
+              Navigator.push(context, animationRouteSlideTransition(LoadingOverlay(child: TroubleView(troubleMain: trouble))));
+            }
+          });
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.blue.shade50,
+          // border: Border.all(color: Colors.black26),
+          borderRadius: BorderRadius.circular(12)
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(widget.repair.dislocationOld != ''
-                ? widget.repair.dislocationOld
-                : 'Неизвестно откуда забрали'),
-            SizedBox(
-              width: 7,
+            Padding(
+              padding: const EdgeInsets.only(left: 8, top: 8, bottom: 5),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text.rich(TextSpan(children: [
+                    TextSpan(text: 'Жалоба: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: widget.repair.complaint != ''
+                            ? widget.repair.complaint
+                            : 'Данные отсутствуют'),
+                    TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
+                  ])),
+                  Row(
+                    children: [
+                      Text(widget.repair.dislocationOld != ''
+                          ? widget.repair.dislocationOld
+                          : 'Неизвестно откуда забрали'),
+                      SizedBox(
+                        width: 7,
+                      ),
+                      Icon(
+                        Icons.delivery_dining,
+                        color: Colors.green.shade700,
+                      ),
+                      Icon(
+                        Icons.arrow_forward,
+                        color: Colors.green.shade700,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      widget.repair.whoTook != ''
+                          ? Text(widget.repair.whoTook)
+                          : Icon(Icons.person_off),
+                    ],
+                  ),
+                  Row(children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: Text.rich(TextSpan(children: [
+                        TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
+                        TextSpan(text: 'Статус: '),
+                        TextSpan(
+                            text:
+                                widget.repair.status != '' ? widget.repair.status : 'Отсутствует'),
+                      ])),
+                    ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Icon(Icons.calendar_month),
+                    SizedBox(
+                      width: 4,
+                    ),
+                    Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000Z'
+                        ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture)
+                        : 'Дата отсутствует')
+                  ])
+                ],
+              ),
             ),
-            Icon(
-              Icons.delivery_dining,
-              color: Colors.green.shade700,
-            ),
-            Icon(
-              Icons.arrow_forward,
-              color: Colors.green.shade700,
-            ),
-            SizedBox(
-              width: 5,
-            ),
-            widget.repair.whoTook != ''
-                ? Text(widget.repair.whoTook)
-                : Icon(Icons.person_off),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Icon(Icons.touch_app, size: 50, color: Colors.black12,),
+            )
           ],
         ),
-        Row(children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4.0),
-            child: Text.rich(TextSpan(children: [
-              TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
-              TextSpan(text: 'Статус: '),
-              TextSpan(
-                  text:
-                      widget.repair.status != '' ? widget.repair.status : 'Отсутствует'),
-            ])),
-          ),
-          SizedBox(
-            width: 8,
-          ),
-          Icon(Icons.calendar_month),
-          SizedBox(
-            width: 4,
-          ),
-          Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000Z'
-              ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture)
-              : 'Дата отсутствует')
-        ])
-      ],
+      ),
     );
   }
 
   Future<bool> _save(Repair repair, ProviderModel providerModel) async {
-    LoadingOverlay.of(context).show();
     final bool isFinishedRepair = isFieldsFilledRepair(repair);
     List<Repair>? resultData =
         await TechnicalSupportRepoImpl.downloadData.updateRepair(repair, true);
@@ -387,14 +420,7 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
       if (!isFinishedRepair) {
         providerModel.refreshCurrentRepairs(resultData);
       }
-      // await addHistory(technic, nameUser);
-      if(mounted){
-        LoadingOverlay.of(context).hide();
-      }
       return true;
-    }
-    if(mounted){
-      LoadingOverlay.of(context).hide();
     }
     return false;
   }

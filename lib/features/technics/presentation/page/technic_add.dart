@@ -26,20 +26,12 @@ class _TechnicAddState extends State<TechnicAdd> {
   final _costTechnic = TextEditingController();
   DateTime? _dateBuyTechnic;
   final _comment = TextEditingController();
-
-  // late final String _dateStartTestDrive;
-  // String _dateFinishTestDrive = '';
   final _resultTestDrive = TextEditingController();
   String? _selectedDropdownCategory;
   String? _selectedDropdownDislocation;
   String? _selectedDropdownStatus;
   bool isBN = false;
   bool isExistNumber = false;
-
-  // String? _selectedDropdownTestDriveDislocation;
-  // bool _switchTestDrive = false;
-  // bool _checkboxTestDrive = false;
-  // bool _isCategoryPhotocamera = false;
 
   final GlobalKey<FormState> _formInnerNumberKey = GlobalKey<FormState>();
 
@@ -58,7 +50,6 @@ class _TechnicAddState extends State<TechnicAdd> {
     super.initState();
     _nameTechnic.text = '';
     _dateBuyTechnic = DateTime.now();
-    // _dateStartTestDrive = DateFormat('d MMMM yyyy', 'ru_RU').format(DateTime.now());
   }
 
   @override
