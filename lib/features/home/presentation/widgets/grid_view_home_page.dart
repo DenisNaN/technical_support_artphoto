@@ -24,7 +24,10 @@ class GridViewHomePage extends StatelessWidget {
             String nameLocation = locations.keys.toList()[index];
             int countTechnics = locations[nameLocation].technics.length;
             int countBrokenTechnics = 0;
+            int countTestDrive = 0;
+            int countNotDeadlineTestDrive = 0;
             bool isHeader = false;
+            bool isFooter = false;
 
             bool isHeaderRepair = locations[nameLocation] is RepairLocation;
             if(!isHeaderRepair){
@@ -32,10 +35,20 @@ class GridViewHomePage extends StatelessWidget {
                 if(element.status == 'Неисправна'){
                   countBrokenTechnics++;
                 }
+                if(element.status == 'Тест-драйв' && element.testDrive != null){
+                  if (element.testDrive!.dateFinish.difference(DateTime.now()).inDays < 0) {
+                    countNotDeadlineTestDrive++;
+                  }else{
+                    countTestDrive++;
+                  }
+                }
               });
             }
             if((isHeaderRepair && countTechnics > 0) || (!isHeaderRepair && countBrokenTechnics > 0)){
               isHeader = true;
+            }
+            if(countTestDrive > 0 || countNotDeadlineTestDrive > 0){
+              isFooter = true;
             }
 
             return Container(
@@ -74,6 +87,30 @@ class GridViewHomePage extends StatelessWidget {
                                 ),
                               ),
                             )
+                          : SizedBox(),
+                      footer: isFooter ? Padding(
+                        padding: const EdgeInsets.all(7.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            children: [
+                              countTestDrive > 0 ? CircleAvatar(
+                                radius: 12,
+                                foregroundColor: Colors.black45,
+                                backgroundColor: Colors.yellowAccent,
+                                child: Text(countTestDrive.toString()),
+                              ) : SizedBox(),
+                              SizedBox(width: countTestDrive > 0 ? 5 : 0,),
+                              countNotDeadlineTestDrive > 0 ? CircleAvatar(
+                                radius: 12,
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.deepOrangeAccent.shade200,
+                                child: Text(countNotDeadlineTestDrive.toString()),
+                              ) : SizedBox(),
+                            ],
+                          ),
+                        ),
+                      )
                           : SizedBox(),
                       child: Container(
                           color: color,

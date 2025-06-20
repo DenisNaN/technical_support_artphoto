@@ -44,7 +44,13 @@ class GridViewTechnics extends StatelessWidget {
                     ),
                     itemBuilder: (_, int index) {
                       Technic technic = technicsNotDonors[index];
-                      bool technicBroken = technic.status == 'Неисправна';
+                      bool isTechnicBroken = technic.status == 'Неисправна';
+                      bool isTestDrive = technic.status == 'Тест-драйв';
+                      bool isNotDeadlineTestDrive = false;
+                      if(technic.testDrive != null && technic.testDrive!.isCloseTestDrive == false &&
+                          technic.testDrive!.dateFinish.difference(DateTime.now()).inDays < 0){
+                        isNotDeadlineTestDrive = true;
+                      }
                       return GridTile(
                         header: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -76,7 +82,7 @@ class GridViewTechnics extends StatelessWidget {
                           },
                           child: Container(
                             decoration: BoxDecoration(
-                              color: technicBroken ? Colors.red.shade50 : Colors.blue.shade50,
+                              color: isTechnicBroken ? Colors.red.shade50 : isTestDrive ? Colors.yellow.shade50 : Colors.blue.shade50,
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
@@ -93,12 +99,18 @@ class GridViewTechnics extends StatelessWidget {
                                   height: 20,
                                 ),
                                 Expanded(child: TechnicImage(category: technic.category)),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 4, right: 2),
-                                  child: Text(
-                                    technic.name == '' ? 'Модель не указана' : technic.name,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                Row(
+                                  children: [
+                                    isNotDeadlineTestDrive ? Icon(Icons.error, color: Colors.red.shade400,) : SizedBox(),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(
+                                          technic.name == '' ? 'Модель не указана' : technic.name,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

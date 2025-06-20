@@ -13,4 +13,12 @@ class Technic{
   TestDrive? testDrive;
 
   Technic(this.id, this.number, this.category, this.name, this.status, this.dislocation, this.dateBuyTechnic, this.cost, this.comment);
+
+  Technic copyWith(){
+    Technic technic = Technic(id, number, category, name, status, dislocation, dateBuyTechnic, cost, comment);
+    if(testDrive != null){
+      technic.testDrive = testDrive;
+    }
+    return technic;
+  }
 }
