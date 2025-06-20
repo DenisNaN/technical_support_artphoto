@@ -3,6 +3,7 @@ import 'package:technical_support_artphoto/core/api/data/models/trouble_account_
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
+import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 
 import '../../../../features/repairs/models/repair.dart';
@@ -37,4 +38,7 @@ abstract interface class TechnicalSupportRepo {
   Future<List<Trouble>> getFinishedTroubles();
   Future<bool> deleteTrouble(String id);
   Future<List<Trouble>?> updateTrouble(Trouble trouble);
+
+  Future<bool> saveTestDrive(TestDrive testDrive);
+  Future<bool> updateTestDrive(TestDrive testDrive);
 }
