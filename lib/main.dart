@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/api/data/datasources/save_local_services.dart';
+import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/di/init_dependencies.dart';
 import 'package:technical_support_artphoto/core/navigation/main_bottom_page_view.dart';
@@ -17,27 +19,33 @@ void main() {
         () async {
       WidgetsFlutterBinding.ensureInitialized();
       await initDependencies();
+      SaveLocalServices localServices = SaveLocalServices();
+      User? user = localServices.getUser();
       FlutterError.onError = (FlutterErrorDetails details) {
-        sendEmailNewTrouble(error: null, stack: null, flutterErrorDetails: '${details.exception}\n\nStack: ${details.stack}');
+        sendEmailNewTrouble(error: null, stack: null, flutterErrorDetails: '${details.exception}\n\nStack: ${details.stack}',
+            user: user);
         debugPrint('🔥 FlutterError.onError поймал ошибку: ${details.exception}');
       };
       PlatformDispatcher.instance.onError = (error, stack) {
-        sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '');
+        sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '',
+            user: user);
         debugPrint('🔥 PlatformDispatcher поймал ошибку: $error');
         return true;
       };
 
-      runApp(const SplashScreenArtphoto());
+      runApp(const MyApp());
     },
         (Object error, StackTrace stack) {
-          sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '');
+          SaveLocalServices localServices = SaveLocalServices();
+          User? user = localServices.getUser();
+          sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '', user: user);
           debugPrint('ARTPHOTO [CrashEvent] [DEBUG] $error\n$stack');
     },
   );
 }
 
-class SplashScreenArtphoto extends StatelessWidget {
-  const SplashScreenArtphoto({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
