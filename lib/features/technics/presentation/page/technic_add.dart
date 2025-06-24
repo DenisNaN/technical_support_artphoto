@@ -376,6 +376,8 @@ class _TechnicAddState extends State<TechnicAdd> {
                       value != 'В ремонте'){
                     _selectedDropdownDislocation = null;
                     _selectedDropdownStatus = value;
+                  } else{
+                    _selectedDropdownStatus = value;
                   }
                 });
               },
