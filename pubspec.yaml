@@ -82,7 +82,6 @@ flutter:
     - assets/avatar/anon_avatar.jpg
     - assets/logo/girl/girl1.png
     - assets/logo/girl/girl2.png
-    - assets/vpn_icon/vpn_icon.png
     - assets/icons_gridview_technical/camera.png
     - assets/icons_gridview_technical/copier.png
     - assets/icons_gridview_technical/flash.png
