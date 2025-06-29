@@ -17,9 +17,6 @@ class _PopupMenuRepairPageState extends State<PopupMenuRepairPage> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     return PopupMenuButton(
-      popUpAnimationStyle: AnimationStyle(
-        curve: Easing.legacy,
-        duration: Duration(milliseconds: 800)),
       borderRadius: BorderRadius.circular(15),
         itemBuilder: (context) => [
           PopupMenuItem(

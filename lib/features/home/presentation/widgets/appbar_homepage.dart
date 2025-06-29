@@ -1,14 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
-import 'package:technical_support_artphoto/core/shared/input_decoration/input_deroration.dart';
-import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
-import 'package:technical_support_artphoto/features/technics/models/technic.dart';
-import 'package:technical_support_artphoto/features/technics/presentation/page/technic_view.dart';
+import 'package:technical_support_artphoto/features/home/presentation/widgets/popup_menu_home_page.dart';
 
 import '../../../../core/api/data/datasources/save_local_services.dart';
 import '../../../../core/api/data/models/user.dart';
@@ -28,7 +23,6 @@ class AppBarHomepage extends StatefulWidget  implements PreferredSizeWidget{
 
 class _AppBarHomepageState extends State<AppBarHomepage> {
   bool isVisibleExit = false;
-  final _numberTechnic = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -81,85 +75,8 @@ class _AppBarHomepageState extends State<AppBarHomepage> {
         ],
       ),
       actions: [
-        IconButton(
-            onPressed: (){
-              showDialog(
-                  context: context,
-                  builder: (_){
-                    return AlertDialog(
-                      title: Column(
-                        spacing: 10,
-                        children: [
-                          TextFormField(
-                            decoration: myDecorationTextFormField('Введите номер техники'),
-                            controller: _numberTechnic,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Обязательное поле';
-                              }
-                              return null;
-                            },
-                            inputFormatters: [numberFormatter],
-                            keyboardType: TextInputType.number,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              ElevatedButton(
-                                  onPressed: (){
-                                    TechnicalSupportRepoImpl.downloadData.getTechnic(_numberTechnic.text).then((technic){
-                                      if(technic != null){
-                                        _navigationOnTechnicView(technic);
-                                      }else{
-                                        _viewSnackBar(Icons.delete_forever, false, '', 'Техника не найдена');
-                                      }
-                                    });
-                                  }, child: Text('Искать')),
-                              ElevatedButton(onPressed: (){
-                                Navigator.of(context).pop();
-                              }, child: Text('Отмена'))
-                          ],)
-                        ],
-                      ),
-                    );
-                  });
-            },
-            icon: Icon(Icons.search))
+        PopupMenuHomePage(),
       ],
     );
-  }
-
-  void _navigationOnTechnicView(Technic technic) {
-    Navigator.push(
-        context,
-        animationRouteSlideTransition(
-            LoadingOverlay(child: TechnicView(location: technic.dislocation, technic: technic))));
-  }
-
-  final numberFormatter = FilteringTextInputFormatter.allow(
-    RegExp(r'[0-9]'),
-  );
-
-  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText) {
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
-              SizedBox(
-                width: 20,
-              ),
-              Flexible(child: Text(isSuccessful ? successText : notSuccessText)),
-            ],
-          ),
-          duration: const Duration(seconds: 5),
-          showCloseIcon: true,
-        ),
-      );
-      Navigator.pop(context);
-    }
   }
 }
