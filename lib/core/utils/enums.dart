@@ -16,6 +16,7 @@ enum TypePage{
   addTrouble,
   viewTrouble,
   error,
+  searchTechnic,
 }
 
 enum TypeDislocation{
@@ -43,4 +44,9 @@ enum SaveTestDriveStatus{
   notSave,
   save,
   update,
+}
+
+enum TypeSearch{
+  searchByName,
+  filterByStatus
 }
