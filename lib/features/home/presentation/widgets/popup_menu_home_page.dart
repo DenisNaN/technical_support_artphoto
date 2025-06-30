@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
+import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/gradients.dart';
 import 'package:technical_support_artphoto/core/shared/input_decoration/input_deroration.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/core/utils/formatters.dart';
+import 'package:technical_support_artphoto/features/search_technics/presentation/page/grid_view_search_technics.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
-import 'package:technical_support_artphoto/features/technics/presentation/page/technic_add.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_view.dart';
 
 class PopupMenuHomePage extends StatefulWidget {
@@ -18,9 +21,12 @@ class PopupMenuHomePage extends StatefulWidget {
 
 class _PopupMenuHomePageState extends State<PopupMenuHomePage> {
   final _numberTechnic = TextEditingController();
+  final _nameTechnic = TextEditingController();
+  String? _selectedDropdownStatus;
 
   @override
   Widget build(BuildContext context) {
+    final providerModel = Provider.of<ProviderModel>(context);
     return PopupMenuButton(
       icon: Icon(Icons.search),
         itemBuilder: (context) => [
@@ -30,35 +36,37 @@ class _PopupMenuHomePageState extends State<PopupMenuHomePage> {
                     showDialog(
                         context: context,
                         builder: (_){
+                          List<String> elementsDropdown = providerModel.statusForEquipment;
+                          elementsDropdown.remove('Списана');
                           return AlertDialog(
                             title: Column(
                               spacing: 10,
                               children: [
-                                TextFormField(
-                                  autofocus: true,
-                                  decoration: myDecorationTextFormField('Выберите статус техники'),
-                                  controller: _numberTechnic,
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return 'Обязательное поле';
-                                    }
-                                    return null;
+                                DropdownButtonFormField<String>(
+                                  decoration: myDecorationDropdown(),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  hint: const Text('Статус техники'),
+                                  validator: (value) => value == null ? "Обязательное поле" : null,
+                                  dropdownColor: Colors.blue.shade50,
+                                  value: _selectedDropdownStatus,
+                                  items: elementsDropdown.map<DropdownMenuItem<String>>((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      _selectedDropdownStatus = value;
+                                    });
                                   },
-                                  inputFormatters: [numberFormatter],
-                                  keyboardType: TextInputType.number,
                                 ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     ElevatedButton(
                                         onPressed: (){
-                                          // TechnicalSupportRepoImpl.downloadData.getTechnic(_numberTechnic.text).then((technic){
-                                          //   if(technic != null){
-                                          //     _navigationOnTechnicView(technic);
-                                          //   }else{
-                                          //     _viewSnackBar(Icons.delete_forever, false, '', 'Техника не найдена');
-                                          //   }
-                                          // });
+                                          _navigationOnSearchTechnics(TypeSearch.filterByStatus, _selectedDropdownStatus);
                                         }, child: Text('Искать')),
                                     ElevatedButton(onPressed: (){
                                       Navigator.of(context).pop();
@@ -110,28 +118,20 @@ class _PopupMenuHomePageState extends State<PopupMenuHomePage> {
                                 TextFormField(
                                   autofocus: true,
                                   decoration: myDecorationTextFormField('Введите название техники'),
-                                  controller: _numberTechnic,
+                                  controller: _nameTechnic,
                                   validator: (value) {
                                     if (value!.isEmpty) {
                                       return 'Обязательное поле';
                                     }
                                     return null;
                                   },
-                                  inputFormatters: [numberFormatter],
-                                  keyboardType: TextInputType.number,
                                 ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     ElevatedButton(
                                         onPressed: (){
-                                          // TechnicalSupportRepoImpl.downloadData.getTechnic(_numberTechnic.text).then((technic){
-                                          //   if(technic != null){
-                                          //     _navigationOnTechnicView(technic);
-                                          //   }else{
-                                          //     _viewSnackBar(Icons.delete_forever, false, '', 'Техника не найдена');
-                                          //   }
-                                          // });
+                                          _navigationOnSearchTechnics(TypeSearch.searchByName, _nameTechnic.text);
                                         }, child: Text('Искать')),
                                     ElevatedButton(onPressed: (){
                                       Navigator.of(context).pop();
@@ -251,6 +251,13 @@ class _PopupMenuHomePageState extends State<PopupMenuHomePage> {
         context,
         animationRouteSlideTransition(
             LoadingOverlay(child: TechnicView(location: technic.dislocation, technic: technic))));
+  }
+
+  void _navigationOnSearchTechnics(TypeSearch typeSearch, String? value) {
+      Navigator.push(
+        context,
+        animationRouteSlideTransition(
+            LoadingOverlay(child: GridViewSearchTechnics(value, typeSearch: typeSearch,))));
   }
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText) {

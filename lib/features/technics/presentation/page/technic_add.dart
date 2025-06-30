@@ -338,6 +338,10 @@ class _TechnicAddState extends State<TechnicAdd> {
   }
 
   Column _buildStatus(ProviderModel providerModel) {
+    List<String> statuses = [];
+    statuses.addAll(providerModel.statusForEquipment);
+    statuses.remove('Тест-драйв');
+    statuses.remove('Транспортировка');
     return Column(
       children: [
         Align(
@@ -360,7 +364,7 @@ class _TechnicAddState extends State<TechnicAdd> {
               validator: (value) => value == null ? "Обязательное поле" : null,
               dropdownColor: Colors.blue.shade50,
               value: _selectedDropdownStatus,
-              items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+              items: statuses.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -371,14 +375,12 @@ class _TechnicAddState extends State<TechnicAdd> {
                   if(value != null && _selectedDropdownStatus != 'В ремонте' &&
                       value == 'В ремонте'){
                     _selectedDropdownDislocation = null;
-                    _selectedDropdownStatus = value;
                   }else if(value != null && _selectedDropdownStatus == 'В ремонте' &&
                       value != 'В ремонте'){
                     _selectedDropdownDislocation = null;
-                    _selectedDropdownStatus = value;
-                  } else{
-                    _selectedDropdownStatus = value;
                   }
+                  _selectedDropdownStatus = value;
+
                 });
               },
             ),

@@ -58,7 +58,6 @@ class _AuthorizationState extends State<Authorization> {
         ),
         body: SingleChildScrollView(
           child: Column(
-            // alignment: AlignmentDirectional.center,
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 50, bottom: 30),
@@ -67,13 +66,11 @@ class _AuthorizationState extends State<Authorization> {
                     height: 200,
                     child: DraggableLogo(
                       child1: Image.asset('assets/logo/girl/girl2.png'),
-                      child2: Hero(
-                          tag: 'logo_hero',
-                          child: Image.asset(
-                            'assets/logo/logo.png',
-                            height: 200,
-                            width: 200,
-                          )),
+                      child2: Image.asset(
+                        'assets/logo/logo.png',
+                        height: 200,
+                        width: 200,
+                      ),
                       child3: Image.asset('assets/logo/girl/girl1.png'),
                     )),
               ),

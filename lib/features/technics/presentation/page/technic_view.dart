@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
+import 'package:technical_support_artphoto/core/shared/get_dropdown_dislocation.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/core/shared/plurals.dart';
 import 'package:technical_support_artphoto/core/utils/constants.dart';
@@ -439,6 +440,12 @@ class _TechnicViewState extends State<TechnicView> {
                     _resultTestDrive.text = '';
                     _isDoneTestDrive = false;
                   }
+                  if(value != null && _selectedDropdownStatus != 'Транспортировка' && value == 'Транспортировка'){
+                    _selectedDropdownDislocation = null;
+                  }
+                  if (value != null && _selectedDropdownStatus == 'Транспортировка' && value != 'Транспортировка') {
+                    _selectedDropdownDislocation = null;
+                  }
                   _selectedDropdownStatus = value;
                 });
               },
@@ -474,19 +481,7 @@ class _TechnicViewState extends State<TechnicView> {
               hint: const Text('Дислокация'),
               value: _selectedDropdownDislocation,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: _selectedDropdownStatus == 'В ремонте'
-                  ? providerModel.services.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList()
-                  : providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
+              items: getDropdownDislocation(_selectedDropdownStatus, providerModel),
               onChanged: (String? value) {
                 setState(() {
                   _selectedDropdownDislocation = value!;
@@ -856,7 +851,7 @@ class _TechnicViewState extends State<TechnicView> {
     }
 
     Map<String, dynamic> result = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
-    providerModel.refreshTechnics(result['Photosalons'], result['Repairs'], result['Storages']);
+    providerModel.refreshTechnics(result['Photosalons'], result['Repairs'], result['Storages'], result['Transportation']);
 
     if (mounted) {
       LoadingOverlay.of(context).hide();

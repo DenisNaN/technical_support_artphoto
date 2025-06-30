@@ -69,6 +69,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         TypePage.viewRepair => _viewRepair(providerModel),
         TypePage.addTrouble => _addTrouble(),
         TypePage.viewTrouble => _viewTrouble(providerModel),
+        TypePage.searchTechnic => _searchTechnic(widget.location),
       }
     );
   }
@@ -221,6 +222,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   Widget _error(String message) {
     return Text(message, style: TextStyle(color: Colors.black),);
+  }
+
+  Widget _searchTechnic(String nameSearching){
+    return Text('Поиск по: $nameSearching', style: TextStyle(color: Colors.black));
   }
 
   _repair(String message) {

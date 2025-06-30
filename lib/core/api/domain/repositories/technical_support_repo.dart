@@ -16,6 +16,7 @@ abstract interface class TechnicalSupportRepo {
   Future<List<Repair>> refreshCurrentRepairsData();
 
   Future<User?> getUser(String password);
+  Future<List<String>> getUsers();
   Future<TroubleAccountMailRu?> getAccountMailRu();
 
   Future<FreeNumbersForTechnic> checkNumberTechnic(String number);

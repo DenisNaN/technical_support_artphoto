@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
+// ignore: must_be_immutable
 class Trouble extends Equatable implements Comparable {
   final int? id;
   final String photosalon;

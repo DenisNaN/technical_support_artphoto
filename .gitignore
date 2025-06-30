@@ -42,4 +42,4 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-/lib/core/domain/api_constants.dart
+/android/app/src/main/AndroidManifest.xml

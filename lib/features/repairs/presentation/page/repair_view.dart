@@ -543,6 +543,11 @@ class _RepairViewState extends State<RepairView> {
   }
 
   Widget _buildNewStatus(ProviderModel providerModel) {
+    List<String> statuses = [];
+    statuses.addAll(providerModel.statusForEquipment);
+    statuses.remove('Тест-драйв');
+    statuses.remove('Транспортировка');
+    statuses.remove('В ремонте');
     return Column(
       children: [
         Align(
@@ -564,8 +569,7 @@ class _RepairViewState extends State<RepairView> {
             borderRadius: BorderRadius.circular(10.0),
             hint: const Text('Новый статус'),
             value: _selectedDropdownStatusNew,
-            items: providerModel.statusForEquipment
-                .map<DropdownMenuItem<String>>((String value) {
+            items: statuses.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(value),
@@ -723,7 +727,7 @@ class _RepairViewState extends State<RepairView> {
                 await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
             providerModel
               ..refreshTechnics(resultDataRefTech['Photosalons'],
-                  resultDataRefTech['Repairs'], resultDataRefTech['Storages'])
+                  resultDataRefTech['Repairs'], resultDataRefTech['Storages'], resultDataRefTech['Transportation'])
               ..refreshCurrentRepairs(resultData);
             if(mounted){
               LoadingOverlay.of(context).hide();

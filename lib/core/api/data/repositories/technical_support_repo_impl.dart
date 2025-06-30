@@ -6,6 +6,7 @@ import 'package:technical_support_artphoto/core/api/data/models/free_number_for_
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/transportation_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/domain/repositories/technical_support_repo.dart';
@@ -29,6 +30,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     Map<String, PhotosalonLocation> technicsInPhotosalons = {};
     Map<String, RepairLocation> technicsInRepairs = {};
     Map<String, StorageLocation> technicsInStorages = {};
+    Map<String, TransportationLocation> technicsInTransportation = {};
 
     List<Repair> repairs = [];
     List<Trouble> troubles = [];
@@ -41,12 +43,14 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     Map<String, int> colorsForEquipment;
 
     TroubleAccountMailRu? accountMailRu;
+    List<String> users;
 
     await ConnectDbMySQL.connDB.connDatabase();
 
     technicsInPhotosalons = await ConnectDbMySQL.connDB.fetchTechnicsInPhotosalons();
     technicsInRepairs = await ConnectDbMySQL.connDB.fetchTechnicsInRepairs();
     technicsInStorages = await ConnectDbMySQL.connDB.fetchTechnicsInStorages();
+    technicsInTransportation = await ConnectDbMySQL.connDB.fetchTechnicsInTransportation();
 
     repairs = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
     troubles = await ConnectDbMySQL.connDB.fetchTroubles();
@@ -59,10 +63,12 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     colorsForEquipment = await ConnectDbMySQL.connDB.fetchColorsForEquipment();
 
     accountMailRu = await ConnectDbMySQL.connDB.fetchAccountMailRu();
+    users = await TechnicalSupportRepoImpl.downloadData.getUsers();
 
     result['Photosalons'] = technicsInPhotosalons;
     result['Repairs'] = technicsInRepairs;
     result['Storages'] = technicsInStorages;
+    result['Transportation'] = technicsInTransportation;
 
     result['AllRepairs'] = repairs;
     result['AllTroubles'] = troubles;
@@ -74,6 +80,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     result['colorsForEquipment'] = colorsForEquipment;
 
     result['accountMailRu'] = accountMailRu;
+    result['users'] = users;
 
     return result;
   }
@@ -85,10 +92,12 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     Map<String, PhotosalonLocation> photosalons = await ConnectDbMySQL.connDB.fetchTechnicsInPhotosalons();
     Map<String, RepairLocation> repairs = await ConnectDbMySQL.connDB.fetchTechnicsInRepairs();
     Map<String, StorageLocation> storages = await ConnectDbMySQL.connDB.fetchTechnicsInStorages();
+    Map<String, TransportationLocation> transportation = await ConnectDbMySQL.connDB.fetchTechnicsInTransportation();
 
     result['Photosalons'] = photosalons;
     result['Repairs'] = repairs;
     result['Storages'] = storages;
+    result['Transportation'] = transportation;
 
     return result;
   }
@@ -111,6 +120,18 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
       }
     }
     return user;
+  }
+
+  @override
+  Future<List<String>> getUsers() async{
+    List<String> users = [];
+    Results? result = await ConnectDbMySQL.connDB.fetchUsers();
+    if (result != null) {
+      for (var row in result) {
+        users.add(row[0]);
+      }
+    }
+    return users;
   }
 
   @override

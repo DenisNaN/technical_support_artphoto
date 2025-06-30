@@ -4,7 +4,9 @@ import 'package:mysql1/mysql1.dart';
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/transportation_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
+import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
@@ -40,7 +42,11 @@ class ConnectDbMySQL {
   }
 
   Future<Results?> fetchAccessLevel(String password) async {
-    return await _connDB!.query('SELECT login, access FROM loginPassword WHERE password = $password');
+    return await _connDB!.query('SELECT login, access FROM users WHERE password = $password');
+  }
+
+  Future<Results?> fetchUsers() async {
+    return await _connDB!.query('SELECT login FROM users');
   }
 
   Future<Map<String, PhotosalonLocation>> fetchTechnicsInPhotosalons() async {
@@ -99,7 +105,9 @@ class ConnectDbMySQL {
         Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
         TestDrive? testDrive = await fetchTestDrive(technic.id.toString());
         if(testDrive != null) technic.testDrive = testDrive;
-        repair.technics.add(technic);
+        if(technic.status == 'В ремонте'){
+          repair.technics.add(technic);
+        }
       }
       repairs[nameRepair] = repair;
     }
@@ -135,6 +143,39 @@ class ConnectDbMySQL {
       storages[nameStorage] = storage;
     }
     return storages;
+  }
+
+  Future<Map<String, TransportationLocation>> fetchTechnicsInTransportation() async {
+    Map<String, TransportationLocation> transportations = {};
+    List<String> namesTransportation = await TechnicalSupportRepoImpl.downloadData.getUsers();
+
+    for (var nameTransportation in namesTransportation) {
+      TransportationLocation transportationLocation = TransportationLocation(nameTransportation);
+      String query = 'SELECT equipment.id, '
+          'equipment.number, '
+          'equipment.category, '
+          'equipment.name, '
+          's.status, '
+          's.dislocation, '
+          'equipment.dateBuy, '
+          'equipment.cost, '
+          'equipment.comment '
+          'FROM equipment '
+          'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
+          'WHERE s.dislocation = "$nameTransportation" AND s.status <> "Списана" '
+          'ORDER BY equipment.number ASC';
+      var result = await _connDB!.query(query);
+      for (var row in result) {
+        Technic technic = Technic(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
+        TestDrive? testDrive = await fetchTestDrive(technic.id.toString());
+        if(testDrive != null) technic.testDrive = testDrive;
+        if(technic.status == 'Транспортировка'){
+          transportationLocation.technics.add(technic);
+        }
+      }
+      transportations[nameTransportation] = transportationLocation;
+    }
+    return transportations;
   }
 
   Future<DecommissionedLocation> fetchTechnicsDecommissioned () async {
