@@ -9,7 +9,6 @@ import 'package:technical_support_artphoto/core/api/provider/provider_model.dart
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/core/shared/technic_image/technic_image.dart';
-import 'package:technical_support_artphoto/features/technics/data/models/grid_view_technics_model.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_view.dart';
 import '../../../../../core/navigation/animation_navigation.dart';
 
@@ -148,12 +147,12 @@ class GridViewSearchTechnics extends StatelessWidget {
 
     for (var technic in tmpTechnics) {
       if (typeSearch == TypeSearch.searchByName) {
-        if(technic.name.contains(valueTechnic)){
+        if(technic.name.trim().toLowerCase().contains(valueTechnic.trim().toLowerCase())){
           technics.add(technic);
         }
       }
       else{
-        if(technic.status.contains(valueTechnic)){
+        if(technic.status.trim().toLowerCase().contains(valueTechnic.trim().toLowerCase())){
           technics.add(technic);
         }
       }

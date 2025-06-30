@@ -40,7 +40,8 @@ class _RepairAddState extends State<RepairAdd> {
   final _diagnosisService = TextEditingController();
   final _recommendationsNotes = TextEditingController();
   String? _selectedDropdownDislocationOld;
-  String? _selectedDropdownStatusOld = 'В ремонте';
+  String? _selectedDropdownStatusOld = 'Транспортировка';
+  String? _selectedDropdownDislocationService;
   bool isBN = false;
   bool isExistNumber = false;
 
@@ -96,6 +97,8 @@ class _RepairAddState extends State<RepairAdd> {
               SizedBox(height: isBN ? 9 : 25),
               _buildStatus(providerModel),
               SizedBox(height: 20),
+              _selectedDropdownStatusOld == 'В ремонте' ? _buildDislocationService(providerModel) : SizedBox(),
+              _selectedDropdownStatusOld == 'В ремонте' ? SizedBox(height: 20) : SizedBox(),
               _buildComplaint(),
               SizedBox(height: 20),
               _buildDateDeparture(),
@@ -123,6 +126,10 @@ class _RepairAddState extends State<RepairAdd> {
                               providerModel.user.name,);
                           if(widget.trouble != null){
                             repair.idTrouble = widget.trouble!.id!;
+                          }
+                          if(_selectedDropdownStatusOld == 'В ремонте'){
+                            repair.serviceDislocation = _selectedDropdownDislocationService;
+                            repair.dateTransferInService = DateTime.now();
                           }
 
                           _save(repair, providerModel).then((isSave) {
@@ -305,6 +312,9 @@ class _RepairAddState extends State<RepairAdd> {
   }
 
   Widget _buildStatus(ProviderModel providerModel) {
+    List<String> statuses = [];
+    statuses.addAll(providerModel.statusForEquipment);
+    statuses.remove('Тест-драйв');
     return Column(
       children: [
         Align(
@@ -327,7 +337,7 @@ class _RepairAddState extends State<RepairAdd> {
               validator: (value) => value == null ? "Обязательное поле" : null,
               dropdownColor: Colors.blue.shade50,
               value: _selectedDropdownStatusOld,
-              items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+              items: statuses.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -339,6 +349,47 @@ class _RepairAddState extends State<RepairAdd> {
                 });
               },
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDislocationService(ProviderModel providerModel) {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: Text(
+              'Мастер по ремонту:',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 40, right: 40),
+          child: ListTile(
+            title: DropdownButtonFormField<String>(
+              decoration: myDecorationDropdown(),
+              validator: (value) => value == null ? "Обязательное поле" : null,
+              dropdownColor: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(10.0),
+              hint: const Text('Мастер по ремонту'),
+              value: _selectedDropdownDislocationService,
+              items: providerModel.services.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? value) {
+                setState(() {
+                  _selectedDropdownDislocationService = value!;
+                });
+              },
+            )
           ),
         ),
       ],
@@ -464,13 +515,16 @@ class _RepairAddState extends State<RepairAdd> {
           }
         }
         technic.status = repair.status;
+        if(technic.status == 'Транспортировка'){
+          technic.dislocation = providerModel.user.name;
+        }
         if(technic.status == 'В ремонте'){
-          technic.dislocation = 'Сергей';
+          technic.dislocation = _selectedDropdownDislocationService!;
         }
         await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technic, providerModel.user.name);
         Map<String, dynamic> technics = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
         providerModel.refreshTechnics(
-            technics['Photosalons'], technics['Repairs'], technics['Storages']);
+            technics['Photosalons'], technics['Repairs'], technics['Storages'], technics['Transportation']);
       }
       providerModel.refreshCurrentRepairs(resultData);
       // await addHistory(technic, nameUser);

@@ -42,7 +42,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           }
           if (snapshot.hasData) {
             providerModel.downloadAllElements(
-                snapshot.data!['Photosalons'], snapshot.data!['Repairs'], snapshot.data!['Storages']);
+                snapshot.data!['Photosalons'], snapshot.data!['Repairs'], snapshot.data!['Storages'], snapshot.data!['Transportation']);
             providerModel.downloadAllCategoryDropDown(
                 snapshot.data!['nameEquipment'],
                 snapshot.data!['namePhotosalons'],
@@ -52,6 +52,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             providerModel.downloadCurrentRepairs(snapshot.data!['AllRepairs']);
             providerModel.downloadTroubles(snapshot.data!['AllTroubles']);
             providerModel.initAccountMailRu(snapshot.data!['accountMailRu']);
+            providerModel.initUsers(snapshot.data!['users']);
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
               User? user = localServices.getUser();
@@ -74,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Hero(tag: 'logo_hero', child: Image.asset('assets/logo/logo.png')),
+                  Image.asset('assets/logo/logo.png'),
                   SizedBox(
                     height: 10,
                   ),
