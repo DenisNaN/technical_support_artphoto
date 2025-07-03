@@ -395,7 +395,7 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                     SizedBox(
                       width: 4,
                     ),
-                    Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000Z'
+                    Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000'
                         ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture)
                         : 'Дата отсутствует')
                   ])

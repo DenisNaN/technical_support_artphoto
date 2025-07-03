@@ -1,7 +1,10 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
+import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/widgets/grid_view_technics.dart';
+import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 
 class GridViewHomePage extends StatelessWidget {
   final Map<String, dynamic> locations;
@@ -11,6 +14,7 @@ class GridViewHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final providerModel = Provider.of<ProviderModel>(context);
     return SliverPadding(
       padding: const EdgeInsets.all(14.0),
       sliver: SliverGrid.builder(
@@ -21,6 +25,7 @@ class GridViewHomePage extends StatelessWidget {
             mainAxisSpacing: 16,
           ),
           itemBuilder: (_, int index) {
+            List<Trouble> troubles = providerModel.getTroubles;
             String nameLocation = locations.keys.toList()[index];
             int countTechnics = locations[nameLocation].technics.length;
             int countBrokenTechnics = 0;
@@ -28,6 +33,7 @@ class GridViewHomePage extends StatelessWidget {
             int countNotDeadlineTestDrive = 0;
             bool isHeader = false;
             bool isFooter = false;
+            bool isTroubleHas = false;
 
             bool isHeaderRepair = locations[nameLocation] is RepairLocation;
             if(!isHeaderRepair){
@@ -42,9 +48,17 @@ class GridViewHomePage extends StatelessWidget {
                     countTestDrive++;
                   }
                 }
+                for(final trouble in troubles){
+                  if(element.number == trouble.numberTechnic){
+                    isTroubleHas = true;
+                    break;
+                  }
+                }
               });
             }
-            if((isHeaderRepair && countTechnics > 0) || (!isHeaderRepair && countBrokenTechnics > 0)){
+            if((isHeaderRepair && countTechnics > 0) ||
+                (!isHeaderRepair && countBrokenTechnics > 0 ||
+                    isTroubleHas)){
               isHeader = true;
             }
             if(countTestDrive > 0 || countNotDeadlineTestDrive > 0){
@@ -77,14 +91,24 @@ class GridViewHomePage extends StatelessWidget {
                       header: isHeader
                           ? Padding(
                               padding: const EdgeInsets.all(7.0),
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: CircleAvatar(
-                                  radius: 12,
-                                  foregroundColor: Colors.white,
-                                  backgroundColor: isHeaderRepair ? Colors.green.shade400 : Colors.red.shade400,
-                                  child: Text(isHeaderRepair? countTechnics.toString() : countBrokenTechnics.toString()),
-                                ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  isTroubleHas ? Icon(Icons.check, color: Colors.red,)
+                                      : SizedBox(),
+                                  countBrokenTechnics > 0 ? CircleAvatar(
+                                    radius: 12,
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Colors.red.shade400,
+                                    child: Text(countBrokenTechnics.toString()),
+                                  ) : SizedBox(),
+                                  countTechnics > 0 && isHeaderRepair ? CircleAvatar(
+                                    radius: 12,
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Colors.green.shade400,
+                                    child: Text(countTechnics.toString()),
+                                  ) : SizedBox(),
+                                ],
                               ),
                             )
                           : SizedBox(),

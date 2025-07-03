@@ -77,8 +77,8 @@ class HistoryTechnicPage extends StatelessWidget {
       return SizedBox();
     }
     if (currentHistoryTechnic.location is RepairLocation &&
-        currentHistoryTechnic.date.toString() != "-0001-11-30 00:00:00.000Z" &&
-        currentHistoryTechnic.date.toString() != "0001-11-30 00:00:00.000Z") {
+        currentHistoryTechnic.date.toString() != "-0001-11-30 00:00:00.000" &&
+        currentHistoryTechnic.date.toString() != "0001-11-30 00:00:00.000") {
       return _buildListTileRepair(currentHistoryTechnic, isStartIndex, context, providerModel);
     } else if (currentHistoryTechnic.location is PhotosalonLocation) {
       if (historyList.length > 1 && index > 0) {
@@ -249,13 +249,22 @@ class HistoryTechnicPage extends StatelessWidget {
                 ),
                 Positioned(
                   left: 50,
-                  top: 12,
+                  top: 7,
                   child: Container(
                     padding: EdgeInsets.only(left: 5, right: 5),
                     color: Colors.grey.shade50,
-                    child: Text(
-                      '${troubles[i].employee}',
-                      style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+                    child: Row(
+                      children: [
+                        Icon(troubles[i].isTroubleClosed == false ? Icons.close :
+                        Icons.check,
+                            color: troubles[i].isTroubleClosed == false ? Colors.red :
+                            Colors.green),
+                        Text(
+                          '${troubles[i].employee}',
+                          style: TextStyle(color: Colors.black, fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                   ),
                 ),

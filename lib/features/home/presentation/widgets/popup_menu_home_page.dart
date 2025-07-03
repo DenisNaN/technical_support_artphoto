@@ -23,6 +23,7 @@ class _PopupMenuHomePageState extends State<PopupMenuHomePage> {
   final _numberTechnic = TextEditingController();
   final _nameTechnic = TextEditingController();
   String? _selectedDropdownStatus;
+  String? _selectedDropdownCategory;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,8 @@ class _PopupMenuHomePageState extends State<PopupMenuHomePage> {
                     showDialog(
                         context: context,
                         builder: (_){
-                          List<String> elementsDropdown = providerModel.statusForEquipment;
+                          List<String> elementsDropdown = [];
+                          elementsDropdown.addAll(providerModel.statusForEquipment);
                           elementsDropdown.remove('Списана');
                           return AlertDialog(
                             title: Column(
@@ -105,6 +107,83 @@ class _PopupMenuHomePageState extends State<PopupMenuHomePage> {
                   ),
                 ),
               ),
+          PopupMenuItem(
+            child: ElevatedButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (_){
+                      List<String> elementsDropdown = [];
+                      elementsDropdown.addAll(providerModel.namesEquipments);
+                      elementsDropdown.remove('Большой копир');
+                      elementsDropdown.remove('Вспышка');
+                      return AlertDialog(
+                        title: Column(
+                          spacing: 10,
+                          children: [
+                            DropdownButtonFormField<String>(
+                              decoration: myDecorationDropdown(),
+                              borderRadius: BorderRadius.circular(10.0),
+                              hint: const Text('Категория техники'),
+                              validator: (value) => value == null ? "Обязательное поле" : null,
+                              dropdownColor: Colors.blue.shade50,
+                              value: _selectedDropdownCategory,
+                              items: elementsDropdown.map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  _selectedDropdownCategory = value;
+                                });
+                              },
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ElevatedButton(
+                                    onPressed: (){
+                                      _navigationOnSearchTechnics(TypeSearch.filterByCategory, _selectedDropdownCategory);
+                                    }, child: Text('Искать')),
+                                ElevatedButton(onPressed: (){
+                                  Navigator.of(context).pop();
+                                }, child: Text('Отмена'))
+                              ],)
+                          ],
+                        ),
+                      );
+                    });
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+              child: Ink(
+                decoration: BoxDecoration(
+                    gradient: gradientArtphoto(),
+                    borderRadius: BorderRadius.circular(20)),
+                child: Padding(
+                  padding: EdgeInsets.only(left: 15, top: 3, bottom: 3),
+                  child: const Row(
+                    spacing: 5,
+                    children: [
+                      Icon(Icons.category_outlined),
+                      Expanded(
+                        child: Text(
+                          overflow: TextOverflow.ellipsis,
+                          'Техника по категории',
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
               PopupMenuItem(
                 child: ElevatedButton(
                   onPressed: () {

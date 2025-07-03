@@ -196,8 +196,8 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
 
   Widget _buildDateFixTroubleEmployee(ProviderModel providerModel) {
     bool isValidateDate = _dateFixTroubleEmployee != null &&
-        _dateFixTroubleEmployee.toString() != "-0001-11-30 00:00:00.000Z" &&
-        _dateFixTroubleEmployee.toString() != "0001-11-30 00:00:00.000Z";
+        _dateFixTroubleEmployee.toString() != "-0001-11-30 00:00:00.000" &&
+        _dateFixTroubleEmployee.toString() != "0001-11-30 00:00:00.000";
     return Column(
       children: [
         Align(
@@ -247,7 +247,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                 IconButton(
                     onPressed: () {
                   setState(() {
-                    _dateFixTroubleEmployee = DateTime.tryParse("-0001-11-30 00:00:00.000Z");
+                    _dateFixTroubleEmployee = DateTime.tryParse("-0001-11-30 00:00:00.000");
                     _fixTroubleEmployee.text = '';
                   });
                 }, icon: Icon(Icons.close, color: Colors.red,))
@@ -293,8 +293,8 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
 
   Widget _buildDateFixTroubleEngineer(ProviderModel providerModel) {
     bool isValidateDate = _dateFixTroubleEngineer != null &&
-        _dateFixTroubleEngineer.toString() != "-0001-11-30 00:00:00.000Z" &&
-        _dateFixTroubleEngineer.toString() != "0001-11-30 00:00:00.000Z";
+        _dateFixTroubleEngineer.toString() != "-0001-11-30 00:00:00.000" &&
+        _dateFixTroubleEngineer.toString() != "0001-11-30 00:00:00.000";
     return Column(
       children: [
         Align(
@@ -344,7 +344,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                 IconButton(
                     onPressed: () {
                       setState(() {
-                        _dateFixTroubleEngineer = DateTime.tryParse("-0001-11-30 00:00:00.000Z");
+                        _dateFixTroubleEngineer = DateTime.tryParse("-0001-11-30 00:00:00.000");
                         _fixTroubleEngineer.text = '';
                       });
                     }, icon: Icon(Icons.close, color: Colors.red,))
@@ -583,13 +583,13 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
   Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
     LoadingOverlay.of(context).show();
     bool isEmptyDateEmployee = trouble.dateFixTroubleEmployee == null ||
-        trouble.dateFixTroubleEmployee.toString() == "-0001-11-30 00:00:00.000Z" ||
-        trouble.dateFixTroubleEmployee.toString() == "0001-11-30 00:00:00.000Z";
+        trouble.dateFixTroubleEmployee.toString() == "-0001-11-30 00:00:00.000" ||
+        trouble.dateFixTroubleEmployee.toString() == "0001-11-30 00:00:00.000";
     bool isEmptyEmployee = trouble.fixTroubleEmployee == null ||
         trouble.fixTroubleEmployee == '';
     bool isEmptyDateEngineer = trouble.dateFixTroubleEngineer == null ||
-        trouble.dateFixTroubleEngineer.toString() == "-0001-11-30 00:00:00.000Z" ||
-        trouble.dateFixTroubleEngineer.toString() == "0001-11-30 00:00:00.000Z";
+        trouble.dateFixTroubleEngineer.toString() == "-0001-11-30 00:00:00.000" ||
+        trouble.dateFixTroubleEngineer.toString() == "0001-11-30 00:00:00.000";
     bool isEmptyEngineer = trouble.fixTroubleEngineer == null ||
         trouble.fixTroubleEngineer == '';
 

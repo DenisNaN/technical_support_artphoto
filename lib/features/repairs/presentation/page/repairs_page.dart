@@ -209,12 +209,12 @@ class _RepairsPageState extends State<RepairsPage> {
     }
     String repairLastDate = 'Забрали с точки: ${repair.dateDeparture.dateFormattedForInterface()}.';
 
-    if (repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
-        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000Z") {}else{
+    if (repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000" ||
+        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000") {}else{
       repairLastDate = 'Сдали в ремонт: ${repair.dateTransferInService?.dateFormattedForInterface() ?? DateTime.now().dateFormattedForInterface()}.';
     }
-    if (repair.dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z" ||
-        repair.dateDepartureFromService.toString() != "0001-11-30 00:00:00.000Z") {}else{
+    if (repair.dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000" ||
+        repair.dateDepartureFromService.toString() != "0001-11-30 00:00:00.000") {}else{
       repairLastDate =
       'Забрали из ремонта: ${repair.dateDepartureFromService?.dateFormattedForInterface() ?? DateTime.now().dateFormattedForInterface()}.';
     }
@@ -243,8 +243,8 @@ class _RepairsPageState extends State<RepairsPage> {
   String fieldsFilled(Repair repair) {
     if (repair.serviceDislocation == null ||
         repair.serviceDislocation == '' ||
-        repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
-        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000Z") {
+        repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000" ||
+        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000") {
       return 'red';
     }
     return 'yellow';

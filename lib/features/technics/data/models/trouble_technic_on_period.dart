@@ -6,15 +6,17 @@ class TroubleTechnicOnPeriod implements Comparable{
   final Location location;
   String? employee;
   String? trouble;
+  bool isTroubleClosed = true;
 
   TroubleTechnicOnPeriod({required this.id, required this.date, required this.location});
 
   @override
   int compareTo(other) {
-    int dateTimeComp = other.date.compareTo(date);
-    if(dateTimeComp == 0){
-      return other.id.compareTo(id);
-    }
-    return dateTimeComp;
+    return other.id.compareTo(id);
+    // int dateTimeComp = other.date.compareTo(date);
+    // if(dateTimeComp == 0){
+    //   return other.id.compareTo(id);
+    // }
+    // return dateTimeComp;
   }
 }

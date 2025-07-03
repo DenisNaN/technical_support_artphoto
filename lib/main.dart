@@ -22,13 +22,13 @@ void main() {
       SaveLocalServices localServices = SaveLocalServices();
       User? user = localServices.getUser();
       FlutterError.onError = (FlutterErrorDetails details) {
-        sendEmailNewTrouble(error: null, stack: null, flutterErrorDetails: '${details.exception}\n\nStack: ${details.stack}',
-            user: user);
+        // sendEmailNewTrouble(error: null, stack: null, flutterErrorDetails: '${details.exception}\n\nStack: ${details.stack}',
+        //     user: user);
         debugPrint('🔥 FlutterError.onError поймал ошибку: ${details.exception}');
       };
       PlatformDispatcher.instance.onError = (error, stack) {
-        sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '',
-            user: user);
+        // sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '',
+        //     user: user);
         debugPrint('🔥 PlatformDispatcher поймал ошибку: $error');
         return true;
       };
@@ -38,7 +38,7 @@ void main() {
         (Object error, StackTrace stack) {
           SaveLocalServices localServices = SaveLocalServices();
           User? user = localServices.getUser();
-          sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '', user: user);
+          // sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '', user: user);
           debugPrint('ARTPHOTO [CrashEvent] [DEBUG] $error\n$stack');
     },
   );

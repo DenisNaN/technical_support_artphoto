@@ -161,14 +161,14 @@ class _TechnicAddState extends State<TechnicAdd> {
                 ),
               ),
             ),
-            _buildButtonChenckNumberTechnic(),
+            _buildButtonCheckNumberTechnic(),
           ],
         ),
       ],
     );
   }
 
-  Padding _buildButtonChenckNumberTechnic() {
+  Padding _buildButtonCheckNumberTechnic() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 30),
       child: ElevatedButton(

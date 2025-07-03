@@ -279,12 +279,13 @@ class ConnectDbMySQL {
   }
 
   Future<bool> checkNumberTechnic(String number) async {
+    print(number);
     var result = await _connDB!.execute('SELECT 1 FROM equipment WHERE number = :number', {'number': number});
-    return result.isEmpty;
+    return result.rows.isEmpty;
   }
 
   Future<int> insertTechnicInDB(Technic technic, String nameUser) async {
-    var result = await _connDB!.execute(
+    await _connDB!.execute(
         'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) '
             'VALUES (:number, :category , :name, :dateBuy, :cost, :comment, :user)', {
           'number': technic.number,
@@ -295,7 +296,8 @@ class ConnectDbMySQL {
           'comment': technic.comment,
           'user': nameUser
         });
-
+    ///TODO
+    var result = await _connDB!.execute('SELECT id FROM equipment ORDER BY id DESC LIMIT 1');
     int id = int.parse(result.rows.first.colAt(0));
     await insertStatusInDB(id, technic.status, technic.dislocation, nameUser);
     return id;
@@ -577,11 +579,11 @@ Future<Technic?> getTechnic(int number) async {
     return mapResult;
   }
 
-  Future<List<HistoryTechnic>> fetchHistoryTechnic(String idTechnic) async {
+  Future<List<HistoryTechnic>> fetchHistoryTechnic(String numberTechnic) async {
     List<HistoryTechnic> historyTechnics = [];
     String query1 = 'SELECT id, date, dislocation FROM statusEquipment '
         'WHERE idEquipment = (SELECT id FROM equipment WHERE number = :number)';
-    var result1 = await _connDB!.execute(query1, {'number': idTechnic});
+    var result1 = await _connDB!.execute(query1, {'number': numberTechnic});
     for (final row in result1.rows) {
       HistoryTechnic historyTechnic = HistoryTechnic(id: int.parse(row.colAt(0)),
           date: row.colAt(1).toString().dateFormattedFromSQL(),
@@ -590,9 +592,9 @@ Future<Technic?> getTechnic(int number) async {
     }
     historyTechnics.sort();
 
-    String query3 = 'SELECT id, ДатаНеисправности, Фотосалон, Сотрудник, Неисправность FROM Неисправности '
-        'WHERE НомерТехники = :НомерТехники';
-    var result3 = await _connDB!.execute(query3, {'НомерТехники': idTechnic});
+    String query3 = 'SELECT id, ДатаНеисправности, Фотосалон, Сотрудник, Неисправность, СотрПодтверУстр, ИнженерПодтверУстр FROM Неисправности '
+        'WHERE НомерТехники = :number';
+    var result3 = await _connDB!.execute(query3, {'number': numberTechnic});
     for (final row in result3.rows) {
       TroubleTechnicOnPeriod troubleTechnicOnPeriod =
           TroubleTechnicOnPeriod(id: int.parse(row.colAt(0)),
@@ -600,26 +602,32 @@ Future<Technic?> getTechnic(int number) async {
               location: PhotosalonLocation(row.colAt(2)));
       troubleTechnicOnPeriod.employee = row.colAt(3);
       troubleTechnicOnPeriod.trouble = row.colAt(4).toString();
+      if(row.colAt(5) == '' || row.colAt(6) == ''){
+        troubleTechnicOnPeriod.isTroubleClosed = false;
+      }
+
       for (int i = 1; i < historyTechnics.length; i++) {
         if (i == 1) {
           if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i - 1].date)) {
-            historyTechnics[i - 1].listTrouble.add(troubleTechnicOnPeriod);
+            historyTechnics[i].listTrouble.add(troubleTechnicOnPeriod);
           }
         }
         if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i].date) &&
             troubleTechnicOnPeriod.date.isBefore(historyTechnics[i - 1].date)) {
-          historyTechnics[i].listTrouble.add(troubleTechnicOnPeriod);
+          historyTechnics[i - 1].listTrouble.add(troubleTechnicOnPeriod);
           continue;
         }
-        historyTechnics[i].listTrouble.sort();
       }
+    }
+    for (int i = 0; i < historyTechnics.length; i++) {
+      historyTechnics[i].listTrouble.sort();
     }
 
     String query2 = 'SELECT id, dateTransferInService, serviceDislocation, '
         'dateDepartureFromService, worksPerformed, '
         'costService FROM repairEquipment '
         'WHERE number = :number';
-    var result2 = await _connDB!.execute(query2, {'number': idTechnic});
+    var result2 = await _connDB!.execute(query2, {'number': numberTechnic});
     for (final row in result2.rows) {
       HistoryTechnic historyTechnic = HistoryTechnic(id: int.parse(row.colAt(0)),
           date: row.colAt(1).toString().dateFormattedFromSQL(),

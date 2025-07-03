@@ -226,8 +226,8 @@ class _RepairViewState extends State<RepairView> {
 
   Color _getColorStepTwoRepair() {
     bool isDateTransferInService =
-        _dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
-            _dateTransferInService.toString() == "0001-11-30 00:00:00.000Z";
+        _dateTransferInService.toString() == "-0001-11-30 00:00:00.000" ||
+            _dateTransferInService.toString() == "0001-11-30 00:00:00.000";
     if (_selectedDropdownService == null || isDateTransferInService) {
       return Colors.yellow.shade200;
     }
@@ -236,12 +236,12 @@ class _RepairViewState extends State<RepairView> {
 
   Color _getColorStepThreeRepair() {
     bool isDateDepartureFormService =
-        _dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000Z" ||
-                _dateDepartureFromService.toString() == "0001-11-30 00:00:00.000Z"
+        _dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000" ||
+                _dateDepartureFromService.toString() == "0001-11-30 00:00:00.000"
             ? true
             : false;
-    bool isDateReceipt = _dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" ||
-            _dateReceipt.toString() == "0001-11-30 00:00:00.000Z"
+    bool isDateReceipt = _dateReceipt.toString() == "-0001-11-30 00:00:00.000" ||
+            _dateReceipt.toString() == "0001-11-30 00:00:00.000"
         ? true
         : false;
 
@@ -334,9 +334,9 @@ class _RepairViewState extends State<RepairView> {
               showDatePicker(
                       context: context,
                       initialDate: _dateTransferInService.toString() ==
-                                  "-0001-11-30 00:00:00.000Z" ||
+                                  "-0001-11-30 00:00:00.000" ||
                               _dateTransferInService.toString() ==
-                                  "0001-11-30 00:00:00.000Z"
+                                  "0001-11-30 00:00:00.000"
                           ? DateTime.now()
                           : _dateTransferInService,
                       firstDate: DateTime(2000),
@@ -358,9 +358,9 @@ class _RepairViewState extends State<RepairView> {
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
                     child: Text(_dateTransferInService.toString() ==
-                                "-0001-11-30 00:00:00.000Z" ||
+                                "-0001-11-30 00:00:00.000" ||
                             _dateTransferInService.toString() ==
-                                "0001-11-30 00:00:00.000Z"
+                                "0001-11-30 00:00:00.000"
                         ? 'Дата отсутствует'
                         : DateFormat('d MMMM yyyy', 'ru_RU')
                             .format(_dateTransferInService ?? DateTime.now())),
@@ -395,9 +395,9 @@ class _RepairViewState extends State<RepairView> {
               showDatePicker(
                       context: context,
                       initialDate: _dateDepartureFromService.toString() ==
-                                  "-0001-11-30 00:00:00.000Z" ||
+                                  "-0001-11-30 00:00:00.000" ||
                               _dateDepartureFromService.toString() ==
-                                  "0001-11-30 00:00:00.000Z"
+                                  "0001-11-30 00:00:00.000"
                           ? DateTime.now()
                           : _dateDepartureFromService,
                       firstDate: DateTime(2000),
@@ -419,9 +419,9 @@ class _RepairViewState extends State<RepairView> {
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
                     child: Text(_dateDepartureFromService.toString() ==
-                                "-0001-11-30 00:00:00.000Z" ||
+                                "-0001-11-30 00:00:00.000" ||
                             _dateDepartureFromService.toString() ==
-                                "0001-11-30 00:00:00.000Z"
+                                "0001-11-30 00:00:00.000"
                         ? 'Дата отсутствует'
                         : DateFormat('d MMMM yyyy', 'ru_RU')
                             .format(_dateDepartureFromService ?? DateTime.now())),
@@ -651,8 +651,8 @@ class _RepairViewState extends State<RepairView> {
               showDatePicker(
                       context: context,
                       initialDate:
-                          _dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" ||
-                                  _dateReceipt.toString() == "0001-11-30 00:00:00.000Z"
+                          _dateReceipt.toString() == "-0001-11-30 00:00:00.000" ||
+                                  _dateReceipt.toString() == "0001-11-30 00:00:00.000"
                               ? DateTime.now()
                               : _dateReceipt,
                       firstDate: DateTime(2000),
@@ -673,8 +673,8 @@ class _RepairViewState extends State<RepairView> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
-                    child: Text(_dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" ||
-                            _dateReceipt.toString() == "0001-11-30 00:00:00.000Z"
+                    child: Text(_dateReceipt.toString() == "-0001-11-30 00:00:00.000" ||
+                            _dateReceipt.toString() == "0001-11-30 00:00:00.000"
                         ? 'Дата отсутствует'
                         : DateFormat('d MMMM yyyy', 'ru_RU')
                             .format(_dateReceipt ?? DateTime.now())),

@@ -253,8 +253,8 @@ class ProviderModel with ChangeNotifier {
     List<Repair> tmpYellowList = [];
     for(int i = 0; i < repairs.length; i++){
       if(repairs[i].serviceDislocation == '' || repairs[i].serviceDislocation == null ||
-          repairs[i].dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
-          repairs[i].dateTransferInService.toString() == "0001-11-30 00:00:00.000Z"){
+          repairs[i].dateTransferInService.toString() == "-0001-11-30 00:00:00.000" ||
+          repairs[i].dateTransferInService.toString() == "0001-11-30 00:00:00.000"){
         tmpRedList.add(repairs[i]);
       }else{
         tmpYellowList.add(repairs[i]);

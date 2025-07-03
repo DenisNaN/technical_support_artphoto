@@ -612,8 +612,8 @@ class _TechnicViewState extends State<TechnicView> {
                               size: 20,
                               color: Colors.grey,
                             ),
-                            _dateStartTestDrive!.toString() == "-0001-11-30 00:00:00.000Z" ||
-                                _dateStartTestDrive!.toString() == "0001-11-30 00:00:00.000Z" ?
+                            _dateStartTestDrive!.toString() == "-0001-11-30 00:00:00.000" ||
+                                _dateStartTestDrive!.toString() == "0001-11-30 00:00:00.000" ?
                             Text('Нет даты') : Text(DateFormat('dd/MM/yyyy').format(_dateStartTestDrive!)),
                           ],
                         ),
@@ -640,8 +640,8 @@ class _TechnicViewState extends State<TechnicView> {
                             size: 20,
                             color: Colors.grey,
                           ),
-                          _dateFinishTestDrive!.toString() == "-0001-11-30 00:00:00.000Z" ||
-                              _dateFinishTestDrive!.toString() == "0001-11-30 00:00:00.000Z" ?
+                          _dateFinishTestDrive!.toString() == "-0001-11-30 00:00:00.000" ||
+                              _dateFinishTestDrive!.toString() == "0001-11-30 00:00:00.000" ?
                           Text('Нет даты') : Text(DateFormat('dd/MM/yyyy').format(_dateFinishTestDrive!)),
                         ],
                       ),
