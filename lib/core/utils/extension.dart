@@ -11,3 +11,9 @@ extension DateForInterface on DateTime{
     return DateFormat("d MMMM yyyy", "ru_RU").format(this);
   }
 }
+
+extension DateFromSQL on String{
+  DateTime dateFormattedFromSQL(){
+    return DateTime.parse(this);
+  }
+}

@@ -37,6 +37,7 @@ class GridViewBasketDecommissioned extends StatelessWidget {
               ),
               child: OpenContainer(
                 transitionDuration: Duration(milliseconds: 600),
+                transitionType: ContainerTransitionType.fadeThrough,
                 openBuilder: (context, openContainer) {
                   return FutureBuilder(
                     future: TechnicalSupportRepoImpl.downloadData.getTechnicsDecommissioned(),
@@ -73,7 +74,7 @@ class GridViewBasketDecommissioned extends StatelessWidget {
                               ),
                             ));
                       } else {
-                        return Center(child: MatrixTransitionLogo());
+                        return Center(child: SizedBox(width: 200, child: MatrixTransitionLogo()));
                       }
                     },
                   );
