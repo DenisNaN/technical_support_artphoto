@@ -296,7 +296,6 @@ class ConnectDbMySQL {
           'comment': technic.comment,
           'user': nameUser
         });
-    ///TODO
     var result = await _connDB!.execute('SELECT id FROM equipment ORDER BY id DESC LIMIT 1');
     int id = int.parse(result.rows.first.colAt(0));
     await insertStatusInDB(id, technic.status, technic.dislocation, nameUser);
@@ -314,7 +313,7 @@ class ConnectDbMySQL {
   Future<int> insertTestDriveInDB(TestDrive testDrive) async {
     int closeTestDrive = 0;
     if(testDrive.isCloseTestDrive) closeTestDrive = 1;
-    var result = await _connDB!.execute(
+    await _connDB!.execute(
         'INSERT INTO test_drive (idEquipment, category, testDriveDislocation, dateStart, dateFinish, result, '
         'checkEquipment, user) VALUES '
             '(:idEquipment, :category, :testDriveDislocation, :dateStart, :dateFinish, '
@@ -329,6 +328,7 @@ class ConnectDbMySQL {
           'checkEquipment': closeTestDrive.toString(),
           'user': testDrive.user
         });
+    var result = await _connDB!.execute('SELECT id FROM test_drive ORDER BY id DESC LIMIT 1');
     int id = int.parse(result.rows.first.colAt(0));
     return id;
   }
@@ -686,7 +686,7 @@ Future<int> insertRepairInDB(Repair repair) async{
         'idTrouble) '
         'VALUES (:number, :category, :dislocationOld, :status, :complaint, :dateDeparture, '
         ':whoTook, :idTrouble)';
-  var result = await _connDB!.execute(str, {
+  await _connDB!.execute(str, {
       'number': repair.numberTechnic,
       'category': repair.category,
       'dislocationOld': repair.dislocationOld,
@@ -696,7 +696,7 @@ Future<int> insertRepairInDB(Repair repair) async{
       'whoTook': repair.whoTook,
       'idTrouble': repair.idTrouble.toString()
     });
-
+  var result = await _connDB!.execute('SELECT id FROM repairEquipment ORDER BY id DESC LIMIT 1');
   int id = int.parse(result.rows.first.colAt(0));
   return id;
 }

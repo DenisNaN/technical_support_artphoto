@@ -242,7 +242,8 @@ class _TechnicViewState extends State<TechnicView> {
                         radius: widget.technic.number
                             .toString()
                             .length > 4 ? 25 : null,
-                        child: Text(widget.technic.number.toString()),
+                        child: Text(widget.technic.number == 0 ? 'БН' :
+                            widget.technic.number.toString()),
                       ),
                     )),
                 Positioned(
@@ -801,7 +802,7 @@ class _TechnicViewState extends State<TechnicView> {
             ),
           ),
         ),
-        isListEmpty
+        isListEmpty || widget.technic.number == 0
             ? SizedBox()
             : InkWell(
           onTap: () {

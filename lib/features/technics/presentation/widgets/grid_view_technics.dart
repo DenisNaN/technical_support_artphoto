@@ -57,7 +57,9 @@ class GridViewTechnics extends StatelessWidget {
                       }
                       for(final trouble in troubles){
                         if(technic.number == trouble.numberTechnic){
-                          isTroubleHas = true;
+                          if (trouble.numberTechnic != 0) {
+                            isTroubleHas = true;
+                          }
                           break;
                         }
                       }
@@ -91,7 +93,8 @@ class GridViewTechnics extends StatelessWidget {
                                     borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
                                 child: Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: Text(technic.number.toString()),
+                                  child: Text(technic.number == 0 ? 'БН' :
+                                  technic.number.toString()),
                                 )),
                           ],
                         ),

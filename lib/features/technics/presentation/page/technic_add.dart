@@ -342,6 +342,8 @@ class _TechnicAddState extends State<TechnicAdd> {
     statuses.addAll(providerModel.statusForEquipment);
     statuses.remove('Тест-драйв');
     statuses.remove('Транспортировка');
+    statuses.remove('В ремонте');
+    statuses.remove('Списана');
     return Column(
       children: [
         Align(

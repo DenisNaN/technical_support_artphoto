@@ -73,7 +73,7 @@ class GridViewSearchTechnics extends StatelessWidget {
                                     borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
                                 child: Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: Text(technic.number.toString()),
+                                  child: Text(technic.number == 0 ? 'БН' :technic.number.toString()),
                                 )),
                           ],
                         ),
