@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/transportation_location.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
@@ -22,7 +23,6 @@ class GridViewSearchTechnics extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Technic> technics =
         getSearchTechnics(typeSearch, valueTechnic ?? '', Provider.of<ProviderModel>(context));
-
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.searchTechnic, location: valueTechnic ?? '', technic: null),
         body: CustomScrollView(
@@ -61,7 +61,7 @@ class GridViewSearchTechnics extends StatelessWidget {
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 2),
                                 child: Text(
-                                  technic.category,
+                                  technic.dislocation,
                                   style: Theme.of(context).textTheme.titleSmall,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -73,7 +73,7 @@ class GridViewSearchTechnics extends StatelessWidget {
                                     borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
                                 child: Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: Text(technic.number.toString()),
+                                  child: Text(technic.number == 0 ? 'БН' :technic.number.toString()),
                                 )),
                           ],
                         ),
@@ -101,7 +101,14 @@ class GridViewSearchTechnics extends StatelessWidget {
                                 SizedBox(
                                   height: 20,
                                 ),
-                                Expanded(child: TechnicImage(category: technic.category)),
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      Text(technic.category),
+                                      Expanded(child: TechnicImage(category: technic.category)),
+                                    ],
+                                  ),
+                                ),
                                 Row(
                                   children: [
                                     isNotDeadlineTestDrive ? Icon(Icons.error, color: Colors.red.shade400,) : SizedBox(),
@@ -131,9 +138,11 @@ class GridViewSearchTechnics extends StatelessWidget {
     Map<String, PhotosalonLocation> techPhoto = provider.technicsInPhotosalons;
     Map<String, RepairLocation> techRep = provider.technicsInRepairs;
     Map<String, StorageLocation> techStor = provider.technicsInStorages;
+    Map<String, TransportationLocation> techTransp = provider.technicsInTransportation;
     Iterable<PhotosalonLocation> photosalonLocation = techPhoto.values;
     Iterable<RepairLocation> repairLocation = techRep.values;
     Iterable<StorageLocation> storageLocation = techStor.values;
+    Iterable<TransportationLocation> transportationLocation = techTransp.values;
     List<Technic> tmpTechnics = [];
     for (var element in photosalonLocation) {
       tmpTechnics.addAll(element.technics);
@@ -144,17 +153,24 @@ class GridViewSearchTechnics extends StatelessWidget {
     for (var element in storageLocation) {
       tmpTechnics.addAll(element.technics);
     }
+    for (var element in transportationLocation) {
+      tmpTechnics.addAll(element.technics);
+    }
 
     for (var technic in tmpTechnics) {
-      if (typeSearch == TypeSearch.searchByName) {
-        if(technic.name.trim().toLowerCase().contains(valueTechnic.trim().toLowerCase())){
-          technics.add(technic);
-        }
-      }
-      else{
-        if(technic.status.trim().toLowerCase().contains(valueTechnic.trim().toLowerCase())){
-          technics.add(technic);
-        }
+      switch(typeSearch){
+        case TypeSearch.searchByName:
+          if(technic.name.trim().toLowerCase().contains(valueTechnic.trim().toLowerCase())){
+            technics.add(technic);
+          }
+        case TypeSearch.filterByStatus:
+          if(technic.status.trim().toLowerCase().contains(valueTechnic.trim().toLowerCase())){
+            technics.add(technic);
+          }
+        case TypeSearch.filterByCategory:
+          if(technic.category.trim().toLowerCase().contains(valueTechnic.trim().toLowerCase())){
+            technics.add(technic);
+          }
       }
     }
     return technics;

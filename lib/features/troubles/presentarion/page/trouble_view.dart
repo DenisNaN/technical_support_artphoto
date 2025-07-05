@@ -117,32 +117,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                           ),
                           ElevatedButton(
                               onPressed: () {
-                                Trouble troubleNew = Trouble(
-                                  id: trouble.id,
-                                  photosalon: trouble.photosalon,
-                                  dateTrouble: trouble.dateTrouble,
-                                  employee: trouble.employee,
-                                  numberTechnic: trouble.numberTechnic,
-                                  trouble: trouble.trouble,
-                                );
-                                if (_photoTrouble != null) {
-                                  troubleNew.photoTrouble = _photoTrouble;
-                                }
-                                if (_dateFixTroubleEmployee != null &&
-                                    _fixTroubleEmployee.text != '') {
-                                  troubleNew.dateFixTroubleEmployee =
-                                      _dateFixTroubleEmployee;
-                                  troubleNew.fixTroubleEmployee =
-                                      _fixTroubleEmployee.text;
-                                }
-                                if (_dateFixTroubleEngineer != null &&
-                                    _fixTroubleEngineer.text != '') {
-                                  troubleNew.dateFixTroubleEngineer =
-                                      _dateFixTroubleEngineer;
-                                  troubleNew.fixTroubleEngineer =
-                                      _fixTroubleEngineer.text;
-                                }
-
+                                Trouble troubleNew = createTrouble();
                                 _save(troubleNew, providerModel).then((isSave) {
                                   _viewSnackBar(Icons.save, isSave, 'Изменения сохранены',
                                       'Изменения не сохранены', false);
@@ -196,8 +171,8 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
 
   Widget _buildDateFixTroubleEmployee(ProviderModel providerModel) {
     bool isValidateDate = _dateFixTroubleEmployee != null &&
-        _dateFixTroubleEmployee.toString() != "-0001-11-30 00:00:00.000Z" &&
-        _dateFixTroubleEmployee.toString() != "0001-11-30 00:00:00.000Z";
+        _dateFixTroubleEmployee.toString() != "-0001-11-30 00:00:00.000" &&
+        _dateFixTroubleEmployee.toString() != "0001-11-30 00:00:00.000";
     return Column(
       children: [
         Align(
@@ -247,7 +222,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                 IconButton(
                     onPressed: () {
                   setState(() {
-                    _dateFixTroubleEmployee = DateTime.tryParse("-0001-11-30 00:00:00.000Z");
+                    _dateFixTroubleEmployee = DateTime.tryParse("-0001-11-30 00:00:00.000");
                     _fixTroubleEmployee.text = '';
                   });
                 }, icon: Icon(Icons.close, color: Colors.red,))
@@ -293,8 +268,8 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
 
   Widget _buildDateFixTroubleEngineer(ProviderModel providerModel) {
     bool isValidateDate = _dateFixTroubleEngineer != null &&
-        _dateFixTroubleEngineer.toString() != "-0001-11-30 00:00:00.000Z" &&
-        _dateFixTroubleEngineer.toString() != "0001-11-30 00:00:00.000Z";
+        _dateFixTroubleEngineer.toString() != "-0001-11-30 00:00:00.000" &&
+        _dateFixTroubleEngineer.toString() != "0001-11-30 00:00:00.000";
     return Column(
       children: [
         Align(
@@ -344,7 +319,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                 IconButton(
                     onPressed: () {
                       setState(() {
-                        _dateFixTroubleEngineer = DateTime.tryParse("-0001-11-30 00:00:00.000Z");
+                        _dateFixTroubleEngineer = DateTime.tryParse("-0001-11-30 00:00:00.000");
                         _fixTroubleEngineer.text = '';
                       });
                     }, icon: Icon(Icons.close, color: Colors.red,))
@@ -446,7 +421,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                                 actions: [
                                   ElevatedButton(
                                       onPressed: () {
-                                        trouble.photoTrouble = Uint8List(0);
+                                        trouble.photoTrouble = null;
                                         TechnicalSupportRepoImpl.downloadData
                                             .updateTrouble(trouble)
                                             .then((result) {
@@ -583,13 +558,13 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
   Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
     LoadingOverlay.of(context).show();
     bool isEmptyDateEmployee = trouble.dateFixTroubleEmployee == null ||
-        trouble.dateFixTroubleEmployee.toString() == "-0001-11-30 00:00:00.000Z" ||
-        trouble.dateFixTroubleEmployee.toString() == "0001-11-30 00:00:00.000Z";
+        trouble.dateFixTroubleEmployee.toString() == "-0001-11-30 00:00:00.000" ||
+        trouble.dateFixTroubleEmployee.toString() == "0001-11-30 00:00:00.000";
     bool isEmptyEmployee = trouble.fixTroubleEmployee == null ||
         trouble.fixTroubleEmployee == '';
     bool isEmptyDateEngineer = trouble.dateFixTroubleEngineer == null ||
-        trouble.dateFixTroubleEngineer.toString() == "-0001-11-30 00:00:00.000Z" ||
-        trouble.dateFixTroubleEngineer.toString() == "0001-11-30 00:00:00.000Z";
+        trouble.dateFixTroubleEngineer.toString() == "-0001-11-30 00:00:00.000" ||
+        trouble.dateFixTroubleEngineer.toString() == "0001-11-30 00:00:00.000";
     bool isEmptyEngineer = trouble.fixTroubleEngineer == null ||
         trouble.fixTroubleEngineer == '';
 
@@ -622,6 +597,39 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
       LoadingOverlay.of(context).hide();
     }
     return false;
+  }
+
+  Trouble createTrouble(){
+    Trouble troubleNew = Trouble(
+      id: trouble.id,
+      photosalon: trouble.photosalon,
+      dateTrouble: trouble.dateTrouble,
+      employee: trouble.employee,
+      numberTechnic: trouble.numberTechnic,
+      trouble: trouble.trouble,
+    );
+    if (_photoTrouble != null) {
+      troubleNew.photoTrouble = _photoTrouble;
+    }
+    if (_photoTrouble != null) {
+
+      troubleNew.photoTrouble = _photoTrouble;
+    }
+    if (_dateFixTroubleEmployee != null &&
+        _fixTroubleEmployee.text != '') {
+      troubleNew.dateFixTroubleEmployee =
+          _dateFixTroubleEmployee;
+      troubleNew.fixTroubleEmployee =
+          _fixTroubleEmployee.text;
+    }
+    if (_dateFixTroubleEngineer != null &&
+        _fixTroubleEngineer.text != '') {
+      troubleNew.dateFixTroubleEngineer =
+          _dateFixTroubleEngineer;
+      troubleNew.fixTroubleEngineer =
+          _fixTroubleEngineer.text;
+    }
+    return troubleNew;
   }
 
   void _viewSnackBar(

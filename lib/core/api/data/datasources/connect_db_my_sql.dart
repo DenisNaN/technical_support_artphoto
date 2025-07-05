@@ -280,11 +280,11 @@ class ConnectDbMySQL {
 
   Future<bool> checkNumberTechnic(String number) async {
     var result = await _connDB!.execute('SELECT 1 FROM equipment WHERE number = :number', {'number': number});
-    return result.isEmpty;
+    return result.rows.isEmpty;
   }
 
   Future<int> insertTechnicInDB(Technic technic, String nameUser) async {
-    var result = await _connDB!.execute(
+    await _connDB!.execute(
         'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) '
             'VALUES (:number, :category , :name, :dateBuy, :cost, :comment, :user)', {
           'number': technic.number,
@@ -295,7 +295,7 @@ class ConnectDbMySQL {
           'comment': technic.comment,
           'user': nameUser
         });
-
+    var result = await _connDB!.execute('SELECT id FROM equipment ORDER BY id DESC LIMIT 1');
     int id = int.parse(result.rows.first.colAt(0));
     await insertStatusInDB(id, technic.status, technic.dislocation, nameUser);
     return id;
@@ -312,7 +312,7 @@ class ConnectDbMySQL {
   Future<int> insertTestDriveInDB(TestDrive testDrive) async {
     int closeTestDrive = 0;
     if(testDrive.isCloseTestDrive) closeTestDrive = 1;
-    var result = await _connDB!.execute(
+    await _connDB!.execute(
         'INSERT INTO test_drive (idEquipment, category, testDriveDislocation, dateStart, dateFinish, result, '
         'checkEquipment, user) VALUES '
             '(:idEquipment, :category, :testDriveDislocation, :dateStart, :dateFinish, '
@@ -327,6 +327,7 @@ class ConnectDbMySQL {
           'checkEquipment': closeTestDrive.toString(),
           'user': testDrive.user
         });
+    var result = await _connDB!.execute('SELECT id FROM test_drive ORDER BY id DESC LIMIT 1');
     int id = int.parse(result.rows.first.colAt(0));
     return id;
   }
@@ -577,11 +578,11 @@ Future<Technic?> getTechnic(int number) async {
     return mapResult;
   }
 
-  Future<List<HistoryTechnic>> fetchHistoryTechnic(String idTechnic) async {
+  Future<List<HistoryTechnic>> fetchHistoryTechnic(String numberTechnic) async {
     List<HistoryTechnic> historyTechnics = [];
     String query1 = 'SELECT id, date, dislocation FROM statusEquipment '
         'WHERE idEquipment = (SELECT id FROM equipment WHERE number = :number)';
-    var result1 = await _connDB!.execute(query1, {'number': idTechnic});
+    var result1 = await _connDB!.execute(query1, {'number': numberTechnic});
     for (final row in result1.rows) {
       HistoryTechnic historyTechnic = HistoryTechnic(id: int.parse(row.colAt(0)),
           date: row.colAt(1).toString().dateFormattedFromSQL(),
@@ -590,9 +591,9 @@ Future<Technic?> getTechnic(int number) async {
     }
     historyTechnics.sort();
 
-    String query3 = 'SELECT id, ДатаНеисправности, Фотосалон, Сотрудник, Неисправность FROM Неисправности '
-        'WHERE НомерТехники = :НомерТехники';
-    var result3 = await _connDB!.execute(query3, {'НомерТехники': idTechnic});
+    String query3 = 'SELECT id, ДатаНеисправности, Фотосалон, Сотрудник, Неисправность, СотрПодтверУстр, ИнженерПодтверУстр FROM Неисправности '
+        'WHERE НомерТехники = :number';
+    var result3 = await _connDB!.execute(query3, {'number': numberTechnic});
     for (final row in result3.rows) {
       TroubleTechnicOnPeriod troubleTechnicOnPeriod =
           TroubleTechnicOnPeriod(id: int.parse(row.colAt(0)),
@@ -600,26 +601,32 @@ Future<Technic?> getTechnic(int number) async {
               location: PhotosalonLocation(row.colAt(2)));
       troubleTechnicOnPeriod.employee = row.colAt(3);
       troubleTechnicOnPeriod.trouble = row.colAt(4).toString();
+      if(row.colAt(5) == '' || row.colAt(6) == ''){
+        troubleTechnicOnPeriod.isTroubleClosed = false;
+      }
+
       for (int i = 1; i < historyTechnics.length; i++) {
         if (i == 1) {
           if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i - 1].date)) {
-            historyTechnics[i - 1].listTrouble.add(troubleTechnicOnPeriod);
+            historyTechnics[i].listTrouble.add(troubleTechnicOnPeriod);
           }
         }
         if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i].date) &&
             troubleTechnicOnPeriod.date.isBefore(historyTechnics[i - 1].date)) {
-          historyTechnics[i].listTrouble.add(troubleTechnicOnPeriod);
+          historyTechnics[i - 1].listTrouble.add(troubleTechnicOnPeriod);
           continue;
         }
-        historyTechnics[i].listTrouble.sort();
       }
+    }
+    for (int i = 0; i < historyTechnics.length; i++) {
+      historyTechnics[i].listTrouble.sort();
     }
 
     String query2 = 'SELECT id, dateTransferInService, serviceDislocation, '
         'dateDepartureFromService, worksPerformed, '
         'costService FROM repairEquipment '
         'WHERE number = :number';
-    var result2 = await _connDB!.execute(query2, {'number': idTechnic});
+    var result2 = await _connDB!.execute(query2, {'number': numberTechnic});
     for (final row in result2.rows) {
       HistoryTechnic historyTechnic = HistoryTechnic(id: int.parse(row.colAt(0)),
           date: row.colAt(1).toString().dateFormattedFromSQL(),
@@ -666,7 +673,7 @@ Future<Technic?> getTechnic(int number) async {
         });
   }
 
-Future<int> insertRepairInDB(Repair repair) async{
+Future<void> insertRepairInDB(Repair repair) async{
     String str = 'INSERT INTO repairEquipment '
         '(number, '
         'category, '
@@ -678,7 +685,7 @@ Future<int> insertRepairInDB(Repair repair) async{
         'idTrouble) '
         'VALUES (:number, :category, :dislocationOld, :status, :complaint, :dateDeparture, '
         ':whoTook, :idTrouble)';
-  var result = await _connDB!.execute(str, {
+  await _connDB!.execute(str, {
       'number': repair.numberTechnic,
       'category': repair.category,
       'dislocationOld': repair.dislocationOld,
@@ -688,9 +695,6 @@ Future<int> insertRepairInDB(Repair repair) async{
       'whoTook': repair.whoTook,
       'idTrouble': repair.idTrouble.toString()
     });
-
-  int id = int.parse(result.rows.first.colAt(0));
-  return id;
 }
 
 Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
@@ -763,52 +767,36 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
   }
 
   Future<void> insertTroubleInDB(Trouble trouble) async{
-    String str = 'INSERT INTO Неисправности '
-        '(Фотосалон, '
-        'ДатаНеисправности, '
-        'Сотрудник, '
-        'НомерТехники, '
-        'Неисправность, '
-        'Фотография) '
-        'VALUES (:Фотосалон, :ДатаНеисправности, :Сотрудник, :НомерТехники, '
-        ':Неисправность, :Фотография)';
-    await _connDB!.execute(str, {
-      'Фотосалон': trouble.photosalon,
-      'ДатаНеисправности': trouble.dateTrouble.dateFormattedForSQL(),
-      'Сотрудник': trouble.employee,
-      'НомерТехники': trouble.numberTechnic.toString(),
-      'Неисправность': trouble.trouble,
-      'Фотография': trouble.photoTrouble ?? ''
-    });
+    var stmt = await _connDB!.prepare('INSERT INTO Неисправности '
+        '(Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, Фотография) '
+        'VALUES (?, ?, ?, ?, ?, ?)');
+    await stmt.execute([
+      trouble.photosalon,
+      trouble.dateTrouble.dateFormattedForSQL(),
+      trouble.employee,
+      trouble.numberTechnic.toString(),
+      trouble.trouble,
+      trouble.photoTrouble ?? ''
+    ]);
   }
 
   Future updateTrouble(Trouble trouble) async{
-    await _connDB!.execute(
-        'UPDATE Неисправности SET '
-            'Фотосалон = :Фотосалон, '
-            'ДатаНеисправности = :ДатаНеисправности, '
-            'Сотрудник = :Сотрудник, '
-            'НомерТехники = :НомерТехники, '
-            'Неисправность = :Неисправность, '
-            'ДатаУстрСотр = :ДатаУстрСотр, '
-            'СотрПодтверУстр = :СотрПодтверУстр, '
-            'ДатаУстрИнженер = :ДатаУстрИнженер, '
-            'ИнженерПодтверУстр = :ИнженерПодтверУстр, '
-            'Фотография = :Фотография '
-            'WHERE id = :id',
-        {
-          'Фотосалон': trouble.photosalon,
-          'ДатаНеисправности': trouble.dateTrouble.dateFormattedForSQL(),
-          'Сотрудник': trouble.employee,
-          'НомерТехники': trouble.numberTechnic.toString(),
-          'Неисправность': trouble.trouble,
-          'ДатаУстрСотр': trouble.dateFixTroubleEmployee?.dateFormattedForSQL() ?? '',
-          'СотрПодтверУстр': trouble.fixTroubleEmployee ?? '',
-          'ДатаУстрИнженер': trouble.dateFixTroubleEngineer?.dateFormattedForSQL() ?? '',
-          'ИнженерПодтверУстр': trouble.fixTroubleEngineer ?? '',
-          'Фотография': trouble.photoTrouble ?? '',
-          'id': trouble.id
-        });
+    var stmt = await _connDB!.prepare(
+      "UPDATE Неисправности SET Фотосалон = ?, ДатаНеисправности = ?, Сотрудник = ?, "
+          "НомерТехники = ?, Неисправность = ?, ДатаУстрСотр = ?, СотрПодтверУстр = ?, "
+          "ДатаУстрИнженер = ?, ИнженерПодтверУстр = ?, Фотография = ? WHERE id = ?"
+    );
+    await stmt.execute([trouble.photosalon,
+      trouble.dateTrouble.dateFormattedForSQL(),
+      trouble.employee,
+      trouble.numberTechnic.toString(),
+      trouble.trouble,
+      trouble.dateFixTroubleEmployee?.dateFormattedForSQL() ?? '',
+      trouble.fixTroubleEmployee ?? '',
+      trouble.dateFixTroubleEngineer?.dateFormattedForSQL() ?? '',
+      trouble.fixTroubleEngineer ?? '',
+      trouble.photoTrouble ?? '',
+      trouble.id]);
   }
 
   Future deleteTroubleInDB(String id) async{
@@ -828,9 +816,8 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
             // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
             // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
             // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
-            // Blob blobImage = row.colAt(10);
-            // Uint8List image = Uint8List.fromList(blobImage.toBytes());
-            Uint8List image = row.colAt(10);
+            Uint8List image = Uint8List.fromList(row.colAt(10));
+            // Uint8List image = row.colAt(10);
             Trouble trouble = Trouble(
                 id: int.parse(row.colAt(0)),
                 photosalon: row.colAt(1),

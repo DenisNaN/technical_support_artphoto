@@ -295,7 +295,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
           SizedBox(
             width: 4,
           ),
-          Text(widget.trouble.dateTrouble.toString() != '-0001-11-30 00:00:00.000Z'
+          Text(widget.trouble.dateTrouble.toString() != '-0001-11-30 00:00:00.000'
               ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.trouble.dateTrouble)
               : 'Дата отсутствует')
         ])

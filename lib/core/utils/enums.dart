@@ -48,5 +48,6 @@ enum SaveTestDriveStatus{
 
 enum TypeSearch{
   searchByName,
-  filterByStatus
+  filterByStatus,
+  filterByCategory,
 }

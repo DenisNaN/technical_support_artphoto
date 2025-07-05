@@ -116,22 +116,7 @@ class _RepairAddState extends State<RepairAdd> {
                   ElevatedButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          Repair repair = Repair(
-                              !isBN ? int.parse(_innerNumberTechnic.text) : 0,
-                              _nameTechnicController.text,
-                              isBN ? _dislocationOldController.text : _selectedDropdownDislocationOld ?? '',
-                              _selectedDropdownStatusOld ?? '',
-                              _complaint.text,
-                              _dateDeparture ?? DateTime.now(),
-                              providerModel.user.name,);
-                          if(widget.trouble != null){
-                            repair.idTrouble = widget.trouble!.id!;
-                          }
-                          if(_selectedDropdownStatusOld == 'В ремонте'){
-                            repair.serviceDislocation = _selectedDropdownDislocationService;
-                            repair.dateTransferInService = DateTime.now();
-                          }
-
+                          Repair repair = createRepair(providerModel);
                           _save(repair, providerModel).then((isSave) {
                             providerModel.changeCurrentPageMainBottomAppBar(1);
                             _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', scaffoldKey);
@@ -495,7 +480,14 @@ class _RepairAddState extends State<RepairAdd> {
     LoadingOverlay.of(context).show();
     List<Repair>? resultData =
       await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
-    if(resultData != null){
+    if(resultData != null && repair.numberTechnic == 0){
+      providerModel.refreshCurrentRepairs(resultData);
+      if(mounted){
+        LoadingOverlay.of(context).hide();
+      }
+      return true;
+    }
+    if(resultData != null && repair.numberTechnic != 0){
       Technic? technic =
         await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
       if (technic != null) {
@@ -537,6 +529,25 @@ class _RepairAddState extends State<RepairAdd> {
       LoadingOverlay.of(context).hide();
     }
     return false;
+  }
+
+  Repair createRepair(ProviderModel providerModel){
+    Repair repair = Repair(
+      !isBN ? int.parse(_innerNumberTechnic.text) : 0,
+      _nameTechnicController.text,
+      _selectedDropdownDislocationOld ?? '',
+      _selectedDropdownStatusOld ?? '',
+      _complaint.text,
+      _dateDeparture ?? DateTime.now(),
+      providerModel.user.name,);
+    if(widget.trouble != null){
+      repair.idTrouble = widget.trouble!.id!;
+    }
+    if(_selectedDropdownStatusOld == 'В ремонте'){
+      repair.serviceDislocation = _selectedDropdownDislocationService;
+      repair.dateTransferInService = DateTime.now();
+    }
+    return repair;
   }
 
   Future addHistory(Repair repair) async {

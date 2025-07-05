@@ -157,7 +157,7 @@ class _TroublesPageState extends State<TroublesPage> {
                   ),
                 ));
           } else {
-            return Center(child: MatrixTransitionLogo());
+            return Center(child: SizedBox(width: 200, child: MatrixTransitionLogo()));
           }
         });
   }

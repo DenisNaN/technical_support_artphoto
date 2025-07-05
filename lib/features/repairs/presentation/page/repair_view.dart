@@ -150,29 +150,7 @@ class _RepairViewState extends State<RepairView> {
                   ),
                   ElevatedButton(
                       onPressed: () {
-                        Repair repair = Repair.fullRepair(
-                          widget.repair.id,
-                          widget.repair.numberTechnic,
-                          widget.repair.category,
-                          widget.repair.dislocationOld,
-                          widget.repair.status,
-                          widget.repair.complaint,
-                          widget.repair.dateDeparture,
-                          widget.repair.whoTook,
-                          widget.repair.idTrouble,
-                          _selectedDropdownService,
-                          _dateTransferInService,
-                          _dateDepartureFromService,
-                          _worksPerformed.text,
-                          int.parse(_costService.text),
-                          _diagnosisService.text,
-                          _recommendationsNotes.text,
-                          _selectedDropdownStatusNew,
-                          _selectedDropdownDislocationNew,
-                          _dateReceipt,
-                          widget.repair.idTestDrive,
-                        );
-
+                        Repair repair = createRepair();
                         _save(repair, providerModel)
                             .then((TypeMessageForSaveRepairView value) {
                           try {
@@ -226,8 +204,8 @@ class _RepairViewState extends State<RepairView> {
 
   Color _getColorStepTwoRepair() {
     bool isDateTransferInService =
-        _dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
-            _dateTransferInService.toString() == "0001-11-30 00:00:00.000Z";
+        _dateTransferInService.toString() == "-0001-11-30 00:00:00.000" ||
+            _dateTransferInService.toString() == "0001-11-30 00:00:00.000";
     if (_selectedDropdownService == null || isDateTransferInService) {
       return Colors.yellow.shade200;
     }
@@ -236,12 +214,12 @@ class _RepairViewState extends State<RepairView> {
 
   Color _getColorStepThreeRepair() {
     bool isDateDepartureFormService =
-        _dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000Z" ||
-                _dateDepartureFromService.toString() == "0001-11-30 00:00:00.000Z"
+        _dateDepartureFromService.toString() == "-0001-11-30 00:00:00.000" ||
+                _dateDepartureFromService.toString() == "0001-11-30 00:00:00.000"
             ? true
             : false;
-    bool isDateReceipt = _dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" ||
-            _dateReceipt.toString() == "0001-11-30 00:00:00.000Z"
+    bool isDateReceipt = _dateReceipt.toString() == "-0001-11-30 00:00:00.000" ||
+            _dateReceipt.toString() == "0001-11-30 00:00:00.000"
         ? true
         : false;
 
@@ -305,6 +283,7 @@ class _RepairViewState extends State<RepairView> {
             onChanged: (String? value) {
               setState(() {
                 _selectedDropdownService = value!;
+                _dateTransferInService = DateTime.now();
               });
             },
           )),
@@ -334,9 +313,9 @@ class _RepairViewState extends State<RepairView> {
               showDatePicker(
                       context: context,
                       initialDate: _dateTransferInService.toString() ==
-                                  "-0001-11-30 00:00:00.000Z" ||
+                                  "-0001-11-30 00:00:00.000" ||
                               _dateTransferInService.toString() ==
-                                  "0001-11-30 00:00:00.000Z"
+                                  "0001-11-30 00:00:00.000"
                           ? DateTime.now()
                           : _dateTransferInService,
                       firstDate: DateTime(2000),
@@ -358,9 +337,9 @@ class _RepairViewState extends State<RepairView> {
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
                     child: Text(_dateTransferInService.toString() ==
-                                "-0001-11-30 00:00:00.000Z" ||
+                                "-0001-11-30 00:00:00.000" ||
                             _dateTransferInService.toString() ==
-                                "0001-11-30 00:00:00.000Z"
+                                "0001-11-30 00:00:00.000"
                         ? 'Дата отсутствует'
                         : DateFormat('d MMMM yyyy', 'ru_RU')
                             .format(_dateTransferInService ?? DateTime.now())),
@@ -395,9 +374,9 @@ class _RepairViewState extends State<RepairView> {
               showDatePicker(
                       context: context,
                       initialDate: _dateDepartureFromService.toString() ==
-                                  "-0001-11-30 00:00:00.000Z" ||
+                                  "-0001-11-30 00:00:00.000" ||
                               _dateDepartureFromService.toString() ==
-                                  "0001-11-30 00:00:00.000Z"
+                                  "0001-11-30 00:00:00.000"
                           ? DateTime.now()
                           : _dateDepartureFromService,
                       firstDate: DateTime(2000),
@@ -419,9 +398,9 @@ class _RepairViewState extends State<RepairView> {
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
                     child: Text(_dateDepartureFromService.toString() ==
-                                "-0001-11-30 00:00:00.000Z" ||
+                                "-0001-11-30 00:00:00.000" ||
                             _dateDepartureFromService.toString() ==
-                                "0001-11-30 00:00:00.000Z"
+                                "0001-11-30 00:00:00.000"
                         ? 'Дата отсутствует'
                         : DateFormat('d MMMM yyyy', 'ru_RU')
                             .format(_dateDepartureFromService ?? DateTime.now())),
@@ -479,6 +458,11 @@ class _RepairViewState extends State<RepairView> {
           title: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: TextFormField(
+              onTap: (){
+                if(_costService.text == '0'){
+                  _costService.text = '';
+                }
+              },
               decoration: myDecorationTextFormField(null, "Стоимость ремонта"),
               controller: _costService,
             ),
@@ -651,8 +635,8 @@ class _RepairViewState extends State<RepairView> {
               showDatePicker(
                       context: context,
                       initialDate:
-                          _dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" ||
-                                  _dateReceipt.toString() == "0001-11-30 00:00:00.000Z"
+                          _dateReceipt.toString() == "-0001-11-30 00:00:00.000" ||
+                                  _dateReceipt.toString() == "0001-11-30 00:00:00.000"
                               ? DateTime.now()
                               : _dateReceipt,
                       firstDate: DateTime(2000),
@@ -673,8 +657,8 @@ class _RepairViewState extends State<RepairView> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20, left: 12),
-                    child: Text(_dateReceipt.toString() == "-0001-11-30 00:00:00.000Z" ||
-                            _dateReceipt.toString() == "0001-11-30 00:00:00.000Z"
+                    child: Text(_dateReceipt.toString() == "-0001-11-30 00:00:00.000" ||
+                            _dateReceipt.toString() == "0001-11-30 00:00:00.000"
                         ? 'Дата отсутствует'
                         : DateFormat('d MMMM yyyy', 'ru_RU')
                             .format(_dateReceipt ?? DateTime.now())),
@@ -758,6 +742,32 @@ class _RepairViewState extends State<RepairView> {
       return TypeMessageForSaveRepairView.notWriteAllFieldStatus;
     }
     // await addHistory(technic, nameUser);
+  }
+
+  Repair createRepair(){
+    Repair repair = Repair.fullRepair(
+      widget.repair.id,
+      widget.repair.numberTechnic,
+      widget.repair.category,
+      widget.repair.dislocationOld,
+      widget.repair.status,
+      widget.repair.complaint,
+      widget.repair.dateDeparture,
+      widget.repair.whoTook,
+      widget.repair.idTrouble,
+      _selectedDropdownService,
+      _dateTransferInService,
+      _dateDepartureFromService,
+      _worksPerformed.text,
+      int.parse(_costService.text),
+      _diagnosisService.text,
+      _recommendationsNotes.text,
+      _selectedDropdownStatusNew,
+      _selectedDropdownDislocationNew,
+      _dateReceipt,
+      widget.repair.idTestDrive,
+    );
+    return repair;
   }
 
   Future addHistory(Repair repair) async {

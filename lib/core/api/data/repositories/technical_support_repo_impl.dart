@@ -292,7 +292,6 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
       await ConnectDbMySQL.connDB.connDatabase();
       await ConnectDbMySQL.connDB.insertRepairInDB(repair);
       var result = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
-      // await ConnectDbMySQL.connDB.dispose();
       repairs = result;
       return repairs;
         } catch (e) {

@@ -210,6 +210,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
               .textTheme
               .titleLarge, ),
         ),
+        widget.technic?.number == 0 ? SizedBox() :
         TextButton(
           onPressed: (){
             Navigator.push(
