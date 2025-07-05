@@ -57,7 +57,6 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
   @override
   void dispose() {
     _numberTechnic.dispose();
-    _nameTechnicController.dispose();
     _complaint.dispose();
     transformationController.dispose();
     animationController.dispose();
@@ -77,8 +76,8 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
             children: [
               _buildInternalID(),
               SizedBox(height: 20),
-              _buildNameTechnic(),
-              SizedBox(height: 14),
+              _isBN ? SizedBox() : _buildNameTechnic(),
+              _isBN ? SizedBox() :  SizedBox(height: 14),
               _buildDislocation(providerModel),
               SizedBox(height: 20),
               _buildComplaint(),

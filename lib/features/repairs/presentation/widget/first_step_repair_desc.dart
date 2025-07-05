@@ -388,22 +388,21 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                                 widget.repair.status != '' ? widget.repair.status : 'Отсутствует'),
                       ])),
                     ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Icon(Icons.calendar_month),
-                    SizedBox(
-                      width: 4,
-                    ),
-                    Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000'
-                        ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture)
-                        : 'Дата отсутствует')
-                  ])
+                  ]),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_month),
+                      SizedBox(width: 4),
+                      Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000'
+                          ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture)
+                          : 'Дата отсутствует'),
+                    ],
+                  )
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+              padding: const EdgeInsets.only(right: 16.0),
               child: Icon(Icons.touch_app, size: 50, color: Colors.black12,),
             )
           ],

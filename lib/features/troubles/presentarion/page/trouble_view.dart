@@ -117,32 +117,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                           ),
                           ElevatedButton(
                               onPressed: () {
-                                Trouble troubleNew = Trouble(
-                                  id: trouble.id,
-                                  photosalon: trouble.photosalon,
-                                  dateTrouble: trouble.dateTrouble,
-                                  employee: trouble.employee,
-                                  numberTechnic: trouble.numberTechnic,
-                                  trouble: trouble.trouble,
-                                );
-                                if (_photoTrouble != null) {
-                                  troubleNew.photoTrouble = _photoTrouble;
-                                }
-                                if (_dateFixTroubleEmployee != null &&
-                                    _fixTroubleEmployee.text != '') {
-                                  troubleNew.dateFixTroubleEmployee =
-                                      _dateFixTroubleEmployee;
-                                  troubleNew.fixTroubleEmployee =
-                                      _fixTroubleEmployee.text;
-                                }
-                                if (_dateFixTroubleEngineer != null &&
-                                    _fixTroubleEngineer.text != '') {
-                                  troubleNew.dateFixTroubleEngineer =
-                                      _dateFixTroubleEngineer;
-                                  troubleNew.fixTroubleEngineer =
-                                      _fixTroubleEngineer.text;
-                                }
-
+                                Trouble troubleNew = createTrouble();
                                 _save(troubleNew, providerModel).then((isSave) {
                                   _viewSnackBar(Icons.save, isSave, 'Изменения сохранены',
                                       'Изменения не сохранены', false);
@@ -446,7 +421,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                                 actions: [
                                   ElevatedButton(
                                       onPressed: () {
-                                        trouble.photoTrouble = Uint8List(0);
+                                        trouble.photoTrouble = null;
                                         TechnicalSupportRepoImpl.downloadData
                                             .updateTrouble(trouble)
                                             .then((result) {
@@ -622,6 +597,39 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
       LoadingOverlay.of(context).hide();
     }
     return false;
+  }
+
+  Trouble createTrouble(){
+    Trouble troubleNew = Trouble(
+      id: trouble.id,
+      photosalon: trouble.photosalon,
+      dateTrouble: trouble.dateTrouble,
+      employee: trouble.employee,
+      numberTechnic: trouble.numberTechnic,
+      trouble: trouble.trouble,
+    );
+    if (_photoTrouble != null) {
+      troubleNew.photoTrouble = _photoTrouble;
+    }
+    if (_photoTrouble != null) {
+
+      troubleNew.photoTrouble = _photoTrouble;
+    }
+    if (_dateFixTroubleEmployee != null &&
+        _fixTroubleEmployee.text != '') {
+      troubleNew.dateFixTroubleEmployee =
+          _dateFixTroubleEmployee;
+      troubleNew.fixTroubleEmployee =
+          _fixTroubleEmployee.text;
+    }
+    if (_dateFixTroubleEngineer != null &&
+        _fixTroubleEngineer.text != '') {
+      troubleNew.dateFixTroubleEngineer =
+          _dateFixTroubleEngineer;
+      troubleNew.fixTroubleEngineer =
+          _fixTroubleEngineer.text;
+    }
+    return troubleNew;
   }
 
   void _viewSnackBar(

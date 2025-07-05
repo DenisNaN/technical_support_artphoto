@@ -279,7 +279,6 @@ class ConnectDbMySQL {
   }
 
   Future<bool> checkNumberTechnic(String number) async {
-    print(number);
     var result = await _connDB!.execute('SELECT 1 FROM equipment WHERE number = :number', {'number': number});
     return result.rows.isEmpty;
   }
@@ -674,7 +673,7 @@ Future<Technic?> getTechnic(int number) async {
         });
   }
 
-Future<int> insertRepairInDB(Repair repair) async{
+Future<void> insertRepairInDB(Repair repair) async{
     String str = 'INSERT INTO repairEquipment '
         '(number, '
         'category, '
@@ -696,9 +695,6 @@ Future<int> insertRepairInDB(Repair repair) async{
       'whoTook': repair.whoTook,
       'idTrouble': repair.idTrouble.toString()
     });
-  var result = await _connDB!.execute('SELECT id FROM repairEquipment ORDER BY id DESC LIMIT 1');
-  int id = int.parse(result.rows.first.colAt(0));
-  return id;
 }
 
 Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
@@ -771,52 +767,36 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
   }
 
   Future<void> insertTroubleInDB(Trouble trouble) async{
-    String str = 'INSERT INTO Неисправности '
-        '(Фотосалон, '
-        'ДатаНеисправности, '
-        'Сотрудник, '
-        'НомерТехники, '
-        'Неисправность, '
-        'Фотография) '
-        'VALUES (:Фотосалон, :ДатаНеисправности, :Сотрудник, :НомерТехники, '
-        ':Неисправность, :Фотография)';
-    await _connDB!.execute(str, {
-      'Фотосалон': trouble.photosalon,
-      'ДатаНеисправности': trouble.dateTrouble.dateFormattedForSQL(),
-      'Сотрудник': trouble.employee,
-      'НомерТехники': trouble.numberTechnic.toString(),
-      'Неисправность': trouble.trouble,
-      'Фотография': trouble.photoTrouble ?? ''
-    });
+    var stmt = await _connDB!.prepare('INSERT INTO Неисправности '
+        '(Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, Фотография) '
+        'VALUES (?, ?, ?, ?, ?, ?)');
+    await stmt.execute([
+      trouble.photosalon,
+      trouble.dateTrouble.dateFormattedForSQL(),
+      trouble.employee,
+      trouble.numberTechnic.toString(),
+      trouble.trouble,
+      trouble.photoTrouble ?? ''
+    ]);
   }
 
   Future updateTrouble(Trouble trouble) async{
-    await _connDB!.execute(
-        'UPDATE Неисправности SET '
-            'Фотосалон = :Фотосалон, '
-            'ДатаНеисправности = :ДатаНеисправности, '
-            'Сотрудник = :Сотрудник, '
-            'НомерТехники = :НомерТехники, '
-            'Неисправность = :Неисправность, '
-            'ДатаУстрСотр = :ДатаУстрСотр, '
-            'СотрПодтверУстр = :СотрПодтверУстр, '
-            'ДатаУстрИнженер = :ДатаУстрИнженер, '
-            'ИнженерПодтверУстр = :ИнженерПодтверУстр, '
-            'Фотография = :Фотография '
-            'WHERE id = :id',
-        {
-          'Фотосалон': trouble.photosalon,
-          'ДатаНеисправности': trouble.dateTrouble.dateFormattedForSQL(),
-          'Сотрудник': trouble.employee,
-          'НомерТехники': trouble.numberTechnic.toString(),
-          'Неисправность': trouble.trouble,
-          'ДатаУстрСотр': trouble.dateFixTroubleEmployee?.dateFormattedForSQL() ?? '',
-          'СотрПодтверУстр': trouble.fixTroubleEmployee ?? '',
-          'ДатаУстрИнженер': trouble.dateFixTroubleEngineer?.dateFormattedForSQL() ?? '',
-          'ИнженерПодтверУстр': trouble.fixTroubleEngineer ?? '',
-          'Фотография': trouble.photoTrouble ?? '',
-          'id': trouble.id
-        });
+    var stmt = await _connDB!.prepare(
+      "UPDATE Неисправности SET Фотосалон = ?, ДатаНеисправности = ?, Сотрудник = ?, "
+          "НомерТехники = ?, Неисправность = ?, ДатаУстрСотр = ?, СотрПодтверУстр = ?, "
+          "ДатаУстрИнженер = ?, ИнженерПодтверУстр = ?, Фотография = ? WHERE id = ?"
+    );
+    await stmt.execute([trouble.photosalon,
+      trouble.dateTrouble.dateFormattedForSQL(),
+      trouble.employee,
+      trouble.numberTechnic.toString(),
+      trouble.trouble,
+      trouble.dateFixTroubleEmployee?.dateFormattedForSQL() ?? '',
+      trouble.fixTroubleEmployee ?? '',
+      trouble.dateFixTroubleEngineer?.dateFormattedForSQL() ?? '',
+      trouble.fixTroubleEngineer ?? '',
+      trouble.photoTrouble ?? '',
+      trouble.id]);
   }
 
   Future deleteTroubleInDB(String id) async{
@@ -836,9 +816,8 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
             // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
             // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
             // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
-            // Blob blobImage = row.colAt(10);
-            // Uint8List image = Uint8List.fromList(blobImage.toBytes());
-            Uint8List image = row.colAt(10);
+            Uint8List image = Uint8List.fromList(row.colAt(10));
+            // Uint8List image = row.colAt(10);
             Trouble trouble = Trouble(
                 id: int.parse(row.colAt(0)),
                 photosalon: row.colAt(1),
