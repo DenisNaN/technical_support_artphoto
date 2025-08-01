@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/datasources/save_local_services.dart';
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
@@ -14,6 +17,17 @@ import 'package:technical_support_artphoto/core/shared/failed_application/send_m
 import 'package:technical_support_artphoto/features/splash_screen/presentation/page/splash_screen.dart';
 import 'core/navigation/main_bottom_app_bar.dart';
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  try {
+    await Firebase.initializeApp(); // Required if not already done
+    debugPrint('Handling a background message: ${message.messageId}');
+    // Do your isolate-safe background processing here
+  } catch (e, stack) {
+    debugPrint('Error in background handler: $e\n$stack');
+  }
+}
+
 void main() {
   runZonedGuarded<Future<void>>(
         () async {
@@ -22,23 +36,26 @@ void main() {
       SaveLocalServices localServices = SaveLocalServices();
       User? user = localServices.getUser();
       FlutterError.onError = (FlutterErrorDetails details) {
-        sendEmailNewTrouble(error: null, stack: null, flutterErrorDetails: '${details.exception}\n\nStack: ${details.stack}',
-            user: user);
+        // sendEmailNewTrouble(error: null, stack: null, flutterErrorDetails: '${details.exception}\n\nStack: ${details.stack}',
+        //     user: user);
         debugPrint('🔥 FlutterError.onError поймал ошибку: ${details.exception}');
       };
       PlatformDispatcher.instance.onError = (error, stack) {
-        sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '',
-            user: user);
+        // sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '',
+        //     user: user);
         debugPrint('🔥 PlatformDispatcher поймал ошибку: $error');
         return true;
       };
+
+      await Firebase.initializeApp();
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
       runApp(const MyApp());
     },
         (Object error, StackTrace stack) {
           SaveLocalServices localServices = SaveLocalServices();
           User? user = localServices.getUser();
-          sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '', user: user);
+          // sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '', user: user);
           debugPrint('ARTPHOTO [CrashEvent] [DEBUG] $error\n$stack');
     },
   );
@@ -51,25 +68,27 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ProviderModel(),
-      child: MaterialApp(
-          localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
-          home: const SplashScreen(),
-          theme: ThemeData(
-            useMaterial3: false,
-            textTheme: TextTheme(
-              headlineMedium: GoogleFonts.philosopher(
-                fontSize: 21,
-                color: Colors.black54,
-                fontWeight: FontWeight.w700,
-                fontStyle: FontStyle.italic,
+      child: OverlaySupport(
+        child: MaterialApp(
+            localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+            home: const SplashScreen(),
+            theme: ThemeData(
+              useMaterial3: false,
+              textTheme: TextTheme(
+                headlineMedium: GoogleFonts.philosopher(
+                  fontSize: 21,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w700,
+                  fontStyle: FontStyle.italic,
+                ),
+                titleSmall: GoogleFonts.philosopher(
+                  fontSize: 15,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-              titleSmall: GoogleFonts.philosopher(
-                fontSize: 15,
-                color: Colors.black,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          )),
+            )),
+      ),
     );
   }
 }
