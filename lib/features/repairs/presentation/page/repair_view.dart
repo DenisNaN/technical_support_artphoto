@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import '../../../technics/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -49,7 +50,7 @@ class _RepairViewState extends State<RepairView> {
     _selectedDropdownStatusNew =
         widget.repair.newStatus != '' ? widget.repair.newStatus : null;
     _selectedDropdownDislocationNew =
-        widget.repair.newDislocation != '' ? widget.repair.newDislocation : null;
+    widget.repair.newDislocation != '' ? widget.repair.newDislocation!.firstSymbolUppercase() : null;
     _dateReceipt = widget.repair.dateReceipt;
   }
 

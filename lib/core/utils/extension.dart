@@ -17,3 +17,9 @@ extension DateFromSQL on String{
     return DateTime.parse(this);
   }
 }
+
+extension SymbolUppercase on String{
+  String firstSymbolUppercase(){
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
+  }
+}
