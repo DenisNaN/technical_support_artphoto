@@ -69,6 +69,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         TypePage.viewRepair => _viewRepair(providerModel),
         TypePage.addTrouble => _addTrouble(),
         TypePage.viewTrouble => _viewTrouble(providerModel),
+        TypePage.searchTechnic => _searchTechnic(widget.location),
       }
     );
   }
@@ -209,6 +210,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
               .textTheme
               .titleLarge, ),
         ),
+        widget.technic?.number == 0 ? SizedBox() :
         TextButton(
           onPressed: (){
             Navigator.push(
@@ -223,29 +225,35 @@ class _CustomAppBarState extends State<CustomAppBar> {
     return Text(message, style: TextStyle(color: Colors.black),);
   }
 
+  Widget _searchTechnic(String nameSearching){
+    return Text('Поиск по: $nameSearching', style: TextStyle(color: Colors.black));
+  }
+
   _repair(String message) {
     return Text(message, style: TextStyle(color: Colors.black),);
   }
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText, String notSuccessfulText, bool isSkipPrevSnackBar) {
-    if(isSkipPrevSnackBar){
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
-            SizedBox(
-              width: 20,
-            ),
-            Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
-          ],
+    if (mounted) {
+      if(isSkipPrevSnackBar){
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+              SizedBox(
+                width: 20,
+              ),
+              Flexible(child: Text(isSuccessful ? successfulText : notSuccessfulText)),
+            ],
+          ),
+          duration: const Duration(seconds: 5),
+          showCloseIcon: true,
         ),
-        duration: const Duration(seconds: 5),
-        showCloseIcon: true,
-      ),
-    );
+      );
+    }
   }
 }

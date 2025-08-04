@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
@@ -56,7 +57,6 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
   @override
   void dispose() {
     _numberTechnic.dispose();
-    _nameTechnicController.dispose();
     _complaint.dispose();
     transformationController.dispose();
     animationController.dispose();
@@ -76,8 +76,8 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
             children: [
               _buildInternalID(),
               SizedBox(height: 20),
-              _buildNameTechnic(),
-              SizedBox(height: 14),
+              _isBN ? SizedBox() : _buildNameTechnic(),
+              _isBN ? SizedBox() :  SizedBox(height: 14),
               _buildDislocation(providerModel),
               SizedBox(height: 20),
               _buildComplaint(),
@@ -491,12 +491,18 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
           child: AspectRatio(aspectRatio: 1, child: Image.file(imageFile!))));
 
   Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
+    LoadingOverlay.of(context).show();
     List<Trouble>? resultData = await TechnicalSupportRepoImpl.downloadData.saveTrouble(trouble);
     if (resultData != null) {
       providerModel.refreshTroubles(resultData);
       await sendEmailNewTrouble(trouble, providerModel);
-      // await addHistory(technic, nameUser);
+      if (mounted) {
+        LoadingOverlay.of(context).hide();
+      }
       return true;
+    }
+    if (mounted) {
+      LoadingOverlay.of(context).hide();
     }
     return false;
   }
@@ -529,30 +535,6 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
       }
     }
   }
-
-  // Future addHistory(Trouble trouble) async {
-  // String descForHistory = descriptionForHistory(repair);
-  // History historyForSQL = History(
-  //     History.historyList.last.id + 1,
-  //     'Repair',
-  //     repair.id!,
-  //     'create',
-  //     descForHistory,
-  //     LoginPassword.login,
-  //     DateFormat('yyyy.MM.dd').format(DateTime.now())
-  // );
-  //
-  // ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
-  // HistorySQFlite.db.insertHistory(historyForSQL);
-  // History.historyList.insert(0, historyForSQL);
-  // }
-
-  // String descriptionForHistory(Repair repair){
-  //   String internalID = repair.internalID == -1 ? 'БН' : '№${repair.internalID}';
-  //   String result = 'Заявка на ремонт $internalID добавленна';
-  //
-  //   return result;
-  // }
 
   void _viewSnackBarGetTechnic(String text) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:mysql1/mysql1.dart';
+import 'package:mysql_client_plus/mysql_client_plus.dart';
 import 'package:technical_support_artphoto/core/api/data/datasources/connect_db_my_sql.dart';
 import 'package:technical_support_artphoto/core/api/data/models/decommissioned.dart';
 import 'package:technical_support_artphoto/core/api/data/models/free_number_for_technic.dart';
 import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
+import 'package:technical_support_artphoto/core/api/data/models/transportation_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/domain/repositories/technical_support_repo.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
+import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 
 import '../../../../features/repairs/models/repair.dart';
@@ -28,6 +30,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     Map<String, PhotosalonLocation> technicsInPhotosalons = {};
     Map<String, RepairLocation> technicsInRepairs = {};
     Map<String, StorageLocation> technicsInStorages = {};
+    Map<String, TransportationLocation> technicsInTransportation = {};
 
     List<Repair> repairs = [];
     List<Trouble> troubles = [];
@@ -40,12 +43,14 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     Map<String, int> colorsForEquipment;
 
     TroubleAccountMailRu? accountMailRu;
+    List<String> users;
 
     await ConnectDbMySQL.connDB.connDatabase();
 
     technicsInPhotosalons = await ConnectDbMySQL.connDB.fetchTechnicsInPhotosalons();
     technicsInRepairs = await ConnectDbMySQL.connDB.fetchTechnicsInRepairs();
     technicsInStorages = await ConnectDbMySQL.connDB.fetchTechnicsInStorages();
+    technicsInTransportation = await ConnectDbMySQL.connDB.fetchTechnicsInTransportation();
 
     repairs = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
     troubles = await ConnectDbMySQL.connDB.fetchTroubles();
@@ -58,10 +63,12 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     colorsForEquipment = await ConnectDbMySQL.connDB.fetchColorsForEquipment();
 
     accountMailRu = await ConnectDbMySQL.connDB.fetchAccountMailRu();
+    users = await TechnicalSupportRepoImpl.downloadData.getUsers();
 
     result['Photosalons'] = technicsInPhotosalons;
     result['Repairs'] = technicsInRepairs;
     result['Storages'] = technicsInStorages;
+    result['Transportation'] = technicsInTransportation;
 
     result['AllRepairs'] = repairs;
     result['AllTroubles'] = troubles;
@@ -73,8 +80,9 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     result['colorsForEquipment'] = colorsForEquipment;
 
     result['accountMailRu'] = accountMailRu;
+    result['users'] = users;
 
-    await ConnectDbMySQL.connDB.dispose();
+    // await ConnectDbMySQL.connDB.dispose();
     return result;
   }
 
@@ -87,12 +95,15 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     Map<String, PhotosalonLocation> photosalons = await ConnectDbMySQL.connDB.fetchTechnicsInPhotosalons();
     Map<String, RepairLocation> repairs = await ConnectDbMySQL.connDB.fetchTechnicsInRepairs();
     Map<String, StorageLocation> storages = await ConnectDbMySQL.connDB.fetchTechnicsInStorages();
+    Map<String, TransportationLocation> transportation = await ConnectDbMySQL.connDB.fetchTechnicsInTransportation();
 
     result['Photosalons'] = photosalons;
     result['Repairs'] = repairs;
     result['Storages'] = storages;
+    result['Transportation'] = transportation;
 
-    await ConnectDbMySQL.connDB.dispose();
+    // await ConnectDbMySQL.connDB.dispose();
+
     return result;
   }
 
@@ -101,23 +112,35 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     List<Repair> repairs = [];
     await ConnectDbMySQL.connDB.connDatabase();
     var result = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
-    await ConnectDbMySQL.connDB.dispose();
+    // await ConnectDbMySQL.connDB.dispose();
     repairs.addAll(result);
     return repairs;
   }
 
   @override
   Future<User?> getUser(String password) async{
-    await ConnectDbMySQL.connDB.connDatabase();
     User? user;
-    Results? result = await ConnectDbMySQL.connDB.fetchAccessLevel(password);
+    await ConnectDbMySQL.connDB.connDatabase();
+    IResultSet? result = await ConnectDbMySQL.connDB.fetchAccessLevel(password);
+    // await ConnectDbMySQL.connDB.dispose();
     if (result != null) {
-      for (var row in result) {
-        user = User(row[0], row[1]);
+      for (final row in result.rows) {
+        user = User(row.colAt(0), row.colAt(1));
       }
     }
-    await ConnectDbMySQL.connDB.dispose();
     return user;
+  }
+
+  @override
+  Future<List<String>> getUsers() async{
+    List<String> users = [];
+    IResultSet? result = await ConnectDbMySQL.connDB.fetchUsers();
+    if (result != null) {
+      for (final row in result.rows) {
+        users.add(row.colAt(0));
+      }
+    }
+    return users;
   }
 
   @override
@@ -125,19 +148,11 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       TroubleAccountMailRu? result = await ConnectDbMySQL.connDB.fetchAccountMailRu();
-      await ConnectDbMySQL.connDB.dispose();
+      // await ConnectDbMySQL.connDB.dispose();
       return result;
     } catch (e) {
       return null;
     }
-
-    // if (result != null) {
-    //   for (var row in result) {
-    //     user = User(row[0], row[1]);
-    //   }
-    // }
-    // await ConnectDbMySQL.connDB.dispose();
-    // return user;
   }
 
   @override
@@ -159,8 +174,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
           i++;
         }
         numberTechnic++;
-      }
-      while (i < 3);
+      } while (i < 3);
+      // await ConnectDbMySQL.connDB.dispose();
       return FreeNumbersForTechnic(isFreeNumber: isFeeNumber, freeNumbers: listFreeNumbers);
     }
   }
@@ -169,7 +184,11 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   Future<Technic?> getTechnic(String number) async{
     await ConnectDbMySQL.connDB.connDatabase();
     Technic? technic = await ConnectDbMySQL.connDB.getTechnic(int.parse(number));
-    await ConnectDbMySQL.connDB.dispose();
+    if (technic != null) {
+      TestDrive? testDrive = await ConnectDbMySQL.connDB.fetchTestDrive(technic.id.toString());
+      technic.testDrive = testDrive;
+    }
+    // await ConnectDbMySQL.connDB.dispose();
     return technic;
   }
 
@@ -179,7 +198,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
-      await ConnectDbMySQL.connDB.dispose();
+      // await ConnectDbMySQL.connDB.dispose();
       return id;
     } catch (e) {
       return id;
@@ -191,7 +210,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       await ConnectDbMySQL.connDB.updateTechnicInDB(technic);
-      await ConnectDbMySQL.connDB.dispose();
+      // await ConnectDbMySQL.connDB.dispose();
       return true;
     } catch (e) {
       return false;
@@ -203,7 +222,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       await ConnectDbMySQL.connDB.insertStatusInDB(technic.id, technic.status, technic.dislocation, userName);
-      await ConnectDbMySQL.connDB.dispose();
+      // await ConnectDbMySQL.connDB.dispose();
       return true;
     } catch (e) {
       return false;
@@ -211,18 +230,18 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
-  Future<Map<int, List<SummRepair>>> getSumRepairs(String numberTechnic) async{
+  Future<Map<int, List<SumRepair>>> getSumRepairs(String numberTechnic) async{
     await ConnectDbMySQL.connDB.connDatabase();
-    Map<int, List<SummRepair>> summsRepairs = await ConnectDbMySQL.connDB.getSummsRepairs(numberTechnic);
-    await ConnectDbMySQL.connDB.dispose();
-    return summsRepairs;
+    Map<int, List<SumRepair>> sumsRepairs = await ConnectDbMySQL.connDB.getSumsRepairs(numberTechnic);
+    // await ConnectDbMySQL.connDB.dispose();
+    return sumsRepairs;
   }
 
   Future<List<HistoryTechnic>> fetchHistoryTechnic(String? numberTechnic) async{
     if(numberTechnic != null){
       await ConnectDbMySQL.connDB.connDatabase();
       List<HistoryTechnic> historyList =  await ConnectDbMySQL.connDB.fetchHistoryTechnic(numberTechnic);
-      await ConnectDbMySQL.connDB.dispose();
+      // await ConnectDbMySQL.connDB.dispose();
       return historyList;
     }else{
       return [];
@@ -234,7 +253,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     DecommissionedLocation decommissioned;
     await ConnectDbMySQL.connDB.connDatabase();
     decommissioned =  await ConnectDbMySQL.connDB.fetchTechnicsDecommissioned();
-    await ConnectDbMySQL.connDB.dispose();
+    // await ConnectDbMySQL.connDB.dispose();
+    // Future.delayed(Duration(seconds: 1));
     return decommissioned;
   }
 
@@ -244,7 +264,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try{
       await ConnectDbMySQL.connDB.connDatabase();
       repairs.addAll(await ConnectDbMySQL.connDB.fetchFinishedRepairs());
-      await ConnectDbMySQL.connDB.dispose();
+      // await ConnectDbMySQL.connDB.dispose();
     } catch (e) {
       debugPrint(e.toString());
       return repairs;
@@ -258,7 +278,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       repair = await ConnectDbMySQL.connDB.fetchRepair(id);
-      await ConnectDbMySQL.connDB.dispose();
+      // await ConnectDbMySQL.connDB.dispose();
       return repair;
     } catch (e) {
       return repair;
@@ -273,7 +293,6 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
       await ConnectDbMySQL.connDB.insertRepairInDB(repair);
       var result = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
       repairs = result;
-      await ConnectDbMySQL.connDB.dispose();
       return repairs;
         } catch (e) {
       return repairs;
@@ -291,8 +310,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
         await ConnectDbMySQL.connDB.updateRepairInDBStepsTwoAndThree(repair);
       }
       var result = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
+      // await ConnectDbMySQL.connDB.dispose();
       repairs = result;
-      await ConnectDbMySQL.connDB.dispose();
       return repairs;
     } catch (e) {
       return repairs;
@@ -304,7 +323,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       await ConnectDbMySQL.connDB.deleteRepairInDB(id);
-      await ConnectDbMySQL.connDB.dispose();
+      // await ConnectDbMySQL.connDB.dispose();
       return true;
     } catch (e) {
       return false;
@@ -317,8 +336,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       var result = await ConnectDbMySQL.connDB.fetchTroubles();
+      // await ConnectDbMySQL.connDB.dispose();
       troubles = result;
-      await ConnectDbMySQL.connDB.dispose();
       return troubles;
     } catch (e) {
       return troubles;
@@ -331,8 +350,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       var result = await ConnectDbMySQL.connDB.fetchTrouble(id);
+      // await ConnectDbMySQL.connDB.dispose();
       trouble = result;
-      await ConnectDbMySQL.connDB.dispose();
       return trouble;
     } catch (e) {
       return trouble;
@@ -346,8 +365,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
       await ConnectDbMySQL.connDB.connDatabase();
       await ConnectDbMySQL.connDB.insertTroubleInDB(trouble);
       var result = await ConnectDbMySQL.connDB.fetchTroubles();
+      // await ConnectDbMySQL.connDB.dispose();
       troubles = result;
-      await ConnectDbMySQL.connDB.dispose();
       return troubles;
     } catch (e) {
       return troubles;
@@ -361,8 +380,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
       await ConnectDbMySQL.connDB.connDatabase();
       await ConnectDbMySQL.connDB.updateTrouble(trouble);
       var result = await ConnectDbMySQL.connDB.fetchTroubles();
+      // await ConnectDbMySQL.connDB.dispose();
       troubles = result;
-      await ConnectDbMySQL.connDB.dispose();
       return troubles;
     } catch (e) {
       return troubles;
@@ -374,7 +393,7 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
       await ConnectDbMySQL.connDB.deleteTroubleInDB(id);
-      await ConnectDbMySQL.connDB.dispose();
+      // await ConnectDbMySQL.connDB.dispose();
       return true;
     } catch (e) {
       return false;
@@ -387,12 +406,36 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     try{
       await ConnectDbMySQL.connDB.connDatabase();
       troubles.addAll(await ConnectDbMySQL.connDB.fetchFinishedTroubles());
-      await ConnectDbMySQL.connDB.dispose();
+      // await ConnectDbMySQL.connDB.dispose();
     } catch (e) {
       debugPrint(e.toString());
       return troubles;
     }
     return troubles;
+  }
+
+  @override
+  Future<bool> saveTestDrive(TestDrive testDrive) async{
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.insertTestDriveInDB(testDrive);
+      // await ConnectDbMySQL.connDB.dispose();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> updateTestDrive(TestDrive testDrive) async{
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      await ConnectDbMySQL.connDB.updateTestDriveInDB(testDrive);
+      // await ConnectDbMySQL.connDB.dispose();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
 //   List getNotifications() {
@@ -483,29 +526,5 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 //       }
 //     });
 //     return notifications;
-//   }
-//
-//   DateTime? getDate(String date) {
-//     if(date != '') {
-//       return DateTime.parse(date.replaceAll('.', '-'));
-//     }
-//     return null;
-//   }
-//
-//   String getDayAddition(int num) {
-//     double preLastDigit = num % 100 / 10;
-//     if (preLastDigit.round() == 1) {
-//       return "дней";
-//     }
-//     switch (num % 10) {
-//       case 1:
-//         return "день";
-//       case 2:
-//       case 3:
-//       case 4:
-//         return "дня";
-//       default:
-//         return "дней";
-//     }
 //   }
 }

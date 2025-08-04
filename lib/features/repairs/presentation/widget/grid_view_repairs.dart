@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
@@ -60,7 +61,7 @@ class GridViewRepairs extends StatelessWidget {
                       child: InkWell(
                         onTap: (){
                           Navigator.push(
-                              context, animationRouteSlideTransition(TechnicView(location: location, technic: technic)));
+                              context, animationRouteSlideTransition(LoadingOverlay(child: TechnicView(location: location, technic: technic))));
                         },
                         child: Container(
                           decoration: BoxDecoration(

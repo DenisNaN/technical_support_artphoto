@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_add.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -45,7 +46,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    trouble = widget.troubleMain;
+    trouble = widget.troubleMain.copyWith();
     _photoTrouble = widget.troubleMain.photoTrouble;
     _dateFixTroubleEmployee = widget.troubleMain.dateFixTroubleEmployee;
     _fixTroubleEmployee.text = widget.troubleMain.fixTroubleEmployee ?? '';
@@ -116,32 +117,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                           ),
                           ElevatedButton(
                               onPressed: () {
-                                Trouble troubleNew = Trouble(
-                                  id: trouble.id,
-                                  photosalon: trouble.photosalon,
-                                  dateTrouble: trouble.dateTrouble,
-                                  employee: trouble.employee,
-                                  numberTechnic: trouble.numberTechnic,
-                                  trouble: trouble.trouble,
-                                );
-                                if (_photoTrouble != null) {
-                                  troubleNew.photoTrouble = _photoTrouble;
-                                }
-                                if (_dateFixTroubleEmployee != null &&
-                                    _fixTroubleEmployee.text != '') {
-                                  troubleNew.dateFixTroubleEmployee =
-                                      _dateFixTroubleEmployee;
-                                  troubleNew.fixTroubleEmployee =
-                                      _fixTroubleEmployee.text;
-                                }
-                                if (_dateFixTroubleEngineer != null &&
-                                    _fixTroubleEngineer.text != '') {
-                                  troubleNew.dateFixTroubleEngineer =
-                                      _dateFixTroubleEngineer;
-                                  troubleNew.fixTroubleEngineer =
-                                      _fixTroubleEngineer.text;
-                                }
-
+                                Trouble troubleNew = createTrouble();
                                 _save(troubleNew, providerModel).then((isSave) {
                                   _viewSnackBar(Icons.save, isSave, 'Изменения сохранены',
                                       'Изменения не сохранены', false);
@@ -195,8 +171,8 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
 
   Widget _buildDateFixTroubleEmployee(ProviderModel providerModel) {
     bool isValidateDate = _dateFixTroubleEmployee != null &&
-        _dateFixTroubleEmployee.toString() != "-0001-11-30 00:00:00.000Z" &&
-        _dateFixTroubleEmployee.toString() != "0001-11-30 00:00:00.000Z";
+        _dateFixTroubleEmployee.toString() != "-0001-11-30 00:00:00.000" &&
+        _dateFixTroubleEmployee.toString() != "0001-11-30 00:00:00.000";
     return Column(
       children: [
         Align(
@@ -246,7 +222,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                 IconButton(
                     onPressed: () {
                   setState(() {
-                    _dateFixTroubleEmployee = DateTime.tryParse("-0001-11-30 00:00:00.000Z");
+                    _dateFixTroubleEmployee = DateTime.tryParse("-0001-11-30 00:00:00.000");
                     _fixTroubleEmployee.text = '';
                   });
                 }, icon: Icon(Icons.close, color: Colors.red,))
@@ -292,8 +268,8 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
 
   Widget _buildDateFixTroubleEngineer(ProviderModel providerModel) {
     bool isValidateDate = _dateFixTroubleEngineer != null &&
-        _dateFixTroubleEngineer.toString() != "-0001-11-30 00:00:00.000Z" &&
-        _dateFixTroubleEngineer.toString() != "0001-11-30 00:00:00.000Z";
+        _dateFixTroubleEngineer.toString() != "-0001-11-30 00:00:00.000" &&
+        _dateFixTroubleEngineer.toString() != "0001-11-30 00:00:00.000";
     return Column(
       children: [
         Align(
@@ -343,7 +319,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                 IconButton(
                     onPressed: () {
                       setState(() {
-                        _dateFixTroubleEngineer = DateTime.tryParse("-0001-11-30 00:00:00.000Z");
+                        _dateFixTroubleEngineer = DateTime.tryParse("-0001-11-30 00:00:00.000");
                         _fixTroubleEngineer.text = '';
                       });
                     }, icon: Icon(Icons.close, color: Colors.red,))
@@ -392,12 +368,12 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
       padding: const EdgeInsets.symmetric(horizontal: 80),
       child: ElevatedButton(
           onPressed: (){
-            Navigator.push(context, animationRouteFadeTransition(RepairAdd(trouble: trouble, technic: technic,)));
+            Navigator.push(context, animationRouteFadeTransition(LoadingOverlay(child: RepairAdd(trouble: trouble, technic: technic,))));
           },
           style: const ButtonStyle(
               backgroundColor: WidgetStatePropertyAll(Colors.greenAccent)
           ),
-          child: const Text('Сформировать заявку на ремонт'),
+          child: const Text('Сформировать заявку на ремонт', textAlign: TextAlign.center,),
       ),
     );
   }
@@ -445,7 +421,7 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                                 actions: [
                                   ElevatedButton(
                                       onPressed: () {
-                                        trouble.photoTrouble = Uint8List(0);
+                                        trouble.photoTrouble = null;
                                         TechnicalSupportRepoImpl.downloadData
                                             .updateTrouble(trouble)
                                             .then((result) {
@@ -580,60 +556,81 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
           child: AspectRatio(aspectRatio: 1, child: Image.memory(_photoTrouble!))));
 
   Future<bool> _save(Trouble trouble, ProviderModel providerModel) async {
+    LoadingOverlay.of(context).show();
     bool isEmptyDateEmployee = trouble.dateFixTroubleEmployee == null ||
-        trouble.dateFixTroubleEmployee.toString() == "-0001-11-30 00:00:00.000Z" ||
-        trouble.dateFixTroubleEmployee.toString() == "0001-11-30 00:00:00.000Z";
+        trouble.dateFixTroubleEmployee.toString() == "-0001-11-30 00:00:00.000" ||
+        trouble.dateFixTroubleEmployee.toString() == "0001-11-30 00:00:00.000";
     bool isEmptyEmployee = trouble.fixTroubleEmployee == null ||
         trouble.fixTroubleEmployee == '';
     bool isEmptyDateEngineer = trouble.dateFixTroubleEngineer == null ||
-        trouble.dateFixTroubleEngineer.toString() == "-0001-11-30 00:00:00.000Z" ||
-        trouble.dateFixTroubleEngineer.toString() == "0001-11-30 00:00:00.000Z";
+        trouble.dateFixTroubleEngineer.toString() == "-0001-11-30 00:00:00.000" ||
+        trouble.dateFixTroubleEngineer.toString() == "0001-11-30 00:00:00.000";
     bool isEmptyEngineer = trouble.fixTroubleEngineer == null ||
         trouble.fixTroubleEngineer == '';
 
     if((isEmptyDateEmployee && !isEmptyEmployee) ||
         (!isEmptyDateEmployee && isEmptyEmployee)) {
       _viewSnackBar(Icons.save, false, '', 'Заполните и дату, и сотрудника', false);
+      if(context.mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return false;
     }
     if((isEmptyDateEngineer && !isEmptyEngineer) ||
         (!isEmptyDateEngineer && isEmptyEngineer)) {
       _viewSnackBar(Icons.save, false, '', 'Заполните и дату, и техника', false);
+      if(context.mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return false;
     }
     List<Trouble>? resultData =
         await TechnicalSupportRepoImpl.downloadData.updateTrouble(trouble);
     if (resultData != null) {
       providerModel.refreshTroubles(resultData);
-      // await addHistory(technic, nameUser);
+      if(mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return true;
+    }
+    if(mounted){
+      LoadingOverlay.of(context).hide();
     }
     return false;
   }
 
-  // Future addHistory(Trouble trouble) async {
-  // String descForHistory = descriptionForHistory(repair);
-  // History historyForSQL = History(
-  //     History.historyList.last.id + 1,
-  //     'Repair',
-  //     repair.id!,
-  //     'create',
-  //     descForHistory,
-  //     LoginPassword.login,
-  //     DateFormat('yyyy.MM.dd').format(DateTime.now())
-  // );
-  //
-  // ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
-  // HistorySQFlite.db.insertHistory(historyForSQL);
-  // History.historyList.insert(0, historyForSQL);
-  // }
+  Trouble createTrouble(){
+    Trouble troubleNew = Trouble(
+      id: trouble.id,
+      photosalon: trouble.photosalon,
+      dateTrouble: trouble.dateTrouble,
+      employee: trouble.employee,
+      numberTechnic: trouble.numberTechnic,
+      trouble: trouble.trouble,
+    );
+    if (_photoTrouble != null) {
+      troubleNew.photoTrouble = _photoTrouble;
+    }
+    if (_photoTrouble != null) {
 
-  // String descriptionForHistory(Repair repair){
-  //   String internalID = repair.internalID == -1 ? 'БН' : '№${repair.internalID}';
-  //   String result = 'Заявка на ремонт $internalID добавленна';
-  //
-  //   return result;
-  // }
+      troubleNew.photoTrouble = _photoTrouble;
+    }
+    if (_dateFixTroubleEmployee != null &&
+        _fixTroubleEmployee.text != '') {
+      troubleNew.dateFixTroubleEmployee =
+          _dateFixTroubleEmployee;
+      troubleNew.fixTroubleEmployee =
+          _fixTroubleEmployee.text;
+    }
+    if (_dateFixTroubleEngineer != null &&
+        _fixTroubleEngineer.text != '') {
+      troubleNew.dateFixTroubleEngineer =
+          _dateFixTroubleEngineer;
+      troubleNew.fixTroubleEngineer =
+          _fixTroubleEngineer.text;
+    }
+    return troubleNew;
+  }
 
   void _viewSnackBar(
       IconData icon, bool isSuccessful, String successText, String notSuccessText, bool isSkip) {

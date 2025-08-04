@@ -6,6 +6,7 @@ import 'package:technical_support_artphoto/core/api/data/repositories/technical_
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/is_fields_filled.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/my_custom_refresh_indicator.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_add.dart';
@@ -44,7 +45,7 @@ class _TroublesPageState extends State<TroublesPage> {
               icon: Icon(Icons.add),
               label: Text('Новая проблема'),
               onPressed: () {
-                Navigator.push(context, animationRouteSlideTransition(TroubleAdd()));
+                Navigator.push(context, animationRouteSlideTransition(const LoadingOverlay(child: TroubleAdd())));
               },
             )
           : null,
@@ -83,7 +84,7 @@ class _TroublesPageState extends State<TroublesPage> {
                     child: ListTile(
                         onTap: () {
                           Navigator.push(context,
-                              animationRouteSlideTransition(TroubleView(troubleMain: trouble)));
+                              animationRouteSlideTransition(LoadingOverlay(child: TroubleView(troubleMain: trouble))));
                         },
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                         title: _buildTitleListTile(context, index, troubles)),
@@ -121,7 +122,7 @@ class _TroublesPageState extends State<TroublesPage> {
                         child: ListTile(
                             onTap: () {
                               Navigator.push(context,
-                                  animationRouteSlideTransition(TroubleView(troubleMain: trouble)));
+                                  animationRouteSlideTransition(LoadingOverlay(child: TroubleView(troubleMain: trouble))));
                             },
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                             title: _buildTitleListTile(context, index, troubles)),
@@ -156,7 +157,7 @@ class _TroublesPageState extends State<TroublesPage> {
                   ),
                 ));
           } else {
-            return Center(child: MatrixTransitionLogo());
+            return Center(child: SizedBox(width: 200, child: MatrixTransitionLogo()));
           }
         });
   }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/shared/is_fields_filled.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_view.dart';
 
 import '../../../technics/models/technic.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -262,7 +264,10 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
       ),
       backgroundColor: Colors.blue[100],
       title: _buildTextTitle(),
-      children: <Widget>[ListTile(title: _buildTextSubtitle())],
+      children: <Widget>[ListTile(title: Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: _buildTextSubtitle(),
+      ))],
     );
   }
 
@@ -278,10 +283,12 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                 if (technic != null) {
                   _navigationOnTechnicView(technic);
                 } else {
-                  _viewSnackBar(
-                      Icons.print, false, '', 'Такой техники нет в базе', false);
+                  _viewSnackBar(Icons.print, false, '', 'Такой техники нет в базе', false, true);
                 }
               });
+              // if (isTechnicNull) {
+              //   _viewSnackBar(Icons.print, false, '', 'Такой техники нет в базе', false);
+              // }
             }
           },
           child: CircleAvatar(
@@ -311,69 +318,88 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
     Navigator.push(
         context,
         animationRouteSlideTransition(
-            TechnicView(location: technic.dislocation, technic: technic)));
+            LoadingOverlay(child: TechnicView(location: technic.dislocation, technic: technic))));
   }
 
   Widget _buildTextSubtitle() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text.rich(TextSpan(children: [
-          TextSpan(text: 'Жалоба: ', style: TextStyle(fontWeight: FontWeight.bold)),
-          TextSpan(
-              text: widget.repair.complaint != ''
-                  ? widget.repair.complaint
-                  : 'Данные отсутствуют'),
-          TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
-        ])),
-        Row(
-          children: [
-            Text(widget.repair.dislocationOld != ''
-                ? widget.repair.dislocationOld
-                : 'Неизвестно откуда забрали'),
-            SizedBox(
-              width: 7,
-            ),
-            Icon(
-              Icons.delivery_dining,
-              color: Colors.green.shade700,
-            ),
-            Icon(
-              Icons.arrow_forward,
-              color: Colors.green.shade700,
-            ),
-            SizedBox(
-              width: 5,
-            ),
-            widget.repair.whoTook != ''
-                ? Text(widget.repair.whoTook)
-                : Icon(Icons.person_off),
-          ],
+    return GestureDetector(
+      onTap: (){
+        if(widget.repair.idTrouble != 0){
+          TechnicalSupportRepoImpl.downloadData.getTrouble(widget.repair.idTrouble.toString()).then((trouble){
+            if(mounted && trouble != null){
+              Navigator.push(context, animationRouteSlideTransition(LoadingOverlay(child: TroubleView(troubleMain: trouble))));
+            }
+          });
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.blue.shade50,
+          // border: Border.all(color: Colors.black26),
+          borderRadius: BorderRadius.circular(12)
         ),
-        Row(children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4.0),
-            child: Text.rich(TextSpan(children: [
-              TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
-              TextSpan(text: 'Статус: '),
-              TextSpan(
-                  text:
-                      widget.repair.status != '' ? widget.repair.status : 'Отсутствует'),
-            ])),
-          ),
-          SizedBox(
-            width: 8,
-          ),
-          Icon(Icons.calendar_month),
-          SizedBox(
-            width: 4,
-          ),
-          Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000Z'
-              ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture)
-              : 'Дата отсутствует')
-        ])
-      ],
+        child: Padding(
+              padding: const EdgeInsets.only(left: 8, top: 8, bottom: 5),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text.rich(TextSpan(children: [
+                    TextSpan(text: 'Жалоба: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: widget.repair.complaint != ''
+                            ? widget.repair.complaint
+                            : 'Данные отсутствуют'),
+                  ])),
+                  Row(
+                    children: [
+                      Text(widget.repair.dislocationOld != ''
+                          ? widget.repair.dislocationOld
+                          : 'Неизвестно откуда забрали'),
+                      SizedBox(
+                        width: 7,
+                      ),
+                      Icon(
+                        Icons.delivery_dining,
+                        color: Colors.green.shade700,
+                      ),
+                      Icon(
+                        Icons.arrow_forward,
+                        color: Colors.green.shade700,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      widget.repair.whoTook != ''
+                          ? Text(widget.repair.whoTook)
+                          : Icon(Icons.person_off),
+                    ],
+                  ),
+                  Row(children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: Text.rich(TextSpan(children: [
+                        TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
+                        TextSpan(text: 'Статус: '),
+                        TextSpan(
+                            text:
+                                widget.repair.status != '' ? widget.repair.status : 'Отсутствует'),
+                      ])),
+                    ),
+                  ]),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_month),
+                      SizedBox(width: 4),
+                      Text(widget.repair.dateDeparture.toString() != '-0001-11-30 00:00:00.000'
+                          ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.repair.dateDeparture)
+                          : 'Дата отсутствует'),
+                    ],
+                  )
+                ],
+              ),
+            ),
+      ),
     );
   }
 
@@ -385,15 +411,14 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
       if (!isFinishedRepair) {
         providerModel.refreshCurrentRepairs(resultData);
       }
-      // await addHistory(technic, nameUser);
       return true;
     }
     return false;
   }
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText,
-      String notSuccessfulText, bool isSkipPrevSnackBar) {
-    if (context.mounted) {
+      String notSuccessfulText, bool isSkipPrevSnackBar, [bool isPop = false]) {
+    if (mounted) {
       if (isSkipPrevSnackBar) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
       }
@@ -413,8 +438,11 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
           showCloseIcon: true,
         ),
       );
-      Navigator.pop(context);
-      Navigator.pop(context);
+      if(!isPop){
+        Navigator.pop(context);
+        Navigator.pop(context);
+      }
+
     }
   }
 }

@@ -16,6 +16,7 @@ enum TypePage{
   addTrouble,
   viewTrouble,
   error,
+  searchTechnic,
 }
 
 enum TypeDislocation{
@@ -30,4 +31,23 @@ enum TypeMessageForSaveRepairView{
   notSuccessSaveStatus,
   notWriteAllFieldStatus,
   notCheckTechnicInDB,
+}
+
+enum TestDriveStatus{
+  notMake,
+  inProcess,
+  finished,
+  missDeadline,
+}
+
+enum SaveTestDriveStatus{
+  notSave,
+  save,
+  update,
+}
+
+enum TypeSearch{
+  searchByName,
+  filterByStatus,
+  filterByCategory,
 }

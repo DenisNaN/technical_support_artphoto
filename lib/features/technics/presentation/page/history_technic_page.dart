@@ -5,6 +5,7 @@ import 'package:technical_support_artphoto/core/api/data/models/photosalon_locat
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/core/shared/logo_animate/logo_matrix_transition_animate.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
@@ -76,8 +77,8 @@ class HistoryTechnicPage extends StatelessWidget {
       return SizedBox();
     }
     if (currentHistoryTechnic.location is RepairLocation &&
-        currentHistoryTechnic.date.toString() != "-0001-11-30 00:00:00.000Z" &&
-        currentHistoryTechnic.date.toString() != "0001-11-30 00:00:00.000Z") {
+        currentHistoryTechnic.date.toString() != "-0001-11-30 00:00:00.000" &&
+        currentHistoryTechnic.date.toString() != "0001-11-30 00:00:00.000") {
       return _buildListTileRepair(currentHistoryTechnic, isStartIndex, context, providerModel);
     } else if (currentHistoryTechnic.location is PhotosalonLocation) {
       if (historyList.length > 1 && index > 0) {
@@ -140,7 +141,7 @@ class HistoryTechnicPage extends StatelessWidget {
           repair = value;
           if(repair != null && context.mounted){
             Navigator.push(context,
-                animationRouteSlideTransition(RepairView(repair: repair!)));
+                animationRouteSlideTransition(LoadingOverlay(child: RepairView(repair: repair!))));
           }
         });
       },
@@ -248,13 +249,22 @@ class HistoryTechnicPage extends StatelessWidget {
                 ),
                 Positioned(
                   left: 50,
-                  top: 12,
+                  top: 7,
                   child: Container(
                     padding: EdgeInsets.only(left: 5, right: 5),
                     color: Colors.grey.shade50,
-                    child: Text(
-                      '${troubles[i].employee}',
-                      style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+                    child: Row(
+                      children: [
+                        Icon(troubles[i].isTroubleClosed == false ? Icons.close :
+                        Icons.check,
+                            color: troubles[i].isTroubleClosed == false ? Colors.red :
+                            Colors.green),
+                        Text(
+                          '${troubles[i].employee}',
+                          style: TextStyle(color: Colors.black, fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -279,6 +289,6 @@ class HistoryTechnicPage extends StatelessWidget {
 
   void _navigationOnTechnicView(Trouble trouble, BuildContext context) {
     Navigator.push(context,
-        animationRouteSlideTransition(TroubleView(troubleMain: trouble)));
+        animationRouteSlideTransition(LoadingOverlay(child: TroubleView(troubleMain: trouble))));
   }
 }

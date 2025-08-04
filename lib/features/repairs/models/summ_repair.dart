@@ -1,16 +1,16 @@
-class SummRepair {
+class SumRepair {
   final int idRepair;
   final String repairmen;
-  final int summRepair;
+  final int sumRepair;
   final String complaint;
   final String worksPerformed;
   DateTime? dateTransferInService;
   DateTime? dateReceipt;
 
-  SummRepair(
+  SumRepair(
       {required this.idRepair,
       required this.repairmen,
-      required this.summRepair,
+      required this.sumRepair,
       required this.complaint,
       required this.worksPerformed,
       required this.dateTransferInService,

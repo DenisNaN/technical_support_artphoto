@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import 'package:technical_support_artphoto/main.dart';
 
@@ -38,7 +40,8 @@ class _RepairAddState extends State<RepairAdd> {
   final _diagnosisService = TextEditingController();
   final _recommendationsNotes = TextEditingController();
   String? _selectedDropdownDislocationOld;
-  String? _selectedDropdownStatusOld = 'В ремонте';
+  String? _selectedDropdownStatusOld = 'Транспортировка';
+  String? _selectedDropdownDislocationService;
   bool isBN = false;
   bool isExistNumber = false;
 
@@ -94,6 +97,8 @@ class _RepairAddState extends State<RepairAdd> {
               SizedBox(height: isBN ? 9 : 25),
               _buildStatus(providerModel),
               SizedBox(height: 20),
+              _selectedDropdownStatusOld == 'В ремонте' ? _buildDislocationService(providerModel) : SizedBox(),
+              _selectedDropdownStatusOld == 'В ремонте' ? SizedBox(height: 20) : SizedBox(),
               _buildComplaint(),
               SizedBox(height: 20),
               _buildDateDeparture(),
@@ -111,15 +116,7 @@ class _RepairAddState extends State<RepairAdd> {
                   ElevatedButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          Repair repair = Repair(
-                              !isBN ? int.parse(_innerNumberTechnic.text) : 0,
-                              _nameTechnicController.text,
-                              isBN ? _dislocationOldController.text : _selectedDropdownDislocationOld ?? '',
-                              _selectedDropdownStatusOld ?? '',
-                              _complaint.text,
-                              _dateDeparture ?? DateTime.now(),
-                              providerModel.user.name);
-
+                          Repair repair = createRepair(providerModel);
                           _save(repair, providerModel).then((isSave) {
                             providerModel.changeCurrentPageMainBottomAppBar(1);
                             _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', scaffoldKey);
@@ -300,6 +297,9 @@ class _RepairAddState extends State<RepairAdd> {
   }
 
   Widget _buildStatus(ProviderModel providerModel) {
+    List<String> statuses = [];
+    statuses.addAll(providerModel.statusForEquipment);
+    statuses.remove('Тест-драйв');
     return Column(
       children: [
         Align(
@@ -322,7 +322,7 @@ class _RepairAddState extends State<RepairAdd> {
               validator: (value) => value == null ? "Обязательное поле" : null,
               dropdownColor: Colors.blue.shade50,
               value: _selectedDropdownStatusOld,
-              items: providerModel.statusForEquipment.map<DropdownMenuItem<String>>((String value) {
+              items: statuses.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -334,6 +334,47 @@ class _RepairAddState extends State<RepairAdd> {
                 });
               },
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDislocationService(ProviderModel providerModel) {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: Text(
+              'Мастер по ремонту:',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 40, right: 40),
+          child: ListTile(
+            title: DropdownButtonFormField<String>(
+              decoration: myDecorationDropdown(),
+              validator: (value) => value == null ? "Обязательное поле" : null,
+              dropdownColor: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(10.0),
+              hint: const Text('Мастер по ремонту'),
+              value: _selectedDropdownDislocationService,
+              items: providerModel.services.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? value) {
+                setState(() {
+                  _selectedDropdownDislocationService = value!;
+                });
+              },
+            )
           ),
         ),
       ],
@@ -436,26 +477,77 @@ class _RepairAddState extends State<RepairAdd> {
   }
 
   Future<bool> _save(Repair repair, ProviderModel providerModel) async{
+    LoadingOverlay.of(context).show();
     List<Repair>? resultData =
       await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
-    if(resultData != null){
+    if(resultData != null && repair.numberTechnic == 0){
+      providerModel.refreshCurrentRepairs(resultData);
+      if(mounted){
+        LoadingOverlay.of(context).hide();
+      }
+      return true;
+    }
+    if(resultData != null && repair.numberTechnic != 0){
       Technic? technic =
         await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
       if (technic != null) {
+        if(technic.status == 'Тест-драйв'){
+          if (technic.testDrive != null) {
+            TestDrive testDrive = TestDrive(
+                id: technic.testDrive!.id!,
+                idTechnic: technic.id,
+                categoryTechnic: technic.category,
+                dislocationTechnic: technic.dislocation,
+                dateStart: technic.testDrive!.dateStart,
+                dateFinish: DateTime.now(),
+                result: 'Увезли в ремонт',
+                isCloseTestDrive: true,
+                user: providerModel.user.name);
+            await TechnicalSupportRepoImpl.downloadData.updateTestDrive(testDrive);
+          }
+        }
         technic.status = repair.status;
+        if(technic.status == 'Транспортировка'){
+          technic.dislocation = providerModel.user.name;
+        }
         if(technic.status == 'В ремонте'){
-          technic.dislocation = 'Сергей';
+          technic.dislocation = _selectedDropdownDislocationService!;
         }
         await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technic, providerModel.user.name);
         Map<String, dynamic> technics = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
         providerModel.refreshTechnics(
-            technics['Photosalons'], technics['Repairs'], technics['Storages']);
+            technics['Photosalons'], technics['Repairs'], technics['Storages'], technics['Transportation']);
       }
       providerModel.refreshCurrentRepairs(resultData);
       // await addHistory(technic, nameUser);
+      if(mounted){
+        LoadingOverlay.of(context).hide();
+      }
       return true;
     }
+    if(mounted){
+      LoadingOverlay.of(context).hide();
+    }
     return false;
+  }
+
+  Repair createRepair(ProviderModel providerModel){
+    Repair repair = Repair(
+      !isBN ? int.parse(_innerNumberTechnic.text) : 0,
+      _nameTechnicController.text,
+      _selectedDropdownDislocationOld ?? '',
+      _selectedDropdownStatusOld ?? '',
+      _complaint.text,
+      _dateDeparture ?? DateTime.now(),
+      providerModel.user.name,);
+    if(widget.trouble != null){
+      repair.idTrouble = widget.trouble!.id!;
+    }
+    if(_selectedDropdownStatusOld == 'В ремонте'){
+      repair.serviceDislocation = _selectedDropdownDislocationService;
+      repair.dateTransferInService = DateTime.now();
+    }
+    return repair;
   }
 
   Future addHistory(Repair repair) async {

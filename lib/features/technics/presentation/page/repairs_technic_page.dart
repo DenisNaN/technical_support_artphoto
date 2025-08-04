@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
@@ -10,10 +11,10 @@ import 'package:technical_support_artphoto/features/repairs/models/summ_repair.d
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_view.dart';
 
 class RepairsTechnicPage extends StatefulWidget {
-  final List<SummRepair> summsRepairs;
+  final List<SumRepair> sumsRepairs;
   final Technic technic;
 
-  const RepairsTechnicPage({super.key, required this.summsRepairs, required this.technic});
+  const RepairsTechnicPage({super.key, required this.sumsRepairs, required this.technic});
 
   @override
   State<RepairsTechnicPage> createState() => _RepairsTechnicPageState();
@@ -25,9 +26,9 @@ class _RepairsTechnicPageState extends State<RepairsTechnicPage> {
     return Scaffold(
       appBar: CustomAppBar(typePage: TypePage.technicRepair, technic: widget.technic, location: null,),
       body: ListView.builder(
-          itemCount: widget.summsRepairs.length,
+          itemCount: widget.sumsRepairs.length,
           itemBuilder: (context, index) {
-            Color colorStage = _getColorStage(widget.summsRepairs[index]);
+            Color colorStage = _getColorStage(widget.sumsRepairs[index]);
             return Container(
               margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
               decoration: BoxDecoration(
@@ -45,10 +46,10 @@ class _RepairsTechnicPageState extends State<RepairsTechnicPage> {
                 title: _buildText(context, index),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 onTap: () {
-                  TechnicalSupportRepoImpl.downloadData.getRepair(widget.summsRepairs[index].idRepair).then((repair){
+                  TechnicalSupportRepoImpl.downloadData.getRepair(widget.sumsRepairs[index].idRepair).then((repair){
                     if(repair != null && context.mounted){
                       Navigator.push(context,
-                          animationRouteSlideTransition(RepairView(repair: repair)));
+                          animationRouteSlideTransition(LoadingOverlay(child: RepairView(repair: repair))));
                     }
                   });
                 },
@@ -59,7 +60,7 @@ class _RepairsTechnicPageState extends State<RepairsTechnicPage> {
   }
 
   Padding _buildText(BuildContext context, int index) {
-    SummRepair repair = widget.summsRepairs[index];
+    SumRepair repair = widget.sumsRepairs[index];
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -84,7 +85,7 @@ class _RepairsTechnicPageState extends State<RepairsTechnicPage> {
             TextSpan(text: repair.worksPerformed)
           ])),
           SizedBox(height: 7,),
-          Text('${repair.summRepair} р.',
+          Text('${repair.sumRepair} р.',
               style: GoogleFonts.montserratAlternates(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.indigo),
           ),
         ],
@@ -105,7 +106,7 @@ class _RepairsTechnicPageState extends State<RepairsTechnicPage> {
     return DateFormat("d MMMM yyyy", "ru_RU").format(date);
   }
 
-  Color _getColorStage(SummRepair repair) {
+  Color _getColorStage(SumRepair repair) {
     String dateRec = getDateFormat(repair.dateReceipt!);
     String dateTrans = getDateFormat(repair.dateTransferInService!);
     if (dateRec != '30 ноября 0001') {

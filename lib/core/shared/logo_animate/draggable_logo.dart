@@ -95,8 +95,8 @@ class _DraggableLogoState extends State<DraggableLogo>
           clipBehavior: Clip.none,
           children: [
             Positioned(
-            left: -270,
-              child: widget.child1),
+                left: -270,
+                child: widget.child1),
             widget.child2,
             Positioned(
                 right: -240,

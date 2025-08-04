@@ -4,6 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
+import 'package:technical_support_artphoto/core/shared/get_dropdown_dislocation.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/core/shared/plurals.dart';
+import 'package:technical_support_artphoto/core/utils/constants.dart';
+import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
@@ -11,6 +16,7 @@ import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/core/shared/input_decoration/input_deroration.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/repairs_technic_page.dart';
+import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import '../../../../core/shared/technic_image/technic_image.dart';
 import '../../../../main.dart';
 
@@ -29,20 +35,17 @@ class _TechnicViewState extends State<TechnicView> {
   final _nameTechnic = TextEditingController();
   final _costTechnic = TextEditingController();
   final _comment = TextEditingController();
-  final List<SummRepair> summsRepairs = [];
-  late final int totalSumm;
-
-  // late final String _dateStartTestDrive;
-  // String _dateFinishTestDrive = '';
-  final _resultTestDrive = TextEditingController();
   String? _selectedDropdownDislocation;
   String? _selectedDropdownStatus;
-  bool isBN = false;
+  final List<SumRepair> sumsRepairs = [];
+  late final int totalSumm;
 
-  // String? _selectedDropdownTestDriveDislocation;
-  // bool _switchTestDrive = false;
-  // bool _checkboxTestDrive = false;
-  // bool _isCategoryPhotocamera = false;
+  DateTime? _dateStartTestDrive;
+  DateTime? _dateFinishTestDrive;
+  bool _isDoneTestDrive = false;
+  final _resultTestDrive = TextEditingController();
+
+  late Technic technicNew;
 
   final GlobalKey<FormState> _formInnerNumberKey = GlobalKey<FormState>();
 
@@ -62,21 +65,31 @@ class _TechnicViewState extends State<TechnicView> {
     _selectedDropdownStatus = widget.technic.status;
     _selectedDropdownDislocation = widget.technic.dislocation;
     _nameTechnic.text = '';
+    technicNew = widget.technic.copyWith();
+    if (widget.technic.testDrive != null) {
+      _dateStartTestDrive = widget.technic.testDrive!.dateStart;
+      _dateFinishTestDrive =  widget.technic.testDrive?.dateFinish ?? _dateStartTestDrive!.add(Duration(days: countDaysTestDrive));
+      _isDoneTestDrive = widget.technic.testDrive!.isCloseTestDrive;
+      _resultTestDrive.text = widget.technic.testDrive!.result;
+    } else if (widget.technic.testDrive == null && _selectedDropdownStatus == 'Тест-драйв') {
+      _selectedDropdownStatus = null;
+    }
     TechnicalSupportRepoImpl.downloadData.getSumRepairs(widget.technic.number.toString()).then((value) {
       if (value.isNotEmpty) {
         setState(() {
-          summsRepairs.addAll(value.values.first);
+          sumsRepairs.addAll(value.values.first);
           totalSumm = value.keys.first;
         });
       }
     });
-    // _dateStartTestDrive = DateFormat('d MMMM yyyy', 'ru_RU').format(DateTime.now());
   }
 
   @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    double widthScreen = MediaQuery.sizeOf(context).width;
+    double widthScreen = MediaQuery
+        .sizeOf(context)
+        .width;
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.viewTechnic, location: widget.location, technic: widget.technic),
         body: Form(
@@ -93,6 +106,8 @@ class _TechnicViewState extends State<TechnicView> {
                 SizedBox(height: 10),
                 _buildDislocation(providerModel),
                 SizedBox(height: 10),
+                _buildTestDrive(technicNew),
+                SizedBox(height: 20),
                 _buildCostAndTotalSumRepairs(providerModel),
                 SizedBox(height: 30),
                 Row(
@@ -108,18 +123,35 @@ class _TechnicViewState extends State<TechnicView> {
                     ElevatedButton(
                         onPressed: () {
                           if (_formInnerNumberKey.currentState!.validate()) {
-                            Technic technic = Technic(
-                                widget.technic.id,
-                                widget.technic.number,
-                                widget.technic.category,
-                                widget.technic.name,
-                                _selectedDropdownStatus ?? widget.technic.status,
-                                _selectedDropdownDislocation ?? widget.technic.dislocation,
-                                widget.technic.dateBuyTechnic,
-                                widget.technic.cost,
-                                widget.technic.comment);
+                            technicNew.status = _selectedDropdownStatus ?? 'На хранении';
+                            technicNew.dislocation = _selectedDropdownDislocation ?? 'Офис';
 
-                            _save(technic, providerModel).then((value){
+                            SaveTestDriveStatus status = SaveTestDriveStatus.notSave;
+                            if ((_selectedDropdownStatus == 'Тест-драйв' && widget.technic.testDrive == null) ||
+                                (widget.technic.status != 'Тест-драйв' && _selectedDropdownStatus == 'Тест-драйв')) {
+                              status = SaveTestDriveStatus.save;
+                            }
+                            if(widget.technic.status == 'Тест-драйв' && widget.technic.testDrive != null) {
+                              status = SaveTestDriveStatus.update;
+                            }
+                            if(status == SaveTestDriveStatus.save || status == SaveTestDriveStatus.update){
+                              TestDrive testDrive = TestDrive(
+                                  idTechnic: widget.technic.id,
+                                  categoryTechnic: widget.technic.category,
+                                  dislocationTechnic: _selectedDropdownDislocation ?? 'На хранении',
+                                  dateStart: _dateStartTestDrive ?? DateTime.now(),
+                                  dateFinish:
+                                  _dateFinishTestDrive ?? DateTime.now().add(Duration(days: countDaysTestDrive)),
+                                  result: _resultTestDrive.text,
+                                  isCloseTestDrive: _isDoneTestDrive,
+                                  user: providerModel.user.name);
+                              if (status == SaveTestDriveStatus.update) {
+                                testDrive.id = widget.technic.testDrive!.id;
+                              }
+                              technicNew.testDrive = testDrive;
+                            }
+
+                            _save(technicNew, providerModel, status).then((value) {
                               _viewSnackBar(value ? Icons.save : Icons.dangerous_outlined, value,
                                   value ? 'Изменения приняты' : 'Изменения не сохранились');
                             });
@@ -165,7 +197,10 @@ class _TechnicViewState extends State<TechnicView> {
                   ],
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                   title: Text('Редактировать'),
-                  titleTextStyle: Theme.of(context).textTheme.headlineMedium,
+                  titleTextStyle: Theme
+                      .of(context)
+                      .textTheme
+                      .headlineMedium,
                   content: TextFormField(
                     decoration: myDecorationTextFormField(null, 'Наименование техники'),
                     controller: _nameTechnic..text = widget.technic.name,
@@ -204,8 +239,11 @@ class _TechnicViewState extends State<TechnicView> {
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: CircleAvatar(
-                        radius: widget.technic.number.toString().length > 4 ? 25 : null,
-                        child: Text(widget.technic.number.toString()),
+                        radius: widget.technic.number
+                            .toString()
+                            .length > 4 ? 25 : null,
+                        child: Text(widget.technic.number == 0 ? 'БН' :
+                            widget.technic.number.toString()),
                       ),
                     )),
                 Positioned(
@@ -248,7 +286,10 @@ class _TechnicViewState extends State<TechnicView> {
                 ],
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                 title: Text('Редактировать'),
-                titleTextStyle: Theme.of(context).textTheme.headlineMedium,
+                titleTextStyle: Theme
+                    .of(context)
+                    .textTheme
+                    .headlineMedium,
                 content: TextFormField(
                   maxLines: 4,
                   decoration: myDecorationTextFormField(null, 'Комментарий'),
@@ -273,16 +314,19 @@ class _TechnicViewState extends State<TechnicView> {
                 children: [
                   Text(
                     isCommentEmpty ? 'Добавить комментарий' : 'Комментарий',
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .headlineMedium,
                   ),
                   SizedBox(
                     width: 10,
                   ),
                   isCommentEmpty
                       ? Icon(
-                          Icons.edit,
-                          color: Colors.grey,
-                        )
+                    Icons.edit,
+                    color: Colors.grey,
+                  )
                       : SizedBox()
                 ],
               ),
@@ -290,15 +334,15 @@ class _TechnicViewState extends State<TechnicView> {
           ),
           !isCommentEmpty
               ? ListTile(
-                  title: Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Container(
-                        padding: EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.blue.shade50),
-                        child: Text(widget.technic.comment!)),
-                  ),
-                )
+            title: Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: Container(
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.blue.shade50),
+                  child: Text(widget.technic.comment!)),
+            ),
+          )
               : SizedBox(),
         ],
       ),
@@ -309,11 +353,11 @@ class _TechnicViewState extends State<TechnicView> {
     return InkWell(
       onTap: () {
         showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2099),
-                locale: const Locale("ru", "RU"))
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2099),
+            locale: const Locale("ru", "RU"))
             .then((date) {
           if (date != null) {
             Technic technic = widget.technic;
@@ -355,7 +399,10 @@ class _TechnicViewState extends State<TechnicView> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Статус техники',
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headlineMedium,
             ),
           ),
         ),
@@ -377,12 +424,27 @@ class _TechnicViewState extends State<TechnicView> {
               }).toList(),
               onChanged: (String? value) {
                 setState(() {
-                  if(value != null && _selectedDropdownStatus != 'В ремонте' &&
-                      value == 'В ремонте'){
+                  if (value != null && _selectedDropdownStatus != 'В ремонте' && value == 'В ремонте') {
                     _selectedDropdownDislocation = null;
                   }
-                  if(value != null && _selectedDropdownStatus == 'В ремонте' &&
-                      value != 'В ремонте'){
+                  if (value != null && _selectedDropdownStatus == 'В ремонте' && value != 'В ремонте') {
+                    _selectedDropdownDislocation = null;
+                  }
+                  if (value != null && _selectedDropdownStatus == 'Тест-драйв' && value != 'Тест-драйв') {
+                    _dateFinishTestDrive = DateTime.now();
+                    _resultTestDrive.text = 'ok';
+                    _isDoneTestDrive = true;
+                  }
+                  if (value != null && value == 'Тест-драйв') {
+                    _dateStartTestDrive = DateTime.now();
+                    _dateFinishTestDrive = DateTime.now().add(Duration(days: countDaysTestDrive));
+                    _resultTestDrive.text = '';
+                    _isDoneTestDrive = false;
+                  }
+                  if(value != null && _selectedDropdownStatus != 'Транспортировка' && value == 'Транспортировка'){
+                    _selectedDropdownDislocation = null;
+                  }
+                  if (value != null && _selectedDropdownStatus == 'Транспортировка' && value != 'Транспортировка') {
                     _selectedDropdownDislocation = null;
                   }
                   _selectedDropdownStatus = value;
@@ -404,7 +466,10 @@ class _TechnicViewState extends State<TechnicView> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Местонахождение техники',
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headlineMedium,
             ),
           ),
         ),
@@ -417,18 +482,7 @@ class _TechnicViewState extends State<TechnicView> {
               hint: const Text('Дислокация'),
               value: _selectedDropdownDislocation,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: _selectedDropdownStatus == 'В ремонте' ? providerModel.services.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList() :
-              providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
+              items: getDropdownDislocation(_selectedDropdownStatus, providerModel),
               onChanged: (String? value) {
                 setState(() {
                   _selectedDropdownDislocation = value!;
@@ -441,8 +495,246 @@ class _TechnicViewState extends State<TechnicView> {
     );
   }
 
+  Widget _buildTestDrive(Technic technic) {
+    TestDriveStatus status = getStatusTestDrive(technic);
+    Color color = getColorTestDrive(status);
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0, bottom: 5),
+            child: Text(
+              'Тест-драйв',
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headlineMedium,
+            ),
+          ),
+        ),
+        Padding(
+            padding: const EdgeInsets.only(left: 40, right: 40),
+            child: ExpansionTile(
+              title: Text(getTitleTestDrive(status)),
+              tilePadding: EdgeInsets.only(left: 28),
+              collapsedShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              collapsedBackgroundColor: color,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              backgroundColor: color,
+              showTrailingIcon: false,
+              textColor: Colors.black,
+              enabled: status == TestDriveStatus.notMake ? false : true,
+              children: [
+                technicNew.testDrive != null || _selectedDropdownStatus == 'Тест-драйв'
+                    ? getSubtitleTestDrive()
+                    : SizedBox(),
+              ],
+            )),
+      ],
+    );
+  }
+
+  TestDriveStatus getStatusTestDrive(Technic technic) {
+    if (technic.testDrive == null && _selectedDropdownStatus != 'Тест-драйв') {
+      return TestDriveStatus.notMake;
+    }
+    if (_dateFinishTestDrive!.difference(DateTime.now()) < Duration(days: -1) && !_isDoneTestDrive) {
+      return TestDriveStatus.missDeadline;
+    }
+    if (_isDoneTestDrive == false) {
+      return TestDriveStatus.inProcess;
+    } else {
+      return TestDriveStatus.finished;
+    }
+  }
+
+  String getTitleTestDrive(TestDriveStatus status) {
+    if (status == TestDriveStatus.notMake) {
+      return 'Не проводился';
+    }
+    if (status == TestDriveStatus.missDeadline) {
+      int days = _dateFinishTestDrive!.difference(DateTime.now()).inDays;
+      return 'Просрочен на ${days.abs()} ${pluralize(days.abs())}';
+    }
+    if (status == TestDriveStatus.inProcess) {
+      return 'В процессе до ${_dateFinishTestDrive!.dateFormattedForInterface()}';
+    } else {
+      return 'Завершен ${_dateFinishTestDrive!.dateFormattedForInterface()}';
+    }
+  }
+
+  Widget getSubtitleTestDrive() {
+    final provider = Provider.of<ProviderModel>(context);
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 20,
+            children: [
+              Column(
+                children: [
+                  Text(
+                    'Начало',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                  GestureDetector(
+                    onTap: _isDoneTestDrive ? () {} : () {
+                      showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2099),
+                          locale: const Locale("ru", "RU"))
+                          .then((date) {
+                        setState(() {
+                          if (date != null) {
+                            _dateStartTestDrive = date;
+                            _dateFinishTestDrive = _dateStartTestDrive!.add(Duration(days: countDaysTestDrive));
+                          }
+                        });
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(border: Border.all(color: Colors.black26)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          spacing: 2,
+                          children: [
+                            Icon(
+                              Icons.calendar_today_outlined,
+                              size: 20,
+                              color: Colors.grey,
+                            ),
+                            _dateStartTestDrive!.toString() == "-0001-11-30 00:00:00.000" ||
+                                _dateStartTestDrive!.toString() == "0001-11-30 00:00:00.000" ?
+                            Text('Нет даты') : Text(DateFormat('dd/MM/yyyy').format(_dateStartTestDrive!)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    'Конец',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(border: Border.all(color: Colors.black26)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        spacing: 2,
+                        children: [
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            size: 20,
+                            color: Colors.grey,
+                          ),
+                          _dateFinishTestDrive!.toString() == "-0001-11-30 00:00:00.000" ||
+                              _dateFinishTestDrive!.toString() == "0001-11-30 00:00:00.000" ?
+                          Text('Нет даты') : Text(DateFormat('dd/MM/yyyy').format(_dateFinishTestDrive!)),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 3,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Text(
+                    'Результат',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                ),
+                TextFormField(
+                  readOnly: _isDoneTestDrive ? true : false,
+                  maxLines: 2,
+                  decoration: myDecorationTextFormField(),
+                  controller: _resultTestDrive,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 25),
+            child: Row(
+              children: [
+                Transform.scale(
+                  scale: 1.2,
+                  child: Switch(
+                      value: _isDoneTestDrive,
+                      activeColor: Colors.green.shade300,
+                      onChanged: !_isDoneTestDrive ? (_) {
+                        setState(() {
+                          _isDoneTestDrive = true;
+                          _selectedDropdownStatus = 'На хранении';
+                          if (_resultTestDrive.text == '') {
+                            _resultTestDrive.text = 'ok';
+                          }
+                          _dateFinishTestDrive = DateTime.now();
+                          TestDrive testDrive = TestDrive(
+                              idTechnic: widget.technic.id,
+                              categoryTechnic: widget.technic.category,
+                              dislocationTechnic: _selectedDropdownDislocation ?? 'Офис',
+                              dateStart: _dateStartTestDrive ?? DateTime.now(),
+                              dateFinish: _dateFinishTestDrive ?? DateTime.now(),
+                              result: _resultTestDrive.text,
+                              isCloseTestDrive: _isDoneTestDrive,
+                              user: provider.user.name);
+                          technicNew.testDrive = testDrive;
+                        });
+                      } : (_) {}),
+                ),
+                Text(_isDoneTestDrive ? 'Завершен' : 'Завершить тест-драйв'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color getColorTestDrive(TestDriveStatus status) {
+    if (status == TestDriveStatus.notMake) {
+      return Colors.blue.shade50;
+    }
+    if (status == TestDriveStatus.missDeadline) {
+      return Colors.red.shade50;
+    }
+    if (status == TestDriveStatus.inProcess) {
+      return Colors.yellow.shade50;
+    } else {
+      return Colors.green.shade50;
+    }
+  }
+
   Widget _buildCostAndTotalSumRepairs(ProviderModel provider) {
-    bool isListEmpty = summsRepairs.isEmpty;
+    bool isListEmpty = sumsRepairs.isEmpty;
     return Column(
       children: [
         InkWell(
@@ -468,7 +760,10 @@ class _TechnicViewState extends State<TechnicView> {
                     ],
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                     title: Text('Редактировать'),
-                    titleTextStyle: Theme.of(context).textTheme.headlineMedium,
+                    titleTextStyle: Theme
+                        .of(context)
+                        .textTheme
+                        .headlineMedium,
                     content: TextFormField(
                       decoration: myDecorationTextFormField(null, 'Стоимость техники'),
                       controller: _costTechnic..text = widget.technic.cost.toString(),
@@ -490,7 +785,10 @@ class _TechnicViewState extends State<TechnicView> {
                 children: [
                   Text(
                     'Стоимость техники: ${NumberFormat('#,###', 'fr').format(widget.technic.cost)} р.',
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .headlineMedium,
                   ),
                   SizedBox(
                     width: 7,
@@ -504,236 +802,66 @@ class _TechnicViewState extends State<TechnicView> {
             ),
           ),
         ),
-        isListEmpty
+        isListEmpty || widget.technic.number == 0
             ? SizedBox()
             : InkWell(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      animationRouteSlideTransition(RepairsTechnicPage(
-                        summsRepairs: summsRepairs,
-                        technic: widget.technic,
-                      )));
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                  child: Container(
-                    padding: EdgeInsets.only(left: 10, top: 5, bottom: 5),
-                    decoration:
-                        BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.blue.shade50),
-                    child: ListTile(
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Количество ремонтов: ${summsRepairs.length}'),
-                          Text('Cтоимость ремонтов: ${NumberFormat('#,###', 'fr').format(totalSumm)} р.')
-                        ],
-                      ),
-                    ),
-                  ),
+          onTap: () {
+            Navigator.push(
+                context,
+                animationRouteSlideTransition(RepairsTechnicPage(
+                  sumsRepairs: sumsRepairs,
+                  technic: widget.technic,
+                )));
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: Container(
+              padding: EdgeInsets.only(left: 10, top: 5, bottom: 5),
+              decoration:
+              BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.blue.shade50),
+              child: ListTile(
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Количество ремонтов: ${sumsRepairs.length}'),
+                    Text('Cтоимость ремонтов: ${NumberFormat('#,###', 'fr').format(totalSumm)} р.')
+                  ],
                 ),
               ),
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  // ListTile _buildSwitchTestDrive() {
-  //   return ListTile(
-  //     title: Row(mainAxisSize: MainAxisSize.min, children: [
-  //       _switchTestDrive
-  //           ? const Text('Выключить тест-драйв ')
-  //           : const Text('Включить тест-драйв '),
-  //       Switch(
-  //           value: _switchTestDrive,
-  //           onChanged: (value) {
-  //             setState(() {
-  //               _switchTestDrive = value;
-  //               if (!_switchTestDrive) {
-  //                 _dateStartTestDrive = '';
-  //                 _dateFinishTestDrive = '';
-  //                 _resultTestDrive.text = '';
-  //                 _checkboxTestDrive = false;
-  //               } else {
-  //                 _dateStartTestDrive = DateFormat('yyyy.MM.dd').format(DateTime.now());
-  //               }
-  //               if (_switchTestDrive &&
-  //                   !_checkboxTestDrive &&
-  //                   _dateFinishTestDrive == '' &&
-  //                   !_isCategoryPhotocamera) {
-  //                 DateTime finishTestDrive = DateFormat('yyyy.MM.dd')
-  //                     .parse(_dateStartTestDrive)
-  //                     .add(const Duration(days: 14));
-  //                 _dateFinishTestDrive = DateFormat('yyyy.MM.dd').format(finishTestDrive);
-  //               }
-  //             });
-  //           }),
-  //     ]),
-  //   );
-  // }
-  //
-  // ListTile _buildTestDrive(ProviderModel providerModel) {
-  //   return ListTile(
-  //       title: _switchTestDrive
-  //           ? _buildTestDriveListTile(providerModel)
-  //           : const Text('Тест-драйв не проводился'));
-  // }
-  //
-  // Padding _buildTestDriveListTile(ProviderModel providerModel) {
-  //   return Padding(
-  //     padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-  //     child: Container(
-  //       decoration: BoxDecoration(
-  //           color: Colors.blue.shade50,
-  //           borderRadius: BorderRadius.circular(20),
-  //           boxShadow: const [
-  //             BoxShadow(
-  //               color: Colors.grey,
-  //               blurRadius: 4,
-  //               offset: Offset(2, 4), // Shadow position
-  //             ),
-  //           ]),
-  //       child: ListTile(
-  //         title: Column(
-  //           children: [
-  //             ListTile(
-  //               contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-  //               leading: const Icon(Icons.airport_shuttle),
-  //               title: DropdownButton<String>(
-  //                 isExpanded: true,
-  //                 hint: const Text('Место тест-драйва'),
-  //                 icon: _selectedDropdownTestDriveDislocation != null
-  //                     ? IconButton(
-  //                         icon: const Icon(Icons.clear, color: Colors.grey),
-  //                         onPressed: () {
-  //                           setState(() {
-  //                             _selectedDropdownTestDriveDislocation = null;
-  //                           });
-  //                         })
-  //                     : null,
-  //                 value: _selectedDropdownTestDriveDislocation,
-  //                 items: providerModel.namesPhotosalons
-  //                     .map<DropdownMenuItem<String>>((String value) {
-  //                   return DropdownMenuItem<String>(
-  //                     value: value,
-  //                     child: Text(value),
-  //                   );
-  //                 }).toList(),
-  //                 onChanged: (String? value) {
-  //                   setState(() {
-  //                     _selectedDropdownTestDriveDislocation = value!;
-  //                   });
-  //                 },
-  //               ),
-  //             ),
-  //             ListTile(
-  //               contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-  //               leading: const Icon(Icons.today),
-  //               title: const Text("Дата начала тест-драйва"),
-  //               subtitle: Text(_dateStartTestDrive),
-  //               trailing: IconButton(
-  //                   icon: const Icon(Icons.edit),
-  //                   onPressed: () {
-  //                     showDatePicker(
-  //                             context: context,
-  //                             initialDate: DateTime.now(),
-  //                             firstDate: DateTime(2000),
-  //                             lastDate: DateTime(2099),
-  //                             locale: const Locale("ru", "RU"))
-  //                         .then((date) {
-  //                       setState(() {
-  //                         if (date != null) {
-  //                           _dateStartTestDrive =
-  //                               DateFormat('d MMMM yyyy', "ru_RU").format(date);
-  //                         }
-  //                       });
-  //                     });
-  //                   },
-  //                   color: Colors.blue),
-  //             ),
-  //             !_isCategoryPhotocamera
-  //                 ? ListTile(
-  //                     contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-  //                     leading: const Icon(Icons.today),
-  //                     title: const Text("Дата конца тест-драйва"),
-  //                     subtitle: Text(DateFormat('d MMMM yyyy', "ru_RU").format(
-  //                         DateTime.parse(_dateFinishTestDrive.replaceAll('.', '-')))),
-  //                     trailing: IconButton(
-  //                         icon: const Icon(Icons.edit),
-  //                         onPressed: () {
-  //                           showDatePicker(
-  //                                   context: context,
-  //                                   initialDate: DateTime.now(),
-  //                                   firstDate: DateTime(2000),
-  //                                   lastDate: DateTime(2099),
-  //                                   locale: const Locale("ru", "RU"))
-  //                               .then((date) {
-  //                             setState(() {
-  //                               if (date != null) {
-  //                                 _dateFinishTestDrive =
-  //                                     DateFormat('d MMMM yyyy', "ru_RU").format(date);
-  //                               }
-  //                             });
-  //                           });
-  //                         },
-  //                         color: Colors.blue),
-  //                   )
-  //                 : const SizedBox.shrink(),
-  //             ListTile(
-  //               contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-  //               leading: const Icon(Icons.create),
-  //               title: TextFormField(
-  //                 decoration:
-  //                     const InputDecoration(hintText: "Результат проверки-тестирования"),
-  //                 controller: _resultTestDrive,
-  //               ),
-  //             ),
-  //             CheckboxListTile(
-  //                 contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-  //                 title: const Text('Тест-драйв выполнен'),
-  //                 secondary: const Icon(Icons.check),
-  //                 value: _checkboxTestDrive,
-  //                 onChanged: (bool? value) {
-  //                   setState(() {
-  //                     _checkboxTestDrive = value!;
-  //                   });
-  //                 })
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  Future<bool> _save(Technic technicModel, ProviderModel providerModel, SaveTestDriveStatus status) async {
+    LoadingOverlay.of(context).show();
 
-  Future<bool> _save(Technic technicModel, ProviderModel providerModel) async{
-    bool isSuccess = false;
-    isSuccess = await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technicModel, providerModel.user.name);
+    bool isSuccessStatus = false;
+    bool isSuccessTestDrive = false;
+    isSuccessStatus = await TechnicalSupportRepoImpl.downloadData
+        .updateStatusAndDislocationTechnic(technicModel, providerModel.user.name);
+    switch (status) {
+      case SaveTestDriveStatus.save:
+        isSuccessTestDrive = await TechnicalSupportRepoImpl.downloadData.saveTestDrive(technicModel.testDrive!);
+      case SaveTestDriveStatus.update:
+        isSuccessTestDrive = await TechnicalSupportRepoImpl.downloadData.updateTestDrive(technicModel.testDrive!);
+      case SaveTestDriveStatus.notSave:
+        isSuccessTestDrive = true;
+    }
+
     Map<String, dynamic> result = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
-    providerModel.refreshTechnics(result['Photosalons'], result['Repairs'], result['Storages']);
-    return isSuccess;
+    providerModel.refreshTechnics(result['Photosalons'], result['Repairs'], result['Storages'], result['Transportation']);
+
+    if (mounted) {
+      LoadingOverlay.of(context).hide();
+    }
+    return isSuccessStatus && isSuccessTestDrive;
   }
 
-  // Future addHistory(Technic technic, String nameUser) async {
-  //   String descForHistory = descriptionForHistory(technic);
-  //   History history = History(History.historyList.last.id + 1, 'Technic', technic.id, 'create', descForHistory,
-  //       nameUser, DateFormat('yyyy.MM.dd').format(DateTime.now()));
-  //
-  //   ConnectDbMySQL.connDB.insertHistory(history);
-  //   History.historyList.insert(0, history);
-  // }
-  //
-  // String descriptionForHistory(Technic technic) {
-  //   String internalID = technic.number == -1 ? 'БН' : '№${technic.number}';
-  //   String result = 'Новая техника $internalID добавленна';
-  //
-  //   return result;
-  // }
-
-  // String getDateFormat(String date) {
-  //   return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
-  // }
-
   void _viewSnackBar(IconData icon, bool isSuccessful, String text) {
-    if(context.mounted){
+    if (context.mounted) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -755,48 +883,6 @@ class _TechnicViewState extends State<TechnicView> {
           context, animationRouteSlideTransition(const ArtphotoTech()), (Route<dynamic> route) => false);
     }
   }
-
-// String validateEmptyFields() {
-//   String result = '';
-//   String tmpResult = '';
-//   int countEmptyFields = 0;
-//
-//   if (_innerNumberTechnic.text == "") {
-//     tmpResult += 'Номер техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_selectedDropdownCategory == null) {
-//     tmpResult += 'Наименование техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_costTechnic.text == "") {
-//     tmpResult += 'Стоимость техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_dateBuyTechnic == "") {
-//     tmpResult += 'Дата покупки техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_selectedDropdownStatus == null) {
-//     tmpResult += 'Статус техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_selectedDropdownDislocation == null) {
-//     tmpResult += 'Дислокация техники, ';
-//     countEmptyFields++;
-//   }
-//   if (_switchTestDrive && _selectedDropdownTestDriveDislocation == null) {
-//     tmpResult += 'Место тест-драйва, ';
-//     countEmptyFields++;
-//   }
-//
-//   if (countEmptyFields > 0) {
-//     tmpResult = tmpResult.trim().replaceFirst(',', '', tmpResult.length - 5);
-//     result = getFieldAddition(countEmptyFields);
-//     result += '$tmpResult.';
-//   }
-//   return result;
-// }
 }
 
 class IntegerCurrencyInputFormatter extends TextInputFormatter {
@@ -833,8 +919,12 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
     }
 
     /// Handle moving cursor.
-    final initialNumberOfPrecedingSeparators = oldValue.text.characters.where((e) => e == thousandSeparator).length;
-    final newNumberOfPrecedingSeparators = formattedText.characters.where((e) => e == thousandSeparator).length;
+    final initialNumberOfPrecedingSeparators = oldValue.text.characters
+        .where((e) => e == thousandSeparator)
+        .length;
+    final newNumberOfPrecedingSeparators = formattedText.characters
+        .where((e) => e == thousandSeparator)
+        .length;
     final additionalOffset = newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
 
     return newValue.copyWith(

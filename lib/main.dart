@@ -1,61 +1,100 @@
 import 'dart:async';
+import 'dart:ui';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/api/data/datasources/save_local_services.dart';
+import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/di/init_dependencies.dart';
 import 'package:technical_support_artphoto/core/navigation/main_bottom_page_view.dart';
+import 'package:technical_support_artphoto/core/shared/failed_application/send_mail_failed_app.dart';
 import 'package:technical_support_artphoto/features/splash_screen/presentation/page/splash_screen.dart';
 import 'core/navigation/main_bottom_app_bar.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  try {
+    await Firebase.initializeApp(); // Required if not already done
+    debugPrint('Handling a background message: ${message.messageId}');
+    // Do your isolate-safe background processing here
+  } catch (e, stack) {
+    debugPrint('Error in background handler: $e\n$stack');
+  }
+}
 
 void main() {
   runZonedGuarded<Future<void>>(
         () async {
       WidgetsFlutterBinding.ensureInitialized();
       await initDependencies();
+      SaveLocalServices localServices = SaveLocalServices();
+      User? user = localServices.getUser();
+      FlutterError.onError = (FlutterErrorDetails details) {
+        // sendEmailNewTrouble(error: null, stack: null, flutterErrorDetails: '${details.exception}\n\nStack: ${details.stack}',
+        //     user: user);
+        debugPrint('🔥 FlutterError.onError поймал ошибку: ${details.exception}');
+      };
+      PlatformDispatcher.instance.onError = (error, stack) {
+        // sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '',
+        //     user: user);
+        debugPrint('🔥 PlatformDispatcher поймал ошибку: $error');
+        return true;
+      };
 
-      runApp(const SplashScreenArtphoto());
+      await Firebase.initializeApp();
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+      runApp(const MyApp());
     },
         (Object error, StackTrace stack) {
-      debugPrint('ARTPHOTO [CrashEvent] [DEBUG] $error\n$stack');
+          SaveLocalServices localServices = SaveLocalServices();
+          User? user = localServices.getUser();
+          // sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '', user: user);
+          debugPrint('ARTPHOTO [CrashEvent] [DEBUG] $error\n$stack');
     },
   );
 }
 
-class SplashScreenArtphoto extends StatelessWidget {
-  const SplashScreenArtphoto({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ProviderModel(),
-      child: MaterialApp(
-          localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
-          home: const SplashScreen(),
-          theme: ThemeData(
-            useMaterial3: false,
-            textTheme: TextTheme(
-              headlineMedium: GoogleFonts.philosopher(
-                fontSize: 21,
-                color: Colors.black54,
-                fontWeight: FontWeight.w700,
-                fontStyle: FontStyle.italic,
+      child: OverlaySupport(
+        child: MaterialApp(
+            localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+            home: const SplashScreen(),
+            theme: ThemeData(
+              useMaterial3: false,
+              textTheme: TextTheme(
+                headlineMedium: GoogleFonts.philosopher(
+                  fontSize: 21,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w700,
+                  fontStyle: FontStyle.italic,
+                ),
+                titleSmall: GoogleFonts.philosopher(
+                  fontSize: 15,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-              titleSmall: GoogleFonts.philosopher(
-                fontSize: 15,
-                color: Colors.black,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          )),
+            )),
+      ),
     );
   }
 }
 
 class ArtphotoTech extends StatefulWidget {
-  const ArtphotoTech({super.key, this.indexPage = 0});
+  const ArtphotoTech({super.key, this.indexPage = 0,});
 
   final int indexPage;
 
@@ -85,44 +124,6 @@ class _ArtphotoTechState extends State<ArtphotoTech> {
         body: MainBottomPageView(pageController: pageViewController)
     );
   }
-
-// Row _buildTitleAppBar(String nameUser, ProviderModel providerModel) {
-//   return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-//     Text(nameUser),
-//       providerModel.currentPageIndexMainBottomAppBar == 3
-//         ? const SizedBox()
-//         : Padding(
-//       padding: const EdgeInsets.all(8.0),
-//       child: ElevatedButton(
-//         style: ElevatedButton.styleFrom(
-//           shadowColor: Colors.transparent,
-//           backgroundColor: Colors.black.withOpacity(0.4),
-//           shape: RoundedRectangleBorder(
-//             borderRadius: BorderRadius.circular(30),
-//           ),
-//           padding: const EdgeInsets.all(12),
-//         ),
-//         child: const Row(
-//           children: [Icon(Icons.search), Text('Поиск и сортировка')],
-//         ),
-//         onPressed: () {
-//           switch (providerModel.currentPageIndexMainBottomAppBar) {
-//             case 0:
-//             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTechnic()));
-//               break;
-//             case 1:
-//             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedRepairs()));
-//               break;
-//             case 2:
-//             Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewFindedTrouble()));
-//               break;
-//           }
-//         },
-//       ),
-//     ),
-//     Expanded(child: Container(alignment: Alignment.centerRight, child: myAppBarIconNotifications())),
-//   ]);
-// }
 
 // Widget myAppBarIconNotifications() {
 //   return GestureDetector(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
@@ -7,6 +8,7 @@ import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/core/shared/technic_image/technic_image.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/grid_view_technics_model.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_view.dart';
+import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../../../../core/navigation/animation_navigation.dart';
 
 class GridViewTechnics extends StatelessWidget {
@@ -16,6 +18,7 @@ class GridViewTechnics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final providerModel = Provider.of<ProviderModel>(context);
     GridViewTechnicsModel gridViewTechnicsModel =
         filteredTechnics(location.technics, Provider.of<ProviderModel>(context));
     bool isTechnicsDonorsNotZero = false;
@@ -25,6 +28,7 @@ class GridViewTechnics extends StatelessWidget {
         break;
       }
     }
+    List<Trouble> troubles = providerModel.getTroubles;
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.listTechnics, location: location, technic: null),
         body: CustomScrollView(
@@ -43,7 +47,22 @@ class GridViewTechnics extends StatelessWidget {
                     ),
                     itemBuilder: (_, int index) {
                       Technic technic = technicsNotDonors[index];
-                      bool technicBroken = technic.status == 'Неисправна';
+                      bool isTechnicBroken = technic.status == 'Неисправна';
+                      bool isTestDrive = technic.status == 'Тест-драйв';
+                      bool isNotDeadlineTestDrive = false;
+                      bool isTroubleHas = false;
+                      if(technic.testDrive != null && technic.testDrive!.isCloseTestDrive == false &&
+                          technic.testDrive!.dateFinish.difference(DateTime.now()).inDays < 0){
+                        isNotDeadlineTestDrive = true;
+                      }
+                      for(final trouble in troubles){
+                        if(technic.number == trouble.numberTechnic){
+                          if (trouble.numberTechnic != 0) {
+                            isTroubleHas = true;
+                          }
+                          break;
+                        }
+                      }
                       return GridTile(
                         header: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -51,10 +70,20 @@ class GridViewTechnics extends StatelessWidget {
                             Expanded(
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 2),
-                                child: Text(
-                                  technic.category,
-                                  style: Theme.of(context).textTheme.titleSmall,
-                                  overflow: TextOverflow.ellipsis,
+                                child: Row(
+                                  children: [
+                                    isTroubleHas ? Icon(
+                                      Icons.check,
+                                      color: Colors.red,
+                                    ) : SizedBox(),
+                                    Expanded(
+                                      child: Text(
+                                        technic.category,
+                                        style: Theme.of(context).textTheme.titleSmall,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -64,18 +93,19 @@ class GridViewTechnics extends StatelessWidget {
                                     borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
                                 child: Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: Text(technic.number.toString()),
+                                  child: Text(technic.number == 0 ? 'БН' :
+                                  technic.number.toString()),
                                 )),
                           ],
                         ),
                         child: InkWell(
                           onTap: () {
                             Navigator.push(context,
-                                animationRouteSlideTransition(TechnicView(location: location, technic: technic)));
+                                animationRouteSlideTransition(LoadingOverlay(child: TechnicView(location: location, technic: technic))));
                           },
                           child: Container(
                             decoration: BoxDecoration(
-                              color: technicBroken ? Colors.red.shade50 : Colors.blue.shade50,
+                              color: isTechnicBroken ? Colors.red.shade50 : isTestDrive ? Colors.yellow.shade50 : Colors.blue.shade50,
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
@@ -92,12 +122,18 @@ class GridViewTechnics extends StatelessWidget {
                                   height: 20,
                                 ),
                                 Expanded(child: TechnicImage(category: technic.category)),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 4, right: 2),
-                                  child: Text(
-                                    technic.name == '' ? 'Модель не указана' : technic.name,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                Row(
+                                  children: [
+                                    isNotDeadlineTestDrive ? Icon(Icons.error, color: Colors.red.shade400,) : SizedBox(),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(
+                                          technic.name == '' ? 'Модель не указана' : technic.name,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -171,7 +207,7 @@ class GridViewTechnics extends StatelessWidget {
                         child: InkWell(
                           onTap: () {
                             Navigator.push(context,
-                                animationRouteSlideTransition(TechnicView(location: location, technic: technic)));
+                                animationRouteSlideTransition(LoadingOverlay(child: TechnicView(location: location, technic: technic))));
                           },
                           child: Container(
                             decoration: BoxDecoration(

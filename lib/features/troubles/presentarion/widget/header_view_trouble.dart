@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
 import '../../../../core/api/provider/provider_model.dart';
@@ -32,7 +33,6 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
   void initState() {
     super.initState();
     _numberTechnic.text = widget.trouble.numberTechnic.toString();
-    _selectedDropdownDislocation = widget.trouble.photosalon;
     _dateTrouble = widget.trouble.dateTrouble;
     _employee.text = widget.trouble.employee;
     _complaint.text = widget.trouble.trouble;
@@ -40,6 +40,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
 
   @override
   Widget build(BuildContext context) {
+    _selectedDropdownDislocation = validateDropdownPhotosalon(widget.trouble);
     final providerModel = Provider.of<ProviderModel>(context);
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
@@ -252,7 +253,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
     Navigator.push(
         context,
         animationRouteSlideTransition(
-            TechnicView(location: technic.dislocation, technic: technic)));
+            LoadingOverlay(child: TechnicView(location: technic.dislocation, technic: technic))));
   }
 
   Widget _buildTextSubtitle() {
@@ -294,7 +295,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
           SizedBox(
             width: 4,
           ),
-          Text(widget.trouble.dateTrouble.toString() != '-0001-11-30 00:00:00.000Z'
+          Text(widget.trouble.dateTrouble.toString() != '-0001-11-30 00:00:00.000'
               ? DateFormat('d MMMM yyyy', 'ru_RU').format(widget.trouble.dateTrouble)
               : 'Дата отсутствует')
         ])
@@ -310,7 +311,6 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
       if (!isFinishedTrouble) {
         providerModel.refreshTroubles(resultData);
       }
-      // await addHistory(technic, nameUser);
       return true;
     }
     return false;
@@ -318,7 +318,7 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText,
       String notSuccessfulText, bool isSkipPrevSnackBar) {
-    if (context.mounted) {
+    if (mounted) {
       if (isSkipPrevSnackBar) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
       }
@@ -341,5 +341,18 @@ class _HeaderViewTroubleState extends State<HeaderViewTrouble> {
       Navigator.pop(context);
       Navigator.pop(context);
     }
+  }
+
+  String? validateDropdownPhotosalon(Trouble trouble) {
+    final providerModel = Provider.of<ProviderModel>(context);
+    List<String> nameDislocation = providerModel.namesDislocation;
+    for (var element in nameDislocation) {
+      if (trouble.photosalon != '') {
+        if (element == trouble.photosalon) {
+          return trouble.photosalon;
+        }
+      }
+    }
+    return null;
   }
 }

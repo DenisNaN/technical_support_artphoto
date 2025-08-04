@@ -1,6 +1,8 @@
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_add.dart';
 import 'package:technical_support_artphoto/features/repairs/presentation/page/repair_view.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -9,10 +11,9 @@ import '../../../../core/navigation/animation_navigation.dart';
 import '../../../../core/shared/custom_app_bar/custom_app_bar.dart';
 import '../../../../core/shared/logo_animate/logo_matrix_transition_animate.dart';
 import '../../../../core/utils/enums.dart';
-import '../../../../core/utils/formatters.dart';
 import '../../../home/presentation/widgets/my_custom_refresh_indicator.dart';
 import '../../models/repair.dart';
-import '../widget/menu_repairs_page.dart';
+import '../widget/popup_menu_repairs_page.dart';
 
 class RepairsPage extends StatefulWidget {
   const RepairsPage({super.key, required this.isCurrentRepairs});
@@ -32,7 +33,7 @@ class _RepairsPageState extends State<RepairsPage> {
         appBar: widget.isCurrentRepairs ? AppBar(
           title: Text('Ремонты'),
           actions: [
-            MenuRepairPage()
+            PopupMenuRepairPage()
           ],
         ) : AppBar(
           title: Text('Завершенные ремонты'),
@@ -41,7 +42,7 @@ class _RepairsPageState extends State<RepairsPage> {
           icon: Icon(Icons.add),
           label: Text('Новая заявка'),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const RepairAdd()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const LoadingOverlay(child: RepairAdd())));
           },
         ) : null,
         body: widget.isCurrentRepairs ?
@@ -77,7 +78,7 @@ class _RepairsPageState extends State<RepairsPage> {
                     child: ListTile(
                       onTap: () {
                         Navigator.push(context,
-                            animationRouteSlideTransition(RepairView(repair: repair)));
+                            animationRouteSlideTransition(LoadingOverlay(child: RepairView(repair: repair))));
                       },
                       title: _buildTextTitle(repair),
                       subtitle: _buildTextSubtitle(repair),
@@ -153,7 +154,7 @@ class _RepairsPageState extends State<RepairsPage> {
                 child: ListTile(
                   onTap: () {
                     Navigator.push(context,
-                        animationRouteSlideTransition(RepairView(repair: repair)));
+                        animationRouteSlideTransition(LoadingOverlay(child: RepairView(repair: repair))));
                   },
                   title: _buildTextTitle(repair),
                   subtitle: _buildTextSubtitle(repair),
@@ -206,16 +207,16 @@ class _RepairsPageState extends State<RepairsPage> {
         repairDislocation = '${repair.dislocationOld}.';
       }
     }
-    String repairLastDate = 'Забрали с точки: ${getDateFormatForInterface(repair.dateDeparture)}.';
+    String repairLastDate = 'Забрали с точки: ${repair.dateDeparture.dateFormattedForInterface()}.';
 
-    if (repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
-        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000Z") {}else{
-      repairLastDate = 'Сдали в ремонт: ${getDateFormatForInterface(repair.dateTransferInService ?? DateTime.now())}.';
+    if (repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000" ||
+        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000") {}else{
+      repairLastDate = 'Сдали в ремонт: ${repair.dateTransferInService?.dateFormattedForInterface() ?? DateTime.now().dateFormattedForInterface()}.';
     }
-    if (repair.dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000Z" ||
-        repair.dateDepartureFromService.toString() != "0001-11-30 00:00:00.000Z") {}else{
+    if (repair.dateDepartureFromService.toString() != "-0001-11-30 00:00:00.000" ||
+        repair.dateDepartureFromService.toString() != "0001-11-30 00:00:00.000") {}else{
       repairLastDate =
-      'Забрали из ремонта: ${getDateFormatForInterface(repair.dateDepartureFromService ?? DateTime.now())}.';
+      'Забрали из ремонта: ${repair.dateDepartureFromService?.dateFormattedForInterface() ?? DateTime.now().dateFormattedForInterface()}.';
     }
     return Text('Статус: $repairStatus\n'
         'Дислокация: $repairDislocation\n'
@@ -242,8 +243,8 @@ class _RepairsPageState extends State<RepairsPage> {
   String fieldsFilled(Repair repair) {
     if (repair.serviceDislocation == null ||
         repair.serviceDislocation == '' ||
-        repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000Z" ||
-        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000Z") {
+        repair.dateTransferInService.toString() == "-0001-11-30 00:00:00.000" ||
+        repair.dateTransferInService.toString() == "0001-11-30 00:00:00.000") {
       return 'red';
     }
     return 'yellow';

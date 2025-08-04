@@ -69,12 +69,12 @@ class _MainBottomAppBarState extends State<MainBottomAppBar> {
               label: 'Неисп-ти',
             ),
             NavigationDestination(
-              selectedIcon: Icon(Icons.history, color: Colors.purpleAccent),
+              selectedIcon: Icon(Icons.assignment_turned_in, color: Colors.purple.shade300),
               icon: Icon(
-                Icons.history_outlined,
+                Icons.notifications_active,
                 color: Colors.white,
               ),
-              label: 'История',
+              label: 'Увед',
             ),
           ],
         ),
