@@ -283,10 +283,12 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                 if (technic != null) {
                   _navigationOnTechnicView(technic);
                 } else {
-                  _viewSnackBar(
-                      Icons.print, false, '', 'Такой техники нет в базе', false);
+                  _viewSnackBar(Icons.print, false, '', 'Такой техники нет в базе', false, true);
                 }
               });
+              // if (isTechnicNull) {
+              //   _viewSnackBar(Icons.print, false, '', 'Такой техники нет в базе', false);
+              // }
             }
           },
           child: CircleAvatar(
@@ -336,10 +338,7 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
           // border: Border.all(color: Colors.black26),
           borderRadius: BorderRadius.circular(12)
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
+        child: Padding(
               padding: const EdgeInsets.only(left: 8, top: 8, bottom: 5),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -351,7 +350,6 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                         text: widget.repair.complaint != ''
                             ? widget.repair.complaint
                             : 'Данные отсутствуют'),
-                    TextSpan(text: '\n \n', style: TextStyle(fontSize: 2)),
                   ])),
                   Row(
                     children: [
@@ -401,12 +399,6 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Icon(Icons.touch_app, size: 50, color: Colors.black12,),
-            )
-          ],
-        ),
       ),
     );
   }
@@ -425,7 +417,7 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
   }
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText,
-      String notSuccessfulText, bool isSkipPrevSnackBar) {
+      String notSuccessfulText, bool isSkipPrevSnackBar, [bool isPop = false]) {
     if (mounted) {
       if (isSkipPrevSnackBar) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -446,8 +438,11 @@ class _FirstStepRepairDescState extends State<FirstStepRepairDesc> {
           showCloseIcon: true,
         ),
       );
-      Navigator.pop(context);
-      Navigator.pop(context);
+      if(!isPop){
+        Navigator.pop(context);
+        Navigator.pop(context);
+      }
+
     }
   }
 }

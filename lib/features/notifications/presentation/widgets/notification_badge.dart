@@ -10,7 +10,7 @@ class NotificationBadge extends StatelessWidget {
     return Container(
       width: 40.0,
       height: 40.0,
-      decoration: new BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.red,
         shape: BoxShape.circle,
       ),

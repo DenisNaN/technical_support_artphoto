@@ -49,8 +49,6 @@ class _RepairViewState extends State<RepairView> {
     _recommendationsNotes.text = widget.repair.recommendationsNotes ?? '';
     _selectedDropdownStatusNew =
         widget.repair.newStatus != '' ? widget.repair.newStatus : null;
-    _selectedDropdownDislocationNew =
-    widget.repair.newDislocation != '' ? widget.repair.newDislocation!.firstSymbolUppercase() : null;
     _dateReceipt = widget.repair.dateReceipt;
   }
 
@@ -68,7 +66,7 @@ class _RepairViewState extends State<RepairView> {
     for (var element in nameDislocation) {
       if (widget.repair.newDislocation != '') {
         if (element == widget.repair.newDislocation) {
-          return widget.repair.newDislocation;
+          return widget.repair.newDislocation!.firstSymbolUppercase();
         }
       }
     }
@@ -572,8 +570,8 @@ class _RepairViewState extends State<RepairView> {
   }
 
   Widget _buildNewDislocation(ProviderModel providerModel) {
-    if (_selectedDropdownDislocationNew == '' ||
-        _selectedDropdownDislocationNew == null) {
+    if (_selectedDropdownDislocationNew != '' ||
+        _selectedDropdownDislocationNew != null) {
       _selectedDropdownDislocationNew = validateDropdownDislocationNew(providerModel);
     }
     return Column(
