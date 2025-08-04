@@ -811,12 +811,15 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
 
   List<Trouble> troubleListFromMap(IResultSet result) {
     List<Trouble> list = [];
-    if (result.isNotEmpty) {
+    if (result.rows.isNotEmpty) {
       for (final row in result.rows) {
             // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
             // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
             // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
-            Uint8List image = Uint8List.fromList(row.colAt(10));
+            Uint8List image = Uint8List(0);
+            if(row.colAt(10) != null){
+              image = Uint8List.fromList(row.colAt(10));
+            }
             // Uint8List image = row.colAt(10);
             Trouble trouble = Trouble(
                 id: int.parse(row.colAt(0)),
