@@ -11,7 +11,7 @@ import '../../../../core/api/provider/provider_model.dart';
 import '../../../../core/navigation/animation_navigation.dart';
 import '../../../auth/presentation/page/authorization.dart';
 
-class AppBarHomepage extends StatefulWidget  implements PreferredSizeWidget{
+class AppBarHomepage extends StatefulWidget implements PreferredSizeWidget{
   const AppBarHomepage({super.key});
 
   @override

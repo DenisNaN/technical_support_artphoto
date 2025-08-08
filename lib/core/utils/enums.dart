@@ -17,6 +17,7 @@ enum TypePage{
   viewTrouble,
   error,
   searchTechnic,
+  buySupplies,
 }
 
 enum TypeDislocation{

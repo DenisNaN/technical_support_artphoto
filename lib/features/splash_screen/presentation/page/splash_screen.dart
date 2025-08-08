@@ -51,6 +51,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 snapshot.data!['colorsForEquipment']);
             providerModel.downloadCurrentRepairs(snapshot.data!['AllRepairs']);
             providerModel.downloadTroubles(snapshot.data!['AllTroubles']);
+            providerModel.downloadSuppliesGarage(snapshot.data!['suppliesGarage']);
+            providerModel.downloadSuppliesOffice(snapshot.data!['suppliesOffice']);
             providerModel.initAccountMailRu(snapshot.data!['accountMailRu']);
             providerModel.initUsers(snapshot.data!['users']);
 

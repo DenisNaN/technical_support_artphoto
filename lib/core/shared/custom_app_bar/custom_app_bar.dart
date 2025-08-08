@@ -70,6 +70,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         TypePage.addTrouble => _addTrouble(),
         TypePage.viewTrouble => _viewTrouble(providerModel),
         TypePage.searchTechnic => _searchTechnic(widget.location),
+        TypePage.buySupplies => _buySupplies(widget.location),
       }
     );
   }
@@ -167,7 +168,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: Text(widget.location.name, style: Theme
+          child: Text(widget.location.location, style: Theme
               .of(context)
               .textTheme
               .titleLarge, ),
@@ -197,7 +198,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget _viewTechnic(){
     String locationName = '';
     if(widget.location is Location){
-      locationName = widget.location.name;
+      locationName = widget.location.location;
     }else{
       locationName = widget.location;
     }
@@ -227,6 +228,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   Widget _searchTechnic(String nameSearching){
     return Text('Поиск по: $nameSearching', style: TextStyle(color: Colors.black));
+  }
+
+  Widget _buySupplies(String nameSupplies){
+    return Text('Покупка $nameSupplies', style: TextStyle(color: Colors.black));
   }
 
   _repair(String message) {

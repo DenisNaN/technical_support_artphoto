@@ -10,6 +10,8 @@ import 'package:technical_support_artphoto/core/api/data/models/trouble_account_
 import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
+import 'package:technical_support_artphoto/features/supplies/models/model_supplies.dart';
+import 'package:technical_support_artphoto/features/supplies/models/supplies_entity.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
 import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
@@ -837,5 +839,62 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
           }
     }
     return list;
+  }
+
+  Future<ModelSupplies?> fetchSuppliesGarage() async{
+    var resultGarage = await _connDB!.execute('SELECT * FROM ХранениеСкладРасходМатериал ORDER BY Дата DESC LIMIT 1');
+    return suppliesListFromMap(resultGarage, 'склад');
+  }
+
+  Future<ModelSupplies?> fetchSuppliesOffice() async{
+    var resultOffice = await _connDB!.execute('SELECT * FROM ХранениеОфисРасходМатериал ORDER BY Дата DESC LIMIT 1');
+    return suppliesListFromMap(resultOffice, 'офис');
+  }
+
+  ModelSupplies? suppliesListFromMap(IResultSet result, String location) {
+    // id-row[0], Дата-row[1],  ОфисБумага-row[2],  КартКопир426-row[3], КартКопир521-row[4], МатоваяА6-row[5],
+    // ГлянецА6-row[6], ГлянецА4-row[7],  СамоклейкаА4-row[8], ПленкаЛам-row[9], Файл-row[10],
+    // Конверты-row[11], КассоваяЛента-row[12],
+
+    // КРАСКА
+    // Cyan-row[13], LightCyan-row[14], Magenta-row[15], LightMagenta-row[16], Black-row[17], Yellow-row[18]
+    if (result.rows.isNotEmpty) {
+      for (final row in result.rows) {
+        List<SuppliesEntity> suppliesEntity = [];
+        int index = 0;
+        for(final element in row.assoc().entries){
+          if(index < 2 || index == 4) {
+            index++;
+            continue;
+          }
+          if(index > 18) break;
+          SuppliesEntity entity = SuppliesEntity(element.key, int.tryParse(element.value) ?? 0);
+          suppliesEntity.add(entity);
+          index++;
+        }
+        // Map<String, int> map = {
+        //   'ОфисБумага': int.tryParse(row.colAt(2)) ?? 0,
+        //   'КартКопир426': int.tryParse(row.colAt(3)) ?? 0,
+        //   'МатоваяА6': int.tryParse(row.colAt(5)) ?? 0,
+        //   'ГлянецА6': int.tryParse(row.colAt(6)) ?? 0,
+        //   'ГлянецА4': int.tryParse(row.colAt(7)) ?? 0,
+        //   'СамоклейкаА4': int.tryParse(row.colAt(8)) ?? 0,
+        //   'ПленкаЛам': int.tryParse(row.colAt(9)) ?? 0,
+        //   'Файл': int.tryParse(row.colAt(10)) ?? 0,
+        //   'Конверты': int.tryParse(row.colAt(11)) ?? 0,
+        //   'КассоваяЛента': int.tryParse(row.colAt(12)) ?? 0,
+        //   'Cyan': int.tryParse(row.colAt(13)) ?? 0,
+        //   'LightCyan': int.tryParse(row.colAt(14)) ?? 0,
+        //   'Magenta': int.tryParse(row.colAt(15)) ?? 0,
+        //   'LightMagenta': int.tryParse(row.colAt(16)) ?? 0,
+        //   'Black': int.tryParse(row.colAt(17)) ?? 0,
+        //   'Yellow': int.tryParse(row.colAt(18)) ?? 0,
+        // };
+        ModelSupplies modelSupplies = ModelSupplies(location, suppliesEntity);
+        modelSupplies.id = int.tryParse(row.colAt(0));
+        return modelSupplies;
+      }
+    }
+    return null;
   }
 }

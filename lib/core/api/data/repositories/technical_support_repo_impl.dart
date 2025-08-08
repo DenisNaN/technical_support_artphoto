@@ -11,6 +11,8 @@ import 'package:technical_support_artphoto/core/api/data/models/trouble_account_
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/domain/repositories/technical_support_repo.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
+import 'package:technical_support_artphoto/features/supplies/models/model_supplies.dart';
+import 'package:technical_support_artphoto/features/supplies/presentation/pages/supplies.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
 import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
@@ -34,6 +36,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 
     List<Repair> repairs = [];
     List<Trouble> troubles = [];
+    ModelSupplies? suppliesGarage;
+    ModelSupplies? suppliesOffice;
 
     /// CategoryDropDown
     List<String> namePhotosalons;
@@ -54,6 +58,8 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 
     repairs = await ConnectDbMySQL.connDB.fetchCurrentRepairs();
     troubles = await ConnectDbMySQL.connDB.fetchTroubles();
+    suppliesGarage = await ConnectDbMySQL.connDB.fetchSuppliesGarage();
+    suppliesOffice = await ConnectDbMySQL.connDB.fetchSuppliesOffice();
 
     namePhotosalons = await ConnectDbMySQL.connDB.fetchNamePhotosalons();
     namePhotosalons.addAll(await ConnectDbMySQL.connDB.fetchNameStorages());
@@ -72,6 +78,9 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
 
     result['AllRepairs'] = repairs;
     result['AllTroubles'] = troubles;
+
+    result['suppliesGarage'] = suppliesGarage;
+    result['suppliesOffice'] = suppliesOffice;
 
     result['namePhotosalons'] = namePhotosalons;
     result['nameEquipment'] = nameEquipment;
@@ -436,6 +445,21 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     } catch (e) {
       return false;
     }
+  }
+
+  @override
+  Future<Map<String, ModelSupplies>> refreshSuppliesData() async{
+    Map<String, ModelSupplies> supplies = {};
+    await ConnectDbMySQL.connDB.connDatabase();
+    var result1 = await ConnectDbMySQL.connDB.fetchSuppliesGarage();
+    if (result1 != null) {
+      supplies['garage'] = result1;
+    }
+    var result2 = await ConnectDbMySQL.connDB.fetchSuppliesOffice();
+    if (result2 != null) {
+      supplies['office'] = result2;
+    }
+    return supplies;
   }
 
 //   List getNotifications() {
