@@ -851,6 +851,60 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
     return suppliesListFromMap(resultOffice, 'офис');
   }
 
+  Future<bool> insertSuppliesInDB(String nameSupplies, int count, ModelSupplies supplies) async {
+    String location = supplies.location;
+    List<SuppliesEntity> suppliesEntities = supplies.suppliesEntity;
+    await _connDB!.execute(
+        'INSERT INTO Хранение$locationРасходМатериал (Дата, ОфисБумага, КартКопир426, МатоваяА6, ГлянецА6, ГлянецА4, СамоклейкаА4, '
+            'ПленкаЛам, Файл, Конверты, КассоваяЛента, Cyan, LightCyan, Magenta, LightMagenta, Black, Yellow, ДатаПрихода, '
+            'ПриходОфисБумага, ПриходКартКопир426, ПриходМатоваяА6, ПриходГлянецА6, ПриходГлянецА4, ПриходСамоклейкаА4, '
+            'ПриходПленкаЛам, ПриходФайл, ПриходКонверты, ПриходКассоваяЛента, ПриходCyan, ПриходLightCyan, ПриходMagenta, '
+            'ПриходLightMagenta, ПриходBlack, ПриходYellow) '
+            'VALUES (:date, :officePaper, :kartKopir426, :matA6, :glossyA6, :glossyA4, :samokley, :lam, :multifora, :covers, '
+            ':kasTape, :cyan, :lightCyan, :magenta, :lightMagenta, :black, :yellow, :dateAdd, :officePaperAdd, :kartKopir426Add, '
+            ':matA6Add, :glossyA6Add, :glossyA4Add, :samokleyAdd, :lamAdd, :multiforaAdd, :coversAdd, :kasTapeAdd, '
+            ':cyanAdd, :lightCyanAdd, :magentaAdd, :lightMagentaAdd, :blackAdd, :yellowAdd)', {
+      'date': DateTime.now().dateFormattedForSQL(),
+      'officePaper': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'kartKopir426': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'matA6': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'glossyA6': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'glossyA4': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'samokley': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'lam': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'multifora': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'covers': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'kasTape': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'cyan': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'lightCyan': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'magenta': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'lightMagenta': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'black': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'yellow': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'dateAdd': DateTime.now().dateFormattedForSQL(),
+      'officePaperAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'kartKopir426Add': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'matA6Add': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'glossyA6Add': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'glossyA4Add': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'samokleyAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'lamAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'multiforaAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'coversAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'kasTapeAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'cyanAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'lightCyanAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'magentaAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'lightMagentaAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'blackAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'yellowAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+    });
+    var result = await _connDB!.execute('SELECT id FROM equipment ORDER BY id DESC LIMIT 1');
+    int id = int.parse(result.rows.first.colAt(0));
+    await insertStatusInDB(id, technic.status, technic.dislocation, nameUser);
+    return id;
+  }
+
   ModelSupplies? suppliesListFromMap(IResultSet result, String location) {
     // id-row[0], Дата-row[1],  ОфисБумага-row[2],  КартКопир426-row[3], КартКопир521-row[4], МатоваяА6-row[5],
     // ГлянецА6-row[6], ГлянецА4-row[7],  СамоклейкаА4-row[8], ПленкаЛам-row[9], Файл-row[10],

@@ -46,4 +46,5 @@ abstract interface class TechnicalSupportRepo {
   Future<bool> updateTestDrive(TestDrive testDrive);
 
   Future<Map<String, ModelSupplies>> refreshSuppliesData();
+  Future<bool> saveSuppliesData();
 }

@@ -32,8 +32,6 @@ class _SuppliesState extends State<Supplies> {
                 physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                 slivers: [
                   GridViewSuppliesPaper(
-                      suppliesGarage: providerModel.getSuppliesGarage,
-                      suppliesOffice: providerModel.getSuppliesOffice,
                       color: Colors.lightGreen.shade400,
                       isPaint: false,
                   ),
@@ -43,8 +41,6 @@ class _SuppliesState extends State<Supplies> {
                     titleTextStyle: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 22),
                   ),
                   GridViewSuppliesPaper(
-                    suppliesGarage: providerModel.getSuppliesGarage,
-                    suppliesOffice: providerModel.getSuppliesOffice,
                     color: Colors.lightGreen.shade400,
                     isPaint: true,
                   ),

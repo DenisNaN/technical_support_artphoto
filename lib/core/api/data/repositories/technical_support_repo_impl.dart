@@ -462,6 +462,18 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
     return supplies;
   }
 
+  @override
+  Future<bool> saveSuppliesData() async{
+    try {
+      await ConnectDbMySQL.connDB.connDatabase();
+      int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
+      // await ConnectDbMySQL.connDB.dispose();
+      return id;
+    } catch (e) {
+      return id;
+    }
+  }
+
 //   List getNotifications() {
 //     List notifications = [];
 //     notifications.addAll(getListNotificationsDontTestDriveAfterRepairBetter1Day());
