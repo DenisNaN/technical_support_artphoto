@@ -168,7 +168,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: Text(widget.location.location, style: Theme
+          child: Text(widget.location.name, style: Theme
               .of(context)
               .textTheme
               .titleLarge, ),
@@ -196,21 +196,21 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   Widget _viewTechnic(){
-    String locationName = '';
-    if(widget.location is Location){
-      locationName = widget.location.location;
-    }else{
-      locationName = widget.location;
-    }
+    // String locationName = '';
+    // if(widget.location is Location){
+    //   locationName = widget.location.name;
+    // }else{
+    //   locationName = widget.location;
+    // }
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Expanded(
-          child: Text(locationName, style: Theme
-              .of(context)
-              .textTheme
-              .titleLarge, ),
-        ),
+        // Expanded(
+        //   child: Text(locationName, style: Theme
+        //       .of(context)
+        //       .textTheme
+        //       .titleLarge, ),
+        // ),
         widget.technic?.number == 0 ? SizedBox() :
         TextButton(
           onPressed: (){

@@ -842,20 +842,20 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
   }
 
   Future<ModelSupplies?> fetchSuppliesGarage() async{
-    var resultGarage = await _connDB!.execute('SELECT * FROM ХранениеСкладРасходМатериал ORDER BY Дата DESC LIMIT 1');
+    var resultGarage = await _connDB!.execute('SELECT * FROM ХранениеСкладРасходМатериал ORDER BY id DESC LIMIT 1');
     return suppliesListFromMap(resultGarage, 'склад');
   }
 
   Future<ModelSupplies?> fetchSuppliesOffice() async{
-    var resultOffice = await _connDB!.execute('SELECT * FROM ХранениеОфисРасходМатериал ORDER BY Дата DESC LIMIT 1');
+    var resultOffice = await _connDB!.execute('SELECT * FROM ХранениеОфисРасходМатериал ORDER BY id DESC LIMIT 1');
     return suppliesListFromMap(resultOffice, 'офис');
   }
 
-  Future<bool> insertSuppliesInDB(String nameSupplies, int count, ModelSupplies supplies) async {
+  Future<void> insertSuppliesInDB(String nameSupplies, int count, ModelSupplies supplies) async {
     String location = supplies.location;
     List<SuppliesEntity> suppliesEntities = supplies.suppliesEntity;
     await _connDB!.execute(
-        'INSERT INTO Хранение$locationРасходМатериал (Дата, ОфисБумага, КартКопир426, МатоваяА6, ГлянецА6, ГлянецА4, СамоклейкаА4, '
+        'INSERT INTO Хранение${location.firstSymbolUppercase()}РасходМатериал (Дата, ОфисБумага, КартКопир426, МатоваяА6, ГлянецА6, ГлянецА4, СамоклейкаА4, '
             'ПленкаЛам, Файл, Конверты, КассоваяЛента, Cyan, LightCyan, Magenta, LightMagenta, Black, Yellow, ДатаПрихода, '
             'ПриходОфисБумага, ПриходКартКопир426, ПриходМатоваяА6, ПриходГлянецА6, ПриходГлянецА4, ПриходСамоклейкаА4, '
             'ПриходПленкаЛам, ПриходФайл, ПриходКонверты, ПриходКассоваяЛента, ПриходCyan, ПриходLightCyan, ПриходMagenta, '
@@ -866,43 +866,39 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
             ':cyanAdd, :lightCyanAdd, :magentaAdd, :lightMagentaAdd, :blackAdd, :yellowAdd)', {
       'date': DateTime.now().dateFormattedForSQL(),
       'officePaper': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'kartKopir426': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'matA6': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'glossyA6': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'glossyA4': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'samokley': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'lam': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'multifora': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'covers': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'kasTape': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'cyan': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'lightCyan': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'magenta': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'lightMagenta': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'black': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'yellow': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'kartKopir426': suppliesEntities[1].count + (suppliesEntities[1].name == nameSupplies ? count : 0),
+      'matA6': suppliesEntities[2].count + (suppliesEntities[2].name == nameSupplies ? count : 0),
+      'glossyA6': suppliesEntities[3].count + (suppliesEntities[3].name == nameSupplies ? count : 0),
+      'glossyA4': suppliesEntities[4].count + (suppliesEntities[4].name == nameSupplies ? count : 0),
+      'samokley': suppliesEntities[5].count + (suppliesEntities[5].name == nameSupplies ? count : 0),
+      'lam': suppliesEntities[6].count + (suppliesEntities[6].name == nameSupplies ? count : 0),
+      'multifora': suppliesEntities[7].count + (suppliesEntities[7].name == nameSupplies ? count : 0),
+      'covers': suppliesEntities[8].count + (suppliesEntities[8].name == nameSupplies ? count : 0),
+      'kasTape': suppliesEntities[9].count + (suppliesEntities[9].name == nameSupplies ? count : 0),
+      'cyan': suppliesEntities[10].count + (suppliesEntities[10].name == nameSupplies ? count : 0),
+      'lightCyan': suppliesEntities[11].count + (suppliesEntities[11].name == nameSupplies ? count : 0),
+      'magenta': suppliesEntities[12].count + (suppliesEntities[12].name == nameSupplies ? count : 0),
+      'lightMagenta': suppliesEntities[13].count + (suppliesEntities[13].name == nameSupplies ? count : 0),
+      'black': suppliesEntities[14].count + (suppliesEntities[14].name == nameSupplies ? count : 0),
+      'yellow': suppliesEntities[15].count + (suppliesEntities[15].name == nameSupplies ? count : 0),
       'dateAdd': DateTime.now().dateFormattedForSQL(),
       'officePaperAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'kartKopir426Add': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'matA6Add': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'glossyA6Add': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'glossyA4Add': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'samokleyAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'lamAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'multiforaAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'coversAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'kasTapeAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'cyanAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'lightCyanAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'magentaAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'lightMagentaAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'blackAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'yellowAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'kartKopir426Add': suppliesEntities[1].name == nameSupplies ? count : 0,
+      'matA6Add': suppliesEntities[2].name == nameSupplies ? count : 0,
+      'glossyA6Add': suppliesEntities[3].name == nameSupplies ? count : 0,
+      'glossyA4Add': suppliesEntities[4].name == nameSupplies ? count : 0,
+      'samokleyAdd': suppliesEntities[5].name == nameSupplies ? count : 0,
+      'lamAdd': suppliesEntities[6].name == nameSupplies ? count : 0,
+      'multiforaAdd': suppliesEntities[7].name == nameSupplies ? count : 0,
+      'coversAdd': suppliesEntities[8].name == nameSupplies ? count : 0,
+      'kasTapeAdd': suppliesEntities[9].name == nameSupplies ? count : 0,
+      'cyanAdd': suppliesEntities[10].name == nameSupplies ? count : 0,
+      'lightCyanAdd': suppliesEntities[11].name == nameSupplies ? count : 0,
+      'magentaAdd': suppliesEntities[12].name == nameSupplies ? count : 0,
+      'lightMagentaAdd': suppliesEntities[13].name == nameSupplies ? count : 0,
+      'blackAdd': suppliesEntities[14].name == nameSupplies ? count : 0,
+      'yellowAdd': suppliesEntities[15].name == nameSupplies ? count : 0,
     });
-    var result = await _connDB!.execute('SELECT id FROM equipment ORDER BY id DESC LIMIT 1');
-    int id = int.parse(result.rows.first.colAt(0));
-    await insertStatusInDB(id, technic.status, technic.dislocation, nameUser);
-    return id;
   }
 
   ModelSupplies? suppliesListFromMap(IResultSet result, String location) {

@@ -89,11 +89,10 @@ class _BuySuppliesState extends State<BuySupplies> {
           ElevatedButton(
               onPressed: () {
                 if (formKey.currentState!.validate()) {
-                  print(_countSupplies.text + '11');
+                  _save(_selectedDislocation!, int.parse(_countSupplies.text), providerModel).then((result) {
+                    _viewSnackBar(Icons.save, result, 'Данные сохраннены', 'Данные не сохраннены');
+                  });
                 }
-                  // _save(technic, providerModel).then((_) {
-                  //   _viewSnackBar(Icons.save, true, 'Техника сохранена', 'Техника не сохранена');
-                  // });
               },
               child: const Text("Сохранить")),
         ],),
@@ -102,49 +101,17 @@ class _BuySuppliesState extends State<BuySupplies> {
   }
 
   Future<bool> _save(String dislocation, int count, ProviderModel providerModel) async{
+    bool result;
     LoadingOverlay.of(context).show();
-    List<Repair>? resultData =
-    await TechnicalSupportRepoImpl.downloadData.saveRepair(repair);
-    if(resultData != null && repair.numberTechnic == 0){
-      providerModel.refreshCurrentRepairs(resultData);
-      if(mounted){
-        LoadingOverlay.of(context).hide();
-      }
-      return true;
+    if(dislocation == 'Склад'){
+      result = await TechnicalSupportRepoImpl.downloadData.saveSupplies(widget.nameSupplies, count, providerModel.getSuppliesGarage);
+    }else{
+      result = await TechnicalSupportRepoImpl.downloadData.saveSupplies(widget.nameSupplies, count, providerModel.getSuppliesOffice);
     }
-    if(resultData != null && repair.numberTechnic != 0){
-      Technic? technic =
-      await TechnicalSupportRepoImpl.downloadData.getTechnic(repair.numberTechnic.toString());
-      if (technic != null) {
-        if(technic.status == 'Тест-драйв'){
-          if (technic.testDrive != null) {
-            TestDrive testDrive = TestDrive(
-                id: technic.testDrive!.id!,
-                idTechnic: technic.id,
-                categoryTechnic: technic.category,
-                dislocationTechnic: technic.dislocation,
-                dateStart: technic.testDrive!.dateStart,
-                dateFinish: DateTime.now(),
-                result: 'Увезли в ремонт',
-                isCloseTestDrive: true,
-                user: providerModel.user.name);
-            await TechnicalSupportRepoImpl.downloadData.updateTestDrive(testDrive);
-          }
-        }
-        technic.status = repair.status;
-        if(technic.status == 'Транспортировка'){
-          technic.dislocation = providerModel.user.name;
-        }
-        if(technic.status == 'В ремонте'){
-          technic.dislocation = _selectedDropdownDislocationService!;
-        }
-        await TechnicalSupportRepoImpl.downloadData.updateStatusAndDislocationTechnic(technic, providerModel.user.name);
-        Map<String, dynamic> technics = await TechnicalSupportRepoImpl.downloadData.refreshTechnicsData();
-        providerModel.refreshTechnics(
-            technics['Photosalons'], technics['Repairs'], technics['Storages'], technics['Transportation']);
-      }
-      providerModel.refreshCurrentRepairs(resultData);
-      // await addHistory(technic, nameUser);
+    if(result){
+      TechnicalSupportRepoImpl.downloadData.refreshSuppliesData().then((resultData) {
+        providerModel.refreshSupplies(resultData);
+      });
       if(mounted){
         LoadingOverlay.of(context).hide();
       }
@@ -157,11 +124,10 @@ class _BuySuppliesState extends State<BuySupplies> {
   }
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String successText,
-      String notSuccessText, GlobalKey<ScaffoldState> scaffoldKey) {
-    final contextViewSnackBar = scaffoldKey.currentContext;
-    if(contextViewSnackBar != null && contextViewSnackBar.mounted){
-      ScaffoldMessenger.of(contextViewSnackBar).hideCurrentSnackBar();
-      ScaffoldMessenger.of(contextViewSnackBar).showSnackBar(
+      String notSuccessText) {
+    if(mounted){
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
             mainAxisSize: MainAxisSize.max,

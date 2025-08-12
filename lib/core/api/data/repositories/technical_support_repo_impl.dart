@@ -463,14 +463,13 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
   }
 
   @override
-  Future<bool> saveSuppliesData() async{
+  Future<bool> saveSupplies(String nameSupplies, int count, ModelSupplies supplies) async{
     try {
       await ConnectDbMySQL.connDB.connDatabase();
-      int id = await ConnectDbMySQL.connDB.insertTechnicInDB(technic, nameUser);
-      // await ConnectDbMySQL.connDB.dispose();
-      return id;
+      await ConnectDbMySQL.connDB.insertSuppliesInDB(nameSupplies, count, supplies);
+      return true;
     } catch (e) {
-      return id;
+      return false;
     }
   }
 

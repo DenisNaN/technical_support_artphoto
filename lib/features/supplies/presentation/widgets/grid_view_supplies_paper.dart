@@ -64,14 +64,14 @@ class GridViewSuppliesPaper extends StatelessWidget {
                         },
                             child: Text('     Покупка     ')),),
                       SizedBox(height: 10,),
-                      Center(child:
-                      ElevatedButton(onPressed: (){
-                        Navigator.pop(context);
-                        Navigator.push(context,
-                            animationRouteSlideTransition(LoadingOverlay(child: BuySupplies(nameSupplies: suppliesEntityGarage.name))));
-                      },
-                          child: Text('Перемещение')),),
-                      SizedBox(height: 10,),
+                      // Center(child:
+                      // ElevatedButton(onPressed: (){
+                      //   Navigator.pop(context);
+                      //   Navigator.push(context,
+                      //       animationRouteSlideTransition(LoadingOverlay(child: BuySupplies(nameSupplies: suppliesEntityGarage.name))));
+                      // },
+                      //     child: Text('Перемещение')),),
+                      // SizedBox(height: 10,),
                     ],
                   );
                 });
