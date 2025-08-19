@@ -5,6 +5,7 @@ import 'package:technical_support_artphoto/core/api/data/models/repair_location.
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/transportation_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
+import 'package:technical_support_artphoto/features/notifications/models/push_notifications.dart';
 import 'package:technical_support_artphoto/features/supplies/models/model_supplies.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
@@ -12,6 +13,8 @@ import '../../../features/repairs/models/repair.dart';
 import '../data/models/user.dart';
 
 class ProviderModel with ChangeNotifier {
+  int totalNotifications = 0;
+
   late final Map<String, PhotosalonLocation> _technicsInPhotosalons;
   late final Map<String, RepairLocation> _technicsInRepairs;
   late final Map<String, StorageLocation> _technicsInStorages;

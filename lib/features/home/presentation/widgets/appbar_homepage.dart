@@ -76,6 +76,11 @@ class _AppBarHomepageState extends State<AppBarHomepage> {
       ),
       actions: [
         PopupMenuHomePage(),
+        /// TODO: count notifications
+        // Center(child: Padding(
+        //   padding: const EdgeInsets.only(right: 20.0),
+        //   child: Text(providerModel.totalNotifications.toString(), style: TextStyle(fontSize: 25),),
+        // )),
       ],
     );
   }
