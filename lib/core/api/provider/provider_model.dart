@@ -5,7 +5,6 @@ import 'package:technical_support_artphoto/core/api/data/models/repair_location.
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/transportation_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
-import 'package:technical_support_artphoto/features/notifications/models/push_notifications.dart';
 import 'package:technical_support_artphoto/features/supplies/models/model_supplies.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
