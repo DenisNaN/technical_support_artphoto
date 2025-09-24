@@ -70,6 +70,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         TypePage.addTrouble => _addTrouble(),
         TypePage.viewTrouble => _viewTrouble(providerModel),
         TypePage.searchTechnic => _searchTechnic(widget.location),
+        TypePage.buySupplies => _buySupplies(widget.location),
       }
     );
   }
@@ -195,21 +196,21 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   Widget _viewTechnic(){
-    String locationName = '';
-    if(widget.location is Location){
-      locationName = widget.location.name;
-    }else{
-      locationName = widget.location;
-    }
+    // String locationName = '';
+    // if(widget.location is Location){
+    //   locationName = widget.location.name;
+    // }else{
+    //   locationName = widget.location;
+    // }
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Expanded(
-          child: Text(locationName, style: Theme
-              .of(context)
-              .textTheme
-              .titleLarge, ),
-        ),
+        // Expanded(
+        //   child: Text(locationName, style: Theme
+        //       .of(context)
+        //       .textTheme
+        //       .titleLarge, ),
+        // ),
         widget.technic?.number == 0 ? SizedBox() :
         TextButton(
           onPressed: (){
@@ -227,6 +228,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   Widget _searchTechnic(String nameSearching){
     return Text('Поиск по: $nameSearching', style: TextStyle(color: Colors.black));
+  }
+
+  Widget _buySupplies(String nameSupplies){
+    return Text('Покупка $nameSupplies', style: TextStyle(color: Colors.black));
   }
 
   _repair(String message) {

@@ -10,6 +10,8 @@ import 'package:technical_support_artphoto/core/api/data/models/trouble_account_
 import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
+import 'package:technical_support_artphoto/features/supplies/models/model_supplies.dart';
+import 'package:technical_support_artphoto/features/supplies/models/supplies_entity.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
 import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
 import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
@@ -837,5 +839,112 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
           }
     }
     return list;
+  }
+
+  Future<ModelSupplies?> fetchSuppliesGarage() async{
+    var resultGarage = await _connDB!.execute('SELECT * FROM ХранениеСкладРасходМатериал ORDER BY id DESC LIMIT 1');
+    return suppliesListFromMap(resultGarage, 'склад');
+  }
+
+  Future<ModelSupplies?> fetchSuppliesOffice() async{
+    var resultOffice = await _connDB!.execute('SELECT * FROM ХранениеОфисРасходМатериал ORDER BY id DESC LIMIT 1');
+    return suppliesListFromMap(resultOffice, 'офис');
+  }
+
+  Future<void> insertSuppliesInDB(String nameSupplies, int count, ModelSupplies supplies) async {
+    String location = supplies.location;
+    List<SuppliesEntity> suppliesEntities = supplies.suppliesEntity;
+    await _connDB!.execute(
+        'INSERT INTO Хранение${location.firstSymbolUppercase()}РасходМатериал (Дата, ОфисБумага, КартКопир426, МатоваяА6, ГлянецА6, ГлянецА4, СамоклейкаА4, '
+            'ПленкаЛам, Файл, Конверты, КассоваяЛента, Cyan, LightCyan, Magenta, LightMagenta, Black, Yellow, ДатаПрихода, '
+            'ПриходОфисБумага, ПриходКартКопир426, ПриходМатоваяА6, ПриходГлянецА6, ПриходГлянецА4, ПриходСамоклейкаА4, '
+            'ПриходПленкаЛам, ПриходФайл, ПриходКонверты, ПриходКассоваяЛента, ПриходCyan, ПриходLightCyan, ПриходMagenta, '
+            'ПриходLightMagenta, ПриходBlack, ПриходYellow) '
+            'VALUES (:date, :officePaper, :kartKopir426, :matA6, :glossyA6, :glossyA4, :samokley, :lam, :multifora, :covers, '
+            ':kasTape, :cyan, :lightCyan, :magenta, :lightMagenta, :black, :yellow, :dateAdd, :officePaperAdd, :kartKopir426Add, '
+            ':matA6Add, :glossyA6Add, :glossyA4Add, :samokleyAdd, :lamAdd, :multiforaAdd, :coversAdd, :kasTapeAdd, '
+            ':cyanAdd, :lightCyanAdd, :magentaAdd, :lightMagentaAdd, :blackAdd, :yellowAdd)', {
+      'date': DateTime.now().dateFormattedForSQL(),
+      'officePaper': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+      'kartKopir426': suppliesEntities[1].count + (suppliesEntities[1].name == nameSupplies ? count : 0),
+      'matA6': suppliesEntities[2].count + (suppliesEntities[2].name == nameSupplies ? count : 0),
+      'glossyA6': suppliesEntities[3].count + (suppliesEntities[3].name == nameSupplies ? count : 0),
+      'glossyA4': suppliesEntities[4].count + (suppliesEntities[4].name == nameSupplies ? count : 0),
+      'samokley': suppliesEntities[5].count + (suppliesEntities[5].name == nameSupplies ? count : 0),
+      'lam': suppliesEntities[6].count + (suppliesEntities[6].name == nameSupplies ? count : 0),
+      'multifora': suppliesEntities[7].count + (suppliesEntities[7].name == nameSupplies ? count : 0),
+      'covers': suppliesEntities[8].count + (suppliesEntities[8].name == nameSupplies ? count : 0),
+      'kasTape': suppliesEntities[9].count + (suppliesEntities[9].name == nameSupplies ? count : 0),
+      'cyan': suppliesEntities[10].count + (suppliesEntities[10].name == nameSupplies ? count : 0),
+      'lightCyan': suppliesEntities[11].count + (suppliesEntities[11].name == nameSupplies ? count : 0),
+      'magenta': suppliesEntities[12].count + (suppliesEntities[12].name == nameSupplies ? count : 0),
+      'lightMagenta': suppliesEntities[13].count + (suppliesEntities[13].name == nameSupplies ? count : 0),
+      'black': suppliesEntities[14].count + (suppliesEntities[14].name == nameSupplies ? count : 0),
+      'yellow': suppliesEntities[15].count + (suppliesEntities[15].name == nameSupplies ? count : 0),
+      'dateAdd': DateTime.now().dateFormattedForSQL(),
+      'officePaperAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+      'kartKopir426Add': suppliesEntities[1].name == nameSupplies ? count : 0,
+      'matA6Add': suppliesEntities[2].name == nameSupplies ? count : 0,
+      'glossyA6Add': suppliesEntities[3].name == nameSupplies ? count : 0,
+      'glossyA4Add': suppliesEntities[4].name == nameSupplies ? count : 0,
+      'samokleyAdd': suppliesEntities[5].name == nameSupplies ? count : 0,
+      'lamAdd': suppliesEntities[6].name == nameSupplies ? count : 0,
+      'multiforaAdd': suppliesEntities[7].name == nameSupplies ? count : 0,
+      'coversAdd': suppliesEntities[8].name == nameSupplies ? count : 0,
+      'kasTapeAdd': suppliesEntities[9].name == nameSupplies ? count : 0,
+      'cyanAdd': suppliesEntities[10].name == nameSupplies ? count : 0,
+      'lightCyanAdd': suppliesEntities[11].name == nameSupplies ? count : 0,
+      'magentaAdd': suppliesEntities[12].name == nameSupplies ? count : 0,
+      'lightMagentaAdd': suppliesEntities[13].name == nameSupplies ? count : 0,
+      'blackAdd': suppliesEntities[14].name == nameSupplies ? count : 0,
+      'yellowAdd': suppliesEntities[15].name == nameSupplies ? count : 0,
+    });
+  }
+
+  ModelSupplies? suppliesListFromMap(IResultSet result, String location) {
+    // id-row[0], Дата-row[1],  ОфисБумага-row[2],  КартКопир426-row[3], КартКопир521-row[4], МатоваяА6-row[5],
+    // ГлянецА6-row[6], ГлянецА4-row[7],  СамоклейкаА4-row[8], ПленкаЛам-row[9], Файл-row[10],
+    // Конверты-row[11], КассоваяЛента-row[12],
+
+    // КРАСКА
+    // Cyan-row[13], LightCyan-row[14], Magenta-row[15], LightMagenta-row[16], Black-row[17], Yellow-row[18]
+    if (result.rows.isNotEmpty) {
+      for (final row in result.rows) {
+        List<SuppliesEntity> suppliesEntity = [];
+        int index = 0;
+        for(final element in row.assoc().entries){
+          if(index < 2 || index == 4) {
+            index++;
+            continue;
+          }
+          if(index > 18) break;
+          SuppliesEntity entity = SuppliesEntity(element.key, int.tryParse(element.value) ?? 0);
+          suppliesEntity.add(entity);
+          index++;
+        }
+        // Map<String, int> map = {
+        //   'ОфисБумага': int.tryParse(row.colAt(2)) ?? 0,
+        //   'КартКопир426': int.tryParse(row.colAt(3)) ?? 0,
+        //   'МатоваяА6': int.tryParse(row.colAt(5)) ?? 0,
+        //   'ГлянецА6': int.tryParse(row.colAt(6)) ?? 0,
+        //   'ГлянецА4': int.tryParse(row.colAt(7)) ?? 0,
+        //   'СамоклейкаА4': int.tryParse(row.colAt(8)) ?? 0,
+        //   'ПленкаЛам': int.tryParse(row.colAt(9)) ?? 0,
+        //   'Файл': int.tryParse(row.colAt(10)) ?? 0,
+        //   'Конверты': int.tryParse(row.colAt(11)) ?? 0,
+        //   'КассоваяЛента': int.tryParse(row.colAt(12)) ?? 0,
+        //   'Cyan': int.tryParse(row.colAt(13)) ?? 0,
+        //   'LightCyan': int.tryParse(row.colAt(14)) ?? 0,
+        //   'Magenta': int.tryParse(row.colAt(15)) ?? 0,
+        //   'LightMagenta': int.tryParse(row.colAt(16)) ?? 0,
+        //   'Black': int.tryParse(row.colAt(17)) ?? 0,
+        //   'Yellow': int.tryParse(row.colAt(18)) ?? 0,
+        // };
+        ModelSupplies modelSupplies = ModelSupplies(location, suppliesEntity);
+        modelSupplies.id = int.tryParse(row.colAt(0));
+        return modelSupplies;
+      }
+    }
+    return null;
   }
 }

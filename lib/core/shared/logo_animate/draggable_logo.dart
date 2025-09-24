@@ -41,9 +41,9 @@ class _DraggableLogoState extends State<DraggableLogo>
     final unitVelocity = unitsPerSecond.distance;
 
     const spring = SpringDescription(
-      mass: 30,
-      stiffness: 1,
-      damping: 1,
+      mass: 1,
+      stiffness: 1000,
+      damping: 15,
     );
 
     final simulation = SpringSimulation(spring, 0, 1, -unitVelocity);

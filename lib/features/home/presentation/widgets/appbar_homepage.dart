@@ -11,7 +11,7 @@ import '../../../../core/api/provider/provider_model.dart';
 import '../../../../core/navigation/animation_navigation.dart';
 import '../../../auth/presentation/page/authorization.dart';
 
-class AppBarHomepage extends StatefulWidget  implements PreferredSizeWidget{
+class AppBarHomepage extends StatefulWidget implements PreferredSizeWidget{
   const AppBarHomepage({super.key});
 
   @override
@@ -76,6 +76,11 @@ class _AppBarHomepageState extends State<AppBarHomepage> {
       ),
       actions: [
         PopupMenuHomePage(),
+        /// TODO: count notifications
+        // Center(child: Padding(
+        //   padding: const EdgeInsets.only(right: 20.0),
+        //   child: Text(providerModel.totalNotifications.toString(), style: TextStyle(fontSize: 25),),
+        // )),
       ],
     );
   }

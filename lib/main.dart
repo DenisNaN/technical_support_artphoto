@@ -14,6 +14,9 @@ import 'package:technical_support_artphoto/core/api/provider/provider_model.dart
 import 'package:technical_support_artphoto/core/di/init_dependencies.dart';
 import 'package:technical_support_artphoto/core/navigation/main_bottom_page_view.dart';
 import 'package:technical_support_artphoto/core/shared/failed_application/send_mail_failed_app.dart';
+import 'package:technical_support_artphoto/features/home/presentation/page/home_page.dart';
+import 'package:technical_support_artphoto/features/notifications/models/push_notifications.dart';
+import 'package:technical_support_artphoto/features/notifications/presentation/widgets/notification_badge.dart';
 import 'package:technical_support_artphoto/features/splash_screen/presentation/page/splash_screen.dart';
 import 'core/navigation/main_bottom_app_bar.dart';
 
@@ -104,17 +107,123 @@ class ArtphotoTech extends StatefulWidget {
 
 class _ArtphotoTechState extends State<ArtphotoTech> {
   late PageController pageViewController;
+  late int _totalNotifications;
+  late final FirebaseMessaging _messaging;
+  PushNotification? _notificationInfo;
 
   @override
   void initState() {
     super.initState();
     pageViewController = PageController(initialPage: widget.indexPage);
+    _totalNotifications = 0;
+    registerNotification();
+
+    checkForInitialMessage();
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      PushNotification notification = PushNotification(
+        title: message.notification?.title,
+        body: message.notification?.body,
+      );
+      setState(() {
+        _notificationInfo = notification;
+        _totalNotifications++;
+      });
+
+      _handleMessage(message);
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
     pageViewController.dispose();
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    Navigator.push(context, MaterialPageRoute(
+        builder: (context) => HomePage()));
+  }
+
+  checkForInitialMessage() async {
+    await Firebase.initializeApp();
+    RemoteMessage? initialMessage =
+    await FirebaseMessaging.instance.getInitialMessage();
+
+    if (initialMessage != null) {
+      PushNotification notification = PushNotification(
+        title: initialMessage.notification?.title,
+        body: initialMessage.notification?.body,
+      );
+      setState(() {
+        _notificationInfo = notification;
+        _totalNotifications++;
+      });
+    }
+  }
+
+  void registerNotification() async {
+    // 1. Initialize the Firebase app
+    await Firebase.initializeApp();
+
+    // 2. Instantiate Firebase Messaging
+    _messaging = FirebaseMessaging.instance;
+
+    // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // print('TOKEN - ${await _messaging.getToken()}');
+
+    // 3. On iOS, this helps to take the user permissions
+    NotificationSettings settings = await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      provisional: false,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+      // TODO: handle the received notifications
+    } else {
+      print('User declined or has not accepted permission');
+    }
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+
+      // For handling the received notifications
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        // Parse the message received
+        PushNotification notification = PushNotification(
+          title: message.notification?.title,
+          body: message.notification?.body,
+        );
+
+        setState(() {
+          _notificationInfo = notification;
+          _totalNotifications++;
+        });
+      });
+    } else {
+      print('User declined or has not accepted permission');
+    }
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        // ...
+        if (_notificationInfo != null) {
+          // For displaying the notification as an overlay
+          showSimpleNotification(
+            Text(_notificationInfo!.title!),
+            leading: NotificationBadge(totalNotifications: _totalNotifications),
+            subtitle: Text(_notificationInfo!.body!),
+            background: Colors.cyan.shade700,
+            duration: Duration(seconds: 2),
+          );
+        }
+      });
+    } else {
+      print('User declined or has not accepted permission');
+    }
   }
 
   @override

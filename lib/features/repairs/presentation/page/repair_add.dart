@@ -574,29 +574,30 @@ class _RepairAddState extends State<RepairAdd> {
   //   return result;
   // }
 
-  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText, GlobalKey<ScaffoldState> scaffoldKey) {
-    final contextViewSnackBar = scaffoldKey.currentContext;
-    if(contextViewSnackBar != null && contextViewSnackBar.mounted){
-      ScaffoldMessenger.of(contextViewSnackBar).hideCurrentSnackBar();
-      ScaffoldMessenger.of(contextViewSnackBar).showSnackBar(
-        SnackBar(
-          content: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
-              SizedBox(
-                width: 20,
-              ),
-              Flexible(child: Text(isSuccessful ? successText : notSuccessText)),
-            ],
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successText,
+      String notSuccessText, GlobalKey<ScaffoldState> scaffoldKey) {
+      final contextViewSnackBar = scaffoldKey.currentContext;
+      if(contextViewSnackBar != null && contextViewSnackBar.mounted){
+        ScaffoldMessenger.of(contextViewSnackBar).hideCurrentSnackBar();
+        ScaffoldMessenger.of(contextViewSnackBar).showSnackBar(
+          SnackBar(
+            content: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+                SizedBox(
+                  width: 20,
+                ),
+                Flexible(child: Text(isSuccessful ? successText : notSuccessText)),
+              ],
+            ),
+            duration: const Duration(seconds: 5),
+            showCloseIcon: true,
           ),
-          duration: const Duration(seconds: 5),
-          showCloseIcon: true,
-        ),
-      );
-      Navigator.pushAndRemoveUntil(
-          context, animationRouteSlideTransition(const ArtphotoTech(indexPage: 1,)), (Route<dynamic> route) => false);
-    }
+        );
+        Navigator.pushAndRemoveUntil(
+            context, animationRouteSlideTransition(const ArtphotoTech(indexPage: 1,)), (Route<dynamic> route) => false);
+      }
     }
 }
 
