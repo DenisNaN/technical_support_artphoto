@@ -5,7 +5,6 @@ import 'package:technical_support_artphoto/core/navigation/animation_navigation.
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/supplies/models/supplies_entity.dart';
 import 'package:technical_support_artphoto/features/supplies/presentation/pages/buy_supplies.dart';
-import '../../models/model_supplies.dart';
 
 class GridViewSuppliesPaper extends StatelessWidget {
   final Color color;

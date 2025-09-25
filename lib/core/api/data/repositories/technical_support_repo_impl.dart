@@ -12,8 +12,7 @@ import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/domain/repositories/technical_support_repo.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/supplies/models/model_supplies.dart';
-import 'package:technical_support_artphoto/features/supplies/presentation/pages/supplies.dart';
-import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
+import 'package:technical_support_artphoto/features/technics/models/history_technic.dart';
 import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 
@@ -279,6 +278,19 @@ class TechnicalSupportRepoImpl implements TechnicalSupportRepo{
       return repairs;
     }
     return repairs;
+  }
+
+  @override
+  Future<List<Technic>> getTechnicsFinishedRepairsByRepairman(String nameRepair) async{
+    List<Technic> technics = [];
+    try{
+      await ConnectDbMySQL.connDB.connDatabase();
+      technics.addAll(await ConnectDbMySQL.connDB.fetchTechnicFinishedRepairsByRepairman(nameRepair));
+      return technics.reversed.toList();
+    }catch(e){
+      debugPrint(e.toString());
+      return technics;
+    }
   }
 
   @override

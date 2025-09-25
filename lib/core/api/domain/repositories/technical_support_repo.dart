@@ -1,7 +1,6 @@
 import 'package:technical_support_artphoto/core/api/data/models/free_number_for_technic.dart';
 import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
 import 'package:technical_support_artphoto/features/supplies/models/model_supplies.dart';
-import 'package:technical_support_artphoto/features/supplies/presentation/pages/supplies.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
@@ -30,6 +29,7 @@ abstract interface class TechnicalSupportRepo {
   Future<DecommissionedLocation> getTechnicsDecommissioned();
 
   Future<List<Repair>> getFinishedRepairs();
+  Future<List<Technic>> getTechnicsFinishedRepairsByRepairman(String nameRepair);
   Future<Repair?> getRepair(int id);
   Future<List<Repair>?> saveRepair(Repair repair);
   Future<List<Repair>?> updateRepair(Repair repair, bool isStepOne);

@@ -5,7 +5,7 @@ import 'package:technical_support_artphoto/core/api/data/models/repair_location.
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/transportation_location.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
-import 'package:technical_support_artphoto/features/technics/data/models/grid_view_technics_model.dart';
+import 'package:technical_support_artphoto/features/technics/models/grid_view_technics_model.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';

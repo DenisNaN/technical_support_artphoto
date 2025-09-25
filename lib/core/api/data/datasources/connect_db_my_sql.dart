@@ -12,8 +12,8 @@ import 'package:technical_support_artphoto/features/repairs/models/repair.dart';
 import 'package:technical_support_artphoto/features/repairs/models/summ_repair.dart';
 import 'package:technical_support_artphoto/features/supplies/models/model_supplies.dart';
 import 'package:technical_support_artphoto/features/supplies/models/supplies_entity.dart';
-import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
-import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
+import 'package:technical_support_artphoto/features/technics/models/history_technic.dart';
+import 'package:technical_support_artphoto/features/technics/models/trouble_technic_on_period.dart';
 import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../models/decommissioned.dart';
@@ -28,12 +28,12 @@ class ConnectDbMySQL {
 
   Future connDatabase() async {
     _connDB ??= await _init();
-    if(_connDB != null && !_connDB!.connected){
+    if (_connDB != null && !_connDB!.connected) {
       try {
         await _connDB!.connect();
         debugPrint('New connection number - $countConnection');
         countConnection++;
-      } on MySQLClientException catch(_){
+      } on MySQLClientException catch (_) {
         _connDB = await _init();
         await _connDB!.connect();
         debugPrint('New connection number - $countConnection');
@@ -58,7 +58,8 @@ class ConnectDbMySQL {
   }
 
   Future<IResultSet?> fetchAccessLevel(String password) async {
-    return await _connDB!.execute('SELECT login, access FROM users WHERE password = :password', {'password': password});
+    return await _connDB!.execute(
+        'SELECT login, access FROM users WHERE password = :password', {'password': password});
   }
 
   Future<IResultSet?> fetchUsers() async {
@@ -90,7 +91,7 @@ class ConnectDbMySQL {
         for (final row in result.rows) {
           Technic technic = technicFromMap(row);
           TestDrive? testDrive = await fetchTestDrive(technic.id.toString());
-          if(testDrive != null) technic.testDrive = testDrive;
+          if (testDrive != null) technic.testDrive = testDrive;
           photosalon.technics.add(technic);
         }
       }
@@ -101,15 +102,15 @@ class ConnectDbMySQL {
 
   Technic technicFromMap(ResultSetRow row) {
     return Technic(
-      int.parse(row.colAt(0)),
-      int.parse(row.colAt(1)),
-      row.colAt(2),
-      row.colAt(3),
-      row.colAt(4),
-      row.colAt(5),
-      row.colAt(6).toString().dateFormattedFromSQL(),
-      int.parse(row.colAt(7)),
-      row.colAt(8));
+        int.parse(row.colAt(0)),
+        int.parse(row.colAt(1)),
+        row.colAt(2),
+        row.colAt(3),
+        row.colAt(4),
+        row.colAt(5),
+        row.colAt(6).toString().dateFormattedFromSQL(),
+        int.parse(row.colAt(7)),
+        row.colAt(8));
   }
 
   Future<Map<String, RepairLocation>> fetchTechnicsInRepairs() async {
@@ -136,8 +137,8 @@ class ConnectDbMySQL {
         for (final row in result.rows) {
           Technic technic = technicFromMap(row);
           TestDrive? testDrive = await fetchTestDrive(technic.id.toString());
-          if(testDrive != null) technic.testDrive = testDrive;
-          if(technic.status == 'В ремонте'){
+          if (testDrive != null) technic.testDrive = testDrive;
+          if (technic.status == 'В ремонте') {
             repair.technics.add(technic);
           }
         }
@@ -171,7 +172,7 @@ class ConnectDbMySQL {
         for (final row in result.rows) {
           Technic technic = technicFromMap(row);
           TestDrive? testDrive = await fetchTestDrive(technic.id.toString());
-          if(testDrive != null) technic.testDrive = testDrive;
+          if (testDrive != null) technic.testDrive = testDrive;
           storage.technics.add(technic);
         }
       }
@@ -210,8 +211,8 @@ class ConnectDbMySQL {
         for (final row in result.rows) {
           Technic technic = technicFromMap(row);
           TestDrive? testDrive = await fetchTestDrive(technic.id.toString());
-          if(testDrive != null) technic.testDrive = testDrive;
-          if(technic.status == 'Транспортировка'){
+          if (testDrive != null) technic.testDrive = testDrive;
+          if (technic.status == 'Транспортировка') {
             transportationLocation.technics.add(technic);
           }
         }
@@ -221,7 +222,7 @@ class ConnectDbMySQL {
     return transportations;
   }
 
-  Future<DecommissionedLocation> fetchTechnicsDecommissioned () async {
+  Future<DecommissionedLocation> fetchTechnicsDecommissioned() async {
     DecommissionedLocation decommissionedTechnics = DecommissionedLocation('Списанная техника');
     String query = 'SELECT equipment.id, '
         'equipment.number, '
@@ -241,7 +242,7 @@ class ConnectDbMySQL {
       for (final row in result.rows) {
         Technic technic = technicFromMap(row);
         TestDrive? testDrive = await fetchTestDrive(technic.id.toString());
-        if(testDrive != null) technic.testDrive = testDrive;
+        if (testDrive != null) technic.testDrive = testDrive;
         decommissionedTechnics.technics.add(technic);
       }
     }
@@ -281,14 +282,16 @@ class ConnectDbMySQL {
   }
 
   Future<bool> checkNumberTechnic(String number) async {
-    var result = await _connDB!.execute('SELECT 1 FROM equipment WHERE number = :number', {'number': number});
+    var result = await _connDB!
+        .execute('SELECT 1 FROM equipment WHERE number = :number', {'number': number});
     return result.rows.isEmpty;
   }
 
   Future<int> insertTechnicInDB(Technic technic, String nameUser) async {
     await _connDB!.execute(
         'INSERT INTO equipment (number, category, name, dateBuy, cost, comment, user) '
-            'VALUES (:number, :category , :name, :dateBuy, :cost, :comment, :user)', {
+        'VALUES (:number, :category , :name, :dateBuy, :cost, :comment, :user)',
+        {
           'number': technic.number,
           'category': technic.category,
           'name': technic.name,
@@ -306,19 +309,24 @@ class ConnectDbMySQL {
   Future insertStatusInDB(int id, String status, String dislocation, String nameUser) async {
     await _connDB!.execute(
         'INSERT INTO statusEquipment (idEquipment, status, dislocation, date, user) VALUES '
-            '(:idEquipment, :status, :dislocation, :date, :user)',
-        {'idEquipment': id, 'status': status, 'dislocation': dislocation,
-          'date': DateTime.now().dateFormattedForSQL(), 'user': nameUser});
+        '(:idEquipment, :status, :dislocation, :date, :user)',
+        {
+          'idEquipment': id,
+          'status': status,
+          'dislocation': dislocation,
+          'date': DateTime.now().dateFormattedForSQL(),
+          'user': nameUser
+        });
   }
 
   Future<int> insertTestDriveInDB(TestDrive testDrive) async {
     int closeTestDrive = 0;
-    if(testDrive.isCloseTestDrive) closeTestDrive = 1;
+    if (testDrive.isCloseTestDrive) closeTestDrive = 1;
     await _connDB!.execute(
         'INSERT INTO test_drive (idEquipment, category, testDriveDislocation, dateStart, dateFinish, result, '
         'checkEquipment, user) VALUES '
-            '(:idEquipment, :category, :testDriveDislocation, :dateStart, :dateFinish, '
-            ':result, :checkEquipment, :user)',
+        '(:idEquipment, :category, :testDriveDislocation, :dateStart, :dateFinish, '
+        ':result, :checkEquipment, :user)',
         {
           'idEquipment': testDrive.idTechnic.toString(),
           'category': testDrive.categoryTechnic,
@@ -334,14 +342,14 @@ class ConnectDbMySQL {
     return id;
   }
 
-  Future updateTestDriveInDB(TestDrive testDrive) async{
+  Future updateTestDriveInDB(TestDrive testDrive) async {
     int checkBox = 0;
-    if(testDrive.isCloseTestDrive) checkBox = 1;
+    if (testDrive.isCloseTestDrive) checkBox = 1;
 
     await _connDB!.execute(
-      'UPDATE test_drive SET testDriveDislocation = :testDriveDislocation, '
-          'dateStart = :dateStart, dateFinish = :dateFinish, '
-          'result = :result, checkEquipment = :checkEquipment WHERE id = :id',
+        'UPDATE test_drive SET testDriveDislocation = :testDriveDislocation, '
+        'dateStart = :dateStart, dateFinish = :dateFinish, '
+        'result = :result, checkEquipment = :checkEquipment WHERE id = :id',
         {
           'testDriveDislocation': testDrive.dislocationTechnic,
           'dateStart': testDrive.dateStart.dateFormattedForSQL(),
@@ -354,9 +362,10 @@ class ConnectDbMySQL {
 
   Future<TestDrive?> fetchTestDrive(String id) async {
     TestDrive? testDrive;
-    var result =
-        await _connDB!.execute('SELECT * FROM test_drive WHERE idEquipment = :idEquipment '
-            'ORDER BY id DESC LIMIT 1', {'idEquipment': id});
+    var result = await _connDB!.execute(
+        'SELECT * FROM test_drive WHERE idEquipment = :idEquipment '
+        'ORDER BY id DESC LIMIT 1',
+        {'idEquipment': id});
     if (result.isNotEmpty) {
       testDrive = testDriveFromMap(result);
     }
@@ -443,30 +452,30 @@ class ConnectDbMySQL {
     return accountMailRu;
   }
 
-Future<Technic?> getTechnic(int number) async {
-  Technic? technic;
-  String query = 'SELECT '
-      'equipment.id, '
-      'equipment.number, '
-      'equipment.category, '
-      'equipment.name, '
-      's.status, '
-      's.dislocation, '
-      'equipment.dateBuy, '
-      'equipment.cost, '
-      'equipment.comment '
-      'FROM equipment '
-      'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
-      'WHERE equipment.number = :number '
-      'ORDER BY equipment.number ASC';
-  var result = await _connDB!.execute(query, {'number': number});
-  if (result.isNotEmpty) {
-    for (final row in result.rows) {
+  Future<Technic?> getTechnic(int number) async {
+    Technic? technic;
+    String query = 'SELECT '
+        'equipment.id, '
+        'equipment.number, '
+        'equipment.category, '
+        'equipment.name, '
+        's.status, '
+        's.dislocation, '
+        'equipment.dateBuy, '
+        'equipment.cost, '
+        'equipment.comment '
+        'FROM equipment '
+        'LEFT JOIN (SELECT * FROM statusEquipment s1 WHERE NOT EXISTS (SELECT 1 FROM statusEquipment s2 WHERE s2.id > s1.id AND s2.idEquipment = s1.idEquipment)) s ON s.idEquipment = equipment.id '
+        'WHERE equipment.number = :number '
+        'ORDER BY equipment.number ASC';
+    var result = await _connDB!.execute(query, {'number': number});
+    if (result.isNotEmpty) {
+      for (final row in result.rows) {
         technic = technicFromMap(row);
       }
+    }
+    return technic;
   }
-  return technic;
-}
 
   Future<List<Repair>> fetchCurrentRepairs() async {
     var result = await _connDB!.execute('SELECT * FROM repairEquipment '
@@ -482,10 +491,28 @@ Future<Technic?> getTechnic(int number) async {
     return list;
   }
 
+  Future<List<Technic>> fetchTechnicFinishedRepairsByRepairman(String nameRepair) async {
+    final List<Technic> list = [];
+
+    var result1 = await _connDB!.execute(
+        'SELECT number FROM repairEquipment WHERE serviceDislocation = :nameRepair',
+        {'nameRepair': nameRepair});
+    for (final row in result1.rows) {
+      try {
+        Technic? technic = await getTechnic(int.parse(row.colAt(0)));
+        if (technic != null) {
+          list.add(technic);
+        }
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    }
+    return list;
+  }
+
   Future<Repair?> fetchRepair(int id) async {
     Repair? repair;
-    var result = await _connDB!.execute('SELECT * FROM repairEquipment WHERE id = :id',
-        {'id': id});
+    var result = await _connDB!.execute('SELECT * FROM repairEquipment WHERE id = :id', {'id': id});
     if (result.isNotEmpty) {
       for (final row in result.rows) {
         // id-row[0], number-row[1],  number-row[1], category-row[2], dislocationOld-row[3], status-row[4],
@@ -547,9 +574,9 @@ Future<Technic?> getTechnic(int number) async {
     List<Repair> list = [];
     if (result.isNotEmpty) {
       for (final row in result.rows) {
-            Repair repair = repairFullFromMap(row);
-            list.add(repair);
-          }
+        Repair repair = repairFullFromMap(row);
+        list.add(repair);
+      }
     }
     return list;
   }
@@ -586,24 +613,26 @@ Future<Technic?> getTechnic(int number) async {
         'WHERE idEquipment = (SELECT id FROM equipment WHERE number = :number)';
     var result1 = await _connDB!.execute(query1, {'number': numberTechnic});
     for (final row in result1.rows) {
-      HistoryTechnic historyTechnic = HistoryTechnic(id: int.parse(row.colAt(0)),
+      HistoryTechnic historyTechnic = HistoryTechnic(
+          id: int.parse(row.colAt(0)),
           date: row.colAt(1).toString().dateFormattedFromSQL(),
           location: PhotosalonLocation(row.colAt(2)));
       historyTechnics.add(historyTechnic);
     }
     historyTechnics.sort();
 
-    String query3 = 'SELECT id, ДатаНеисправности, Фотосалон, Сотрудник, Неисправность, СотрПодтверУстр, ИнженерПодтверУстр FROM Неисправности '
+    String query3 =
+        'SELECT id, ДатаНеисправности, Фотосалон, Сотрудник, Неисправность, СотрПодтверУстр, ИнженерПодтверУстр FROM Неисправности '
         'WHERE НомерТехники = :number';
     var result3 = await _connDB!.execute(query3, {'number': numberTechnic});
     for (final row in result3.rows) {
-      TroubleTechnicOnPeriod troubleTechnicOnPeriod =
-          TroubleTechnicOnPeriod(id: int.parse(row.colAt(0)),
-              date: row.colAt(1).toString().dateFormattedFromSQL(),
-              location: PhotosalonLocation(row.colAt(2)));
+      TroubleTechnicOnPeriod troubleTechnicOnPeriod = TroubleTechnicOnPeriod(
+          id: int.parse(row.colAt(0)),
+          date: row.colAt(1).toString().dateFormattedFromSQL(),
+          location: PhotosalonLocation(row.colAt(2)));
       troubleTechnicOnPeriod.employee = row.colAt(3);
       troubleTechnicOnPeriod.trouble = row.colAt(4).toString();
-      if(row.colAt(5) == '' || row.colAt(6) == ''){
+      if (row.colAt(5) == '' || row.colAt(6) == '') {
         troubleTechnicOnPeriod.isTroubleClosed = false;
       }
 
@@ -630,7 +659,8 @@ Future<Technic?> getTechnic(int number) async {
         'WHERE number = :number';
     var result2 = await _connDB!.execute(query2, {'number': numberTechnic});
     for (final row in result2.rows) {
-      HistoryTechnic historyTechnic = HistoryTechnic(id: int.parse(row.colAt(0)),
+      HistoryTechnic historyTechnic = HistoryTechnic(
+          id: int.parse(row.colAt(0)),
           date: row.colAt(1).toString().dateFormattedFromSQL(),
           location: RepairLocation(row.colAt(2)));
       historyTechnic.dateDepartureFromService = row.colAt(3).toString().dateFormattedFromSQL();
@@ -664,9 +694,10 @@ Future<Technic?> getTechnic(int number) async {
 // }
 
   Future<void> updateTechnicInDB(Technic technic) async {
-    await _connDB!
-        .execute('UPDATE equipment SET name = :name, dateBuy = :dateBuy, cost = :cost, '
-        'comment = :comment WHERE id = :id', {
+    await _connDB!.execute(
+        'UPDATE equipment SET name = :name, dateBuy = :dateBuy, cost = :cost, '
+        'comment = :comment WHERE id = :id',
+        {
           'name': technic.name,
           'dateBuy': technic.dateBuyTechnic.dateFormattedForSQL(),
           'cost': technic.cost,
@@ -675,7 +706,7 @@ Future<Technic?> getTechnic(int number) async {
         });
   }
 
-Future<void> insertRepairInDB(Repair repair) async{
+  Future<void> insertRepairInDB(Repair repair) async {
     String str = 'INSERT INTO repairEquipment '
         '(number, '
         'category, '
@@ -687,7 +718,7 @@ Future<void> insertRepairInDB(Repair repair) async{
         'idTrouble) '
         'VALUES (:number, :category, :dislocationOld, :status, :complaint, :dateDeparture, '
         ':whoTook, :idTrouble)';
-  await _connDB!.execute(str, {
+    await _connDB!.execute(str, {
       'number': repair.numberTechnic,
       'category': repair.category,
       'dislocationOld': repair.dislocationOld,
@@ -697,23 +728,23 @@ Future<void> insertRepairInDB(Repair repair) async{
       'whoTook': repair.whoTook,
       'idTrouble': repair.idTrouble.toString()
     });
-}
+  }
 
-Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
-  await _connDB!.execute(
-      'UPDATE repairEquipment SET '
-          'serviceDislocation = :serviceDislocation, '
-          'dateTransferInService = :dateTransferInService, '
-          'dateDepartureFromService = :dateDepartureFromService, '
-          'worksPerformed = :worksPerformed, '
-          'costService = :costService, '
-          'diagnosisService = :diagnosisService, '
-          'recommendationsNotes = :recommendationsNotes, '
-          'newStatus = :newStatus, '
-          'newDislocation = :newDislocation, '
-          'dateReceipt = :dateReceipt '
-          'WHERE id = :id',
-      {
+  Future updateRepairInDBStepsTwoAndThree(Repair repair) async {
+    await _connDB!.execute(
+        'UPDATE repairEquipment SET '
+        'serviceDislocation = :serviceDislocation, '
+        'dateTransferInService = :dateTransferInService, '
+        'dateDepartureFromService = :dateDepartureFromService, '
+        'worksPerformed = :worksPerformed, '
+        'costService = :costService, '
+        'diagnosisService = :diagnosisService, '
+        'recommendationsNotes = :recommendationsNotes, '
+        'newStatus = :newStatus, '
+        'newDislocation = :newDislocation, '
+        'dateReceipt = :dateReceipt '
+        'WHERE id = :id',
+        {
           'serviceDislocation': repair.serviceDislocation,
           'dateTransferInService': repair.dateTransferInService?.dateFormattedForSQL() ?? '',
           'dateDepartureFromService': repair.dateDepartureFromService?.dateFormattedForSQL() ?? '',
@@ -726,18 +757,18 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
           'dateReceipt': repair.dateReceipt?.dateFormattedForSQL() ?? '',
           'id': repair.id
         });
-}
+  }
 
-  Future updateRepairInDBStepOne(Repair repair) async{
+  Future updateRepairInDBStepOne(Repair repair) async {
     await _connDB!.execute(
         'UPDATE repairEquipment SET '
-            'category = :category, '
-            'dislocationOld = :dislocationOld, '
-            'status = :status, '
-            'complaint = :complaint, '
-            'dateDeparture = :dateDeparture, '
-            'whoTook = :whoTook '
-            'WHERE id = :id',
+        'category = :category, '
+        'dislocationOld = :dislocationOld, '
+        'status = :status, '
+        'complaint = :complaint, '
+        'dateDeparture = :dateDeparture, '
+        'whoTook = :whoTook '
+        'WHERE id = :id',
         {
           'category': repair.category,
           'dislocationOld': repair.dislocationOld,
@@ -749,12 +780,13 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
         });
   }
 
-  Future deleteRepairInDB(String id) async{
+  Future deleteRepairInDB(String id) async {
     await _connDB!.execute('DELETE FROM repairEquipment WHERE id = :id', {'id': id});
   }
 
-  Future<List<Trouble>> fetchTroubles() async{
-    var result = await _connDB!.execute('SELECT * FROM Неисправности WHERE СотрПодтверУстр = "" OR ИнженерПодтверУстр = ""');
+  Future<List<Trouble>> fetchTroubles() async {
+    var result = await _connDB!.execute(
+        'SELECT * FROM Неисправности WHERE СотрПодтверУстр = "" OR ИнженерПодтверУстр = ""');
 
     var list = troubleListFromMap(result);
     List<Trouble> reversedList = List.from(list.reversed);
@@ -768,7 +800,7 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
     return list;
   }
 
-  Future<void> insertTroubleInDB(Trouble trouble) async{
+  Future<void> insertTroubleInDB(Trouble trouble) async {
     var stmt = await _connDB!.prepare('INSERT INTO Неисправности '
         '(Фотосалон, ДатаНеисправности, Сотрудник, НомерТехники, Неисправность, Фотография) '
         'VALUES (?, ?, ?, ?, ?, ?)');
@@ -782,13 +814,13 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
     ]);
   }
 
-  Future updateTrouble(Trouble trouble) async{
-    var stmt = await _connDB!.prepare(
-      "UPDATE Неисправности SET Фотосалон = ?, ДатаНеисправности = ?, Сотрудник = ?, "
-          "НомерТехники = ?, Неисправность = ?, ДатаУстрСотр = ?, СотрПодтверУстр = ?, "
-          "ДатаУстрИнженер = ?, ИнженерПодтверУстр = ?, Фотография = ? WHERE id = ?"
-    );
-    await stmt.execute([trouble.photosalon,
+  Future updateTrouble(Trouble trouble) async {
+    var stmt = await _connDB!
+        .prepare("UPDATE Неисправности SET Фотосалон = ?, ДатаНеисправности = ?, Сотрудник = ?, "
+            "НомерТехники = ?, Неисправность = ?, ДатаУстрСотр = ?, СотрПодтверУстр = ?, "
+            "ДатаУстрИнженер = ?, ИнженерПодтверУстр = ?, Фотография = ? WHERE id = ?");
+    await stmt.execute([
+      trouble.photosalon,
       trouble.dateTrouble.dateFormattedForSQL(),
       trouble.employee,
       trouble.numberTechnic.toString(),
@@ -798,10 +830,11 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
       trouble.dateFixTroubleEngineer?.dateFormattedForSQL() ?? '',
       trouble.fixTroubleEngineer ?? '',
       trouble.photoTrouble ?? '',
-      trouble.id]);
+      trouble.id
+    ]);
   }
 
-  Future deleteTroubleInDB(String id) async{
+  Future deleteTroubleInDB(String id) async {
     await _connDB!.execute('DELETE FROM Неисправности WHERE id = :id', {'id': id});
   }
 
@@ -815,39 +848,41 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
     List<Trouble> list = [];
     if (result.rows.isNotEmpty) {
       for (final row in result.rows) {
-            // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
-            // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
-            // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
-            Uint8List image = Uint8List(0);
-            if(row.colAt(10) != null){
-              image = Uint8List.fromList(row.colAt(10));
-            }
-            // Uint8List image = row.colAt(10);
-            Trouble trouble = Trouble(
-                id: int.parse(row.colAt(0)),
-                photosalon: row.colAt(1),
-                dateTrouble: row.colAt(2).toString().dateFormattedFromSQL(),
-                employee: row.colAt(3),
-                numberTechnic: int.parse(row.colAt(4)),
-                trouble: row.colAt(5));
-                trouble.dateFixTroubleEmployee = row.colAt(6).toString().dateFormattedFromSQL();
-                trouble.fixTroubleEmployee = row.colAt(7);
-                trouble.dateFixTroubleEngineer = row.colAt(8).toString().dateFormattedFromSQL();
-                trouble.fixTroubleEngineer = row.colAt(9);
-                trouble.photoTrouble = image;
-            list.add(trouble);
-          }
+        // id-row[0], photosalon-row[1],  dateTrouble-row[2],  employee-row[3], internalID-row[4], trouble-row[5],
+        // dateCheckFixTroubleEmployee-row[6], employeeCheckFixTrouble-row[7],  dateCheckFixTroubleEngineer-row[8],
+        // engineerCheckFixTrouble-row[9], photoTrouble-row[10]
+        Uint8List image = Uint8List(0);
+        if (row.colAt(10) != null) {
+          image = Uint8List.fromList(row.colAt(10));
+        }
+        // Uint8List image = row.colAt(10);
+        Trouble trouble = Trouble(
+            id: int.parse(row.colAt(0)),
+            photosalon: row.colAt(1),
+            dateTrouble: row.colAt(2).toString().dateFormattedFromSQL(),
+            employee: row.colAt(3),
+            numberTechnic: int.parse(row.colAt(4)),
+            trouble: row.colAt(5));
+        trouble.dateFixTroubleEmployee = row.colAt(6).toString().dateFormattedFromSQL();
+        trouble.fixTroubleEmployee = row.colAt(7);
+        trouble.dateFixTroubleEngineer = row.colAt(8).toString().dateFormattedFromSQL();
+        trouble.fixTroubleEngineer = row.colAt(9);
+        trouble.photoTrouble = image;
+        list.add(trouble);
+      }
     }
     return list;
   }
 
-  Future<ModelSupplies?> fetchSuppliesGarage() async{
-    var resultGarage = await _connDB!.execute('SELECT * FROM ХранениеСкладРасходМатериал ORDER BY id DESC LIMIT 1');
+  Future<ModelSupplies?> fetchSuppliesGarage() async {
+    var resultGarage = await _connDB!
+        .execute('SELECT * FROM ХранениеСкладРасходМатериал ORDER BY id DESC LIMIT 1');
     return suppliesListFromMap(resultGarage, 'склад');
   }
 
-  Future<ModelSupplies?> fetchSuppliesOffice() async{
-    var resultOffice = await _connDB!.execute('SELECT * FROM ХранениеОфисРасходМатериал ORDER BY id DESC LIMIT 1');
+  Future<ModelSupplies?> fetchSuppliesOffice() async {
+    var resultOffice =
+        await _connDB!.execute('SELECT * FROM ХранениеОфисРасходМатериал ORDER BY id DESC LIMIT 1');
     return suppliesListFromMap(resultOffice, 'офис');
   }
 
@@ -856,49 +891,65 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
     List<SuppliesEntity> suppliesEntities = supplies.suppliesEntity;
     await _connDB!.execute(
         'INSERT INTO Хранение${location.firstSymbolUppercase()}РасходМатериал (Дата, ОфисБумага, КартКопир426, МатоваяА6, ГлянецА6, ГлянецА4, СамоклейкаА4, '
-            'ПленкаЛам, Файл, Конверты, КассоваяЛента, Cyan, LightCyan, Magenta, LightMagenta, Black, Yellow, ДатаПрихода, '
-            'ПриходОфисБумага, ПриходКартКопир426, ПриходМатоваяА6, ПриходГлянецА6, ПриходГлянецА4, ПриходСамоклейкаА4, '
-            'ПриходПленкаЛам, ПриходФайл, ПриходКонверты, ПриходКассоваяЛента, ПриходCyan, ПриходLightCyan, ПриходMagenta, '
-            'ПриходLightMagenta, ПриходBlack, ПриходYellow) '
-            'VALUES (:date, :officePaper, :kartKopir426, :matA6, :glossyA6, :glossyA4, :samokley, :lam, :multifora, :covers, '
-            ':kasTape, :cyan, :lightCyan, :magenta, :lightMagenta, :black, :yellow, :dateAdd, :officePaperAdd, :kartKopir426Add, '
-            ':matA6Add, :glossyA6Add, :glossyA4Add, :samokleyAdd, :lamAdd, :multiforaAdd, :coversAdd, :kasTapeAdd, '
-            ':cyanAdd, :lightCyanAdd, :magentaAdd, :lightMagentaAdd, :blackAdd, :yellowAdd)', {
-      'date': DateTime.now().dateFormattedForSQL(),
-      'officePaper': suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
-      'kartKopir426': suppliesEntities[1].count + (suppliesEntities[1].name == nameSupplies ? count : 0),
-      'matA6': suppliesEntities[2].count + (suppliesEntities[2].name == nameSupplies ? count : 0),
-      'glossyA6': suppliesEntities[3].count + (suppliesEntities[3].name == nameSupplies ? count : 0),
-      'glossyA4': suppliesEntities[4].count + (suppliesEntities[4].name == nameSupplies ? count : 0),
-      'samokley': suppliesEntities[5].count + (suppliesEntities[5].name == nameSupplies ? count : 0),
-      'lam': suppliesEntities[6].count + (suppliesEntities[6].name == nameSupplies ? count : 0),
-      'multifora': suppliesEntities[7].count + (suppliesEntities[7].name == nameSupplies ? count : 0),
-      'covers': suppliesEntities[8].count + (suppliesEntities[8].name == nameSupplies ? count : 0),
-      'kasTape': suppliesEntities[9].count + (suppliesEntities[9].name == nameSupplies ? count : 0),
-      'cyan': suppliesEntities[10].count + (suppliesEntities[10].name == nameSupplies ? count : 0),
-      'lightCyan': suppliesEntities[11].count + (suppliesEntities[11].name == nameSupplies ? count : 0),
-      'magenta': suppliesEntities[12].count + (suppliesEntities[12].name == nameSupplies ? count : 0),
-      'lightMagenta': suppliesEntities[13].count + (suppliesEntities[13].name == nameSupplies ? count : 0),
-      'black': suppliesEntities[14].count + (suppliesEntities[14].name == nameSupplies ? count : 0),
-      'yellow': suppliesEntities[15].count + (suppliesEntities[15].name == nameSupplies ? count : 0),
-      'dateAdd': DateTime.now().dateFormattedForSQL(),
-      'officePaperAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
-      'kartKopir426Add': suppliesEntities[1].name == nameSupplies ? count : 0,
-      'matA6Add': suppliesEntities[2].name == nameSupplies ? count : 0,
-      'glossyA6Add': suppliesEntities[3].name == nameSupplies ? count : 0,
-      'glossyA4Add': suppliesEntities[4].name == nameSupplies ? count : 0,
-      'samokleyAdd': suppliesEntities[5].name == nameSupplies ? count : 0,
-      'lamAdd': suppliesEntities[6].name == nameSupplies ? count : 0,
-      'multiforaAdd': suppliesEntities[7].name == nameSupplies ? count : 0,
-      'coversAdd': suppliesEntities[8].name == nameSupplies ? count : 0,
-      'kasTapeAdd': suppliesEntities[9].name == nameSupplies ? count : 0,
-      'cyanAdd': suppliesEntities[10].name == nameSupplies ? count : 0,
-      'lightCyanAdd': suppliesEntities[11].name == nameSupplies ? count : 0,
-      'magentaAdd': suppliesEntities[12].name == nameSupplies ? count : 0,
-      'lightMagentaAdd': suppliesEntities[13].name == nameSupplies ? count : 0,
-      'blackAdd': suppliesEntities[14].name == nameSupplies ? count : 0,
-      'yellowAdd': suppliesEntities[15].name == nameSupplies ? count : 0,
-    });
+        'ПленкаЛам, Файл, Конверты, КассоваяЛента, Cyan, LightCyan, Magenta, LightMagenta, Black, Yellow, ДатаПрихода, '
+        'ПриходОфисБумага, ПриходКартКопир426, ПриходМатоваяА6, ПриходГлянецА6, ПриходГлянецА4, ПриходСамоклейкаА4, '
+        'ПриходПленкаЛам, ПриходФайл, ПриходКонверты, ПриходКассоваяЛента, ПриходCyan, ПриходLightCyan, ПриходMagenta, '
+        'ПриходLightMagenta, ПриходBlack, ПриходYellow) '
+        'VALUES (:date, :officePaper, :kartKopir426, :matA6, :glossyA6, :glossyA4, :samokley, :lam, :multifora, :covers, '
+        ':kasTape, :cyan, :lightCyan, :magenta, :lightMagenta, :black, :yellow, :dateAdd, :officePaperAdd, :kartKopir426Add, '
+        ':matA6Add, :glossyA6Add, :glossyA4Add, :samokleyAdd, :lamAdd, :multiforaAdd, :coversAdd, :kasTapeAdd, '
+        ':cyanAdd, :lightCyanAdd, :magentaAdd, :lightMagentaAdd, :blackAdd, :yellowAdd)',
+        {
+          'date': DateTime.now().dateFormattedForSQL(),
+          'officePaper':
+              suppliesEntities[0].count + (suppliesEntities[0].name == nameSupplies ? count : 0),
+          'kartKopir426':
+              suppliesEntities[1].count + (suppliesEntities[1].name == nameSupplies ? count : 0),
+          'matA6':
+              suppliesEntities[2].count + (suppliesEntities[2].name == nameSupplies ? count : 0),
+          'glossyA6':
+              suppliesEntities[3].count + (suppliesEntities[3].name == nameSupplies ? count : 0),
+          'glossyA4':
+              suppliesEntities[4].count + (suppliesEntities[4].name == nameSupplies ? count : 0),
+          'samokley':
+              suppliesEntities[5].count + (suppliesEntities[5].name == nameSupplies ? count : 0),
+          'lam': suppliesEntities[6].count + (suppliesEntities[6].name == nameSupplies ? count : 0),
+          'multifora':
+              suppliesEntities[7].count + (suppliesEntities[7].name == nameSupplies ? count : 0),
+          'covers':
+              suppliesEntities[8].count + (suppliesEntities[8].name == nameSupplies ? count : 0),
+          'kasTape':
+              suppliesEntities[9].count + (suppliesEntities[9].name == nameSupplies ? count : 0),
+          'cyan':
+              suppliesEntities[10].count + (suppliesEntities[10].name == nameSupplies ? count : 0),
+          'lightCyan':
+              suppliesEntities[11].count + (suppliesEntities[11].name == nameSupplies ? count : 0),
+          'magenta':
+              suppliesEntities[12].count + (suppliesEntities[12].name == nameSupplies ? count : 0),
+          'lightMagenta':
+              suppliesEntities[13].count + (suppliesEntities[13].name == nameSupplies ? count : 0),
+          'black':
+              suppliesEntities[14].count + (suppliesEntities[14].name == nameSupplies ? count : 0),
+          'yellow':
+              suppliesEntities[15].count + (suppliesEntities[15].name == nameSupplies ? count : 0),
+          'dateAdd': DateTime.now().dateFormattedForSQL(),
+          'officePaperAdd': suppliesEntities[0].name == nameSupplies ? count : 0,
+          'kartKopir426Add': suppliesEntities[1].name == nameSupplies ? count : 0,
+          'matA6Add': suppliesEntities[2].name == nameSupplies ? count : 0,
+          'glossyA6Add': suppliesEntities[3].name == nameSupplies ? count : 0,
+          'glossyA4Add': suppliesEntities[4].name == nameSupplies ? count : 0,
+          'samokleyAdd': suppliesEntities[5].name == nameSupplies ? count : 0,
+          'lamAdd': suppliesEntities[6].name == nameSupplies ? count : 0,
+          'multiforaAdd': suppliesEntities[7].name == nameSupplies ? count : 0,
+          'coversAdd': suppliesEntities[8].name == nameSupplies ? count : 0,
+          'kasTapeAdd': suppliesEntities[9].name == nameSupplies ? count : 0,
+          'cyanAdd': suppliesEntities[10].name == nameSupplies ? count : 0,
+          'lightCyanAdd': suppliesEntities[11].name == nameSupplies ? count : 0,
+          'magentaAdd': suppliesEntities[12].name == nameSupplies ? count : 0,
+          'lightMagentaAdd': suppliesEntities[13].name == nameSupplies ? count : 0,
+          'blackAdd': suppliesEntities[14].name == nameSupplies ? count : 0,
+          'yellowAdd': suppliesEntities[15].name == nameSupplies ? count : 0,
+        });
   }
 
   ModelSupplies? suppliesListFromMap(IResultSet result, String location) {
@@ -912,12 +963,12 @@ Future updateRepairInDBStepsTwoAndThree(Repair repair) async{
       for (final row in result.rows) {
         List<SuppliesEntity> suppliesEntity = [];
         int index = 0;
-        for(final element in row.assoc().entries){
-          if(index < 2 || index == 4) {
+        for (final element in row.assoc().entries) {
+          if (index < 2 || index == 4) {
             index++;
             continue;
           }
-          if(index > 18) break;
+          if (index > 18) break;
           SuppliesEntity entity = SuppliesEntity(element.key, int.tryParse(element.value) ?? 0);
           suppliesEntity.add(entity);
           index++;
