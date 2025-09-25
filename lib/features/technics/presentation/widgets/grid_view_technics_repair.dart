@@ -11,23 +11,27 @@ import 'package:technical_support_artphoto/features/technics/presentation/page/t
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../../../../core/navigation/animation_navigation.dart';
 
-class GridViewTechnicsRepair extends StatelessWidget {
+class GridViewTechnicsRepair extends StatefulWidget {
   const GridViewTechnicsRepair({super.key, required this.location});
 
   final dynamic location;
 
   @override
+  State<GridViewTechnicsRepair> createState() => _GridViewTechnicsRepairState();
+}
+
+class _GridViewTechnicsRepairState extends State<GridViewTechnicsRepair> {
+  @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    List<Technic> technics = location.technics;
+    List<Technic> technics = widget.location.technics;
     List<Trouble> troubles = providerModel.getTroubles;
     return Scaffold(
-        appBar: CustomAppBar(typePage: TypePage.listTechnics, location: location, technic: null),
+        appBar: CustomAppBar(typePage: TypePage.listTechnics, location: widget.location, technic: null),
         floatingActionButton: FloatingActionButton.extended(
             onPressed: () async{
-              List<Technic> technicsClosedRepair = await TechnicalSupportRepoImpl.downloadData.getTechnicsFinishedRepairsByRepairman(location.name);
-              providerModel.updateTechnicsClosedRepair(technicsClosedRepair);
-        },
+              downloadTechnicsClosedRepair(providerModel);
+            },
           label: Text('Отремонтированная техника')),
         body: CustomScrollView(
           physics: BouncingScrollPhysics(),
@@ -93,7 +97,7 @@ class GridViewTechnicsRepair extends StatelessWidget {
                             Navigator.push(context,
                                 animationRouteSlideTransition(LoadingOverlay(
                                     child: TechnicView(
-                                        location: location,
+                                        location: widget.location,
                                         technic: technic))));
                           },
                           child: Container(
@@ -198,7 +202,7 @@ class GridViewTechnicsRepair extends StatelessWidget {
                         child: InkWell(
                           onTap: () {
                             Navigator.push(context,
-                                animationRouteSlideTransition(LoadingOverlay(child: TechnicView(location: location, technic: technic))));
+                                animationRouteSlideTransition(LoadingOverlay(child: TechnicView(location: widget.location, technic: technic))));
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -235,5 +239,14 @@ class GridViewTechnicsRepair extends StatelessWidget {
               ),
           ],
         ));
+  }
+
+  void downloadTechnicsClosedRepair(ProviderModel providerModel) async{
+    LoadingOverlay.of(context).show();
+    List<Technic> technicsClosedRepair = await TechnicalSupportRepoImpl.downloadData.getTechnicsFinishedRepairsByRepairman(widget.location.name);
+    providerModel.updateTechnicsClosedRepair(technicsClosedRepair);
+    if (mounted) {
+      LoadingOverlay.of(context).hide();
+    }
   }
 }
