@@ -8,8 +8,8 @@ import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/core/shared/logo_animate/logo_matrix_transition_animate.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
-import 'package:technical_support_artphoto/features/technics/data/models/history_technic.dart';
-import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
+import 'package:technical_support_artphoto/features/technics/models/history_technic.dart';
+import 'package:technical_support_artphoto/features/technics/models/trouble_technic_on_period.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_view.dart';
 

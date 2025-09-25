@@ -9,7 +9,6 @@ import 'package:technical_support_artphoto/main.dart';
 
 import '../../../features/repairs/models/repair.dart';
 import '../../../features/troubles/models/trouble.dart';
-import '../../api/data/models/location.dart';
 import '../../api/provider/provider_model.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {

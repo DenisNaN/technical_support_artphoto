@@ -20,6 +20,7 @@ class ProviderModel with ChangeNotifier {
   late final Map<String, TransportationLocation> _technicsInTransportation;
 
   late final List<Repair> _currentRepairs;
+  List<Technic> _technicsClosedRepair = [];
   bool _isChangeRedAndYellow = false;
 
   late final List<Trouble> _troubles;
@@ -54,6 +55,8 @@ class ProviderModel with ChangeNotifier {
   Map<String, TransportationLocation> get technicsInTransportation => _technicsInTransportation;
 
   List<Repair> get getCurrentRepairs => _currentRepairs;
+
+  List<Technic> get getTechnicsClosedRepair => _technicsClosedRepair;
 
   bool get isChangeRedAndYellow => _isChangeRedAndYellow;
 
@@ -199,6 +202,16 @@ class ProviderModel with ChangeNotifier {
 
   void addTechnicInRepair(String name, Technic technic) {
     _technicsInRepairs[name]!.technics.add(technic);
+    notifyListeners();
+  }
+
+  void updateTechnicsClosedRepair(List<Technic> technics){
+    _technicsClosedRepair = technics;
+    notifyListeners();
+  }
+
+  void clearTechnicsClosedRepair() {
+    _technicsClosedRepair.clear();
     notifyListeners();
   }
 

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/widgets/grid_view_technics.dart';
+import 'package:technical_support_artphoto/features/technics/presentation/widgets/grid_view_technics_repair.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 
 class GridViewHomePage extends StatelessWidget {
@@ -35,33 +36,32 @@ class GridViewHomePage extends StatelessWidget {
             bool isFooter = false;
             bool isTroubleHas = false;
 
-            bool isHeaderRepair = locations[nameLocation] is RepairLocation;
-            if(!isHeaderRepair){
-              locations[nameLocation].technics.forEach((element){
-                if(element.status == 'Неисправна'){
+            bool isRepairLocation = locations[nameLocation] is RepairLocation;
+            if (!isRepairLocation) {
+              locations[nameLocation].technics.forEach((element) {
+                if (element.status == 'Неисправна') {
                   countBrokenTechnics++;
                 }
-                if(element.status == 'Тест-драйв' && element.testDrive != null){
+                if (element.status == 'Тест-драйв' && element.testDrive != null) {
                   if (element.testDrive!.dateFinish.difference(DateTime.now()).inDays < 0) {
                     countNotDeadlineTestDrive++;
-                  }else{
+                  } else {
                     countTestDrive++;
                   }
                 }
-                for(final trouble in troubles){
-                  if(element.number == trouble.numberTechnic){
+                for (final trouble in troubles) {
+                  if (element.number == trouble.numberTechnic) {
                     isTroubleHas = true;
                     break;
                   }
                 }
               });
             }
-            if((isHeaderRepair && countTechnics > 0) ||
-                (!isHeaderRepair && countBrokenTechnics > 0 ||
-                    isTroubleHas)){
+            if ((isRepairLocation && countTechnics > 0) ||
+                (!isRepairLocation && countBrokenTechnics > 0 || isTroubleHas)) {
               isHeader = true;
             }
-            if(countTestDrive > 0 || countNotDeadlineTestDrive > 0){
+            if (countTestDrive > 0 || countNotDeadlineTestDrive > 0) {
               isFooter = true;
             }
 
@@ -78,9 +78,16 @@ class GridViewHomePage extends StatelessWidget {
                 ],
               ),
               child: OpenContainer(
+                onClosed: (_){
+                  if (providerModel.getTechnicsClosedRepair.isNotEmpty && context.mounted) {
+                    providerModel.clearTechnicsClosedRepair();
+                  }
+                },
                 transitionDuration: Duration(milliseconds: 600),
                 openBuilder: (context, openContainer) {
-                  return GridViewTechnics(location: locations[nameLocation]);
+                  return isRepairLocation ?
+                    GridViewTechnicsRepair(location: locations[nameLocation]) :
+                    GridViewTechnics(location: locations[nameLocation]);
                 },
                 closedBuilder: (context, openContainer) {
                   return GestureDetector(
@@ -94,53 +101,69 @@ class GridViewHomePage extends StatelessWidget {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  isTroubleHas ? Icon(Icons.check, color: Colors.red,)
+                                  isTroubleHas
+                                      ? Icon(
+                                          Icons.check,
+                                          color: Colors.red,
+                                        )
                                       : SizedBox(),
-                                  countBrokenTechnics > 0 ? CircleAvatar(
-                                    radius: 12,
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Colors.red.shade400,
-                                    child: Text(countBrokenTechnics.toString()),
-                                  ) : SizedBox(),
-                                  countTechnics > 0 && isHeaderRepair ? CircleAvatar(
-                                    radius: 12,
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Colors.green.shade400,
-                                    child: Text(countTechnics.toString()),
-                                  ) : SizedBox(),
+                                  countBrokenTechnics > 0
+                                      ? CircleAvatar(
+                                          radius: 12,
+                                          foregroundColor: Colors.white,
+                                          backgroundColor: Colors.red.shade400,
+                                          child: Text(countBrokenTechnics.toString()),
+                                        )
+                                      : SizedBox(),
+                                  countTechnics > 0 && isRepairLocation
+                                      ? CircleAvatar(
+                                          radius: 12,
+                                          foregroundColor: Colors.white,
+                                          backgroundColor: Colors.green.shade400,
+                                          child: Text(countTechnics.toString()),
+                                        )
+                                      : SizedBox(),
                                 ],
                               ),
                             )
                           : SizedBox(),
-                      footer: isFooter ? Padding(
-                        padding: const EdgeInsets.all(7.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            children: [
-                              countTestDrive > 0 ? CircleAvatar(
-                                radius: 12,
-                                foregroundColor: Colors.black45,
-                                backgroundColor: Colors.yellowAccent,
-                                child: Text(countTestDrive.toString()),
-                              ) : SizedBox(),
-                              SizedBox(width: countTestDrive > 0 ? 5 : 0,),
-                              countNotDeadlineTestDrive > 0 ? CircleAvatar(
-                                radius: 12,
-                                foregroundColor: Colors.white,
-                                backgroundColor: Colors.deepOrangeAccent.shade200,
-                                child: Text(countNotDeadlineTestDrive.toString()),
-                              ) : SizedBox(),
-                            ],
-                          ),
-                        ),
-                      )
+                      footer: isFooter
+                          ? Padding(
+                              padding: const EdgeInsets.all(7.0),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  children: [
+                                    countTestDrive > 0
+                                        ? CircleAvatar(
+                                            radius: 12,
+                                            foregroundColor: Colors.black45,
+                                            backgroundColor: Colors.yellowAccent,
+                                            child: Text(countTestDrive.toString()),
+                                          )
+                                        : SizedBox(),
+                                    SizedBox(
+                                      width: countTestDrive > 0 ? 5 : 0,
+                                    ),
+                                    countNotDeadlineTestDrive > 0
+                                        ? CircleAvatar(
+                                            radius: 12,
+                                            foregroundColor: Colors.white,
+                                            backgroundColor: Colors.deepOrangeAccent.shade200,
+                                            child: Text(countNotDeadlineTestDrive.toString()),
+                                          )
+                                        : SizedBox(),
+                                  ],
+                                ),
+                              ),
+                            )
                           : SizedBox(),
                       child: Container(
                           color: color,
                           child: Center(
                             child: Text(locations.keys.toList()[index],
-                                overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.titleMedium),
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.titleMedium),
                           )),
                     ),
                   );
