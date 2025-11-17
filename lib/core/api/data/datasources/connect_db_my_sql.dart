@@ -639,7 +639,7 @@ class ConnectDbMySQL {
       for (int i = 1; i < historyTechnics.length; i++) {
         if (i == 1) {
           if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i - 1].date)) {
-            historyTechnics[i].listTrouble.add(troubleTechnicOnPeriod);
+            historyTechnics[i - 1].listTrouble.add(troubleTechnicOnPeriod);
           }
         }
         if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i].date) &&

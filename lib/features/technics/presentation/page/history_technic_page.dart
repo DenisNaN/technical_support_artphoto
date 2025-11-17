@@ -50,15 +50,24 @@ class HistoryTechnicPage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.wifi_off, size: 150, color: Colors.blue, shadows: [
-                        BoxShadow(
-                          color: Colors.grey.withValues(alpha: 0.5),
-                          spreadRadius: 3,
-                          blurRadius: 4,
-                          offset: Offset(0, 4), // changes position of shadow
-                        ),
-                      ],),
-                      Text('Данные не загрузились.\nПроверьте подключение к сети', style: TextStyle(fontSize: 20),textAlign: TextAlign.center,),
+                      Icon(
+                        Icons.wifi_off,
+                        size: 150,
+                        color: Colors.blue,
+                        shadows: [
+                          BoxShadow(
+                            color: Colors.grey.withValues(alpha: 0.5),
+                            spreadRadius: 3,
+                            blurRadius: 4,
+                            offset: Offset(0, 4), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'Данные не загрузились.\nПроверьте подключение к сети',
+                        style: TextStyle(fontSize: 20),
+                        textAlign: TextAlign.center,
+                      ),
                     ],
                   ),
                 ));
@@ -90,10 +99,7 @@ class HistoryTechnicPage extends StatelessWidget {
   }
 
   Widget _buildListTilePhotosalon(
-    HistoryTechnic currentHistoryTechnic,
-    bool isStartIndex,
-    DateTime? finishDate, BuildContext context
-  ) {
+      HistoryTechnic currentHistoryTechnic, bool isStartIndex, DateTime? finishDate, BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -131,17 +137,14 @@ class HistoryTechnicPage extends StatelessWidget {
   }
 
   Widget _buildListTileRepair(
-    HistoryTechnic currentHistoryTechnic,
-    bool isStartIndex, BuildContext context, providerModel
-  ) {
+      HistoryTechnic currentHistoryTechnic, bool isStartIndex, BuildContext context, providerModel) {
     return GestureDetector(
       onTap: () {
         Repair? repair;
-        getRepairForHistory(currentHistoryTechnic.id).then((value){
+        getRepairForHistory(currentHistoryTechnic.id).then((value) {
           repair = value;
-          if(repair != null && context.mounted){
-            Navigator.push(context,
-                animationRouteSlideTransition(LoadingOverlay(child: RepairView(repair: repair!))));
+          if (repair != null && context.mounted) {
+            Navigator.push(context, animationRouteSlideTransition(LoadingOverlay(child: RepairView(repair: repair!))));
           }
         });
       },
@@ -151,7 +154,8 @@ class HistoryTechnicPage extends StatelessWidget {
           Container(
             width: 200,
             padding: EdgeInsets.all(7),
-            decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(15)), color: Colors.green.shade300),
+            decoration:
+                BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(15)), color: Colors.green.shade300),
             child: Center(
                 child: Text(
               (currentHistoryTechnic.location as RepairLocation).name,
@@ -164,7 +168,8 @@ class HistoryTechnicPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 isStartIndex
-                    ? Text('${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)} - по настоящее время',
+                    ? Text(
+                        '${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)} - по настоящее время',
                         style: TextStyle(fontSize: 18))
                     : Text(
                         '${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)} - ${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.dateDepartureFromService!)}',
@@ -219,9 +224,9 @@ class HistoryTechnicPage extends StatelessWidget {
       children: [
         for (int i = 0; i < troubles.length; i++)
           GestureDetector(
-            onTap: (){
-              TechnicalSupportRepoImpl.downloadData.getTrouble(troubles[i].id.toString()).then((trouble){
-                if(trouble != null){
+            onTap: () {
+              TechnicalSupportRepoImpl.downloadData.getTrouble(troubles[i].id.toString()).then((trouble) {
+                if (trouble != null) {
                   if (context.mounted) {
                     _navigationOnTechnicView(trouble, context);
                   }
@@ -255,14 +260,11 @@ class HistoryTechnicPage extends StatelessWidget {
                     color: Colors.grey.shade50,
                     child: Row(
                       children: [
-                        Icon(troubles[i].isTroubleClosed == false ? Icons.close :
-                        Icons.check,
-                            color: troubles[i].isTroubleClosed == false ? Colors.red :
-                            Colors.green),
+                        Icon(troubles[i].isTroubleClosed == false ? Icons.close : Icons.check,
+                            color: troubles[i].isTroubleClosed == false ? Colors.red : Colors.green),
                         Text(
                           '${troubles[i].employee}',
-                          style: TextStyle(color: Colors.black, fontSize: 15,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -275,7 +277,7 @@ class HistoryTechnicPage extends StatelessWidget {
     );
   }
 
-  Future<Repair?> getRepairForHistory(int id) async{
+  Future<Repair?> getRepairForHistory(int id) async {
     Repair? repair = await TechnicalSupportRepoImpl.downloadData.getRepair(id);
     return repair;
   }
@@ -288,7 +290,6 @@ class HistoryTechnicPage extends StatelessWidget {
   }
 
   void _navigationOnTechnicView(Trouble trouble, BuildContext context) {
-    Navigator.push(context,
-        animationRouteSlideTransition(LoadingOverlay(child: TroubleView(troubleMain: trouble))));
+    Navigator.push(context, animationRouteSlideTransition(LoadingOverlay(child: TroubleView(troubleMain: trouble))));
   }
 }
