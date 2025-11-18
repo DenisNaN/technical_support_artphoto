@@ -92,79 +92,82 @@ class _TechnicViewState extends State<TechnicView> {
         .width;
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.viewTechnic, location: widget.location, technic: widget.technic),
-        body: Form(
-            key: _formInnerNumberKey,
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                _buildDateBuyTechnic(providerModel),
-                _buildCardTechnic(widthScreen, providerModel),
-                SizedBox(height: 20),
-                _buildComment(providerModel, widget.technic.comment ?? ''),
-                SizedBox(height: 10),
-                _buildStatus(providerModel),
-                SizedBox(height: 10),
-                _buildDislocation(providerModel),
-                SizedBox(height: 10),
-                _buildTestDrive(technicNew),
-                SizedBox(height: 20),
-                _buildCostAndTotalSumRepairs(providerModel),
-                SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
-                      child: Text("Отмена"),
-                    ),
-                    ElevatedButton(
+        body: SafeArea(
+          bottom: true,
+          child: Form(
+              key: _formInnerNumberKey,
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildDateBuyTechnic(providerModel),
+                  _buildCardTechnic(widthScreen, providerModel),
+                  SizedBox(height: 20),
+                  _buildComment(providerModel, widget.technic.comment ?? ''),
+                  SizedBox(height: 10),
+                  _buildStatus(providerModel),
+                  SizedBox(height: 10),
+                  _buildDislocation(providerModel),
+                  SizedBox(height: 10),
+                  _buildTestDrive(technicNew),
+                  SizedBox(height: 20),
+                  _buildCostAndTotalSumRepairs(providerModel),
+                  SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      ElevatedButton(
                         onPressed: () {
-                          if (_formInnerNumberKey.currentState!.validate()) {
-                            technicNew.status = _selectedDropdownStatus ?? 'На хранении';
-                            technicNew.dislocation = _selectedDropdownDislocation ?? 'Офис';
-
-                            SaveTestDriveStatus status = SaveTestDriveStatus.notSave;
-                            if ((_selectedDropdownStatus == 'Тест-драйв' && widget.technic.testDrive == null) ||
-                                (widget.technic.status != 'Тест-драйв' && _selectedDropdownStatus == 'Тест-драйв')) {
-                              status = SaveTestDriveStatus.save;
-                            }
-                            if(widget.technic.status == 'Тест-драйв' && widget.technic.testDrive != null) {
-                              status = SaveTestDriveStatus.update;
-                            }
-                            if(status == SaveTestDriveStatus.save || status == SaveTestDriveStatus.update){
-                              TestDrive testDrive = TestDrive(
-                                  idTechnic: widget.technic.id,
-                                  categoryTechnic: widget.technic.category,
-                                  dislocationTechnic: _selectedDropdownDislocation ?? 'На хранении',
-                                  dateStart: _dateStartTestDrive ?? DateTime.now(),
-                                  dateFinish:
-                                  _dateFinishTestDrive ?? DateTime.now().add(Duration(days: countDaysTestDrive)),
-                                  result: _resultTestDrive.text,
-                                  isCloseTestDrive: _isDoneTestDrive,
-                                  user: providerModel.user.name);
-                              if (status == SaveTestDriveStatus.update) {
-                                testDrive.id = widget.technic.testDrive!.id;
-                              }
-                              technicNew.testDrive = testDrive;
-                            }
-
-                            _save(technicNew, providerModel, status).then((value) {
-                              _viewSnackBar(value ? Icons.save : Icons.dangerous_outlined, value,
-                                  value ? 'Изменения приняты' : 'Изменения не сохранились');
-                            });
-                          }
+                          Navigator.pop(context);
                         },
-                        child: const Text("Сохранить")),
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                )
-              ],
-            )));
+                        style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                        child: Text("Отмена"),
+                      ),
+                      ElevatedButton(
+                          onPressed: () {
+                            if (_formInnerNumberKey.currentState!.validate()) {
+                              technicNew.status = _selectedDropdownStatus ?? 'На хранении';
+                              technicNew.dislocation = _selectedDropdownDislocation ?? 'Офис';
+
+                              SaveTestDriveStatus status = SaveTestDriveStatus.notSave;
+                              if ((_selectedDropdownStatus == 'Тест-драйв' && widget.technic.testDrive == null) ||
+                                  (widget.technic.status != 'Тест-драйв' && _selectedDropdownStatus == 'Тест-драйв')) {
+                                status = SaveTestDriveStatus.save;
+                              }
+                              if(widget.technic.status == 'Тест-драйв' && widget.technic.testDrive != null) {
+                                status = SaveTestDriveStatus.update;
+                              }
+                              if(status == SaveTestDriveStatus.save || status == SaveTestDriveStatus.update){
+                                TestDrive testDrive = TestDrive(
+                                    idTechnic: widget.technic.id,
+                                    categoryTechnic: widget.technic.category,
+                                    dislocationTechnic: _selectedDropdownDislocation ?? 'На хранении',
+                                    dateStart: _dateStartTestDrive ?? DateTime.now(),
+                                    dateFinish:
+                                    _dateFinishTestDrive ?? DateTime.now().add(Duration(days: countDaysTestDrive)),
+                                    result: _resultTestDrive.text,
+                                    isCloseTestDrive: _isDoneTestDrive,
+                                    user: providerModel.user.name);
+                                if (status == SaveTestDriveStatus.update) {
+                                  testDrive.id = widget.technic.testDrive!.id;
+                                }
+                                technicNew.testDrive = testDrive;
+                              }
+
+                              _save(technicNew, providerModel, status).then((value) {
+                                _viewSnackBar(value ? Icons.save : Icons.dangerous_outlined, value,
+                                    value ? 'Изменения приняты' : 'Изменения не сохранились');
+                              });
+                            }
+                          },
+                          child: const Text("Сохранить")),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  )
+                ],
+              )),
+        ));
   }
 
   final numberFormatter = FilteringTextInputFormatter.allow(

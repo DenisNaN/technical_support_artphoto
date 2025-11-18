@@ -57,64 +57,67 @@ class _TechnicAddState extends State<TechnicAdd> {
     final providerModel = Provider.of<ProviderModel>(context);
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.addTechnic, location: null, technic: null),
-        body: Form(
-            key: _formInnerNumberKey,
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                _buildInternalID(),
-                SizedBox(height: 20),
-                _buildCategoryTechnic(providerModel),
-                SizedBox(height: 20),
-                _buildCostTechnic(),
-                SizedBox(height: 20),
-                _buildNameTechnic(),
-                SizedBox(height: 20),
-                _buildDateBuyTechnic(),
-                SizedBox(height: 20),
-                _buildStatus(providerModel),
-                SizedBox(height: 20),
-                _buildDislocation(providerModel),
-                SizedBox(height: 20),
-                _buildComment(),
-                SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
-                      child: Text("Отмена"),
-                    ),
-                    ElevatedButton(
+        body: SafeArea(
+          bottom: true,
+          child: Form(
+              key: _formInnerNumberKey,
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildInternalID(),
+                  SizedBox(height: 20),
+                  _buildCategoryTechnic(providerModel),
+                  SizedBox(height: 20),
+                  _buildCostTechnic(),
+                  SizedBox(height: 20),
+                  _buildNameTechnic(),
+                  SizedBox(height: 20),
+                  _buildDateBuyTechnic(),
+                  SizedBox(height: 20),
+                  _buildStatus(providerModel),
+                  SizedBox(height: 20),
+                  _buildDislocation(providerModel),
+                  SizedBox(height: 20),
+                  _buildComment(),
+                  SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      ElevatedButton(
                         onPressed: () {
-                          if (_formInnerNumberKey.currentState!.validate()) {
-                            Technic technic = Technic(
-                                0,
-                                !isBN ? int.parse(_innerNumberTechnic.text) : 0,
-                                _selectedDropdownCategory!,
-                                _nameTechnic.text,
-                                _selectedDropdownStatus!,
-                                _selectedDropdownDislocation!,
-                                _dateBuyTechnic ?? DateTime.now(),
-                                int.parse(_costTechnic.text.replaceAll(",", "")),
-                                _comment.text);
-
-                            _save(technic, providerModel).then((_) {
-                              _viewSnackBar(Icons.save, true, 'Техника сохранена', 'Техника не сохранена');
-                            });
-                          }
+                          Navigator.pop(context);
                         },
-                        child: const Text("Сохранить")),
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                )
-              ],
-            )));
+                        style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                        child: Text("Отмена"),
+                      ),
+                      ElevatedButton(
+                          onPressed: () {
+                            if (_formInnerNumberKey.currentState!.validate()) {
+                              Technic technic = Technic(
+                                  0,
+                                  !isBN ? int.parse(_innerNumberTechnic.text) : 0,
+                                  _selectedDropdownCategory!,
+                                  _nameTechnic.text,
+                                  _selectedDropdownStatus!,
+                                  _selectedDropdownDislocation!,
+                                  _dateBuyTechnic ?? DateTime.now(),
+                                  int.parse(_costTechnic.text.replaceAll(",", "")),
+                                  _comment.text);
+
+                              _save(technic, providerModel).then((_) {
+                                _viewSnackBar(Icons.save, true, 'Техника сохранена', 'Техника не сохранена');
+                              });
+                            }
+                          },
+                          child: const Text("Сохранить")),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  )
+                ],
+              )),
+        ));
   }
 
   Column _buildInternalID() {

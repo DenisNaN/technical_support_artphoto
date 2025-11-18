@@ -85,51 +85,54 @@ class _TroubleViewState extends State<TroubleView> with SingleTickerProviderStat
                 if(!isTechnicNull){
                   technic = snapshot.data;
                 }
-                return Form(
-                  key: formKey,
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      HeaderViewTrouble(trouble: trouble, technic: technic),
-                      SizedBox(height: 20),
-                      _buildPhotoTrouble(),
-                      SizedBox(height: 14),
-                      _buildDateFixTroubleEmployee(providerModel),
-                      SizedBox(height: 20),
-                      _buildFixTroubleEmployee(),
-                      SizedBox(height: 15),
-                      _buildDateFixTroubleEngineer(providerModel),
-                      SizedBox(height: 20),
-                      _buildFixTroubleEngineer(),
-                      SizedBox(height: 20),
-                      _buildCreateNewRepair(trouble, technic),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            style: ButtonStyle(
-                                backgroundColor: WidgetStatePropertyAll(Colors.grey)),
-                            child: Text("Отмена"),
-                          ),
-                          ElevatedButton(
+                return SafeArea(
+                  bottom: true,
+                  child: Form(
+                    key: formKey,
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        HeaderViewTrouble(trouble: trouble, technic: technic),
+                        SizedBox(height: 20),
+                        _buildPhotoTrouble(),
+                        SizedBox(height: 14),
+                        _buildDateFixTroubleEmployee(providerModel),
+                        SizedBox(height: 20),
+                        _buildFixTroubleEmployee(),
+                        SizedBox(height: 15),
+                        _buildDateFixTroubleEngineer(providerModel),
+                        SizedBox(height: 20),
+                        _buildFixTroubleEngineer(),
+                        SizedBox(height: 20),
+                        _buildCreateNewRepair(trouble, technic),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            ElevatedButton(
                               onPressed: () {
-                                Trouble troubleNew = createTrouble();
-                                _save(troubleNew, providerModel).then((isSave) {
-                                  _viewSnackBar(Icons.save, isSave, 'Изменения сохранены',
-                                      'Изменения не сохранены', false);
-                                });
+                                Navigator.pop(context);
                               },
-                              child: const Text("Сохранить")),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 20,
-                      )
-                    ],
+                              style: ButtonStyle(
+                                  backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                              child: Text("Отмена"),
+                            ),
+                            ElevatedButton(
+                                onPressed: () {
+                                  Trouble troubleNew = createTrouble();
+                                  _save(troubleNew, providerModel).then((isSave) {
+                                    _viewSnackBar(Icons.save, isSave, 'Изменения сохранены',
+                                        'Изменения не сохранены', false);
+                                  });
+                                },
+                                child: const Text("Сохранить")),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        )
+                      ],
+                    ),
                   ),
                 );
               } else if (snapshot.hasError) {
