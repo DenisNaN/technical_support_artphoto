@@ -639,12 +639,12 @@ class ConnectDbMySQL {
       for (int i = 1; i < historyTechnics.length; i++) {
         if (i == 1) {
           if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i - 1].date)) {
-            historyTechnics[i - 1].listTrouble.add(troubleTechnicOnPeriod);
+            historyTechnics[i].listTrouble.add(troubleTechnicOnPeriod);
           }
         }
         if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i].date) &&
             troubleTechnicOnPeriod.date.isBefore(historyTechnics[i - 1].date)) {
-          historyTechnics[i - 1].listTrouble.add(troubleTechnicOnPeriod);
+          historyTechnics[i].listTrouble.add(troubleTechnicOnPeriod);
           continue;
         }
       }
@@ -669,7 +669,30 @@ class ConnectDbMySQL {
       historyTechnics.add(historyTechnic);
     }
     historyTechnics.sort();
-    return historyTechnics;
+    List<HistoryTechnic> withoutDuplicatesHistoryTechnics =
+        _removeDuplicatePhotosalosHistoryTechnics(historyTechnics);
+    return withoutDuplicatesHistoryTechnics;
+  }
+
+  List<HistoryTechnic> _removeDuplicatePhotosalosHistoryTechnics(
+      List<HistoryTechnic> historyTechnics) {
+    List<HistoryTechnic> newHistoryTechnics = [];
+    for (int i = 0; i < historyTechnics.length - 1; i++) {
+      if((historyTechnics[i].location is PhotosalonLocation) && (historyTechnics[i + 1].location is PhotosalonLocation)){
+        PhotosalonLocation currentPhotosalon = historyTechnics[i].location as PhotosalonLocation;
+        PhotosalonLocation nextPhotosalon = historyTechnics[i + 1].location as PhotosalonLocation;
+        if (currentPhotosalon.name == nextPhotosalon.name &&
+            historyTechnics[i].listTrouble.isEmpty && historyTechnics[i + 1].listTrouble.isEmpty) {
+          continue;
+        } else {
+          newHistoryTechnics.add(historyTechnics[i]);
+        }
+      }else{
+        newHistoryTechnics.add(historyTechnics[i]);
+      }
+    }
+    newHistoryTechnics.add(historyTechnics[historyTechnics.length - 1]);
+    return newHistoryTechnics;
   }
 
 // Future<List> getAllHistory() async{

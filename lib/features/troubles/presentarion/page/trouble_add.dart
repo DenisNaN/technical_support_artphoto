@@ -69,61 +69,64 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
     return Scaffold(
         key: scaffoldKey,
         appBar: CustomAppBar(typePage: TypePage.addTrouble, location: null, technic: null),
-        body: Form(
-          key: formKey,
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              _buildInternalID(),
-              SizedBox(height: 20),
-              _isBN ? SizedBox() : _buildNameTechnic(),
-              _isBN ? SizedBox() :  SizedBox(height: 14),
-              _buildDislocation(providerModel),
-              SizedBox(height: 20),
-              _buildComplaint(),
-              SizedBox(height: 20),
-              _buildDateTrouble(),
-              SizedBox(height: 20),
-              _buildPhotoTroubleListTile(),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
-                    child: Text("Отмена"),
-                  ),
-                  ElevatedButton(
+        body: SafeArea(
+          bottom: true,
+          child: Form(
+            key: formKey,
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildInternalID(),
+                SizedBox(height: 20),
+                _isBN ? SizedBox() : _buildNameTechnic(),
+                _isBN ? SizedBox() :  SizedBox(height: 14),
+                _buildDislocation(providerModel),
+                SizedBox(height: 20),
+                _buildComplaint(),
+                SizedBox(height: 20),
+                _buildDateTrouble(),
+                SizedBox(height: 20),
+                _buildPhotoTroubleListTile(),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
                       onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          Trouble trouble = Trouble(
-                            id: null,
-                            photosalon: _isBN ? _selectedDropdownDislocation ?? '' : _dislocation ?? '',
-                            dateTrouble: _dateTrouble ?? DateTime.now(),
-                            employee: providerModel.user.name,
-                            numberTechnic: !_isBN ? int.parse(_numberTechnic.text) : 0,
-                            trouble: _complaint.text,
-                          );
-                          if(imageFile != null) {
-                            _photoTrouble = _decoderPhotoToBlob(imageFile!);
-                            trouble.photoTrouble = _photoTrouble;
-                          }
-
-                          _save(trouble, providerModel).then((isSave) {
-                            _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', scaffoldKey);
-                          });
-                        }
+                        Navigator.pop(context);
                       },
-                      child: const Text("Сохранить")),
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              )
-            ],
+                      style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                      child: Text("Отмена"),
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            Trouble trouble = Trouble(
+                              id: null,
+                              photosalon: _isBN ? _selectedDropdownDislocation ?? '' : _dislocation ?? '',
+                              dateTrouble: _dateTrouble ?? DateTime.now(),
+                              employee: providerModel.user.name,
+                              numberTechnic: !_isBN ? int.parse(_numberTechnic.text) : 0,
+                              trouble: _complaint.text,
+                            );
+                            if(imageFile != null) {
+                              _photoTrouble = _decoderPhotoToBlob(imageFile!);
+                              trouble.photoTrouble = _photoTrouble;
+                            }
+
+                            _save(trouble, providerModel).then((isSave) {
+                              _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', scaffoldKey);
+                            });
+                          }
+                        },
+                        child: const Text("Сохранить")),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                )
+              ],
+            ),
           ),
         ));
   }
@@ -515,7 +518,7 @@ class _TroubleAddState extends State<TroubleAdd> with SingleTickerProviderStateM
     final smtpServer = mailru(providerModel.accountMailRu.account, providerModel.accountMailRu.password);
     final message = Message()
     ..from = Address(providerModel.accountMailRu.account)
-    ..recipients.addAll(['Pigarev-Denis@mail.ru', 'CINEMAMAN2008@yandex.ru', 'gurov-vs@list.ru', 'inzhener.6razryada@mail.ru'])
+    ..recipients.addAll(['Pigarev-Denis@mail.ru', 'CINEMAMAN2008@yandex.ru', 'gurov-vs@list.ru', 'Dred12386@yandex.ru'])
     ..subject = 'Проблема в фотосалоне ${trouble.photosalon}'
     ..text = trouble.numberTechnic != 0 ? 'Номер техники: ${trouble.numberTechnic}.\n'
         'В фотосалоне "${trouble.photosalon}" ${trouble.employee} сообщает, что:\n'

@@ -81,122 +81,125 @@ class _RepairViewState extends State<RepairView> {
     return Scaffold(
         appBar: CustomAppBar(
             typePage: TypePage.viewRepair, location: widget.repair, technic: null),
-        body: Form(
-          child: ListView(
-            children: [
-              SizedBox(height: 10),
-              _headerData(),
-              SizedBox(height: 20),
-              Center(
-                  child: Text(
-                'Второй этап заявки',
-                style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
-              )),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    decoration: BoxDecoration(
-                        color: colorStepTwoRepair,
-                        borderRadius: BorderRadius.circular(30)),
-                    child: Column(spacing: 10, children: [
-                      _buildServices(providerModel),
-                      _buildDateTransferInService(),
-                    ])),
-              ),
-              SizedBox(height: 10),
-              Center(
-                  child: Column(
-                children: [
-                  Text(
-                    'Третий этап заявки',
-                    style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
-                  ),
-                ],
-              )),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    decoration: BoxDecoration(
-                        color: colorStepThreeRepair,
-                        borderRadius: BorderRadius.circular(30)),
+        body: SafeArea(
+          bottom: true,
+          child: Form(
+            child: ListView(
+              children: [
+                SizedBox(height: 10),
+                _headerData(),
+                SizedBox(height: 20),
+                Center(
+                    child: Text(
+                  'Второй этап заявки',
+                  style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+                )),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      decoration: BoxDecoration(
+                          color: colorStepTwoRepair,
+                          borderRadius: BorderRadius.circular(30)),
+                      child: Column(spacing: 10, children: [
+                        _buildServices(providerModel),
+                        _buildDateTransferInService(),
+                      ])),
+                ),
+                SizedBox(height: 10),
+                Center(
                     child: Column(
-                      spacing: 10,
-                      children: [
-                        _buildDateDepartureFromService(),
-                        _buildWorksPerformed(),
-                        _buildCostService(),
-                        _buildDiagnosisService(),
-                        _buildRecommendationsNotes(),
-                        _buildNewStatus(providerModel),
-                        _buildNewDislocation(providerModel),
-                        _buildDateReceipt(),
-                      ],
-                    )),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style:
-                        ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
-                    child: Text("Отмена"),
-                  ),
-                  ElevatedButton(
+                  children: [
+                    Text(
+                      'Третий этап заявки',
+                      style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+                    ),
+                  ],
+                )),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      decoration: BoxDecoration(
+                          color: colorStepThreeRepair,
+                          borderRadius: BorderRadius.circular(30)),
+                      child: Column(
+                        spacing: 10,
+                        children: [
+                          _buildDateDepartureFromService(),
+                          _buildWorksPerformed(),
+                          _buildCostService(),
+                          _buildDiagnosisService(),
+                          _buildRecommendationsNotes(),
+                          _buildNewStatus(providerModel),
+                          _buildNewDislocation(providerModel),
+                          _buildDateReceipt(),
+                        ],
+                      )),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
                       onPressed: () {
-                        Repair repair = createRepair();
-                        _save(repair, providerModel)
-                            .then((TypeMessageForSaveRepairView value) {
-                          try {
-                            switch (value) {
-                              case TypeMessageForSaveRepairView.successSaveRepair:
-                                _viewSnackBar(Icons.save, true, 'Заявка изменена', '',
-                                    true, repair);
-                              case TypeMessageForSaveRepairView.notSuccessSaveRepair:
-                                _viewSnackBar(Icons.save, false, '', 'Заявка не изменена',
-                                    true, repair);
-                              case TypeMessageForSaveRepairView.notSuccessSaveStatus:
-                                _viewSnackBar(
-                                    Icons.print_disabled,
-                                    false,
-                                    '',
-                                    'Статус и дислокацию техники изменить не удалось. Попробуйте вручную в карточке техники',
-                                    false,
-                                    repair);
-                              case TypeMessageForSaveRepairView.notWriteAllFieldStatus:
-                                _viewSnackBar(
-                                    Icons.print_disabled,
-                                    false,
-                                    '',
-                                    'Статус или дислокация не заполенены.\n',
-                                    false,
-                                    repair);
-                              case TypeMessageForSaveRepairView.notCheckTechnicInDB:
-                                _viewSnackBar(
-                                    Icons.print_disabled,
-                                    false,
-                                    '',
-                                    'Техника с таким номером в базе не обнаружена',
-                                    false,
-                                    repair);
-                            }
-                          } catch (e) {
-                            debugPrint(e.toString());
-                          }
-                        });
+                        Navigator.pop(context);
                       },
-                      child: const Text("Сохранить")),
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              )
-            ],
+                      style:
+                          ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                      child: Text("Отмена"),
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          Repair repair = createRepair();
+                          _save(repair, providerModel)
+                              .then((TypeMessageForSaveRepairView value) {
+                            try {
+                              switch (value) {
+                                case TypeMessageForSaveRepairView.successSaveRepair:
+                                  _viewSnackBar(Icons.save, true, 'Заявка изменена', '',
+                                      true, repair);
+                                case TypeMessageForSaveRepairView.notSuccessSaveRepair:
+                                  _viewSnackBar(Icons.save, false, '', 'Заявка не изменена',
+                                      true, repair);
+                                case TypeMessageForSaveRepairView.notSuccessSaveStatus:
+                                  _viewSnackBar(
+                                      Icons.print_disabled,
+                                      false,
+                                      '',
+                                      'Статус и дислокацию техники изменить не удалось. Попробуйте вручную в карточке техники',
+                                      false,
+                                      repair);
+                                case TypeMessageForSaveRepairView.notWriteAllFieldStatus:
+                                  _viewSnackBar(
+                                      Icons.print_disabled,
+                                      false,
+                                      '',
+                                      'Статус или дислокация не заполенены.\n',
+                                      false,
+                                      repair);
+                                case TypeMessageForSaveRepairView.notCheckTechnicInDB:
+                                  _viewSnackBar(
+                                      Icons.print_disabled,
+                                      false,
+                                      '',
+                                      'Техника с таким номером в базе не обнаружена',
+                                      false,
+                                      repair);
+                              }
+                            } catch (e) {
+                              debugPrint(e.toString());
+                            }
+                          });
+                        },
+                        child: const Text("Сохранить")),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                )
+              ],
+            ),
           ),
         ));
   }
