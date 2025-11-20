@@ -687,7 +687,8 @@ class ConnectDbMySQL {
 
       for (int i = 1; i < historyTechnics.length; i++) {
         if (i == 1) {
-          if (testDriveHistoryTechnic.dateFinish.isAfter(historyTechnics[i - 1].date)) {
+          if (testDriveHistoryTechnic.dateFinish.isAfter(historyTechnics[i - 1].date) ||
+              testDriveHistoryTechnic.dateFinish.compareTo(historyTechnics[i - 1].date) == 0) {
             historyTechnics[i - 1].listTestDrive.add(testDriveHistoryTechnic);
           }
         }
