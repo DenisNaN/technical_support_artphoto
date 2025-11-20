@@ -13,6 +13,7 @@ import 'package:technical_support_artphoto/features/repairs/models/summ_repair.d
 import 'package:technical_support_artphoto/features/supplies/models/model_supplies.dart';
 import 'package:technical_support_artphoto/features/supplies/models/supplies_entity.dart';
 import 'package:technical_support_artphoto/features/technics/models/history_technic.dart';
+import 'package:technical_support_artphoto/features/technics/models/test_drive_history_technic.dart';
 import 'package:technical_support_artphoto/features/technics/models/trouble_technic_on_period.dart';
 import 'package:technical_support_artphoto/features/test_drive/models/test_drive.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
@@ -668,6 +669,38 @@ class ConnectDbMySQL {
       historyTechnic.costService = int.parse(row.colAt(5));
       historyTechnics.add(historyTechnic);
     }
+
+    String query4 = 'SELECT id, category, testDriveDislocation, '
+        'dateStart, dateFinish, result, checkEquipment, user FROM test_drive '
+        'WHERE idEquipment = (SELECT id FROM equipment WHERE number = :number)';
+    var result4 = await _connDB!.execute(query4, {'number': numberTechnic});
+    for (final row in result4.rows) {
+      TestDriveHistoryTechnic testDriveHistoryTechnic = TestDriveHistoryTechnic(
+          id: int.parse(row.colAt(0)),
+          category: row.colAt(1),
+          dislocation: row.colAt(2),
+          dateStart: row.colAt(3).toString().dateFormattedFromSQL(),
+          dateFinish: row.colAt(4).toString().dateFormattedFromSQL(),
+          user: row.colAt(7));
+      testDriveHistoryTechnic.result ??= row.colAt(5);
+      testDriveHistoryTechnic.isTestDriveClosed = row.colAt(6).toString() == '1' ? true : false;
+
+      for (int i = 1; i < historyTechnics.length; i++) {
+        if (i == 1) {
+          if (testDriveHistoryTechnic.dateFinish.isAfter(historyTechnics[i - 1].date)) {
+            historyTechnics[i - 1].listTestDrive.add(testDriveHistoryTechnic);
+          }
+        }
+        if (testDriveHistoryTechnic.dateFinish.isBefore(historyTechnics[i - 1].date) &&
+            testDriveHistoryTechnic.dateFinish.isAfter(historyTechnics[i].date)) {
+          if (!historyTechnics[i].listTestDrive.contains(testDriveHistoryTechnic)) {
+            historyTechnics[i].listTestDrive.add(testDriveHistoryTechnic);
+          }
+          continue;
+        }
+      }
+    }
+
     historyTechnics.sort();
     List<HistoryTechnic> withoutDuplicatesHistoryTechnics =
         _removeDuplicatePhotosalosHistoryTechnics(historyTechnics);
@@ -678,43 +711,26 @@ class ConnectDbMySQL {
       List<HistoryTechnic> historyTechnics) {
     List<HistoryTechnic> newHistoryTechnics = [];
     for (int i = 0; i < historyTechnics.length - 1; i++) {
-      if((historyTechnics[i].location is PhotosalonLocation) && (historyTechnics[i + 1].location is PhotosalonLocation)){
+      if ((historyTechnics[i].location is PhotosalonLocation) &&
+          (historyTechnics[i + 1].location is PhotosalonLocation)) {
         PhotosalonLocation currentPhotosalon = historyTechnics[i].location as PhotosalonLocation;
         PhotosalonLocation nextPhotosalon = historyTechnics[i + 1].location as PhotosalonLocation;
         if (currentPhotosalon.name == nextPhotosalon.name &&
-            historyTechnics[i].listTrouble.isEmpty && historyTechnics[i + 1].listTrouble.isEmpty) {
+            historyTechnics[i].listTrouble.isEmpty &&
+            historyTechnics[i + 1].listTrouble.isEmpty &&
+            historyTechnics[i].listTestDrive.isEmpty &&
+            historyTechnics[i + 1].listTestDrive.isEmpty) {
           continue;
         } else {
           newHistoryTechnics.add(historyTechnics[i]);
         }
-      }else{
+      } else {
         newHistoryTechnics.add(historyTechnics[i]);
       }
     }
     newHistoryTechnics.add(historyTechnics[historyTechnics.length - 1]);
     return newHistoryTechnics;
   }
-
-// Future<List> getAllHistory() async{
-//   var result = await _connDB!.query('SELECT * FROM history');
-//   var list = historyListFromMap(result);
-//   var reversedList = List.from(list.reversed);
-//   return reversedList;
-// }
-//
-
-//
-// List historyListFromMap(var result) {
-//   List list = [];
-//   for (var row in result) {
-//     // id-row[0], section-row[1],  idSection-row[2],  typeOperation-row[3], description-row[4], login-row[5],
-//     // date-row[6]
-//     String dateHystory = row[6].toString() == "-0001-11-30 00:00:00.000Z" ? "" : getDateFormatted(row[6].toString());
-//     History history = History(row[0], row[1],  row[2],  row[3], row[4].toString(), row[5].toString(), dateHystory);
-//     list.add(history);
-//   }
-//   return list;
-// }
 
   Future<void> updateTechnicInDB(Technic technic) async {
     await _connDB!.execute(

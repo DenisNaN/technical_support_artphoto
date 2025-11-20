@@ -8,7 +8,9 @@ import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/core/shared/logo_animate/logo_matrix_transition_animate.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
+import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/technics/models/history_technic.dart';
+import 'package:technical_support_artphoto/features/technics/models/test_drive_history_technic.dart';
 import 'package:technical_support_artphoto/features/technics/models/trouble_technic_on_period.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import 'package:technical_support_artphoto/features/troubles/presentarion/page/trouble_view.dart';
@@ -128,6 +130,7 @@ class HistoryTechnicPage extends StatelessWidget {
           ),
         ),
         _getListTroubles(currentHistoryTechnic.listTrouble, context),
+        _getListTestDrive(currentHistoryTechnic.listTestDrive),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0),
           child: Icon(Icons.arrow_upward),
@@ -272,6 +275,64 @@ class HistoryTechnicPage extends StatelessWidget {
                 ),
               ],
             ),
+          )
+      ],
+    );
+  }
+
+  Widget _getListTestDrive(List<TestDriveHistoryTechnic> testDrives) {
+    return Column(
+      children: [
+        for (int i = 0; i < testDrives.length; i++)
+          Stack(
+            children: <Widget>[
+              Container(
+                width: double.infinity,
+                margin: EdgeInsets.fromLTRB(20, 20, 20, 10),
+                padding: EdgeInsets.only(bottom: 7),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color.fromARGB(255, 248, 204, 12), width: 1),
+                  borderRadius: BorderRadius.circular(10),
+                  shape: BoxShape.rectangle,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 12.0, top: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Период: ${testDrives[i].dateStart.dateFormattedForInterface()} - ${testDrives[i].dateFinish.dateFormattedForInterface()}',
+                        style: TextStyle(color: Colors.black, fontSize: 14),
+                      ),
+                      Text(
+                        'Результат: ${testDrives[i].result}',
+                        style: TextStyle(color: Colors.black, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 50,
+                top: 7,
+                child: Container(
+                  padding: EdgeInsets.only(left: 5, right: 5),
+                  color: Colors.grey.shade50,
+                  child: Row(
+                    children: [
+                      Text('Тест-драйв ',
+                          style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
+                      Text(testDrives[i].isTestDriveClosed == false ? 'не завершен' : 'завершен',
+                          style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
+                      Icon(testDrives[i].isTestDriveClosed == false ? Icons.close : Icons.check,
+                          color: testDrives[i].isTestDriveClosed == false ? Colors.red : Colors.green),
+                      Text(
+                        testDrives[i].user),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           )
       ],
     );

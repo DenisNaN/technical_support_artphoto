@@ -13,10 +13,5 @@ class TroubleTechnicOnPeriod implements Comparable{
   @override
   int compareTo(other) {
     return other.id.compareTo(id);
-    // int dateTimeComp = other.date.compareTo(date);
-    // if(dateTimeComp == 0){
-    //   return other.id.compareTo(id);
-    // }
-    // return dateTimeComp;
   }
 }
