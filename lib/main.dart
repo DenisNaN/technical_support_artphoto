@@ -13,14 +13,17 @@ import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/di/init_dependencies.dart';
 import 'package:technical_support_artphoto/core/navigation/main_bottom_page_view.dart';
-import 'package:technical_support_artphoto/core/shared/failed_application/send_mail_failed_app.dart';
+// import 'package:technical_support_artphoto/core/shared/failed_application/send_mail_failed_app.dart';
+import 'package:technical_support_artphoto/features/home/presentation/page/home_page.dart';
+import 'package:technical_support_artphoto/features/notifications/models/push_notifications.dart';
+import 'package:technical_support_artphoto/features/notifications/presentation/widgets/notification_badge.dart';
 import 'package:technical_support_artphoto/features/splash_screen/presentation/page/splash_screen.dart';
 import 'core/navigation/main_bottom_app_bar.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
-    await Firebase.initializeApp(); // Required if not already done
+    // await Firebase.initializeApp(); // Required if not already done
     debugPrint('Handling a background message: ${message.messageId}');
     // Do your isolate-safe background processing here
   } catch (e, stack) {
@@ -47,8 +50,8 @@ void main() {
         return true;
       };
 
-      await Firebase.initializeApp();
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      // await Firebase.initializeApp();
+      // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
       runApp(const MyApp());
     },
@@ -104,17 +107,123 @@ class ArtphotoTech extends StatefulWidget {
 
 class _ArtphotoTechState extends State<ArtphotoTech> {
   late PageController pageViewController;
+  late int _totalNotifications;
+  late final FirebaseMessaging _messaging;
+  PushNotification? _notificationInfo;
 
   @override
   void initState() {
     super.initState();
     pageViewController = PageController(initialPage: widget.indexPage);
+    _totalNotifications = 0;
+    // registerNotification();
+
+    // checkForInitialMessage();
+
+    // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    //   PushNotification notification = PushNotification(
+    //     title: message.notification?.title,
+    //     body: message.notification?.body,
+    //   );
+    //   setState(() {
+    //     _notificationInfo = notification;
+    //     _totalNotifications++;
+    //   });
+
+      // _handleMessage(message);
+    // });
   }
 
   @override
   void dispose() {
     super.dispose();
     pageViewController.dispose();
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    Navigator.push(context, MaterialPageRoute(
+        builder: (context) => HomePage()));
+  }
+
+  checkForInitialMessage() async {
+    await Firebase.initializeApp();
+    RemoteMessage? initialMessage =
+    await FirebaseMessaging.instance.getInitialMessage();
+
+    if (initialMessage != null) {
+      PushNotification notification = PushNotification(
+        title: initialMessage.notification?.title,
+        body: initialMessage.notification?.body,
+      );
+      setState(() {
+        _notificationInfo = notification;
+        _totalNotifications++;
+      });
+    }
+  }
+
+  void registerNotification() async {
+    // 1. Initialize the Firebase app
+    await Firebase.initializeApp();
+
+    // 2. Instantiate Firebase Messaging
+    _messaging = FirebaseMessaging.instance;
+
+    // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // print('TOKEN - ${await _messaging.getToken()}');
+
+    // 3. On iOS, this helps to take the user permissions
+    NotificationSettings settings = await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      provisional: false,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      debugPrint('User granted permission');
+      // TODO: handle the received notifications
+    } else {
+      debugPrint('User declined or has not accepted permission');
+    }
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      debugPrint('User granted permission');
+
+      // For handling the received notifications
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        // Parse the message received
+        PushNotification notification = PushNotification(
+          title: message.notification?.title,
+          body: message.notification?.body,
+        );
+
+        setState(() {
+          _notificationInfo = notification;
+          _totalNotifications++;
+        });
+      });
+    } else {
+      debugPrint('User declined or has not accepted permission');
+    }
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        // ...
+        if (_notificationInfo != null) {
+          // For displaying the notification as an overlay
+          showSimpleNotification(
+            Text(_notificationInfo!.title!),
+            leading: NotificationBadge(totalNotifications: _totalNotifications),
+            subtitle: Text(_notificationInfo!.body!),
+            background: Colors.cyan.shade700,
+            duration: Duration(seconds: 2),
+          );
+        }
+      });
+    } else {
+      debugPrint('User declined or has not accepted permission');
+    }
   }
 
   @override
@@ -124,139 +233,4 @@ class _ArtphotoTechState extends State<ArtphotoTech> {
         body: MainBottomPageView(pageController: pageViewController)
     );
   }
-
-// Widget myAppBarIconNotifications() {
-//   return GestureDetector(
-//     onTap: () {
-//       showModalBottomSheet<void>(
-//         enableDrag: true,
-//         showDragHandle: true,
-//         backgroundColor: Colors.purple.shade100,
-//         shape: const RoundedRectangleBorder(
-//           borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-//         ),
-//         context: context,
-//         builder: (BuildContext context) {
-//           return SizedBox(
-//             height: 500,
-//             child: Center(child: _buildListForBottomSheet()),
-//           );
-//         },
-//       );
-//     },
-//     child: SizedBox(
-//       width: 30,
-//       height: 30,
-//       child: Stack(
-//         children: [
-//           Notifications.notificationsList.isNotEmpty
-//               ? const Icon(
-//                   Icons.notifications_active,
-//                   color: Colors.white,
-//                   size: 30,
-//                 )
-//               : const Icon(
-//                   Icons.notifications_off,
-//                   color: Colors.white,
-//                   size: 30,
-//                 ),
-//           Container(
-//             width: 30,
-//             height: 30,
-//             alignment: Alignment.topRight,
-//             margin: const EdgeInsets.only(top: 5),
-//             child: Container(
-//               width: 17,
-//               height: 17,
-//               decoration: BoxDecoration(
-//                   shape: BoxShape.circle,
-//                   color: Colors.blue.shade200,
-//                   border: Border.all(color: Colors.purpleAccent, width: 1)),
-//               child: Padding(
-//                 padding: const EdgeInsets.all(0.0),
-//                 child: Center(
-//                   child: Text(
-//                     '${Notifications.notificationsList.length}',
-//                     style: const TextStyle(fontSize: 10, color: Colors.black),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     ),
-//   );
-// }
-//
-// ListView _buildListForBottomSheet() {
-//   return ListView.builder(
-//       physics: const AlwaysScrollableScrollPhysics(),
-//       itemCount: Notifications.notificationsList.length,
-//       itemBuilder: (context, index) {
-//         return Container(
-//           margin: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
-//           decoration: BoxDecoration(
-//               borderRadius: BorderRadius.circular(10),
-//               gradient: const LinearGradient(
-//                   colors: [Colors.white54, Colors.white], begin: Alignment.topRight, end: Alignment.bottomLeft),
-//               boxShadow: const [
-//                 BoxShadow(
-//                   color: Colors.grey,
-//                   blurRadius: 4,
-//                   offset: Offset(2, 4), // Shadow position
-//                 ),
-//               ]),
-//           child: ListTile(
-//               onTap: () {
-//                 switch (Notifications.notificationsList[index].section) {
-//                   case 'Technic':
-//                     Technic? technicFind = Technic.technicList.firstWhere(
-//                         (item) => item.id == Notifications.notificationsList[index].idSection,
-//                         orElse: () => null);
-//                     if (technicFind != null) {
-//                       Navigator.pop(context);
-//                       Navigator.push(context,
-//                               MaterialPageRoute(builder: (context) => TechnicViewAndChange(technic: technicFind)))
-//                           .then((value) {
-//                         setState(() {
-//                           if (value != null) {
-//                             Technic.technicList[Technic.technicList.indexWhere(
-//                                 (element) => element.id == Notifications.notificationsList[index].idSection)] = value;
-//                             Notifications.notificationsList.clear();
-//                             Notifications.notificationsList
-//                                 .addAll(DownloadAllList.downloadStartData.getNotifications());
-//                           }
-//                         });
-//                       });
-//                       break;
-//                     }
-//                   case 'Repair':
-//                     Repair? repairFind = Repair.repairList.firstWhere(
-//                         (item) => item.id == Notifications.notificationsList[index].idSection,
-//                         orElse: () => null);
-//                     if (repairFind != null) {
-//                       Navigator.pop(context);
-//                       Navigator.push(context,
-//                               MaterialPageRoute(builder: (context) => RepairViewAndChange(repair: repairFind)))
-//                           .then((value) {
-//                         setState(() {
-//                           if (value != null) {
-//                             Repair.repairList[Repair.repairList.indexWhere(
-//                                 (element) => element.id == Notifications.notificationsList[index].idSection)] = value;
-//                             Notifications.notificationsList.clear();
-//                             Notifications.notificationsList
-//                                 .addAll(DownloadAllList.downloadStartData.getNotifications());
-//                           }
-//                         });
-//                       });
-//                       break;
-//                     }
-//                 }
-//               },
-//               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-//               title: Text(Notifications.notificationsList[index].description)),
-//         );
-//       });
-// }
 }

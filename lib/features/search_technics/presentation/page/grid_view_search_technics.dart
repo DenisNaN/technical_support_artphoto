@@ -5,6 +5,7 @@ import 'package:technical_support_artphoto/core/api/data/models/repair_location.
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/transportation_location.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/features/technics/models/grid_view_technics_model.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
@@ -23,29 +24,44 @@ class GridViewSearchTechnics extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Technic> technics =
         getSearchTechnics(typeSearch, valueTechnic ?? '', Provider.of<ProviderModel>(context));
+    GridViewTechnicsModel gridViewTechnicsModel =
+      filteredTechnics(technics, Provider.of<ProviderModel>(context));
+    List<Technic> technicsNotDonors = [];
+    List<Technic> technicsDonors = [];
+    for (var technicsNotDonorsList in gridViewTechnicsModel.mapNotDonors.values){
+      if(technicsNotDonorsList.isNotEmpty){
+        technicsNotDonors.addAll(technicsNotDonorsList);
+      }
+    }
+    for (var technicsDonorsList in gridViewTechnicsModel.mapDonors.values){
+      if(technicsDonorsList.isNotEmpty){
+        technicsDonors.addAll(technicsDonorsList);
+      }
+    }
+    bool isTechnicsDonorsNotZero = technicsDonors.isEmpty ? false : true;
     return Scaffold(
         appBar: CustomAppBar(typePage: TypePage.searchTechnic, location: valueTechnic ?? '', technic: null),
         body: CustomScrollView(
           physics: BouncingScrollPhysics(),
           primary: false,
           slivers: [
-              technics.isEmpty ?
+            technicsNotDonors.isEmpty ?
               SliverAppBar(
                 leading: SizedBox(),
-                title: Text('Техника не найдена'),
+                title: Text('Работоспособная техника не найдена'),
                 centerTitle: true,
               ) :
               SliverPadding(
                 padding: EdgeInsets.all(8),
                 sliver: SliverGrid.builder(
-                    itemCount: technics.length,
+                    itemCount: technicsNotDonors.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                     ),
                     itemBuilder: (_, int index) {
-                      Technic technic = technics[index];
+                      Technic technic = technicsNotDonors[index];
                       bool isTechnicBroken = technic.status == 'Неисправна';
                       bool isTestDrive = technic.status == 'Тест-драйв';
                       bool isNotDeadlineTestDrive = false;
@@ -129,6 +145,105 @@ class GridViewSearchTechnics extends StatelessWidget {
                       );
                     }),
               ),
+            SliverAppBar(
+              backgroundColor: Colors.grey.shade50,
+              automaticallyImplyLeading: false,
+              title: isTechnicsDonorsNotZero
+                  ? Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 2,
+                    decoration: BoxDecoration(color: Colors.black),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  const Text(
+                    'Доноры:',
+                    style: TextStyle(color: Colors.blueAccent),
+                  ),
+                ],
+              )
+                  : SizedBox(),
+            ),
+            SliverPadding(
+              padding: EdgeInsets.only(
+                  bottom: technicsDonors.isNotEmpty ? 14.0 : 0,
+                  left: technicsDonors.isNotEmpty ? 14.0 : 0,
+                  right: technicsDonors.isNotEmpty ? 14.0 : 0),
+              sliver: SliverGrid.builder(
+                  itemCount: technicsDonors.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemBuilder: (_, int index) {
+                    Technic technic = technicsDonors[index];
+
+                    return GridTile(
+                      header: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 2),
+                              child: Text(
+                                technic.category,
+                                style: Theme.of(context).textTheme.titleSmall,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black54, width: 1),
+                                  borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Text(technic.number.toString()),
+                              )),
+                        ],
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(context,
+                              animationRouteSlideTransition(LoadingOverlay(child: TechnicView(location: technic.dislocation, technic: technic))));
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.shade500,
+                                spreadRadius: 1,
+                                blurRadius: 3,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Expanded(child: TechnicImage(category: technic.category)),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4, right: 2),
+                                child: Text(
+                                  technic.name == '' ? 'Модель не указана' : technic.name,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+            ),
           ],
         ));
   }
@@ -174,5 +289,38 @@ class GridViewSearchTechnics extends StatelessWidget {
       }
     }
     return technics;
+  }
+
+  GridViewTechnicsModel filteredTechnics(List<Technic> list, ProviderModel provider) {
+    GridViewTechnicsModel gridViewTechnicsModel = GridViewTechnicsModel();
+    List<Technic> listNotDonors = [];
+    List<Technic> listDonors = [];
+    List<String> namesEquipments = provider.namesEquipments;
+
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].status != 'Донор') {
+        listNotDonors.add(list[i]);
+      } else {
+        listDonors.add(list[i]);
+      }
+    }
+
+    //filter for namesEquipments
+    for (var elementNamesEquipments in namesEquipments) {
+      gridViewTechnicsModel.mapNotDonors[elementNamesEquipments] = <Technic>[];
+      gridViewTechnicsModel.mapDonors[elementNamesEquipments] = <Technic>[];
+
+      for (var elementListNotDonors in listNotDonors) {
+        if (elementListNotDonors.category == elementNamesEquipments) {
+          gridViewTechnicsModel.mapNotDonors[elementNamesEquipments]?.add(elementListNotDonors);
+        }
+      }
+      for (var elementListDonors in listDonors) {
+        if (elementListDonors.category == elementNamesEquipments) {
+          gridViewTechnicsModel.mapDonors[elementNamesEquipments]?.add(elementListDonors);
+        }
+      }
+    }
+    return gridViewTechnicsModel;
   }
 }

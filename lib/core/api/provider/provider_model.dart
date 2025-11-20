@@ -5,21 +5,28 @@ import 'package:technical_support_artphoto/core/api/data/models/repair_location.
 import 'package:technical_support_artphoto/core/api/data/models/storage_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/transportation_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/trouble_account_mail_ru.dart';
+import 'package:technical_support_artphoto/features/supplies/models/model_supplies.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../../../features/repairs/models/repair.dart';
 import '../data/models/user.dart';
 
 class ProviderModel with ChangeNotifier {
+  int totalNotifications = 0;
+
   late final Map<String, PhotosalonLocation> _technicsInPhotosalons;
   late final Map<String, RepairLocation> _technicsInRepairs;
   late final Map<String, StorageLocation> _technicsInStorages;
   late final Map<String, TransportationLocation> _technicsInTransportation;
 
   late final List<Repair> _currentRepairs;
+  List<Technic> _technicsClosedRepair = [];
   bool _isChangeRedAndYellow = false;
 
   late final List<Trouble> _troubles;
+
+  late ModelSupplies _suppliesGarage;
+  late ModelSupplies _suppliesOffice;
 
   late final List<String> _namesEquipments;
   late final List<String> _namesDislocations;
@@ -49,9 +56,15 @@ class ProviderModel with ChangeNotifier {
 
   List<Repair> get getCurrentRepairs => _currentRepairs;
 
+  List<Technic> get getTechnicsClosedRepair => _technicsClosedRepair;
+
   bool get isChangeRedAndYellow => _isChangeRedAndYellow;
 
   List<Trouble> get getTroubles => _troubles;
+
+  ModelSupplies get getSuppliesGarage => _suppliesGarage;
+
+  ModelSupplies get getSuppliesOffice => _suppliesOffice;
 
   List<String> get namesDislocation => _namesDislocations;
 
@@ -108,6 +121,14 @@ class ProviderModel with ChangeNotifier {
     _troubles.clear();
     _troubles.addAll(troubles);
     notifyListeners();
+  }
+
+  void downloadSuppliesGarage(ModelSupplies model) {
+    _suppliesGarage = model;
+  }
+
+  void downloadSuppliesOffice(ModelSupplies model) {
+    _suppliesOffice = model;
   }
 
   void downloadAllCategoryDropDown(List<String> namesEquipments, List<String> namePhotosalons, List<String> services,
@@ -181,6 +202,16 @@ class ProviderModel with ChangeNotifier {
 
   void addTechnicInRepair(String name, Technic technic) {
     _technicsInRepairs[name]!.technics.add(technic);
+    notifyListeners();
+  }
+
+  void updateTechnicsClosedRepair(List<Technic> technics){
+    _technicsClosedRepair = technics;
+    notifyListeners();
+  }
+
+  void clearTechnicsClosedRepair() {
+    _technicsClosedRepair.clear();
     notifyListeners();
   }
 
@@ -272,6 +303,12 @@ class ProviderModel with ChangeNotifier {
 
     _currentRepairs.clear();
     _currentRepairs.addAll(filterRepairs);
+  }
+
+  void refreshSupplies(Map<String, ModelSupplies> supplies) {
+    _suppliesGarage = supplies['garage']!;
+    _suppliesOffice = supplies['office']!;
+    notifyListeners();
   }
 
   bool setChangeRedAndYellow(){

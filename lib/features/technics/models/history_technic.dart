@@ -1,5 +1,6 @@
 import 'package:technical_support_artphoto/core/api/data/models/location.dart';
-import 'package:technical_support_artphoto/features/technics/data/models/trouble_technic_on_period.dart';
+import 'package:technical_support_artphoto/features/technics/models/test_drive_history_technic.dart';
+import 'package:technical_support_artphoto/features/technics/models/trouble_technic_on_period.dart';
 
 class HistoryTechnic implements Comparable{
   final int id;
@@ -11,6 +12,7 @@ class HistoryTechnic implements Comparable{
   String? employee;
   String? trouble;
   List<TroubleTechnicOnPeriod> listTrouble = [];
+  List<TestDriveHistoryTechnic> listTestDrive = [];
 
   HistoryTechnic({required this.id, required this.date, required this.location});
 

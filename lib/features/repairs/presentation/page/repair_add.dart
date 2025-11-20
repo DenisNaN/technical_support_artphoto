@@ -84,52 +84,55 @@ class _RepairAddState extends State<RepairAdd> {
     return Scaffold(
         key: scaffoldKey,
         appBar: CustomAppBar(typePage: TypePage.addRepair, location: null, technic: null),
-        body: Form(
-          key: formKey,
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              _buildInternalID(),
-              SizedBox(height: 20),
-              _buildNameTechnic(),
-              SizedBox(height: isBN ? 14 : 25),
-              _buildLastDislocation(providerModel),
-              SizedBox(height: isBN ? 9 : 25),
-              _buildStatus(providerModel),
-              SizedBox(height: 20),
-              _selectedDropdownStatusOld == 'В ремонте' ? _buildDislocationService(providerModel) : SizedBox(),
-              _selectedDropdownStatusOld == 'В ремонте' ? SizedBox(height: 20) : SizedBox(),
-              _buildComplaint(),
-              SizedBox(height: 20),
-              _buildDateDeparture(),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
-                    child: Text("Отмена"),
-                  ),
-                  ElevatedButton(
+        body: SafeArea(
+          bottom: true,
+          child: Form(
+            key: formKey,
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildInternalID(),
+                SizedBox(height: 20),
+                _buildNameTechnic(),
+                SizedBox(height: isBN ? 14 : 25),
+                _buildLastDislocation(providerModel),
+                SizedBox(height: isBN ? 9 : 25),
+                _buildStatus(providerModel),
+                SizedBox(height: 20),
+                _selectedDropdownStatusOld == 'В ремонте' ? _buildDislocationService(providerModel) : SizedBox(),
+                _selectedDropdownStatusOld == 'В ремонте' ? SizedBox(height: 20) : SizedBox(),
+                _buildComplaint(),
+                SizedBox(height: 20),
+                _buildDateDeparture(),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
                       onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          Repair repair = createRepair(providerModel);
-                          _save(repair, providerModel).then((isSave) {
-                            providerModel.changeCurrentPageMainBottomAppBar(1);
-                            _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', scaffoldKey);
-                          });
-                        }
+                        Navigator.pop(context);
                       },
-                      child: const Text("Сохранить")),
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              )
-            ],
+                      style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                      child: Text("Отмена"),
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            Repair repair = createRepair(providerModel);
+                            _save(repair, providerModel).then((isSave) {
+                              providerModel.changeCurrentPageMainBottomAppBar(1);
+                              _viewSnackBar(Icons.save, isSave, 'Заявка создана', 'Заявка не создана', scaffoldKey);
+                            });
+                          }
+                        },
+                        child: const Text("Сохранить")),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                )
+              ],
+            ),
           ),
         ));
   }
@@ -574,29 +577,30 @@ class _RepairAddState extends State<RepairAdd> {
   //   return result;
   // }
 
-  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText, GlobalKey<ScaffoldState> scaffoldKey) {
-    final contextViewSnackBar = scaffoldKey.currentContext;
-    if(contextViewSnackBar != null && contextViewSnackBar.mounted){
-      ScaffoldMessenger.of(contextViewSnackBar).hideCurrentSnackBar();
-      ScaffoldMessenger.of(contextViewSnackBar).showSnackBar(
-        SnackBar(
-          content: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
-              SizedBox(
-                width: 20,
-              ),
-              Flexible(child: Text(isSuccessful ? successText : notSuccessText)),
-            ],
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successText,
+      String notSuccessText, GlobalKey<ScaffoldState> scaffoldKey) {
+      final contextViewSnackBar = scaffoldKey.currentContext;
+      if(contextViewSnackBar != null && contextViewSnackBar.mounted){
+        ScaffoldMessenger.of(contextViewSnackBar).hideCurrentSnackBar();
+        ScaffoldMessenger.of(contextViewSnackBar).showSnackBar(
+          SnackBar(
+            content: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+                SizedBox(
+                  width: 20,
+                ),
+                Flexible(child: Text(isSuccessful ? successText : notSuccessText)),
+              ],
+            ),
+            duration: const Duration(seconds: 5),
+            showCloseIcon: true,
           ),
-          duration: const Duration(seconds: 5),
-          showCloseIcon: true,
-        ),
-      );
-      Navigator.pushAndRemoveUntil(
-          context, animationRouteSlideTransition(const ArtphotoTech(indexPage: 1,)), (Route<dynamic> route) => false);
-    }
+        );
+        Navigator.pushAndRemoveUntil(
+            context, animationRouteSlideTransition(const ArtphotoTech(indexPage: 1,)), (Route<dynamic> route) => false);
+      }
     }
 }
 

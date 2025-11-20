@@ -1,60 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/shared/custom_app_bar/custom_app_bar.dart';
 import 'package:technical_support_artphoto/core/utils/enums.dart';
 import 'package:technical_support_artphoto/core/shared/technic_image/technic_image.dart';
-import 'package:technical_support_artphoto/features/technics/models/grid_view_technics_model.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_view.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
 import '../../../../core/navigation/animation_navigation.dart';
 
-class GridViewTechnics extends StatelessWidget {
-  const GridViewTechnics({super.key, required this.location});
+class GridViewTechnicsRepair extends StatefulWidget {
+  const GridViewTechnicsRepair({super.key, required this.location});
 
   final dynamic location;
 
   @override
+  State<GridViewTechnicsRepair> createState() => _GridViewTechnicsRepairState();
+}
+
+class _GridViewTechnicsRepairState extends State<GridViewTechnicsRepair> {
+  @override
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
-    GridViewTechnicsModel gridViewTechnicsModel =
-        filteredTechnics(location.technics, Provider.of<ProviderModel>(context));
-    bool isTechnicsDonorsNotZero = false;
-    for (var element in gridViewTechnicsModel.mapDonors.values) {
-      if(element.isNotEmpty) {
-        isTechnicsDonorsNotZero = true;
-        break;
-      }
-    }
+    List<Technic> technics = widget.location.technics;
     List<Trouble> troubles = providerModel.getTroubles;
     return Scaffold(
-        appBar: CustomAppBar(typePage: TypePage.listTechnics, location: location, technic: null),
+        appBar: CustomAppBar(typePage: TypePage.listTechnics, location: widget.location, technic: null),
+        floatingActionButton: FloatingActionButton.extended(
+            onPressed: () async{
+              downloadTechnicsClosedRepair(providerModel);
+            },
+          label: Text('Отремонтированная техника')),
         body: CustomScrollView(
           physics: BouncingScrollPhysics(),
           primary: false,
           slivers: [
-            for (var technicsNotDonors in gridViewTechnicsModel.mapNotDonors.values)
               SliverPadding(
-                padding: EdgeInsets.all(technicsNotDonors.isNotEmpty ? 8 : 0),
+                padding: EdgeInsets.all(technics.isNotEmpty ? 8 : 0),
                 sliver: SliverGrid.builder(
-                    itemCount: technicsNotDonors.length,
+                    itemCount: technics.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                     ),
                     itemBuilder: (_, int index) {
-                      Technic technic = technicsNotDonors[index];
-                      bool isTechnicBroken = technic.status == 'Неисправна';
-                      bool isTestDrive = technic.status == 'Тест-драйв';
-                      bool isNotDeadlineTestDrive = false;
+                      Technic technic = technics[index];
                       bool isTroubleHas = false;
-                      if(technic.testDrive != null && technic.testDrive!.isCloseTestDrive == false &&
-                          technic.testDrive!.dateFinish.difference(DateTime.now()).inDays < 0){
-                        isNotDeadlineTestDrive = true;
-                      }
                       for(final trouble in troubles){
                         if(technic.number == trouble.numberTechnic){
                           if (trouble.numberTechnic != 0) {
@@ -103,12 +97,12 @@ class GridViewTechnics extends StatelessWidget {
                             Navigator.push(context,
                                 animationRouteSlideTransition(LoadingOverlay(
                                     child: TechnicView(
-                                        location: location,
+                                        location: widget.location,
                                         technic: technic))));
                           },
                           child: Container(
                             decoration: BoxDecoration(
-                              color: isTechnicBroken ? Colors.red.shade50 : isTestDrive ? Colors.yellow.shade50 : Colors.blue.shade50,
+                              color: Colors.blue.shade50,
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
@@ -127,7 +121,6 @@ class GridViewTechnics extends StatelessWidget {
                                 Expanded(child: TechnicImage(category: technic.category)),
                                 Row(
                                   children: [
-                                    isNotDeadlineTestDrive ? Icon(Icons.error, color: Colors.red.shade400,) : SizedBox(),
                                     Expanded(
                                       child: Center(
                                         child: Text(
@@ -148,7 +141,7 @@ class GridViewTechnics extends StatelessWidget {
             SliverAppBar(
               backgroundColor: Colors.grey.shade50,
               automaticallyImplyLeading: false,
-              title: isTechnicsDonorsNotZero
+              title: providerModel.getTechnicsClosedRepair.isNotEmpty
                   ? Column(
                       children: [
                         Container(
@@ -160,28 +153,27 @@ class GridViewTechnics extends StatelessWidget {
                           height: 5,
                         ),
                         const Text(
-                          'Доноры:',
+                          'История:',
                           style: TextStyle(color: Colors.blueAccent),
                         ),
                       ],
                     )
                   : SizedBox(),
             ),
-            for (var technicsDonors in gridViewTechnicsModel.mapDonors.values)
-              SliverPadding(
+            SliverPadding(
                 padding: EdgeInsets.only(
-                    bottom: technicsDonors.isNotEmpty ? 14.0 : 0,
-                    left: technicsDonors.isNotEmpty ? 14.0 : 0,
-                    right: technicsDonors.isNotEmpty ? 14.0 : 0),
+                    bottom: providerModel.getTechnicsClosedRepair.isNotEmpty ? 14.0 : 0,
+                    left: providerModel.getTechnicsClosedRepair.isNotEmpty ? 14.0 : 0,
+                    right: providerModel.getTechnicsClosedRepair.isNotEmpty ? 14.0 : 0),
                 sliver: SliverGrid.builder(
-                    itemCount: technicsDonors.length,
+                    itemCount: providerModel.getTechnicsClosedRepair.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                     ),
                     itemBuilder: (_, int index) {
-                      Technic technic = technicsDonors[index];
+                      Technic technic = providerModel.getTechnicsClosedRepair[index];
 
                       return GridTile(
                         header: Row(
@@ -210,7 +202,7 @@ class GridViewTechnics extends StatelessWidget {
                         child: InkWell(
                           onTap: () {
                             Navigator.push(context,
-                                animationRouteSlideTransition(LoadingOverlay(child: TechnicView(location: location, technic: technic))));
+                                animationRouteSlideTransition(LoadingOverlay(child: TechnicView(location: widget.location, technic: technic))));
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -249,36 +241,12 @@ class GridViewTechnics extends StatelessWidget {
         ));
   }
 
-  GridViewTechnicsModel filteredTechnics(List<Technic> list, ProviderModel provider) {
-    GridViewTechnicsModel gridViewTechnicsModel = GridViewTechnicsModel();
-    List<Technic> listNotDonors = [];
-    List<Technic> listDonors = [];
-    List<String> namesEquipments = provider.namesEquipments;
-
-    for (int i = 0; i < list.length; i++) {
-      if (list[i].status != 'Донор') {
-        listNotDonors.add(list[i]);
-      } else {
-        listDonors.add(list[i]);
-      }
+  void downloadTechnicsClosedRepair(ProviderModel providerModel) async{
+    LoadingOverlay.of(context).show();
+    List<Technic> technicsClosedRepair = await TechnicalSupportRepoImpl.downloadData.getTechnicsFinishedRepairsByRepairman(widget.location.name);
+    providerModel.updateTechnicsClosedRepair(technicsClosedRepair);
+    if (mounted) {
+      LoadingOverlay.of(context).hide();
     }
-
-    //filter for namesEquipments
-    for (var elementNamesEquipments in namesEquipments) {
-      gridViewTechnicsModel.mapNotDonors[elementNamesEquipments] = <Technic>[];
-      gridViewTechnicsModel.mapDonors[elementNamesEquipments] = <Technic>[];
-
-      for (var elementListNotDonors in listNotDonors) {
-        if (elementListNotDonors.category == elementNamesEquipments) {
-          gridViewTechnicsModel.mapNotDonors[elementNamesEquipments]?.add(elementListNotDonors);
-        }
-      }
-      for (var elementListDonors in listDonors) {
-        if (elementListDonors.category == elementNamesEquipments) {
-          gridViewTechnicsModel.mapDonors[elementNamesEquipments]?.add(elementListDonors);
-        }
-      }
-    }
-    return gridViewTechnicsModel;
   }
 }
