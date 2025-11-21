@@ -7,6 +7,7 @@ import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_ov
 import 'package:technical_support_artphoto/features/home/presentation/widgets/grid_view_basket_decommissioned.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/grid_view_home_page.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/grid_view_transport_technics.dart';
+import 'package:technical_support_artphoto/features/home/presentation/widgets/hint_expandable_container.dart';
 import 'package:technical_support_artphoto/features/home/presentation/widgets/my_custom_refresh_indicator.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/page/technic_add.dart';
 import '../widgets/appbar_homepage.dart';
@@ -42,6 +43,7 @@ class _HomePageState extends State<HomePage> {
                 GridViewHomePage(locations: providerModel.technicsInRepairs, color: providerModel.colorRepairs),
                 GridViewTransportTechnics(locations: providerModel.technicsInTransportation, color: providerModel.colorTransport),
                 GridViewBasketDecommissioned(),
+                HintExpandableContainer()
               ],
             )),
       ),

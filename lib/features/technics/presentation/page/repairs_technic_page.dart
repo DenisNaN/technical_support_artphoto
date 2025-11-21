@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
+import 'package:technical_support_artphoto/core/utils/extension.dart';
 import 'package:technical_support_artphoto/features/technics/models/technic.dart';
 import 'package:technical_support_artphoto/core/api/data/repositories/technical_support_repo_impl.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
@@ -24,7 +25,11 @@ class _RepairsTechnicPageState extends State<RepairsTechnicPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(typePage: TypePage.technicRepair, technic: widget.technic, location: null,),
+      appBar: CustomAppBar(
+        typePage: TypePage.technicRepair,
+        technic: widget.technic,
+        location: null,
+      ),
       body: ListView.builder(
           itemCount: widget.sumsRepairs.length,
           itemBuilder: (context, index) {
@@ -46,10 +51,14 @@ class _RepairsTechnicPageState extends State<RepairsTechnicPage> {
                 title: _buildText(context, index),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 onTap: () {
-                  TechnicalSupportRepoImpl.downloadData.getRepair(widget.sumsRepairs[index].idRepair).then((repair){
-                    if(repair != null && context.mounted){
-                      Navigator.push(context,
-                          animationRouteSlideTransition(LoadingOverlay(child: RepairView(repair: repair))));
+                  TechnicalSupportRepoImpl.downloadData
+                      .getRepair(widget.sumsRepairs[index].idRepair)
+                      .then((repair) {
+                    if (repair != null && context.mounted) {
+                      Navigator.push(
+                          context,
+                          animationRouteSlideTransition(
+                              LoadingOverlay(child: RepairView(repair: repair))));
                     }
                   });
                 },
@@ -71,35 +80,48 @@ class _RepairsTechnicPageState extends State<RepairsTechnicPage> {
             style: GoogleFonts.montserratAlternates(fontWeight: FontWeight.bold, fontSize: 20),
           ),
           Text.rich(TextSpan(children: [
-            TextSpan(text: 'Жалоба: ', style: TextStyle(fontWeight: FontWeight.bold)
-            ),
+            TextSpan(text: 'Жалоба: ', style: TextStyle(fontWeight: FontWeight.bold)),
             TextSpan(text: repair.complaint)
+          ])),
+          Text.rich(TextSpan(children: [
+            TextSpan(text: 'Выполненые работы: ', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextSpan(text: repair.worksPerformed)
           ])),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 2.0),
-            child: Container(height: 1, color: Colors.black87,),
+            child: Container(
+              height: 1,
+              color: Colors.black87,
+            ),
           ),
           Text.rich(TextSpan(children: [
-            TextSpan(text: 'Выполненые работы: ', style: TextStyle(fontWeight: FontWeight.bold)
-            ),
-            TextSpan(text: repair.worksPerformed)
+            TextSpan(text: 'Отвозили в ремонт: ', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextSpan(
+                text: repair.dateTransferInService != null &&
+                        repair.dateTransferInService.toString() != "-0001-11-30 00:00:00.000" &&
+                        repair.dateTransferInService.toString() != "0001-11-30 00:00:00.000"
+                    ? repair.dateTransferInService?.dateFormattedForInterface()
+                    : 'нет даты')
           ])),
-          SizedBox(height: 7,),
-          Text('${repair.sumRepair} р.',
-              style: GoogleFonts.montserratAlternates(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.indigo),
+          Text.rich(TextSpan(children: [
+            TextSpan(text: 'Забрали из ремонта: ', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextSpan(text: repair.dateReceipt != null &&
+                repair.dateReceipt.toString() != "-0001-11-30 00:00:00.000" &&
+                repair.dateReceipt.toString() != "0001-11-30 00:00:00.000"
+                ? repair.dateReceipt?.dateFormattedForInterface()
+                : 'нет даты')
+          ])),
+          SizedBox(
+            height: 7,
+          ),
+          Text(
+            '${repair.sumRepair} р.',
+            style: GoogleFonts.montserratAlternates(
+                fontWeight: FontWeight.bold, fontSize: 20, color: Colors.indigo),
           ),
         ],
       ),
     );
-
-    //   Text.rich(
-    //     TextSpan(children: [
-    //       TextSpan(text: 'Ремонтировал: ${repair.repairmen}\n', style: const TextStyle(fontSize: 20)),
-    //       TextSpan(text: 'Сумма ремонта: ${repair.summRepair}\n'),
-    //       TextSpan(text: 'Жалоба: ${repair.complaint}\n'),
-    //     ]
-    //     )
-    // );
   }
 
   String getDateFormat(DateTime date) {

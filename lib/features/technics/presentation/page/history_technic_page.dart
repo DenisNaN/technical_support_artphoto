@@ -47,7 +47,8 @@ class HistoryTechnicPage extends StatelessWidget {
             );
           } else if (snapshot.hasError) {
             return Scaffold(
-                appBar: CustomAppBar(typePage: TypePage.error, location: 'Произошел сбой', technic: null),
+                appBar: CustomAppBar(
+                    typePage: TypePage.error, location: 'Произошел сбой', technic: null),
                 body: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -79,7 +80,8 @@ class HistoryTechnicPage extends StatelessWidget {
         });
   }
 
-  Widget _listTile(List<HistoryTechnic> historyList, int index, BuildContext context, ProviderModel providerModel) {
+  Widget _listTile(List<HistoryTechnic> historyList, int index, BuildContext context,
+      ProviderModel providerModel) {
     bool isStartIndex = index == 0;
     HistoryTechnic currentHistoryTechnic = historyList[index];
     DateTime? finishDate;
@@ -100,15 +102,16 @@ class HistoryTechnicPage extends StatelessWidget {
     return SizedBox();
   }
 
-  Widget _buildListTilePhotosalon(
-      HistoryTechnic currentHistoryTechnic, bool isStartIndex, DateTime? finishDate, BuildContext context) {
+  Widget _buildListTilePhotosalon(HistoryTechnic currentHistoryTechnic, bool isStartIndex,
+      DateTime? finishDate, BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
           width: 200,
           padding: EdgeInsets.all(7),
-          decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(15)), color: Colors.blue),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(15)), color: Colors.blue),
           child: Center(
               child: Text(
             (currentHistoryTechnic.location as PhotosalonLocation).name,
@@ -121,7 +124,8 @@ class HistoryTechnicPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               isStartIndex || finishDate == null
-                  ? Text('${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)} - по настоящее время',
+                  ? Text(
+                      '${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)} - по настоящее время',
                       style: TextStyle(fontSize: 18))
                   : Text(
                       '${DateFormat('dd MMMM yyyy', 'ru').format(currentHistoryTechnic.date)} - ${DateFormat('dd MMMM yyyy', 'ru').format(finishDate)}',
@@ -139,15 +143,16 @@ class HistoryTechnicPage extends StatelessWidget {
     );
   }
 
-  Widget _buildListTileRepair(
-      HistoryTechnic currentHistoryTechnic, bool isStartIndex, BuildContext context, providerModel) {
+  Widget _buildListTileRepair(HistoryTechnic currentHistoryTechnic, bool isStartIndex,
+      BuildContext context, providerModel) {
     return GestureDetector(
       onTap: () {
         Repair? repair;
         getRepairForHistory(currentHistoryTechnic.id).then((value) {
           repair = value;
           if (repair != null && context.mounted) {
-            Navigator.push(context, animationRouteSlideTransition(LoadingOverlay(child: RepairView(repair: repair!))));
+            Navigator.push(context,
+                animationRouteSlideTransition(LoadingOverlay(child: RepairView(repair: repair!))));
           }
         });
       },
@@ -157,8 +162,8 @@ class HistoryTechnicPage extends StatelessWidget {
           Container(
             width: 200,
             padding: EdgeInsets.all(7),
-            decoration:
-                BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(15)), color: Colors.green.shade300),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(15)), color: Colors.green.shade300),
             child: Center(
                 child: Text(
               (currentHistoryTechnic.location as RepairLocation).name,
@@ -207,7 +212,8 @@ class HistoryTechnicPage extends StatelessWidget {
                   color: Colors.grey.shade50,
                   child: Text(
                     '${currentHistoryTechnic.costService} р.',
-                    style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+                    style:
+                        TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -228,7 +234,9 @@ class HistoryTechnicPage extends StatelessWidget {
         for (int i = 0; i < troubles.length; i++)
           GestureDetector(
             onTap: () {
-              TechnicalSupportRepoImpl.downloadData.getTrouble(troubles[i].id.toString()).then((trouble) {
+              TechnicalSupportRepoImpl.downloadData
+                  .getTrouble(troubles[i].id.toString())
+                  .then((trouble) {
                 if (trouble != null) {
                   if (context.mounted) {
                     _navigationOnTechnicView(trouble, context);
@@ -264,10 +272,12 @@ class HistoryTechnicPage extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(troubles[i].isTroubleClosed == false ? Icons.close : Icons.check,
-                            color: troubles[i].isTroubleClosed == false ? Colors.red : Colors.green),
+                            color:
+                                troubles[i].isTroubleClosed == false ? Colors.red : Colors.green),
                         Text(
                           '${troubles[i].employee}',
-                          style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -321,13 +331,20 @@ class HistoryTechnicPage extends StatelessWidget {
                   child: Row(
                     children: [
                       Text('Тест-драйв ',
-                          style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
-                      Text(testDrives[i].isTestDriveClosed == false ? 'не завершен' : 'завершен',
-                          style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
-                      Icon(testDrives[i].isTestDriveClosed == false ? Icons.close : Icons.check,
-                          color: testDrives[i].isTestDriveClosed == false ? Colors.red : Colors.green),
+                          style: TextStyle(
+                              color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
                       Text(
-                        testDrives[i].user),
+                          testDrives[i].isTestDriveClosed == false
+                              ? testDrives[i].dateFinish.isAfter(DateTime.now())
+                                  ? 'в процессе'
+                                  : 'не завершен'
+                              : 'завершен',
+                          style: TextStyle(
+                              color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
+                      Icon(testDrives[i].isTestDriveClosed == false ? Icons.close : Icons.check,
+                          color:
+                              testDrives[i].isTestDriveClosed == false ? Colors.red : Colors.green),
+                      Text(testDrives[i].user),
                     ],
                   ),
                 ),
@@ -351,6 +368,7 @@ class HistoryTechnicPage extends StatelessWidget {
   }
 
   void _navigationOnTechnicView(Trouble trouble, BuildContext context) {
-    Navigator.push(context, animationRouteSlideTransition(LoadingOverlay(child: TroubleView(troubleMain: trouble))));
+    Navigator.push(context,
+        animationRouteSlideTransition(LoadingOverlay(child: TroubleView(troubleMain: trouble))));
   }
 }

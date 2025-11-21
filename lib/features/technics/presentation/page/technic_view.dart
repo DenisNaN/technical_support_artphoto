@@ -567,7 +567,8 @@ class _TechnicViewState extends State<TechnicView> {
     if (status == TestDriveStatus.inProcess) {
       return 'В процессе до ${_dateFinishTestDrive!.dateFormattedForInterface()}';
     } else {
-      return 'Завершен ${_dateFinishTestDrive!.dateFormattedForInterface()}';
+      return 'Завершен ${_dateFinishTestDrive!.toString() == "-0001-11-30 00:00:00.000" ||
+          _dateFinishTestDrive!.toString() == "0001-11-30 00:00:00.000" ? '/ Нет даты' : _dateFinishTestDrive!.dateFormattedForInterface()}';
     }
   }
 

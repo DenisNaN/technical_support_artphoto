@@ -1,12 +1,15 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:technical_support_artphoto/core/api/data/models/photosalon_location.dart';
 import 'package:technical_support_artphoto/core/api/data/models/repair_location.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/shared/loader_overlay/loading_overlay.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/widgets/grid_view_technics.dart';
 import 'package:technical_support_artphoto/features/technics/presentation/widgets/grid_view_technics_repair.dart';
 import 'package:technical_support_artphoto/features/troubles/models/trouble.dart';
+
+import '../../../technics/models/technic.dart';
 
 class GridViewHomePage extends StatelessWidget {
   final Map<String, dynamic> locations;
@@ -51,7 +54,8 @@ class GridViewHomePage extends StatelessWidget {
                   }
                 }
                 for (final trouble in troubles) {
-                  if (element.number == trouble.numberTechnic) {
+                  if (element.number == trouble.numberTechnic ||
+                      trouble.photosalon == nameLocation && trouble.numberTechnic == 0) {
                     isTroubleHas = true;
                     break;
                   }
@@ -79,16 +83,17 @@ class GridViewHomePage extends StatelessWidget {
                 ],
               ),
               child: OpenContainer(
-                onClosed: (_){
+                onClosed: (_) {
                   if (providerModel.getTechnicsClosedRepair.isNotEmpty && context.mounted) {
                     providerModel.clearTechnicsClosedRepair();
                   }
                 },
                 transitionDuration: Duration(milliseconds: 600),
                 openBuilder: (context, openContainer) {
-                  return isRepairLocation ?
-                  LoadingOverlay(child: GridViewTechnicsRepair(location: locations[nameLocation])) :
-                    GridViewTechnics(location: locations[nameLocation]);
+                  return isRepairLocation
+                      ? LoadingOverlay(
+                          child: GridViewTechnicsRepair(location: locations[nameLocation]))
+                      : GridViewTechnics(location: locations[nameLocation]);
                 },
                 closedBuilder: (context, openContainer) {
                   return GestureDetector(

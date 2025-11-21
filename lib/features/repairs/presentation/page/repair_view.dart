@@ -49,6 +49,8 @@ class _RepairViewState extends State<RepairView> {
     _recommendationsNotes.text = widget.repair.recommendationsNotes ?? '';
     _selectedDropdownStatusNew =
         widget.repair.newStatus != '' ? widget.repair.newStatus : null;
+    _selectedDropdownDislocationNew =
+    widget.repair.newDislocation != '' ? widget.repair.newDislocation : null;
     _dateReceipt = widget.repair.dateReceipt;
   }
 
@@ -743,7 +745,6 @@ class _RepairViewState extends State<RepairView> {
       }
       return TypeMessageForSaveRepairView.notWriteAllFieldStatus;
     }
-    // await addHistory(technic, nameUser);
   }
 
   Repair createRepair(){
@@ -771,30 +772,6 @@ class _RepairViewState extends State<RepairView> {
     );
     return repair;
   }
-
-  Future addHistory(Repair repair) async {
-    // String descForHistory = descriptionForHistory(repair);
-    // History historyForSQL = History(
-    //     History.historyList.last.id + 1,
-    //     'Repair',
-    //     repair.id!,
-    //     'create',
-    //     descForHistory,
-    //     LoginPassword.login,
-    //     DateFormat('yyyy.MM.dd').format(DateTime.now())
-    // );
-    //
-    // ConnectToDBMySQL.connDB.insertHistory(historyForSQL);
-    // HistorySQFlite.db.insertHistory(historyForSQL);
-    // History.historyList.insert(0, historyForSQL);
-  }
-
-  // String descriptionForHistory(Repair repair){
-  //   String internalID = repair.internalID == -1 ? 'БН' : '№${repair.internalID}';
-  //   String result = 'Заявка на ремонт $internalID добавленна';
-  //
-  //   return result;
-  // }
 
   void _viewSnackBar(IconData icon, bool isSuccessful, String successfulText,
       String notSuccessfulText, bool isSkipPrevSnackBar, Repair repair) {
