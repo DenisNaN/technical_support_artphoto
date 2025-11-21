@@ -637,13 +637,22 @@ class ConnectDbMySQL {
         troubleTechnicOnPeriod.isTroubleClosed = false;
       }
 
+      if(historyTechnics.length == 1){
+        if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[0].date) ||
+            troubleTechnicOnPeriod.date.compareTo(historyTechnics[0].date) == 0) {
+          historyTechnics[0].listTrouble.add(troubleTechnicOnPeriod);
+        }
+      }
+
       for (int i = 1; i < historyTechnics.length; i++) {
         if (i == 1) {
-          if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i - 1].date)) {
-            historyTechnics[i].listTrouble.add(troubleTechnicOnPeriod);
+          if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i - 1].date) ||
+              troubleTechnicOnPeriod.date.compareTo(historyTechnics[i - 1].date) == 0) {
+            historyTechnics[i - 1].listTrouble.add(troubleTechnicOnPeriod);
           }
         }
-        if (troubleTechnicOnPeriod.date.isAfter(historyTechnics[i].date) &&
+        if ((troubleTechnicOnPeriod.date.isAfter(historyTechnics[i].date) ||
+        troubleTechnicOnPeriod.date.compareTo(historyTechnics[i - 1].date) == 0) &&
             troubleTechnicOnPeriod.date.isBefore(historyTechnics[i - 1].date)) {
           historyTechnics[i].listTrouble.add(troubleTechnicOnPeriod);
           continue;
