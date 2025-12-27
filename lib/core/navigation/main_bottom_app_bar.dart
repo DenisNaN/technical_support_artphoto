@@ -4,7 +4,7 @@ import 'package:technical_support_artphoto/core/api/provider/provider_model.dart
 import 'package:technical_support_artphoto/core/shared/gradients.dart';
 
 class MainBottomAppBar extends StatefulWidget {
-  final PageController pageController;
+  final PageController? pageController;
 
   const MainBottomAppBar({super.key, required this.pageController});
 
@@ -34,8 +34,10 @@ class _MainBottomAppBarState extends State<MainBottomAppBar> {
           backgroundColor: Colors.transparent,
           onDestinationSelected: (int index) {
             setState(() {
-              widget.pageController
-                  .animateToPage(index, duration: const Duration(milliseconds: 600), curve: Curves.ease);
+              if(widget.pageController != null){
+                widget.pageController!
+                    .animateToPage(index, duration: const Duration(milliseconds: 600), curve: Curves.ease);
+              }
             });
           },
           indicatorColor: Colors.white,

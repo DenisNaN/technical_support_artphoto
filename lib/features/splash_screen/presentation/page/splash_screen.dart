@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/navigation/animation_navigation.dart';
 import 'package:technical_support_artphoto/features/auth/presentation/page/authorization.dart';
+import 'package:technical_support_artphoto/features/splash_screen/presentation/page/shimmer_page_auth.dart';
+import 'package:technical_support_artphoto/features/splash_screen/presentation/page/shimmer_page_home.dart';
+
 import '../../../../core/api/data/datasources/save_local_services.dart';
 import '../../../../core/api/data/models/user.dart';
 import '../../../../core/api/data/repositories/technical_support_repo_impl.dart';
@@ -62,38 +65,29 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 providerModel.initUser(user);
               }
               if (user != null && (user.isAutocomplete ?? false)) {
-                Navigator.pushReplacement(context, animationRouteSlideTransition(const ArtphotoTech()));
+                Navigator.pushReplacement(context, animationRouteFadeTransition(const ArtphotoTech()));
               } else {
                 Navigator.pushReplacement(context, animationRouteFadeTransition(const Authorization()));
               }
             });
           }
           return Scaffold(
-            body: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.blue, Colors.purple], begin: Alignment.topRight, end: Alignment.bottomLeft)),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset('assets/logo/logo.png'),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Техническая\n Поддержка',
-                    style: TextStyle(fontSize: 35),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  CircularProgressIndicator(),
-                ],
-              ),
-            ),
+            body: isAuthPage(providerModel, localServices),
           );
         });
+  }
+
+  StatefulWidget isAuthPage(ProviderModel providerModel, SaveLocalServices localServices){
+    User? user = localServices.getUser();
+
+    if(user != null){
+      providerModel.initUser(user);
+    }
+    if (user != null && (user.isAutocomplete ?? false)) {
+      return ShimmerPageHome();
+    } else {
+      return ShimmerPageAuth();
+    }
   }
 }
 
