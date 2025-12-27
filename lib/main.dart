@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -110,6 +111,10 @@ class _ArtphotoTechState extends State<ArtphotoTech> {
   late int _totalNotifications;
   late final FirebaseMessaging _messaging;
   PushNotification? _notificationInfo;
+
+  DateTime? currentBackPressTime;
+  bool canPopNow = false;
+  int requiredSeconds = 2;
 
   @override
   void initState() {
@@ -230,7 +235,54 @@ class _ArtphotoTechState extends State<ArtphotoTech> {
   Widget build(BuildContext context) {
     return Scaffold(
         bottomNavigationBar: MainBottomAppBar(pageController: pageViewController),
-        body: MainBottomPageView(pageController: pageViewController)
+        body: PopScope(
+            canPop: false,
+            onPopInvokedWithResult: (bool didPop, Object? result) async {
+              final bool shouldPop = await _onPopInvokedWithResult();
+              if (shouldPop) {
+                SystemNavigator.pop();
+              }
+            },
+            child: MainBottomPageView(pageController: pageViewController))
     );
   }
-}
+
+  Future<bool> _onPopInvokedWithResult() {
+      _showSnackBar();
+      DateTime now = DateTime.now();
+      if (currentBackPressTime == null ||
+          now.difference(currentBackPressTime!) > Duration(seconds: requiredSeconds)) {
+        currentBackPressTime = now;
+        return Future.delayed(Duration.zero, (){
+          return false;
+        });
+      }
+      return Future.delayed(Duration.zero, (){
+        return true;
+      });
+    }
+
+  void _showSnackBar(){
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)
+        ),
+        // padding: EdgeInsets.all(20),
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Icon(Icons.exit_to_app, size: 40, color: Colors.black),
+            SizedBox(width: 5,),
+            Flexible(child: const Text('Для выхода нажмите назад, еще раз', style: TextStyle(color: Colors.black),)),
+          ],
+        ),
+        backgroundColor: Color(0xFFFFD039),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+  }
