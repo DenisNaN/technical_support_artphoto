@@ -14,7 +14,6 @@ import 'package:technical_support_artphoto/core/api/data/models/user.dart';
 import 'package:technical_support_artphoto/core/api/provider/provider_model.dart';
 import 'package:technical_support_artphoto/core/di/init_dependencies.dart';
 import 'package:technical_support_artphoto/core/navigation/main_bottom_page_view.dart';
-// import 'package:technical_support_artphoto/core/shared/failed_application/send_mail_failed_app.dart';
 import 'package:technical_support_artphoto/features/home/presentation/page/home_page.dart';
 import 'package:technical_support_artphoto/features/notifications/models/push_notifications.dart';
 import 'package:technical_support_artphoto/features/notifications/presentation/widgets/notification_badge.dart';
@@ -113,7 +112,6 @@ class _ArtphotoTechState extends State<ArtphotoTech> {
   PushNotification? _notificationInfo;
 
   DateTime? currentBackPressTime;
-  bool canPopNow = false;
   int requiredSeconds = 2;
 
   @override
