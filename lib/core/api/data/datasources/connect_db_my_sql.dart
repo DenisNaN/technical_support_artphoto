@@ -1017,7 +1017,7 @@ class ConnectDbMySQL {
             index++;
             continue;
           }
-          if (index > 18) break;
+          if (index > 19) break;
           SuppliesEntity entity = SuppliesEntity(element.key, int.tryParse(element.value) ?? 0);
           suppliesEntity.add(entity);
           index++;
