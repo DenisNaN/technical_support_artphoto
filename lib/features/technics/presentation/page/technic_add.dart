@@ -32,6 +32,7 @@ class _TechnicAddState extends State<TechnicAdd> {
   String? _selectedDropdownStatus;
   bool isBN = false;
   bool isExistNumber = false;
+  String freeNumbers = '';
 
   final GlobalKey<FormState> _formInnerNumberKey = GlobalKey<FormState>();
 
@@ -56,7 +57,8 @@ class _TechnicAddState extends State<TechnicAdd> {
   Widget build(BuildContext context) {
     final providerModel = Provider.of<ProviderModel>(context);
     return Scaffold(
-        appBar: CustomAppBar(typePage: TypePage.addTechnic, location: null, technic: null),
+        appBar: CustomAppBar(
+            typePage: TypePage.addTechnic, location: null, technic: null),
         body: SafeArea(
           bottom: true,
           child: Form(
@@ -87,25 +89,41 @@ class _TechnicAddState extends State<TechnicAdd> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
+                        style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStatePropertyAll(Colors.grey)),
                         child: Text("Отмена"),
                       ),
                       ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            if (_innerNumberTechnic.text != '' && !isBN) {
+                              FreeNumbersForTechnic freeNumber = await TechnicalSupportRepoImpl.downloadData
+                                  .checkNumberTechnic(_innerNumberTechnic.text);
+                              isExistNumber = !freeNumber.isFreeNumber;
+                              freeNumbers = freeNumber.freeNumbers.toString();
+                            }
+
                             if (_formInnerNumberKey.currentState!.validate()) {
                               Technic technic = Technic(
                                   0,
-                                  !isBN ? int.parse(_innerNumberTechnic.text) : 0,
+                                  !isBN
+                                      ? int.parse(_innerNumberTechnic.text)
+                                      : 0,
                                   _selectedDropdownCategory!,
                                   _nameTechnic.text,
                                   _selectedDropdownStatus!,
                                   _selectedDropdownDislocation!,
                                   _dateBuyTechnic ?? DateTime.now(),
-                                  int.parse(_costTechnic.text.replaceAll(",", "")),
+                                  int.parse(
+                                      _costTechnic.text.replaceAll(",", "")),
                                   _comment.text);
 
                               _save(technic, providerModel).then((_) {
-                                _viewSnackBar(Icons.save, true, 'Техника сохранена', 'Техника не сохранена');
+                                _viewSnackBar(
+                                    Icons.save,
+                                    true,
+                                    'Техника сохранена',
+                                    'Техника не сохранена');
                               });
                             }
                           },
@@ -148,14 +166,15 @@ class _TechnicAddState extends State<TechnicAdd> {
               child: ListTile(
                 title: TextFormField(
                   enabled: !isBN,
-                  decoration: myDecorationTextFormField(!isBN ? 'Номер техники' : 'Без номера'),
+                  decoration: myDecorationTextFormField(
+                      !isBN ? 'Номер техники' : 'Без номера',),
                   controller: _innerNumberTechnic,
                   validator: (value) {
                     if (value!.isEmpty && !isBN) {
                       return 'Обязательное поле';
                     }
                     if (isExistNumber) {
-                      return 'Номер занят';
+                      return 'Номер занят. Свободные номера $freeNumbers';
                     }
                     return null;
                   },
@@ -180,7 +199,9 @@ class _TechnicAddState extends State<TechnicAdd> {
           ),
           onPressed: () async {
             if (_innerNumberTechnic.text != '' && !isBN) {
-              TechnicalSupportRepoImpl.downloadData.checkNumberTechnic(_innerNumberTechnic.text).then((result) {
+              TechnicalSupportRepoImpl.downloadData
+                  .checkNumberTechnic(_innerNumberTechnic.text)
+                  .then((result) {
                 _viewSnackBarCheckEmptyNumberTechnic(result);
               });
             }
@@ -212,7 +233,8 @@ class _TechnicAddState extends State<TechnicAdd> {
               borderRadius: BorderRadius.circular(10.0),
               hint: const Text('Техника'),
               value: _selectedDropdownCategory,
-              items: providerModel.namesEquipments.map<DropdownMenuItem<String>>((String value) {
+              items: providerModel.namesEquipments
+                  .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -312,7 +334,8 @@ class _TechnicAddState extends State<TechnicAdd> {
           padding: const EdgeInsets.only(left: 55, right: 55, top: 6),
           child: ListTile(
             title: Text(
-              DateFormat('d MMMM yyyy', 'ru_RU').format(_dateBuyTechnic ?? DateTime.now()),
+              DateFormat('d MMMM yyyy', 'ru_RU')
+                  .format(_dateBuyTechnic ?? DateTime.now()),
               style: TextStyle(color: Colors.black54),
             ),
             tileColor: Colors.blue.shade50,
@@ -377,15 +400,16 @@ class _TechnicAddState extends State<TechnicAdd> {
               }).toList(),
               onChanged: (String? value) {
                 setState(() {
-                  if(value != null && _selectedDropdownStatus != 'В ремонте' &&
-                      value == 'В ремонте'){
+                  if (value != null &&
+                      _selectedDropdownStatus != 'В ремонте' &&
+                      value == 'В ремонте') {
                     _selectedDropdownDislocation = null;
-                  }else if(value != null && _selectedDropdownStatus == 'В ремонте' &&
-                      value != 'В ремонте'){
+                  } else if (value != null &&
+                      _selectedDropdownStatus == 'В ремонте' &&
+                      value != 'В ремонте') {
                     _selectedDropdownDislocation = null;
                   }
                   _selectedDropdownStatus = value;
-
                 });
               },
             ),
@@ -417,18 +441,21 @@ class _TechnicAddState extends State<TechnicAdd> {
               hint: const Text('Дислокация'),
               value: _selectedDropdownDislocation,
               validator: (value) => value == null ? "Обязательное поле" : null,
-              items: _selectedDropdownStatus == 'В ремонте' ? providerModel.services.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList() :
-              providerModel.namesDislocation.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
+              items: _selectedDropdownStatus == 'В ремонте'
+                  ? providerModel.services
+                      .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList()
+                  : providerModel.namesDislocation
+                      .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
               onChanged: (String? value) {
                 setState(() {
                   _selectedDropdownDislocation = value!;
@@ -458,7 +485,8 @@ class _TechnicAddState extends State<TechnicAdd> {
           title: Padding(
             padding: const EdgeInsets.only(left: 40, right: 40),
             child: TextFormField(
-              decoration: myDecorationTextFormField(null, "Комментарий (необязательно)"),
+              decoration: myDecorationTextFormField(
+                  null, "Комментарий (необязательно)"),
               controller: _comment,
               maxLines: 3,
             ),
@@ -471,16 +499,17 @@ class _TechnicAddState extends State<TechnicAdd> {
   Future<bool> _save(Technic technic, ProviderModel providerModel) async {
     LoadingOverlay.of(context).show();
     String nameUser = providerModel.user.name;
-    int? id = await TechnicalSupportRepoImpl.downloadData.saveTechnic(technic, nameUser);
-    if(id != null){
+    int? id = await TechnicalSupportRepoImpl.downloadData
+        .saveTechnic(technic, nameUser);
+    if (id != null) {
       technic.id = id;
       addTechnicInProviderModel(technic, providerModel);
-      if(mounted){
+      if (mounted) {
         LoadingOverlay.of(context).hide();
       }
       return true;
     }
-    if(mounted){
+    if (mounted) {
       LoadingOverlay.of(context).hide();
     }
     return false;
@@ -488,7 +517,8 @@ class _TechnicAddState extends State<TechnicAdd> {
 
   void addTechnicInProviderModel(Technic technic, ProviderModel providerModel) {
     String dislocation = technic.dislocation;
-    if (providerModel.technicsInPhotosalons.keys.any((element) => element == dislocation)) {
+    if (providerModel.technicsInPhotosalons.keys
+        .any((element) => element == dislocation)) {
       providerModel.addTechnicInPhotosalon(dislocation, technic);
     } else {
       providerModel.addTechnicInStorage(dislocation, technic);
@@ -503,17 +533,20 @@ class _TechnicAddState extends State<TechnicAdd> {
   }
 
   String getDateFormat(String date) {
-    return DateFormat("d MMMM yyyy", "ru_RU").format(DateTime.parse(date.replaceAll('.', '-')));
+    return DateFormat("d MMMM yyyy", "ru_RU")
+        .format(DateTime.parse(date.replaceAll('.', '-')));
   }
 
-  void _viewSnackBar(IconData icon, bool isSuccessful, String successText, String notSuccessText) {
+  void _viewSnackBar(IconData icon, bool isSuccessful, String successText,
+      String notSuccessText) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           mainAxisSize: MainAxisSize.max,
           children: [
-            Icon(icon, size: 40, color: isSuccessful ? Colors.green : Colors.red),
+            Icon(icon,
+                size: 40, color: isSuccessful ? Colors.green : Colors.red),
             SizedBox(
               width: 20,
             ),
@@ -527,16 +560,23 @@ class _TechnicAddState extends State<TechnicAdd> {
     Navigator.pop(context);
   }
 
-  void _viewSnackBarCheckEmptyNumberTechnic(FreeNumbersForTechnic freeNumbersForTechnic) {
+  void _viewSnackBarCheckEmptyNumberTechnic(
+      FreeNumbersForTechnic freeNumbersForTechnic) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           mainAxisSize: MainAxisSize.max,
           children: [
-            Icon(Icons.bolt, size: 40, color: freeNumbersForTechnic.isFreeNumber ? Colors.green : Colors.red),
-            Flexible(child: Text(freeNumbersForTechnic.isFreeNumber ? 'Номер свободен' :
-            'Номер занят!\nВыберите другой номер.\nНапример: ${freeNumbersForTechnic.freeNumbers.toString()}')),
+            Icon(Icons.bolt,
+                size: 40,
+                color: freeNumbersForTechnic.isFreeNumber
+                    ? Colors.green
+                    : Colors.red),
+            Flexible(
+                child: Text(freeNumbersForTechnic.isFreeNumber
+                    ? 'Номер свободен'
+                    : 'Номер занят!\nВыберите другой номер.\nНапример: ${freeNumbersForTechnic.freeNumbers.toString()}')),
           ],
         ),
         duration: const Duration(seconds: 5),
@@ -552,7 +592,8 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
   static const thousandSeparator = ',';
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     if (!validationRegex.hasMatch(newValue.text)) {
       return oldValue;
     }
@@ -580,13 +621,17 @@ class IntegerCurrencyInputFormatter extends TextInputFormatter {
     }
 
     /// Handle moving cursor.
-    final initialNumberOfPrecedingSeparators = oldValue.text.characters.where((e) => e == thousandSeparator).length;
-    final newNumberOfPrecedingSeparators = formattedText.characters.where((e) => e == thousandSeparator).length;
-    final additionalOffset = newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
+    final initialNumberOfPrecedingSeparators =
+        oldValue.text.characters.where((e) => e == thousandSeparator).length;
+    final newNumberOfPrecedingSeparators =
+        formattedText.characters.where((e) => e == thousandSeparator).length;
+    final additionalOffset =
+        newNumberOfPrecedingSeparators - initialNumberOfPrecedingSeparators;
 
     return newValue.copyWith(
       text: formattedText,
-      selection: TextSelection.collapsed(offset: newValue.selection.baseOffset + additionalOffset),
+      selection: TextSelection.collapsed(
+          offset: newValue.selection.baseOffset + additionalOffset),
     );
   }
 }

@@ -41,6 +41,7 @@ InputDecoration myDecorationTextFormField([String? labelText, String? hintText, 
       errorBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.red, width: 1),
           borderRadius: BorderRadius.circular(15)),
+      errorMaxLines: 2,
       labelText: labelText,
       labelStyle: TextStyle(fontStyle: FontStyle.italic, color: Colors.black45),
       hintText: hintText,
