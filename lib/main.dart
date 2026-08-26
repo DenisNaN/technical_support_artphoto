@@ -57,7 +57,7 @@ void main() {
     },
         (Object error, StackTrace stack) {
           SaveLocalServices localServices = SaveLocalServices();
-          User? user = localServices.getUser();
+          // User? user = localServices.getUser();
           // sendEmailNewTrouble(error: error, stack: stack, flutterErrorDetails: '', user: user);
           debugPrint('ARTPHOTO [CrashEvent] [DEBUG] $error\n$stack');
     },

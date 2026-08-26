@@ -20,7 +20,7 @@ class GridViewSuppliesPaper extends StatelessWidget {
     List<SuppliesEntity> actualSuppliesOffice = [];
 
     if(isPaint){
-      for(int i = 10; i < providerModel.getSuppliesGarage.suppliesEntity.length ; i++){
+      for(int i = 11; i < providerModel.getSuppliesGarage.suppliesEntity.length; i++){
         actualSuppliesGarage.add(providerModel.getSuppliesGarage.suppliesEntity[i]);
         actualSuppliesOffice.add(providerModel.getSuppliesOffice.suppliesEntity[i]);
       }
